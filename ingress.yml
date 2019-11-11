@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: diss-backend
+  annotations:
+    kubernetes.io/ingres.class: "nginx"
+spec:
+  rules:
+  - host: diss-backend.test.com # 内网环境的测试，可以根据 云环境、自定义环境配置
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: diss-backend
+          servicePort: 8080
+# tls 为自签名证书 
+  tls:
+  - hosts: 
+    - diss-backend.test.com
+    secretName: rest-tls
+

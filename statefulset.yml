@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: diss-backend-mariadb
+spec:
+  replicas: 1
+  selector: # 必要参数
+    matchLabels:
+      app: diss-backend-mariadb
+  serviceName: diss-backend-mariadb #必要参数
+  template:
+    metadata:
+      labels:
+        app: diss-backend-mariadb # 此处对应 service的labels
+    spec:
+      containers:
+      - env:
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: pwd
+              name: diss-backend-secret
+        - name: MARIADB_USER
+          value: diss-backend
+        - name: MARIADB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: pwd
+              name: diss-backend-secret
+        - name: MARIADB_DATABASE
+          value: diss-backend 
+        name: mariadb
+        image: docker.io/bitnami/mariadb:10.1.35-debian-9
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3306
+          name: mysql
+          protocol: TCP
+        resources: 
+          limits:
+            cpu: 1000m
+            memory: 1024Mi
+          requests:
+            cpu: 300m
+            memory: 256Mi
+        volumeMounts:
+        - name: diss-backend-data
+          mountPath: /data/diss-backend/mysql
+      volumes:
+      - name: diss-backend-data
+        emptyDir: {}

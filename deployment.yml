@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: diss-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: diss-backend
+  template:
+    metadata:
+      labels:
+        app: diss-backend
+    spec:
+      containers:
+      - env:
+        - name: ALLOW_EMPTY_PASSWORD
+          value: "yes"
+        - name: MARIADB_HOST
+          value: diss-backend-mariadb
+        - name: MARIADB_PORT_NUMBER
+          value: "3306"
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: pwd
+              name: diss-backend-secret
+        - name: MARIADB_USER
+          value: diss-backend
+        - name: MARIADB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: pwd
+              name: diss-backend-secret
+        - name: MARIADB_DATABASE
+          value: diss-backend 
+        name: diss-backend
+        image: xiliangma/diss-backend:statefulset-test
+        imagePullPolicy: Always
+        ports:
+        - name: dev
+          containerPort: 8080
+        - name: prod
+          containerPort: 8088
+        - name: https
+          containerPort: 443
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1024Mi
+          requests:
+            cpu: 300m
+            memory: 256Mi
+        livenessProbe:
+          httpGet:
+            path: /swagger
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - mountPath: /data/diss-backend
+          name: diss-backend-data
+      volumes:
+      - name: diss-backend-data
+        emptyDir: {}
+
