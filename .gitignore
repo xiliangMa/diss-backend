@@ -1,5 +1,7 @@
 # IDE files
-.idea*
+.idea
+.idea/*
+.idea/workspace.xml
 *.log*
 .DS_Store
 
@@ -9,7 +11,8 @@
 diss-backend
 logs*
 swagger/*
-swagge.zip
+swagger.zip
+router/comments*
 
 
 lastupdate.tmp
