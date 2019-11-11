@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/astaxie/beego"
-	_ "github.com/xiliangMa/restapi/routers"
-	_ "github.com/xiliangMa/restapi/sysinit"
+	_ "github.com/xiliangMa/diss-backend/routers"
+	_ "github.com/xiliangMa/diss-backend/sysinit"
 )
 
 func main() {

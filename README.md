@@ -1,7 +1,7 @@
 ## run
 
     set env:
-        MARIADB_DATABASE=uranus_local;MARIADB_USER=root;MARIADB_PASSWORD=abc123123;MARIADB_HOST=127.0.0.1
+        MARIADB_DATABASE=diss;MARIADB_USER=diss;MARIADB_PASSWORD=abc123;MARIADB_HOST=127.0.0.1
     
     go build:
         go build -o diss-backend
@@ -9,7 +9,7 @@
     run：
         bee run -gendoc=true -downdoc=true
         
-    run by restapi：
+    run by diss-backend：
         ./diss-backend
 
 ## build image

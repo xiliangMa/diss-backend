@@ -7,7 +7,7 @@ import (
 
 func init() {
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:AuthController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:AuthController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:AuthController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:AuthController"],
         beego.ControllerComments{
             Method: "Authorize",
             Router: `/authorize`,
@@ -16,7 +16,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:AuthController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:AuthController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:AuthController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:AuthController"],
         beego.ControllerComments{
             Method: "Signin",
             Router: `/signin`,
@@ -25,7 +25,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:ClusterController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:ClusterController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:ClusterController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:ClusterController"],
         beego.ControllerComments{
             Method: "ClusterList",
             Router: `/`,
@@ -34,7 +34,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:ClusterController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:ClusterController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:ClusterController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:ClusterController"],
         beego.ControllerComments{
             Method: "DeleteCluster",
             Router: `/:id`,
@@ -43,7 +43,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:ClusterController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:ClusterController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:ClusterController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:ClusterController"],
         beego.ControllerComments{
             Method: "AddCluster",
             Router: `/addCluster`,
@@ -52,7 +52,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:HostController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:HostController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"],
         beego.ControllerComments{
             Method: "HostList",
             Router: `/`,
@@ -61,7 +61,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:HostController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:HostController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"],
         beego.ControllerComments{
             Method: "DeleteHost",
             Router: `/:id`,
@@ -70,7 +70,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:HostController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:HostController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"],
         beego.ControllerComments{
             Method: "AddHost",
             Router: `/addhost`,
@@ -79,7 +79,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderDetailController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderDetailController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderDetailController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderDetailController"],
         beego.ControllerComments{
             Method: "OrderDetailList",
             Router: `/`,
@@ -88,7 +88,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderDetailController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderDetailController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderDetailController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderDetailController"],
         beego.ControllerComments{
             Method: "DeleteOrderDetail",
             Router: `/:id`,
@@ -97,7 +97,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderDetailController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderDetailController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderDetailController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderDetailController"],
         beego.ControllerComments{
             Method: "AddOrderDetail",
             Router: `/addOrderDetail`,
@@ -106,7 +106,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderMasterController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderMasterController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderMasterController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderMasterController"],
         beego.ControllerComments{
             Method: "OrderMasterList",
             Router: `/`,
@@ -115,7 +115,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderMasterController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderMasterController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderMasterController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderMasterController"],
         beego.ControllerComments{
             Method: "DeleteOrderMaster",
             Router: `/:id`,
@@ -124,7 +124,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderMasterController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderMasterController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderMasterController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderMasterController"],
         beego.ControllerComments{
             Method: "AddOrderMaster",
             Router: `/addOrderMaster`,
@@ -133,7 +133,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderRenewalController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderRenewalController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderRenewalController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderRenewalController"],
         beego.ControllerComments{
             Method: "OrderRenewalList",
             Router: `/`,
@@ -142,7 +142,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderRenewalController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderRenewalController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderRenewalController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderRenewalController"],
         beego.ControllerComments{
             Method: "DeleteOrderRenewal",
             Router: `/:id`,
@@ -151,7 +151,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderRenewalController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:OrderRenewalController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderRenewalController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:OrderRenewalController"],
         beego.ControllerComments{
             Method: "AddOrderRenewal",
             Router: `/addOrderRenewal`,
@@ -160,7 +160,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:PromotionController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:PromotionController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:PromotionController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:PromotionController"],
         beego.ControllerComments{
             Method: "PromotionList",
             Router: `/`,
@@ -169,7 +169,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:PromotionController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:PromotionController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:PromotionController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:PromotionController"],
         beego.ControllerComments{
             Method: "DeletePromotion",
             Router: `/:id`,
@@ -178,7 +178,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:PromotionController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:PromotionController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:PromotionController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:PromotionController"],
         beego.ControllerComments{
             Method: "AddPromotion",
             Router: `/addPromotion`,
@@ -187,7 +187,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:RancherServerController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:RancherServerController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:RancherServerController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:RancherServerController"],
         beego.ControllerComments{
             Method: "RancherServerList",
             Router: `/`,
@@ -196,7 +196,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:RancherServerController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:RancherServerController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:RancherServerController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:RancherServerController"],
         beego.ControllerComments{
             Method: "DeleteRancherServer",
             Router: `/:id`,
@@ -205,7 +205,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:RancherServerController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:RancherServerController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:RancherServerController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:RancherServerController"],
         beego.ControllerComments{
             Method: "AddRancherServer",
             Router: `/addRancherServer`,
@@ -214,7 +214,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:UserController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:UserController"],
         beego.ControllerComments{
             Method: "UserList",
             Router: `/`,
@@ -223,7 +223,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:UserController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:UserController"],
         beego.ControllerComments{
             Method: "DeleteUser",
             Router: `/:id`,
@@ -232,7 +232,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:UserController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:UserController"],
         beego.ControllerComments{
             Method: "AddUser",
             Router: `/addUser`,
@@ -241,7 +241,7 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/restapi/controllers:UserController"],
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:UserController"],
         beego.ControllerComments{
             Method: "UserInfo",
             Router: `/info`,

@@ -22,6 +22,7 @@ func initDB() {
 	//dbName := beego.AppConfig.String(dbType + "::db_name")
 	dbName := os.Getenv("MARIADB_DATABASE");
 
+
 	//数据库连接用户名
 	//dbUser := beego.AppConfig.String(dbType + "::db_user")
 	dbUser := os.Getenv("MARIADB_USER")

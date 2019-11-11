@@ -3,8 +3,8 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
-	"github.com/xiliangMa/restapi/models"
-	"github.com/xiliangMa/restapi/utils"
+	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/utils"
 )
 
 type AuthController struct {

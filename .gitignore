@@ -1,0 +1,15 @@
+# IDE files
+.idea*
+*.log*
+.DS_Store
+
+
+
+#diss-backend
+diss-backend
+logs*
+swagger/*
+swagge.zip
+
+
+lastupdate.tmp

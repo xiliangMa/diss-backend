@@ -3,7 +3,7 @@ package models
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"github.com/xiliangMa/restapi/utils"
+	"github.com/xiliangMa/diss-backend/utils"
 	"time"
 )
 

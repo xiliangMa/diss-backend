@@ -3,7 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/astaxie/beego"
-	"github.com/xiliangMa/restapi/models"
+	"github.com/xiliangMa/diss-backend/models"
 )
 
 // Promotion object api list
