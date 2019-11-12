@@ -12,7 +12,7 @@ diss-backend
 logs*
 swagger/*
 swagger.zip
-router/comments*
+routers/commentsRouter_controllers.go
 
 
 lastupdate.tmp

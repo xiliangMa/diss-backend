@@ -1,11 +1,7 @@
 // @APIVersion 1.0.0
-// @Title Backend Service API
-// @Description Backend Service API
-// @TermsOfServiceUrl http://beego.me/
+// @Title DISS API
+// @Description DISS API
 // @Schemes [http]
-// @Contact astaxie@gmail.com
-// @License MIT License
-// @LicenseUrl https://opensource.org/licenses/MIT
 
 package routers
 
@@ -24,46 +20,6 @@ func init() {
 				&controllers.HostController{},
 			),
 		),
-		beego.NSNamespace("/clusters",
-			beego.NSInclude(
-				&controllers.ClusterController{},
-			),
-		),
-		beego.NSNamespace("/rancherservers",
-			beego.NSInclude(
-				&controllers.RancherServerController{},
-			),
-		),
-		beego.NSNamespace("/users",
-			beego.NSInclude(
-				&controllers.UserController{},
-			),
-		),
-		beego.NSNamespace("/promotions",
-			beego.NSInclude(
-				&controllers.PromotionController{},
-			),
-		),
-		beego.NSNamespace("/auth",
-			beego.NSInclude(
-				&controllers.AuthController{},
-			),
-		),
-		beego.NSNamespace("/ordermaster",
-			beego.NSInclude(
-				&controllers.OrderMasterController{},
-			),
-		),
-		beego.NSNamespace("/orderrenewal",
-			beego.NSInclude(
-				&controllers.OrderRenewalController{},
-			),
-		),
-		beego.NSNamespace("/orderdetail",
-			beego.NSInclude(
-				&controllers.OrderDetailController{},
-			),
-		),
 	)
 
 	var isLogin = func(ctx *context.Context) {
@@ -76,14 +32,6 @@ func init() {
 
 	}
 	beego.InsertFilter("/v1/hosts/*", beego.BeforeRouter, isLogin)
-	beego.InsertFilter("/v1/clusters/*", beego.BeforeRouter, isLogin)
-	beego.InsertFilter("/v1/rancherservers/", beego.BeforeRouter, isLogin)
-	beego.InsertFilter("/v1/promotions/*", beego.BeforeRouter, isLogin)
-	beego.InsertFilter("/v1/users/*", beego.BeforeRouter, isLogin)
-	beego.InsertFilter("/v1/ordemaster/*", beego.BeforeRouter, isLogin)
-	beego.InsertFilter("/v1/orderrenewal/*", beego.BeforeRouter, isLogin)
-	beego.InsertFilter("/v1/orderdetail/*", beego.BeforeRouter, isLogin)
-
 
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins:  true,
