@@ -2,9 +2,11 @@
 // @Title Backend Service API
 // @Description Backend Service API
 // @TermsOfServiceUrl http://beego.me/
+// @Schemes [http]
 // @Contact astaxie@gmail.com
 // @License MIT License
 // @LicenseUrl https://opensource.org/licenses/MIT
+
 package routers
 
 import (
