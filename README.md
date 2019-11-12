@@ -1,7 +1,10 @@
 ## run
-
+```
     set env:
-        MARIADB_DATABASE=diss;MARIADB_USER=diss;MARIADB_PASSWORD=abc123;MARIADB_HOST=127.0.0.1
+        MARIADB_DATABASE=diss
+        MARIADB_USER=diss
+        MARIADB_PASSWORD=pwd
+        MARIADB_HOST=DBIP
     
     go build:
         go build -o diss-backend
@@ -11,6 +14,8 @@
         
     run by diss-backend：
         ./diss-backend
+```
+    
 
 ## build image
 
