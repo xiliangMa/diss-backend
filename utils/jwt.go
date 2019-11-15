@@ -2,60 +2,47 @@ package utils
 
 import (
 	"fmt"
+	"github.com/astaxie/beego"
 	"github.com/dgrijalva/jwt-go"
-	"reflect"
+	"net/http"
 	"time"
 )
 
 var (
-	secret []byte = []byte("Hello World！This is jwt test demo!")
+	secret []byte = []byte("secret")
 )
 
-func GenToken(name, pwd string) (string, int) {
-	claims := &jwt.StandardClaims{
-		Id:        name,
-		NotBefore: int64(time.Now().Unix()),
-		ExpiresAt: int64(time.Now().Unix() + 1800000*6),
-		Issuer:    "Bitch",
-	}
+func GreateToken(name, pwd string) (string, int) {
+	if name == beego.AppConfig.String("system::AdminUser") && pwd == beego.AppConfig.String("system::AdminPwd") {
+		// Create token
+		token := jwt.New(jwt.SigningMethodHS256)
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	ss, err := token.SignedString(secret)
-	if err != nil {
-		return err.Error(), SiginErr
+		claims := token.Claims.(jwt.MapClaims)
+		claims["name"] = "Jon Snow"
+		claims["admin"] = true
+		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+
+		t, err := token.SignedString([]byte("secret"))
+		if err != nil {
+			return err.Error(), SiginErr
+		}
+		return t, http.StatusOK
 	}
-	return ss, Success
+	return http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized
 }
 
-func CheckToken(token string) (string, int) {
-	_, err := jwt.Parse(token, func(*jwt.Token) (interface{}, error) {
+func CheckToken(tokenString string) (string, int) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
 		return secret, nil
 	})
-	if err != nil {
+
+	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return "", http.StatusOK
+	} else {
 		return err.Error(), AuthorizeErr
 	}
-	return "", Success
-}
-
-func ParseToken(tokenSrt string, SecretKey []byte) (claims jwt.Claims, err error) {
-	var token *jwt.Token
-	token, err = jwt.Parse(tokenSrt, func(*jwt.Token) (interface{}, error) {
-		return SecretKey, nil
-	})
-	claims = token.Claims
-	return
-}
-
-func GetNameFromClaims(key string, claims jwt.Claims) string {
-	v := reflect.ValueOf(claims)
-	if v.Kind() == reflect.Map {
-		for _, k := range v.MapKeys() {
-			value := v.MapIndex(k)
-
-			if fmt.Sprintf("%s", k.Interface()) == key {
-				return fmt.Sprintf("%v", value.Interface())
-			}
-		}
-	}
-	return ""
 }

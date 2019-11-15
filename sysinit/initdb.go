@@ -10,7 +10,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-
 func initDB() {
 
 	dbType := beego.AppConfig.String("db::db_type")
@@ -20,8 +19,7 @@ func initDB() {
 
 	//数据库名称
 	//dbName := beego.AppConfig.String(dbType + "::db_name")
-	dbName := os.Getenv("MARIADB_DATABASE");
-
+	dbName := os.Getenv("MARIADB_DATABASE")
 
 	//数据库连接用户名
 	//dbUser := beego.AppConfig.String(dbType + "::db_user")
@@ -55,4 +53,3 @@ func initDB() {
 	//auto create db
 	orm.RunSyncdb("default", force, isDev)
 }
-

@@ -11,18 +11,18 @@ type AuthController struct {
 	beego.Controller
 }
 
-// @Title Signin
-// @Description get auth
-// @Param name query string true "user name"
-// @Param pwd query string true "user pwd"
+// @Title login
+// @Description login
+// @Param name query string true "UserName"
+// @Param pwd query string true "UserPwd"
 // @Success 200 {object} models.Result
-// @router /signin [post]
-func (this *AuthController) Signin() {
+// @router /login [post]
+func (this *AuthController) Login() {
 	name := this.GetString("name")
 	pwd := this.GetString("pwd")
 
 	var ResultData models.Result
-	result, code := utils.GenToken(name, pwd)
+	result, code := utils.GreateToken(name, pwd)
 	ResultData.Code = code
 	if code != utils.Success {
 		ResultData.Message = result
@@ -33,20 +33,20 @@ func (this *AuthController) Signin() {
 	this.ServeJSON(false)
 }
 
-// @Title authorize
-// @Description authorize
-// @Param token header string true "Auth token"
+// @Title Authorization
+// @Description Authorization
+// @Param authorization header string true "Token"
 // @Success 200 {object} models.Result
-// @router /authorize [post]
+// @router /Authorization [post]
 func (this *AuthController) Authorize() {
-	token := this.GetString("token")
 
+	token := this.Ctx.Request.Header.Get("authorization")
 	var ResultData models.Result
 	result, code := utils.CheckToken(token)
 	ResultData.Code = code
 	if code != utils.Success {
 		ResultData.Message = result
-		logs.Error("Authorize failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error("Authorization failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 	} else {
 		ResultData.Data = result
 	}
