@@ -1,8 +1,6 @@
 // @APIVersion 1.0.0
 // @Title DISS API
 // @Description DISS API
-// @Schemes [http]
-
 package routers
 
 import (
@@ -18,6 +16,11 @@ func init() {
 		beego.NSNamespace("/hosts",
 			beego.NSInclude(
 				&controllers.HostController{},
+			),
+		),
+		beego.NSNamespace("/auth",
+			beego.NSInclude(
+				&controllers.AuthController{},
 			),
 		),
 	)

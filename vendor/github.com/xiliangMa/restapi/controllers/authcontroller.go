@@ -3,8 +3,8 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
-	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/utils"
+	"github.com/xiliangMa/restapi/models"
+	"github.com/xiliangMa/restapi/utils"
 )
 
 type AuthController struct {
@@ -20,7 +20,6 @@ type AuthController struct {
 func (this *AuthController) Signin() {
 	name := this.GetString("name")
 	pwd := this.GetString("pwd")
-
 	var ResultData models.Result
 	result, code := utils.GenToken(name, pwd)
 	ResultData.Code = code

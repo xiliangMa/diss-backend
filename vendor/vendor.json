@@ -147,6 +147,12 @@
 			"revisionTime": "2018-09-06T18:38:39Z"
 		},
 		{
+			"checksumSHA1": "cIiyvAduLLFvu+tg1Qr5Jw3jeWo=",
+			"path": "github.com/jtolds/gls",
+			"revision": "b4936e06046bbecbb94cae9c18127ebe510a2cb9",
+			"revisionTime": "2018-11-10T20:28:10Z"
+		},
+		{
 			"checksumSHA1": "9CxtAyVNPsScpfghpxfapxMPniU=",
 			"path": "github.com/magiconair/properties",
 			"revision": "7757cc9fdb852f7579b24170bcacda2c7471bb6a",
@@ -169,6 +175,24 @@
 			"path": "github.com/shiena/ansicolor",
 			"revision": "a422bbe96644373c5753384a59d678f7d261ff10",
 			"revisionTime": "2015-11-19T15:19:21Z"
+		},
+		{
+			"checksumSHA1": "tzcUwQrH1EMR+RPvTE1Ico6kqT4=",
+			"path": "github.com/smartystreets/goconvey/convey",
+			"revision": "505e419363375c0dc132d3ac02632a4ee32199ca",
+			"revisionTime": "2019-07-31T23:36:26Z"
+		},
+		{
+			"checksumSHA1": "6Mgn4H/4vpqYGlaIKZ0UwOmJN0E=",
+			"path": "github.com/smartystreets/goconvey/convey/gotest",
+			"revision": "505e419363375c0dc132d3ac02632a4ee32199ca",
+			"revisionTime": "2019-07-31T23:36:26Z"
+		},
+		{
+			"checksumSHA1": "zUFddnpn7/A+gjwhShq642PM40I=",
+			"path": "github.com/smartystreets/goconvey/convey/reporting",
+			"revision": "505e419363375c0dc132d3ac02632a4ee32199ca",
+			"revisionTime": "2019-07-31T23:36:26Z"
 		},
 		{
 			"checksumSHA1": "2d0rR/VhqllUdrcH6kwHHrhqJ2E=",
@@ -205,6 +229,30 @@
 			"path": "github.com/spf13/viper",
 			"revision": "7a605a50e69cd1ea431c4a1e6eebe9b287ef6de4",
 			"revisionTime": "2019-04-08T14:06:45Z"
+		},
+		{
+			"checksumSHA1": "VpEXNedFooOvnHtY4KLMKDKshC0=",
+			"path": "github.com/xiliangMa/restapi/controllers",
+			"revision": "76c12444dea55baa0b9b9a43c35d6448c7e13db0",
+			"revisionTime": "2019-08-23T04:25:06Z"
+		},
+		{
+			"checksumSHA1": "Yn7nkd5x3wsnkRjv1o+QWv8KVSY=",
+			"path": "github.com/xiliangMa/restapi/models",
+			"revision": "76c12444dea55baa0b9b9a43c35d6448c7e13db0",
+			"revisionTime": "2019-08-23T04:25:06Z"
+		},
+		{
+			"checksumSHA1": "xhTBk1DwUZXIYPgJ5b0cRvLDT7k=",
+			"path": "github.com/xiliangMa/restapi/routers",
+			"revision": "76c12444dea55baa0b9b9a43c35d6448c7e13db0",
+			"revisionTime": "2019-08-23T04:25:06Z"
+		},
+		{
+			"checksumSHA1": "+4B6CPcrPgGClpaIXVKitGuCXdA=",
+			"path": "github.com/xiliangMa/restapi/utils",
+			"revision": "76c12444dea55baa0b9b9a43c35d6448c7e13db0",
+			"revisionTime": "2019-08-23T04:25:06Z"
 		},
 		{
 			"checksumSHA1": "J6lNRPdrYhKft6S8x33K9brxyhE=",
@@ -246,5 +294,5 @@
 			"revisionTime": "2018-11-30T08:57:49Z"
 		}
 	],
-	"rootPath": "github.com/xiliangMa/restapi"
+	"rootPath": "github.com/xiliangMa/diss-backend"
 }
