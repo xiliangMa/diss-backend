@@ -9,7 +9,7 @@
 
 #diss-backend
 diss-backend
-logs*
+logs/*
 swagger/*
 swagger.zip
 routers/commentsRouter_controllers.go

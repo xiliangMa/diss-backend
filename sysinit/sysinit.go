@@ -1,6 +1,6 @@
 package sysinit
 
 func init() {
-	initDB()
-	InitLogs()
+	InitDB()
+	InitLogger()
 }

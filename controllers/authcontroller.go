@@ -48,6 +48,7 @@ func (this *AuthController) Authorize() {
 		ResultData.Message = result
 		logs.Error("Authorization failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 	} else {
+		logs.Info("login success, %s", ResultData)
 		ResultData.Data = result
 	}
 	this.Data["json"] = ResultData

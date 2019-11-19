@@ -10,7 +10,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func initDB() {
+func InitDB() {
 
 	dbType := beego.AppConfig.String("db::Type")
 
