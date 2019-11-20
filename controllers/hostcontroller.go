@@ -39,9 +39,29 @@ func (this *HostController) HostList() {
 func (this *HostController) AddHost() {
 	var h models.Host
 	json.Unmarshal(this.Ctx.Input.RequestBody, &h)
-	this.Data["json"] = models.AddHost(&h)
-	this.ServeJSON(false)
 
+	existhost := models.GetHost(h.HostName)
+	if h.Id == 0 {
+		this.Data["json"] = models.AddHost(&h)
+	} else {
+		existhost.Message = "Host Exist"
+		this.Data["json"] = existhost
+	}
+
+	this.ServeJSON(false)
+}
+
+
+// @Title GetHost
+// @Description Get one Host
+// @Param token header string true "Auth token"
+// @Param hostname query string false "Enter hostname"
+// @Success 200 {object} models.Result
+// @router /gethost [post]
+func (this *HostController) GetHost(){
+	hostname := this.GetString("hostname")
+	this.Data["json"] = models.GetHost(hostname)
+	this.ServeJSON(false)
 }
 
 // @Title DelHost
