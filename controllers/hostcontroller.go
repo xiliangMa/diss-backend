@@ -40,11 +40,11 @@ func (this *HostController) AddHost() {
 	var h models.Host
 	json.Unmarshal(this.Ctx.Input.RequestBody, &h)
 
-	existhost := models.GetHost(h.HostName)
-	if h.Id == 0 {
+	existhost := models.GetHostInternal(h.HostName)
+	if existhost == nil {
 		this.Data["json"] = models.AddHost(&h)
 	} else {
-		existhost.Message = "Host Exist"
+		existhost["Message"] = "Host Exist"
 		this.Data["json"] = existhost
 	}
 

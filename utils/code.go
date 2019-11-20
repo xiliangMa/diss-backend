@@ -6,6 +6,7 @@ var (
 	GetHostListErr = 2
 	AddHostErr     = 3
 	DeleteHostErr  = 4
+	GetHostErr 	   = 5
 	SiginErr       = 17
 	AuthorizeErr   = 18
 	GetUserInfoErr = 19

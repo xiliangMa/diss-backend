@@ -46,26 +46,33 @@ func GetHostList(name, ip string, from, limit int) Result {
 	return ResultData
 }
 
-func GetHost(hostname string) Result{
+func GetHostInternal(hostname string) map[string]interface{} {
 	o := orm.NewOrm()
 	o.Using("default")
 	var host Host
 	data := make(map[string]interface{})
-	var ResultData Result
+
 
 	err := o.QueryTable("host").Filter("host_name", hostname).One(&host)
-	if (err == orm.ErrNoRows){
+	if (err == orm.ErrNoRows) {
 		fmt.Print(err)
+		logs.Error("GetHost failed, code: %d, err: %s", utils.GetHostListErr, "Get Host Error")
 	}
 
 	if host.Id != 0 {
 		data["items"] = host
 		data["total"] = 1
-	}else{
+	} else {
 		data = nil
 	}
 
+	return data
+}
 
+func GetHost(hostname string) Result{
+	var ResultData Result
+
+	data := GetHostInternal(hostname)
 	ResultData.Code = utils.Success
 	ResultData.Data = data
 	return ResultData
