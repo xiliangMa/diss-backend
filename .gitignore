@@ -13,6 +13,7 @@ logs/*
 swagger/*
 swagger.zip
 routers/commentsRouter_controllers.go
+routers/commentsRouter*
 
 
 lastupdate.tmp
