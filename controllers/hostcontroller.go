@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
 )
@@ -60,6 +61,8 @@ func (this *HostController) AddHost() {
 // @router /gethost [post]
 func (this *HostController) GetHost(){
 	hostname := this.GetString("hostname")
+	hostinfo := models.GetHost(hostname)
+	fmt.Print(hostinfo)
 	this.Data["json"] = models.GetHost(hostname)
 	this.ServeJSON(false)
 }

@@ -18,6 +18,11 @@ func init() {
 				&controllers.HostController{},
 			),
 		),
+		beego.NSNamespace("/merticinfo",
+			beego.NSInclude(
+				&controllers.MetricController{},
+			),
+		),
 		beego.NSNamespace("/auth",
 			beego.NSInclude(
 				&controllers.AuthController{},

@@ -29,7 +29,7 @@ func GetHostList(name, ip string, from, limit int) Result {
 	o.Using("default")
 	var HostList []*Host
 	var ResultData Result
-	_, err := o.QueryTable("host").Filter("name__icontains", name).Filter("host_ip__icontains", ip).Limit(limit, from).All(&HostList)
+	_, err := o.QueryTable("host").Limit(limit, from).All(&HostList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetHostListErr
@@ -56,7 +56,10 @@ func GetHostInternal(hostname string) map[string]interface{} {
 	err := o.QueryTable("host").Filter("host_name", hostname).One(&host)
 	if (err == orm.ErrNoRows) {
 		fmt.Print(err)
-		logs.Error("GetHost failed, code: %d, err: %s", utils.GetHostListErr, "Get Host Error")
+		logs.Error("GetHost failed, code: %d, err: %s", utils.GetHostZero, "Get Host Zero")
+		//data["Message"] = "Get Host Error"
+		//data["Code"] = utils.GetHostErr
+		//return data
 	}
 
 	if host.Id != 0 {
