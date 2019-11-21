@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
@@ -37,7 +38,7 @@ func (this *MetricController) HostList() {
 // @Description HostMetricBasicInfo
 // @Param token header string true "Auth token"
 // @Param hostname query string false "Enter hostname"
-// @Success 200 {object} mertric.HostBasicInfo
+// @Success 200 {object} models.Result
 // @router /hostinfo [post]
 func (this *MetricController) HostInfo() {
 	hostname := this.GetString("hostname")
@@ -48,85 +49,13 @@ func (this *MetricController) HostInfo() {
 
 	res, _ := esclient.API.Search(esclient.Search.WithContext(context.Background()),
 		esclient.Search.WithIndex("metric*"),
-		esclient.Search.WithBody(strings.NewReader(`{
-    "timeout": "30000ms",
-    "query":
-    {
-        "bool":
-        {
-            "must": [],
-            "filter": [
-            {
-                "bool":
-                {
-                    "should": [
-                    {
-                        "match_phrase":
-                        {
-                            "host.name": "c5b627e16af7"
-                        }
-                    }],
-                    "minimum_should_match": 1
-                }
-            },
-            {
-                "bool":
-                {
-                    "should": [
-                    {
-                        "match_phrase":
-                        {
-                            "event.module": "system"
-                        }
-                    }],
-                    "minimum_should_match": 1
-                }
-            },{
-                "range":
-                {
-                    "@timestamp":
-                    {
-                        "format": "strict_date_optional_time",
-                        "gte": "2019-11-15T00:29:17.970Z",
-                        "lte": "2019-11-15T12:29:17.970Z"
-                    }
-                }
-            }
-            ],
-            "should": [],
-            "must_not": []
-        }
-    },
-    "size": 0,
-
-    "aggs":{
-    	"event_dataset_list":{
-    		"terms":{
-    			"field":"event.dataset",
-    			"size" :15
-    		},
-    		"aggs" : {
-    			"metric_data" :{
-	    			"top_hits" :{
-	    				"sort": [
-	                            {
-	                                "@timestamp": {
-	                                    "order": "desc"
-	                                }
-	                            }
-	                        ],
-	                    "size" :1    
-	    			}
-    			}
-    		}
-    	}
-    }
-}`)),
+		esclient.Search.WithBody(strings.NewReader(`{"query" : { "match_all":{} }}`)),
 		esclient.Search.WithTrackTotalHits(true),
 		esclient.Search.WithPretty())
 
-	data["hostinfo"] = res
-
+	var hostInfo map[string]interface{}
+	json.NewDecoder(res.Body).Decode(&hostInfo)
+	data["hostInfo"] = hostInfo
 	this.Data["json"] = data
 	this.ServeJSON(false)
 }
