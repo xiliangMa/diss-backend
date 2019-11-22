@@ -52,9 +52,8 @@ func GetHostInternal(hostname string) map[string]interface{} {
 	var host Host
 	data := make(map[string]interface{})
 
-
 	err := o.QueryTable("host").Filter("host_name", hostname).One(&host)
-	if (err == orm.ErrNoRows) {
+	if err == orm.ErrNoRows {
 		fmt.Print(err)
 		logs.Error("GetHost failed, code: %d, err: %s", utils.GetHostZero, "Get Host Zero")
 		//data["Message"] = "Get Host Error"
@@ -72,7 +71,7 @@ func GetHostInternal(hostname string) map[string]interface{} {
 	return data
 }
 
-func GetHost(hostname string) Result{
+func GetHost(hostname string) Result {
 	var ResultData Result
 
 	data := GetHostInternal(hostname)
