@@ -43,14 +43,13 @@ func (this *MetricController) HostInfo() {
 	this.ServeJSON(false)
 }
 
-
 // @Title GetHost
 // @Description Get one Host
 // @Param token header string true "Auth token"
 // @Param hostname query string false "Enter hostname"
 // @Success 200 {object} models.Result
 // @router /gethost [post]
-func (this *MetricController) GetHost(){
+func (this *MetricController) GetHost() {
 	hostname := this.GetString("hostname")
 	this.Data["json"] = models.GetHost(hostname)
 	this.ServeJSON(false)
