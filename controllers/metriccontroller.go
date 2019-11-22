@@ -1,13 +1,8 @@
 package controllers
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/utils"
-	"strings"
 )
 
 // Hosts object api list
@@ -42,21 +37,9 @@ func (this *MetricController) HostList() {
 // @router /hostinfo [post]
 func (this *MetricController) HostInfo() {
 	hostname := this.GetString("hostname")
-	curhost := models.GetHostInternal(hostname)
-	esclient := utils.GetESClient()
-	fmt.Print(curhost)
-	data := make(map[string]interface{})
+	hostInfo := models.GetHostMetricInfo(hostname)
 
-	res, _ := esclient.API.Search(esclient.Search.WithContext(context.Background()),
-		esclient.Search.WithIndex("metric*"),
-		esclient.Search.WithBody(strings.NewReader(`{"query" : { "match_all":{} }}`)),
-		esclient.Search.WithTrackTotalHits(true),
-		esclient.Search.WithPretty())
-
-	var hostInfo map[string]interface{}
-	json.NewDecoder(res.Body).Decode(&hostInfo)
-	data["hostInfo"] = hostInfo
-	this.Data["json"] = data
+	this.Data["json"] = hostInfo
 	this.ServeJSON(false)
 }
 
