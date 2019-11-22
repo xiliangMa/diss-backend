@@ -91,17 +91,17 @@ func ESString(queryTag string) string {
     }
 }`
 	QueryDefine["msearch_host_metric"] = `{"index":"metricbeat-*","ignore_unavailable":true,"preference":1573547985305}
-				{"_source":["system.cpu.cores"],"sort": { "@timestamp": { "order": "desc" }},"size": 1,"query":{"bool":{"must": [{"term": {"event.module": "system"}},{"term": {"host.name": "c5b627e16af7"}},{"exists":{"field": "system.cpu.cores"}}]}}}
+				{"_source":["system.cpu.cores"],"sort": { "@timestamp": { "order": "desc" }},"size": 1,"query":{"bool":{"must": [{"term": {"event.module": "system"}},{"term": {"host.name": "!Param@hostname!"}},{"exists":{"field": "system.cpu.cores"}}]}}}
 				{"index":"metricbeat-*","ignore_unavailable":true,"preference":1573547985305}
-				{"_source":["system.memory.total"],"sort": { "@timestamp": { "order": "desc" }},"size": 1,"query":{"bool":{"must": [{"term": {"event.module": "system"}},{"term": {"host.name": "c5b627e16af7"}},{"exists":{"field": "system.memory.total"}}]}}}
+				{"_source":["system.memory.total"],"sort": { "@timestamp": { "order": "desc" }},"size": 1,"query":{"bool":{"must": [{"term": {"event.module": "system"}},{"term": {"host.name": "!Param@hostname!"}},{"exists":{"field": "system.memory.total"}}]}}}
 				{"index":"metricbeat-*","ignore_unavailable":true,"preference":1573547985305}
-{				"_source":["system.filesystem.total"],"sort": { "@timestamp": { "order": "desc" }},"size": 1,"query":{"bool":{"must": [{"term": {"event.module": "system"}},{"term": {"host.name": "c5b627e16af7"}},{"exists":{"field": "system.filesystem.total"}}]}}}
+{				"_source":["system.filesystem.total"],"sort": { "@timestamp": { "order": "desc" }},"size": 1,"query":{"bool":{"must": [{"term": {"event.module": "system"}},{"term": {"host.name": "!Param@hostname!"}},{"exists":{"field": "system.filesystem.total"}}]}}}
 `
 	QueryDefine["container_metric"] = `{
     "timeout": "30000ms",
     "aggs":
     {
-        "container_name":
+        "container_list":
         {
             "terms":
             {
@@ -158,6 +158,7 @@ func ESString(queryTag string) string {
         "excludes": []
     },
     "stored_fields": ["*"],
+    "sort": { "@timestamp": { "order": "desc" }},
     "query":
     {
         "bool":
@@ -197,21 +198,10 @@ func ESString(queryTag string) string {
                     {
                         "match_phrase":
                         {
-                            "host.name": "c5b627e16af7"
+                            "host.name": "!Param@hostname!"
                         }
                     }],
                     "minimum_should_match": 1
-                }
-            },
-            {
-                "range":
-                {
-                    "@timestamp":
-                    {
-                        "format": "strict_date_optional_time",
-                        "gte": "2019-06-14T09:29:17.970Z",
-                        "lte": "2019-11-14T09:29:17.970Z"
-                    }
                 }
             }],
             "should": [],
@@ -220,6 +210,76 @@ func ESString(queryTag string) string {
     }
 }
 `
+	QueryDefine["container_summary"] = `{
+    "timeout": "30000ms",
+    "aggs":
+    {
+        "running":
+        {
+            "max":
+            {
+                "field": "docker.info.containers.running"
+            }
+        },
+        "paused":
+        {
+            "max":
+            {
+                "field": "docker.info.containers.paused"
+            }
+        },
+        "stopped":
+        {
+            "max":
+            {
+                "field": "docker.info.containers.stopped"
+            }
+        }
+    },
+    "size": 0,
+    "_source":
+    {
+        "excludes": []
+    },
+    "stored_fields": ["*"],
+	"sort": { "@timestamp": { "order": "desc" }},
+    "query":
+    {
+        "bool":
+        {
+            "must": [],
+            "filter": [
+            {
+                "bool":
+                {
+                    "should": [
+                    {
+                        "match":
+                        {
+                            "event.module": "docker"
+                        }
+                    }],
+                    "minimum_should_match": 1
+                }
+            },
+            {
+                "bool":
+                {
+                    "should": [
+                    {
+                        "match_phrase":
+                        {
+                            "host.name": "!Param@hostname!"
+                        }
+                    }],
+                    "minimum_should_match": 1
+                }
+            }],
+            "should": [],
+            "must_not": []
+        }
+    }
+}`
 
 	return QueryDefine[queryTag]
 }
@@ -227,7 +287,8 @@ func ESString(queryTag string) string {
 func GetHostMetricInfo_M(hostname string) interface{} {
 	esclient := utils.GetESClient()
 
-	mres, _ := esclient.API.Msearch(strings.NewReader(ESString("msearch_host_metric")), esclient.Msearch.WithIndex("metric*"))
+	esqueryStr := strings.Replace(ESString("msearch_host_metric"),"!Param@hostname!", hostname,4)
+	mres, _ := esclient.API.Msearch(strings.NewReader(esqueryStr), esclient.Msearch.WithIndex("metric*"))
 
 	logs.Info("msearch is ok ,  %s", mres.Status())
 	var hostInfo map[string]interface{}
@@ -269,16 +330,42 @@ func GetHostMetricInfo(hostname string) interface{} {
 func GetContainerListMetricInfo(hostname string) interface{} {
 	esclient := utils.GetESClient()
 
+	esqueryStr := strings.Replace(ESString("container_metric"),"!Param@hostname!", hostname,1)
 	res, _ := esclient.API.Search(esclient.Search.WithContext(context.Background()),
 		esclient.Search.WithIndex("metric*"),
-		esclient.Search.WithBody(strings.NewReader(ESString("container_metric"))),
+		esclient.Search.WithBody(strings.NewReader(esqueryStr)),
 		esclient.Search.WithTrackTotalHits(true),
 		esclient.Search.WithPretty())
 
-	var hostInfo map[string]interface{}
-	json.NewDecoder(res.Body).Decode(&hostInfo)
+	var containerInfo map[string]interface{}
+	json.NewDecoder(res.Body).Decode(&containerInfo)
 
-	hostInfoPure := hostInfo["aggregations"]
+	var hostInfoPure []interface{}
+	containerInfoRefine1 := containerInfo["aggregations"].(map[string]interface{})
+	containerInfoRefine2 := containerInfoRefine1["container_list"].(map[string]interface{})
+	for _, x := range containerInfoRefine2["buckets"].([]interface{}) {
+		hostInfoPure = append(hostInfoPure, x)
+	}
 
+
+	hostInfoPure = hostInfoPure
 	return hostInfoPure
+}
+
+func GetContainerSummaryInfo(hostname string) interface{} {
+	esclient := utils.GetESClient()
+
+	esqueryStr := strings.Replace(ESString("container_summary"),"!Param@hostname!", hostname,1)
+	res, _ := esclient.API.Search(esclient.Search.WithContext(context.Background()),
+		esclient.Search.WithIndex("metric*"),
+		esclient.Search.WithBody(strings.NewReader(esqueryStr)),
+		esclient.Search.WithTrackTotalHits(true),
+		esclient.Search.WithPretty())
+
+	var containerSummaryInfo map[string]interface{}
+	json.NewDecoder(res.Body).Decode(&containerSummaryInfo)
+
+	containerInfoPure := containerSummaryInfo["aggregations"].(map[string]interface{})
+
+	return containerInfoPure
 }
