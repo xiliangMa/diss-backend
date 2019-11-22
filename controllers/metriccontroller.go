@@ -5,28 +5,23 @@ import (
 	"github.com/xiliangMa/diss-backend/models"
 )
 
-// Hosts object api list
+// Metric object api list [inner]
 type MetricController struct {
 	beego.Controller
 }
 
-// @Title GetHost
-// @Description Get Hosts
+// @Title GetContainerList
+// @Description Get ContainerList
 // @Param token header string true "Auth token"
 // @Param name query string false "host name"
-// @Param ip query string false "host ip"
-// @Param from query int 0 false "from"
-// @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router / [post]
-func (this *MetricController) HostList() {
-	name := this.GetString("name")
-	ip := this.GetString("ip")
-	limit, _ := this.GetInt("limit")
-	from, _ := this.GetInt("from")
-	this.Data["json"] = models.GetHostList(name, ip, from, limit)
-	this.ServeJSON(false)
+// @router /containerlist [post]
+func (this *MetricController) ContainerList() {
+	hostname := this.GetString("name")
+	containerList := models.GetContainerListMetricInfo(hostname)
 
+	this.Data["json"] = containerList
+	this.ServeJSON(false)
 }
 
 // @Title HostInfo
@@ -37,7 +32,7 @@ func (this *MetricController) HostList() {
 // @router /hostinfo [post]
 func (this *MetricController) HostInfo() {
 	hostname := this.GetString("hostname")
-	hostInfo := models.GetHostMetricInfo(hostname)
+	hostInfo := models.GetHostMetricInfo_M(hostname)
 
 	this.Data["json"] = hostInfo
 	this.ServeJSON(false)

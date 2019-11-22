@@ -3,14 +3,15 @@ package models
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"strings"
 )
 
-type esqueryString map[string]string
-func ESString (queryTag string) string{
-	QueryDefine := make(esqueryString)
+type ESQueryString map[string]string
+
+func ESString(queryTag string) string {
+	QueryDefine := make(ESQueryString)
 	QueryDefine["host_metric"] = `{
     "timeout": "30000ms",
     "query":
@@ -90,9 +91,12 @@ func ESString (queryTag string) string{
     }
 }`
 	QueryDefine["msearch_host_metric"] = `{"index":"metricbeat-*","ignore_unavailable":true,"preference":1573547985305}
-{"_source":["system.cpu.cores"],"sort": { "@timestamp": { "order": "desc" }},"size": 1,"query":{"bool":{"must": [{"term": {"event.module": "system"}},{"term": {"host.name": "c5b627e16af7"}},{"exists":{"field": "system.cpu.cores"}}]}}}
-{"index":"metricbeat-*","ignore_unavailable":true,"preference":1573547985305}
-{"_source":["system.memory.total"],"sort": { "@timestamp": { "order": "desc" }},"size": 1,"query":{"bool":{"must": [{"term": {"event.module": "system"}},{"term": {"host.name": "c5b627e16af7"}},{"exists":{"field": "system.memory.total"}}]}}}`
+				{"_source":["system.cpu.cores"],"sort": { "@timestamp": { "order": "desc" }},"size": 1,"query":{"bool":{"must": [{"term": {"event.module": "system"}},{"term": {"host.name": "c5b627e16af7"}},{"exists":{"field": "system.cpu.cores"}}]}}}
+				{"index":"metricbeat-*","ignore_unavailable":true,"preference":1573547985305}
+				{"_source":["system.memory.total"],"sort": { "@timestamp": { "order": "desc" }},"size": 1,"query":{"bool":{"must": [{"term": {"event.module": "system"}},{"term": {"host.name": "c5b627e16af7"}},{"exists":{"field": "system.memory.total"}}]}}}
+				{"index":"metricbeat-*","ignore_unavailable":true,"preference":1573547985305}
+{				"_source":["system.filesystem.total"],"sort": { "@timestamp": { "order": "desc" }},"size": 1,"query":{"bool":{"must": [{"term": {"event.module": "system"}},{"term": {"host.name": "c5b627e16af7"}},{"exists":{"field": "system.filesystem.total"}}]}}}
+`
 	QueryDefine["container_metric"] = `{
     "timeout": "30000ms",
     "aggs":
@@ -220,28 +224,32 @@ func ESString (queryTag string) string{
 	return QueryDefine[queryTag]
 }
 
-func GetHostMetricInfo_M(hostname string) interface{}{
-	curhost := GetHostInternal(hostname)
-	//esclient := utils.GetESClient()
-	fmt.Print(curhost)
+func GetHostMetricInfo_M(hostname string) interface{} {
+	esclient := utils.GetESClient()
 
-	//res, _ := esclient.API.Msearch(esclient.Msearch.WithContext(context.Background()),
-	//	esclient.Msearch.WithIndex("metric*"),
-	//	esclient.Msearch.WithBody(strings.NewReader(ESString("hostmetric_msearch"))),
-	//	esclient.Search.WithTrackTotalHits(true),
-	//	esclient.Search.WithPretty())
-	//
-	//var hostInfo map[string]interface{}
-	//json.NewDecoder(res.Body).Decode(&hostInfo)
-	//
-	//hostInfoPure := hostInfo["aggregations"]
+	mres, _ := esclient.API.Msearch(strings.NewReader(ESString("msearch_host_metric")), esclient.Msearch.WithIndex("metric*"))
 
-	return curhost
+	logs.Info("msearch is ok ,  %s", mres.Status())
+	var hostInfo map[string]interface{}
+	json.NewDecoder(mres.Body).Decode(&hostInfo)
+
+	var hostInfoPure []interface{}
+	for _, x := range hostInfo["responses"].([]interface{}) {
+		hostInfoRefine1 := x.(map[string]interface{})["hits"]
+		hostInfoRefine2 := hostInfoRefine1.(map[string]interface{})["hits"]
+		hostInfoRefine2a := hostInfoRefine2.([]interface{})
+		hostInfoRefine3 := hostInfoRefine2a[0].(map[string]interface{})["_source"]
+		hostInfoPure = append(hostInfoPure, hostInfoRefine3)
+	}
+
+	return hostInfoPure
 }
 
-func GetHostMetricInfo(hostname string) interface{}{
-	//curhost := GetHostInternal(hostname)
+/// -- 因为结构复杂不使用的方法 ，通过 search - aggregation 方式获取es数据
+func GetHostMetricInfo(hostname string) interface{} {
+
 	esclient := utils.GetESClient()
+	//curhost := GetHostInternal(hostname)
 	//fmt.Print(curhost)
 
 	res, _ := esclient.API.Search(esclient.Search.WithContext(context.Background()),
@@ -258,10 +266,8 @@ func GetHostMetricInfo(hostname string) interface{}{
 	return hostInfoPure
 }
 
-func GetContainerListMetricInfo(hostname string) interface{}{
-	//curhost := GetHostInternal(hostname)
+func GetContainerListMetricInfo(hostname string) interface{} {
 	esclient := utils.GetESClient()
-	//fmt.Print(curhost)
 
 	res, _ := esclient.API.Search(esclient.Search.WithContext(context.Background()),
 		esclient.Search.WithIndex("metric*"),
