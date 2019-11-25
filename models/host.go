@@ -10,14 +10,19 @@ import (
 
 type Host struct {
 	Id            int       `xorm:"not null pk autoincr INT(11)"`
-	HostLabel     string    `xorm:"not null comment('用于界面显示的标签') VARCHAR(255)"`
-	HostName      string    `xorm:"not null comment('主机名称') VARCHAR(30)"`
-	HostIp        string    `xorm:"not null comment('主机IP') VARCHAR(30)"`
-	HostDesc      string    `xorm:"comment('主机说明') VARCHAR(255)"`
-	State         string    `xorm:"comment('状态') VARCHAR(30)"`
-	PublicAddress string    `xorm:"comment('外部访问地址') VARCHAR(255)"`
+	HostLabel     string    `xorm:"not null default '' comment('用于界面显示的标签') VARCHAR(255)"`
+	HostName      string    `xorm:"not null default '' comment('主机名称') VARCHAR(255)"`
+	HostIp        string    `xorm:"not null default '' comment('主机IP') VARCHAR(255)"`
+	HostDesc      string    `xorm:"default '' comment('主机说明') VARCHAR(255)"`
+	State         string    `xorm:"default '' comment('状态') VARCHAR(255)"`
+	PublicAddress string    `xorm:"default '' comment('外部访问地址') VARCHAR(255)"`
 	CreateTime    time.Time `xorm:"comment('记录添加时间') DATETIME"`
 	UpdateTime    time.Time `xorm:"comment('记录更改时间') DATETIME"`
+	CpuKernel     float64   `xorm:"DOUBLE"`
+	CpuFrequency  float64   `xorm:"DOUBLE"`
+	Mem           float64   `xorm:"DOUBLE"`
+	Disk          float64   `xorm:"DOUBLE"`
+	Network       float64   `xorm:"DOUBLE"`
 }
 
 func init() {
