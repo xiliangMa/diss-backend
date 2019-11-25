@@ -2,7 +2,8 @@
 diss-backend
 
 ## 开发环境
-
+> 前提：安装 mysql 5.7+
+ 
 set env:
 ```
 MYSQL_DATABASE=<DB>
@@ -36,20 +37,28 @@ macos 系统:
             
 build image:
  ```
-docker build -t diss-backend-1.0.0 .
+docker build -t diss-backend .
 ```
-    
+> 前提：安装mysql 5.7+
+
+修改 diss-backend.env:
+```
+MYSQL_ROOT_PASSWORD=diss
+MYSQL_USER=diss
+MYSQL_PASSWORD=diss
+MYSQL_DATABASE=diss
+MYSQL_HOST=diss-db
+```
+
+
 run:
- ```
+```
 docker run --name=diss-backend -d \
--e MYSQL_DATABASE=<DB> \
--e MYSQL_USER=<DB_USER> \
--e MYSQL_PASSWORD=<DB_PWD> \
--e MYSQL_HOST=<DB_IP>  \
+--env-file  ./diss-backend.env \
 -p 8080:8080 \
 -p 10443:10443 \
 -p 8889:8889 \
-diss-backend-1.0.0
+diss-backend
 ```
 
 
