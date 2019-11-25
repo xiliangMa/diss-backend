@@ -59,7 +59,8 @@ func (this *HostController) AddHost() {
 // @router /gethost [post]
 func (this *HostController) GetHost() {
 	hostname := this.GetString("hostname")
-	this.Data["json"] = models.GetHost(hostname)
+
+	this.Data["json"] = models.GetHostWithMetric(hostname)
 	this.ServeJSON(false)
 }
 

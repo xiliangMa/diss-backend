@@ -85,6 +85,19 @@ func GetHost(hostname string) Result {
 	return ResultData
 }
 
+func GetHostWithMetric(hostname string) Result {
+	var ResultData Result
+	alldata := make(map[string]interface{})
+	hostdata := GetHostInternal(hostname)
+	hostMetricInfo := GetHostMetricInfo_M(hostname)
+	alldata["hostConfig"] = hostdata
+	alldata["hostMetric"] = hostMetricInfo
+
+	ResultData.Code = utils.Success
+	ResultData.Data = alldata
+	return ResultData
+}
+
 func AddHost(host *Host) Result {
 	o := orm.NewOrm()
 	o.Using("default")
