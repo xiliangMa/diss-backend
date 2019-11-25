@@ -1,0 +1,31 @@
+version: '3'
+services:
+  diss-backend:
+    restart: always
+    container_name: diss-backend
+    image: diss-backend
+    ports:
+      - "8080:8080"
+      - "10443:10443"
+      - "8088:8088"
+    env_file:
+      - ./diss-backend.env
+    links:
+      - diss-db
+    depends_on:
+      - diss-db
+    volumes:
+      - /tmp/diss/diss-backend:/diss/diss-backend
+    entrypoint: ["./entrypoint.sh"]
+
+  diss-db:
+    restart: unless-stopped
+    container_name: diss-db
+    image: mysql:5.7.14
+    env_file:
+      - ./diss-backend.env
+    ports:
+      - 3306:3306
+    volumes:
+      - /tmp/diss/mysql:/var/lib/mysql
+      - ./conf/my.cnf:/etc/my.cnf

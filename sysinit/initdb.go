@@ -19,19 +19,19 @@ func InitDB() {
 
 	//数据库名称
 	//dbName := beego.AppConfig.String(dbType + "::Name")
-	dbName := os.Getenv("MARIADB_DATABASE")
+	dbName := os.Getenv("MYSQL_DATABASE")
 
 	//数据库连接用户名
 	//dbUser := beego.AppConfig.String(dbType + "::User")
-	dbUser := os.Getenv("MARIADB_USER")
+	dbUser := os.Getenv("MYSQL_USER")
 
 	//数据库连接用户名
 	//dbPwd := beego.AppConfig.String(dbType + "::Pwd")
-	dbPwd := os.Getenv("MARIADB_PASSWORD")
+	dbPwd := os.Getenv("MYSQL_PASSWORD")
 
 	//数据库IP（域名）
 	//dbHost := beego.AppConfig.String(dbType + "::Host")
-	dbHost := os.Getenv("MARIADB_HOST")
+	dbHost := os.Getenv("MYSQL_HOST")
 
 	//数据库端口
 	//dbPort := beego.AppConfig.String(dbType + "::Port")

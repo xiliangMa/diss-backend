@@ -5,10 +5,10 @@ diss-backend
 
 set env:
 ```
-MARIADB_DATABASE=<DB>
-MARIADB_USER=<DB_User>
-MARIADB_PASSWORD=<DB_PWD>
-MARIADB_HOST=<DB_IP>
+MYSQL_DATABASE=<DB>
+MYSQL_USER=<DB_User>
+MYSQL_PASSWORD=<DB_PWD>
+MYSQL_HOST=<DB_IP>
 ```
     
 build:
@@ -42,16 +42,37 @@ docker build -t diss-backend-1.0.0 .
 run:
  ```
 docker run --name=diss-backend -d \
--e MARIADB_DATABASE=<DB> \
--e MARIADB_USER=<DB_USER> \
--e MARIADB_PASSWORD=<DB_PWD> \
--e MARIADB_HOST=<DB_IP>  \
+-e MYSQL_DATABASE=<DB> \
+-e MYSQL_USER=<DB_USER> \
+-e MYSQL_PASSWORD=<DB_PWD> \
+-e MYSQL_HOST=<DB_IP>  \
 -p 8080:8080 \
 -p 10443:10443 \
 -p 8889:8889 \
 diss-backend-1.0.0
 ```
 
+
+
+## Run by docker-compose
+修改 diss-backend.env:
+```
+MYSQL_ROOT_PASSWORD=diss
+MYSQL_USER=diss
+MYSQL_PASSWORD=diss
+MYSQL_DATABASE=diss
+MYSQL_HOST=diss-db
+```
+
+启动
+```
+docker-compose up -d
+```
+
+关闭：
+```
+docker-compose down
+```
 
 ## Run in kubernetes cluster
 
