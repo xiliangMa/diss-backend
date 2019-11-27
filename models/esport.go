@@ -310,7 +310,7 @@ func GetHostMetricInfo_M(hostname string) []interface{} {
 func GetHostMetricInfo(hostname string) interface{} {
 
 	esclient := utils.GetESClient()
-	//curhost := GetHostInternal(hostname)
+	//curhost := Internal_GetHost(hostname)
 	//fmt.Print(curhost)
 
 	res, _ := esclient.API.Search(esclient.Search.WithContext(context.Background()),

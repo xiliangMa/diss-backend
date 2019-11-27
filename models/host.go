@@ -51,7 +51,8 @@ func GetHostList(name, ip string, from, limit int) Result {
 	return ResultData
 }
 
-func GetHostInternal(hostname string) map[string]interface{} {
+/// 内部处理函数，不返回ResultData，仅仅返回基础数据
+func Internal_GetHost(hostname string) map[string]interface{} {
 	o := orm.NewOrm()
 	o.Using("default")
 	var host Host
@@ -76,10 +77,12 @@ func GetHostInternal(hostname string) map[string]interface{} {
 	return data
 }
 
+/// ---- 暂时不使用这个函数，使用的GetHostWithMetric，加入获取Metric数据
 func GetHost(hostname string) Result {
 	var ResultData Result
 
-	data := GetHostInternal(hostname)
+	data := Internal_GetHost(hostname)
+
 	ResultData.Code = utils.Success
 	ResultData.Data = data
 	return ResultData
@@ -87,17 +90,26 @@ func GetHost(hostname string) Result {
 
 func GetHostWithMetric(hostname string) Result {
 	var ResultData Result
+
 	alldata := make(map[string]interface{})
-	hostdata := GetHostInternal(hostname)
+	hostdata := Internal_GetHost(hostname)
 	hostMetricInfo := GetHostMetricInfo_M(hostname)
+	pureMetric := utils.ExtractHostInfo(hostMetricInfo)
+	dockerContainerSummary := GetContainerSummaryInfo(hostname)
+	dockerContainerRuning := GetContainerListMetricInfo(hostname)
+
+	// alldata包含：主机基本配置，主机动态指标获取，运行的容器汇总，运行中的容器列表
 	alldata["hostConfig"] = hostdata
-	alldata["hostMetric"] = hostMetricInfo
+	alldata["hostMetric"] = pureMetric
+	alldata["containerSummary"] = dockerContainerSummary
+	alldata["containerRunning"] = dockerContainerRuning
 
 	ResultData.Code = utils.Success
 	ResultData.Data = alldata
 	return ResultData
 }
 
+/// ---- 暂时不使用这个函数，使用的AddHostProcessing，加入处理一些如主机已存在的异常
 func AddHost(host *Host) Result {
 	o := orm.NewOrm()
 	o.Using("default")
@@ -139,7 +151,7 @@ func AddHostProcessing(h Host) interface{} {
 	var ResultData Result
 
 	// host exist detect
-	existhost := GetHostInternal(h.HostName)
+	existhost := Internal_GetHost(h.HostName)
 	if existhost != nil {
 		ResultData.Code = utils.HostExistError
 		ResultData.Message = "Host Exist"
