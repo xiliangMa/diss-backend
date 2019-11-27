@@ -41,7 +41,7 @@ func (this *HostController) AddHost() {
 	var h models.Host
 	json.Unmarshal(this.Ctx.Input.RequestBody, &h)
 
-	this.Data["json"] =models.AddHostProcessing(h)
+	this.Data["json"] = models.AddHostProcessing(h)
 	this.ServeJSON(false)
 }
 

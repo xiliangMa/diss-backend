@@ -24,7 +24,6 @@ func (this *MetricController) ContainerSummary() {
 	this.ServeJSON(false)
 }
 
-
 // @Title GetContainerList
 // @Description Get ContainerList
 // @Param token header string true "Auth token"
@@ -38,7 +37,6 @@ func (this *MetricController) ContainerList() {
 	this.Data["json"] = containerList
 	this.ServeJSON(false)
 }
-
 
 // @Title ContainerSummary
 // @Description Get Container Summary counts
