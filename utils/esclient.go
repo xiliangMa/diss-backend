@@ -2,11 +2,11 @@ package utils
 
 import (
 	"crypto/tls"
-	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/elastic/go-elasticsearch"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 )
@@ -16,9 +16,9 @@ var (
 )
 
 func InitEsClient() {
-	Adress := strings.Split(beego.AppConfig.String("es::Address"), ",")
-	UserName := beego.AppConfig.String("es::UserName")
-	Password := beego.AppConfig.String("es::Password")
+	Adress := strings.Split(os.Getenv("Address"), ",")
+	UserName := os.Getenv("UserName")
+	Password := os.Getenv("Password")
 
 	cfg := elasticsearch.Config{
 		Addresses: Adress,
