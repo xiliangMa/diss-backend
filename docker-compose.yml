@@ -7,7 +7,7 @@ services:
     ports:
       - "8080:8080"
       - "10443:10443"
-      - "8088:8088"
+      - "8889:8889"
     env_file:
       - ./diss-backend.env
     links:
