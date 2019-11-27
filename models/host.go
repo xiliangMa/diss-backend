@@ -102,6 +102,12 @@ func AddHost(host *Host) Result {
 	o := orm.NewOrm()
 	o.Using("default")
 	var ResultData Result
+
+	//createTime
+	timenow := time.Now().Unix()
+	formatTime := time.Unix(timenow, 0)
+	host.CreateTime = formatTime
+
 	id, err := o.Insert(host)
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -126,5 +132,41 @@ func DeleteHost(id int) Result {
 		return ResultData
 	}
 	ResultData.Code = utils.Success
+	return ResultData
+}
+
+func AddHostProcessing(h Host) interface{} {
+	var ResultData Result
+
+	// host exist detect
+	existhost := GetHostInternal(h.HostName)
+	if existhost != nil {
+		ResultData.Code = utils.HostExistError
+		ResultData.Message = "Host Exist"
+		ResultData.Data = existhost
+		logs.Error("AddHost failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	// get host metric by hostname
+	hostMetricInfo := GetHostMetricInfo_M(h.HostName)
+	pureMetric := utils.ExtractHostInfo(hostMetricInfo)
+
+	if len(pureMetric) == 0 {
+		ResultData.Code = utils.GetHostMetricError
+		ResultData.Message = "Host Metric cant acquire"
+		ResultData.Data = h
+		logs.Error("AddHost failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	h.CpuKernel = pureMetric["cpu.cores"].(float64)
+	h.Disk = pureMetric["filesystem.total"].(float64)
+	h.Mem = pureMetric["memory.total"].(float64)
+
+	// add host
+	hostadded := AddHost(&h)
+	ResultData.Data = hostadded
+	ResultData.Code = utils.Success
+
 	return ResultData
 }

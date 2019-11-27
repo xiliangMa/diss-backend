@@ -49,6 +49,7 @@ func (this *MetricController) ContainerList() {
 func (this *MetricController) GetHost() {
 	hostname := this.GetString("hostname")
 	containerSummary := models.GetContainerSummaryInfo(hostname)
+
 	this.Data["json"] = containerSummary
 	this.ServeJSON(false)
 }

@@ -284,10 +284,10 @@ func ESString(queryTag string) string {
 	return QueryDefine[queryTag]
 }
 
-func GetHostMetricInfo_M(hostname string) interface{} {
+func GetHostMetricInfo_M(hostname string) []interface{} {
 	esclient := utils.GetESClient()
 
-	esqueryStr := strings.Replace(ESString("msearch_host_metric"),"!Param@hostname!", hostname,4)
+	esqueryStr := strings.Replace(ESString("msearch_host_metric"), "!Param@hostname!", hostname, 4)
 	mres, _ := esclient.API.Msearch(strings.NewReader(esqueryStr), esclient.Msearch.WithIndex("metric*"))
 
 	logs.Info("msearch is ok ,  %s", mres.Status())
@@ -327,10 +327,10 @@ func GetHostMetricInfo(hostname string) interface{} {
 	return hostInfoPure
 }
 
-func GetContainerListMetricInfo(hostname string) interface{} {
+func GetContainerListMetricInfo(hostname string) []interface{} {
 	esclient := utils.GetESClient()
 
-	esqueryStr := strings.Replace(ESString("container_metric"),"!Param@hostname!", hostname,1)
+	esqueryStr := strings.Replace(ESString("container_metric"), "!Param@hostname!", hostname, 1)
 	res, _ := esclient.API.Search(esclient.Search.WithContext(context.Background()),
 		esclient.Search.WithIndex("metric*"),
 		esclient.Search.WithBody(strings.NewReader(esqueryStr)),
@@ -347,7 +347,6 @@ func GetContainerListMetricInfo(hostname string) interface{} {
 		hostInfoPure = append(hostInfoPure, x)
 	}
 
-
 	hostInfoPure = hostInfoPure
 	return hostInfoPure
 }
@@ -355,7 +354,7 @@ func GetContainerListMetricInfo(hostname string) interface{} {
 func GetContainerSummaryInfo(hostname string) interface{} {
 	esclient := utils.GetESClient()
 
-	esqueryStr := strings.Replace(ESString("container_summary"),"!Param@hostname!", hostname,1)
+	esqueryStr := strings.Replace(ESString("container_summary"), "!Param@hostname!", hostname, 1)
 	res, _ := esclient.API.Search(esclient.Search.WithContext(context.Background()),
 		esclient.Search.WithIndex("metric*"),
 		esclient.Search.WithBody(strings.NewReader(esqueryStr)),

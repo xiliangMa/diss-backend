@@ -25,6 +25,7 @@ func (this *HostController) HostList() {
 	ip := this.GetString("ip")
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
+
 	this.Data["json"] = models.GetHostList(name, ip, from, limit)
 	this.ServeJSON(false)
 
@@ -40,14 +41,7 @@ func (this *HostController) AddHost() {
 	var h models.Host
 	json.Unmarshal(this.Ctx.Input.RequestBody, &h)
 
-	existhost := models.GetHostInternal(h.HostName)
-	if existhost == nil {
-		this.Data["json"] = models.AddHost(&h)
-	} else {
-		existhost["Message"] = "Host Exist"
-		this.Data["json"] = existhost
-	}
-
+	this.Data["json"] =models.AddHostProcessing(h)
 	this.ServeJSON(false)
 }
 
@@ -72,6 +66,7 @@ func (this *HostController) GetHost() {
 // @router /:id [delete]
 func (this *HostController) DeleteHost() {
 	id, _ := this.GetInt(":id")
+
 	this.Data["json"] = models.DeleteHost(id)
 	this.ServeJSON(false)
 
