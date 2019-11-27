@@ -6,10 +6,6 @@ EXPOSE 8080
 EXPOSE 8088
 EXPOSE 10443
 
-ENV MARIADB_DATABASE diss
-ENV MARIADB_HOST localhost
-ENV MARIADB_USER diss
-ENV MARIADB_PASSWORD diss
 
 WORKDIR /usr/share/diss-backend
 RUN mkdir -p /usr/share/diss-backend/conf && \
