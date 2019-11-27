@@ -64,15 +64,6 @@ diss-backend
 
 
 ## Run by docker-compose
-修改 diss-backend.env:
-```
-MYSQL_ROOT_PASSWORD=diss
-MYSQL_USER=diss
-MYSQL_PASSWORD=diss
-MYSQL_DATABASE=diss
-MYSQL_HOST=diss-db
-```
-
 启动
 ```
 docker-compose up -d

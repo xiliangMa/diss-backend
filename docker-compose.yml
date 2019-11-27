@@ -22,8 +22,11 @@ services:
     restart: unless-stopped
     container_name: diss-db
     image: mysql:5.7.14
-    env_file:
-      - ./diss-backend.env
+    environment:
+      MYSQL_ROOT_PASSWORD: diss
+      MYSQL_USER: diss
+      MYSQL_PASSWORD: diss
+      MYSQL_DATABASE: diss
     ports:
       - 3306:3306
     volumes:
