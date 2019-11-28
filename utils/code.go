@@ -1,7 +1,6 @@
 package utils
 
 var (
-	Success            = 200
 	Fail               = 1
 	GetHostListErr     = 2
 	AddHostErr         = 3
@@ -13,4 +12,5 @@ var (
 	AuthorizeErr       = 18
 	GetUserInfoErr     = 19
 	ElasticConnErr     = 21
+	ElasticSearchErr   = 22
 )

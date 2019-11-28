@@ -171,8 +171,13 @@ func AddHostProcessing(h Host) interface{} {
 	// get host metric by hostname
 	ResultData = Internal_HostMetricInfo_M(h.HostName)
 	if ResultData.Code != http.StatusOK {
-		ResultData.Code = utils.ElasticConnErr
-		ResultData.Message = "Cant Connect ElaticSearch, Please retry"
+		if ResultData.Code == utils.ElasticConnErr {
+			ResultData.Message = "Cant Connect ElaticSearch, Please retry"
+		}
+		if ResultData.Code == utils.ElasticSearchErr {
+			ResultData.Message = "Elastic Search Error, Please retry"
+		}
+
 		return ResultData
 	}
 	pureMetric := utils.ExtractHostInfo(ResultData.Data.([]interface{}))

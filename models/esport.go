@@ -290,6 +290,7 @@ func Internal_HostMetricInfo_M(hostname string) Result {
 	esclient := utils.GetESClient()
 
 	if _, err := esclient.Info(); err != nil {
+		logs.Error("esclient connect error:", err.Error())
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.ElasticConnErr
 		return ResultData
@@ -299,8 +300,9 @@ func Internal_HostMetricInfo_M(hostname string) Result {
 	mres, err := esclient.API.Msearch(strings.NewReader(esqueryStr), esclient.Msearch.WithIndex("metric*"))
 
 	if err != nil {
-		logs.Error("host msearch err: ", err.Error())
+		logs.Error("host msearch error: ", err.Error())
 		ResultData.Message = err.Error()
+		ResultData.Code = utils.ElasticSearchErr
 		ResultData.Data = nil
 		return ResultData
 	}
