@@ -49,7 +49,7 @@ func GetHostList(name, ip string, from, limit int) Result {
 	data["items"] = HostList
 	data["total"] = total
 
-	ResultData.Code = utils.Success
+	ResultData.Code = http.StatusOK
 	ResultData.Data = data
 	return ResultData
 }
@@ -86,7 +86,7 @@ func GetHost(hostname string) Result {
 
 	data := Internal_GetHost(hostname)
 
-	ResultData.Code = utils.Success
+	ResultData.Code = http.StatusOK
 	ResultData.Data = data
 	return ResultData
 }

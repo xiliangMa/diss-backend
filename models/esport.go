@@ -297,11 +297,11 @@ func Internal_HostMetricInfo_M(hostname string) Result {
 	}
 
 	esqueryStr := strings.Replace(ESString("msearch_host_metric"), "!Param@hostname!", hostname, 4)
-	mres, err := esclient.API.Msearch(strings.NewReader(esqueryStr), esclient.Msearch.WithIndex("metric*"))
+	mres, errSearch := esclient.API.Msearch(strings.NewReader(esqueryStr), esclient.Msearch.WithIndex("metric*"))
 
-	if err != nil {
-		logs.Error("host msearch error: ", err.Error())
-		ResultData.Message = err.Error()
+	if errSearch != nil {
+		logs.Error("host msearch error: ", errSearch.Error())
+		ResultData.Message = errSearch.Error()
 		ResultData.Code = utils.ElasticSearchErr
 		ResultData.Data = nil
 		return ResultData
@@ -360,11 +360,18 @@ func Internal_ContainerListMetricInfo(hostname string) Result {
 		return ResultData
 	}
 	esqueryStr := strings.Replace(ESString("container_metric"), "!Param@hostname!", hostname, 1)
-	res, _ := esclient.API.Search(esclient.Search.WithContext(context.Background()),
+	res, errSearch := esclient.API.Search(esclient.Search.WithContext(context.Background()),
 		esclient.Search.WithIndex("metric*"),
 		esclient.Search.WithBody(strings.NewReader(esqueryStr)),
 		esclient.Search.WithTrackTotalHits(true),
 		esclient.Search.WithPretty())
+	if errSearch != nil {
+		logs.Error("host msearch error: ", errSearch.Error())
+		ResultData.Message = errSearch.Error()
+		ResultData.Code = utils.ElasticSearchErr
+		ResultData.Data = nil
+		return ResultData
+	}
 
 	var containerInfo map[string]interface{}
 	json.NewDecoder(res.Body).Decode(&containerInfo)
@@ -392,11 +399,18 @@ func Internal_ContainerSummaryInfo(hostname string) Result {
 	}
 
 	esqueryStr := strings.Replace(ESString("container_summary"), "!Param@hostname!", hostname, 1)
-	res, _ := esclient.API.Search(esclient.Search.WithContext(context.Background()),
+	res, errSearch := esclient.API.Search(esclient.Search.WithContext(context.Background()),
 		esclient.Search.WithIndex("metric*"),
 		esclient.Search.WithBody(strings.NewReader(esqueryStr)),
 		esclient.Search.WithTrackTotalHits(true),
 		esclient.Search.WithPretty())
+	if errSearch != nil {
+		logs.Error("host msearch error: ", errSearch.Error())
+		ResultData.Message = errSearch.Error()
+		ResultData.Code = utils.ElasticSearchErr
+		ResultData.Data = nil
+		return ResultData
+	}
 
 	var containerSummaryInfo map[string]interface{}
 	json.NewDecoder(res.Body).Decode(&containerSummaryInfo)
