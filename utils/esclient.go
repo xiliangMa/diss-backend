@@ -45,9 +45,11 @@ func InitEsClient() {
 	}
 
 	client, err := elasticsearch.NewClient(cfg)
+
 	if err != nil {
 		logs.Error("Error creating the ES client: %s", err)
 	}
+
 	ESClient = client
 }
 

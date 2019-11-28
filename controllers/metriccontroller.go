@@ -17,8 +17,10 @@ type MetricController struct {
 // @Success 200 {object} models.Result
 // @router /hostinfo [post]
 func (this *MetricController) HostMetricInfo() {
-		hostname := this.GetString("hostname")
-		this.Data["json"] = models.Internal_HostMetricInfo_M(hostname)
+	hostname := this.GetString("hostname")
+	hostdata := models.Internal_HostMetricInfo_M(hostname)
+
+	this.Data["json"] = hostdata
 	this.ServeJSON(false)
 }
 

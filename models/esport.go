@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/utils"
+	"net/http"
 	"strings"
 )
 
@@ -284,10 +285,10 @@ func ESString(queryTag string) string {
 	return QueryDefine[queryTag]
 }
 
-func Internal_HostMetricInfo_M(hostname string) Result{
+func Internal_HostMetricInfo_M(hostname string) Result {
 	var ResultData Result
-
 	esclient := utils.GetESClient()
+
 	if _, err := esclient.Info(); err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.ElasticConnErr
@@ -295,9 +296,16 @@ func Internal_HostMetricInfo_M(hostname string) Result{
 	}
 
 	esqueryStr := strings.Replace(ESString("msearch_host_metric"), "!Param@hostname!", hostname, 4)
-	mres, _ := esclient.API.Msearch(strings.NewReader(esqueryStr), esclient.Msearch.WithIndex("metric*"))
+	mres, err := esclient.API.Msearch(strings.NewReader(esqueryStr), esclient.Msearch.WithIndex("metric*"))
 
-	logs.Info("host metric info is ok ,  %s", mres.Status())
+	if err != nil {
+		logs.Error("host msearch err: ", err.Error())
+		ResultData.Message = err.Error()
+		ResultData.Data = nil
+		return ResultData
+	}
+
+	logs.Info("host metric info is ok , %s", mres.Status())
 
 	var hostInfo map[string]interface{}
 	json.NewDecoder(mres.Body).Decode(&hostInfo)
@@ -311,8 +319,8 @@ func Internal_HostMetricInfo_M(hostname string) Result{
 		hostInfoPure = append(hostInfoPure, hostInfoRefine3)
 	}
 
-	ResultData.Data = hostInfo
-	ResultData.Data = utils.Success
+	ResultData.Data = hostInfoPure
+	ResultData.Code = http.StatusOK
 	return ResultData
 }
 
@@ -367,10 +375,9 @@ func Internal_ContainerListMetricInfo(hostname string) Result {
 	}
 
 	ResultData.Data = hostInfoPure
-	ResultData.Data = utils.Success
+	ResultData.Code = http.StatusOK
 	return ResultData
 }
-
 
 func Internal_ContainerSummaryInfo(hostname string) Result {
 	var ResultData Result
@@ -395,6 +402,6 @@ func Internal_ContainerSummaryInfo(hostname string) Result {
 	containerInfoPure := containerSummaryInfo["aggregations"].(map[string]interface{})
 
 	ResultData.Data = containerInfoPure
-	ResultData.Data = utils.Success
+	ResultData.Code = http.StatusOK
 	return ResultData
 }

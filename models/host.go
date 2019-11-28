@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
+	"net/http"
 	"time"
 )
 
@@ -111,7 +112,7 @@ func GetHostWithMetric(hostname string) Result {
 	alldata["containerSummary"] = dockerContainerSummary.Data
 	alldata["containerRunning"] = dockerContainerRuning.Data
 
-	ResultData.Code = utils.Success
+	ResultData.Code = http.StatusOK
 	ResultData.Data = alldata
 	return ResultData
 }
@@ -134,7 +135,7 @@ func AddHost(host *Host) Result {
 		logs.Error("AddHost failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
-	ResultData.Code = utils.Success
+	ResultData.Code = http.StatusOK
 	ResultData.Data = id
 	return ResultData
 }
@@ -150,7 +151,7 @@ func DeleteHost(id int) Result {
 		logs.Error("DeleteHost failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
-	ResultData.Code = utils.Success
+	ResultData.Code = http.StatusOK
 	return ResultData
 }
 
@@ -169,9 +170,9 @@ func AddHostProcessing(h Host) interface{} {
 
 	// get host metric by hostname
 	ResultData = Internal_HostMetricInfo_M(h.HostName)
-	if ResultData.Code != 200 {
+	if ResultData.Code != http.StatusOK {
 		ResultData.Code = utils.ElasticConnErr
-		ResultData.Message = "Cant Connect ElaticSearch"
+		ResultData.Message = "Cant Connect ElaticSearch, Please retry"
 		return ResultData
 	}
 	pureMetric := utils.ExtractHostInfo(ResultData.Data.([]interface{}))
@@ -190,7 +191,7 @@ func AddHostProcessing(h Host) interface{} {
 	// add host
 	hostadded := AddHost(&h)
 	ResultData.Data = hostadded
-	ResultData.Code = utils.Success
+	ResultData.Code = http.StatusOK
 
 	return ResultData
 }

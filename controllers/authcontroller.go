@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
+	"net/http"
 )
 
 type AuthController struct {
@@ -24,7 +25,7 @@ func (this *AuthController) Login() {
 	var ResultData models.Result
 	result, code := utils.GreateToken(name, pwd)
 	ResultData.Code = code
-	if code != utils.Success {
+	if code != http.StatusOK {
 		ResultData.Message = result
 	} else {
 		ResultData.Data = result
@@ -44,7 +45,7 @@ func (this *AuthController) Authorize() {
 	var ResultData models.Result
 	result, code := utils.CheckToken(token)
 	ResultData.Code = code
-	if code != utils.Success {
+	if code != http.StatusOK {
 		ResultData.Message = result
 		logs.Error("Authorization failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 	} else {
