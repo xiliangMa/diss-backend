@@ -12,4 +12,5 @@ var (
 	SiginErr           = 17
 	AuthorizeErr       = 18
 	GetUserInfoErr     = 19
+	ElasticConnErr	   = 21
 )

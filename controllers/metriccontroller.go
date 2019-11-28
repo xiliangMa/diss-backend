@@ -16,11 +16,9 @@ type MetricController struct {
 // @Param hostname query string false "Enter hostname"
 // @Success 200 {object} models.Result
 // @router /hostinfo [post]
-func (this *MetricController) ContainerSummary() {
-	hostname := this.GetString("hostname")
-	hostInfo := models.GetHostMetricInfo_M(hostname)
-
-	this.Data["json"] = hostInfo
+func (this *MetricController) HostMetricInfo() {
+		hostname := this.GetString("hostname")
+		this.Data["json"] = models.Internal_HostMetricInfo_M(hostname)
 	this.ServeJSON(false)
 }
 
@@ -32,7 +30,7 @@ func (this *MetricController) ContainerSummary() {
 // @router /containerlist [post]
 func (this *MetricController) ContainerList() {
 	hostname := this.GetString("name")
-	containerList := models.GetContainerListMetricInfo(hostname)
+	containerList := models.Internal_ContainerListMetricInfo(hostname)
 
 	this.Data["json"] = containerList
 	this.ServeJSON(false)
@@ -44,9 +42,9 @@ func (this *MetricController) ContainerList() {
 // @Param hostname query string false "Enter hostname"
 // @Success 200 {object} models.Result
 // @router /containersummary [post]
-func (this *MetricController) GetHost() {
+func (this *MetricController) ContainerSummary() {
 	hostname := this.GetString("hostname")
-	containerSummary := models.GetContainerSummaryInfo(hostname)
+	containerSummary := models.Internal_ContainerSummaryInfo(hostname)
 
 	this.Data["json"] = containerSummary
 	this.ServeJSON(false)

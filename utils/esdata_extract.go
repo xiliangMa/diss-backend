@@ -1,7 +1,6 @@
 package utils
 
 func ExtractHostInfo(hostInfo []interface{}) map[string]interface{} {
-	//var hostMetricPure []map[string]string
 	var metricPure = make(map[string]interface{})
 
 	for _, x := range hostInfo {

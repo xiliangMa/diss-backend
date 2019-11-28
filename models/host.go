@@ -34,6 +34,7 @@ func GetHostList(name, ip string, from, limit int) Result {
 	o.Using("default")
 	var HostList []*Host
 	var ResultData Result
+
 	_, err := o.QueryTable("host").Limit(limit, from).All(&HostList)
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -46,6 +47,7 @@ func GetHostList(name, ip string, from, limit int) Result {
 	data := make(map[string]interface{})
 	data["items"] = HostList
 	data["total"] = total
+
 	ResultData.Code = utils.Success
 	ResultData.Data = data
 	return ResultData
@@ -93,16 +95,21 @@ func GetHostWithMetric(hostname string) Result {
 
 	alldata := make(map[string]interface{})
 	hostdata := Internal_GetHost(hostname)
-	hostMetricInfo := GetHostMetricInfo_M(hostname)
-	pureMetric := utils.ExtractHostInfo(hostMetricInfo)
-	dockerContainerSummary := GetContainerSummaryInfo(hostname)
-	dockerContainerRuning := GetContainerListMetricInfo(hostname)
+	ResultData = Internal_HostMetricInfo_M(hostname)
+	if ResultData.Message != "" {
+		ResultData.Code = utils.ElasticConnErr
+		ResultData.Message = "Cant Connect ElaticSearch"
+		return ResultData
+	}
+	pureMetric := utils.ExtractHostInfo(ResultData.Data.([]interface{}))
+	dockerContainerSummary := Internal_ContainerSummaryInfo(hostname)
+	dockerContainerRuning := Internal_ContainerListMetricInfo(hostname)
 
 	// alldata包含：主机基本配置，主机动态指标获取，运行的容器汇总，运行中的容器列表
 	alldata["hostConfig"] = hostdata
 	alldata["hostMetric"] = pureMetric
-	alldata["containerSummary"] = dockerContainerSummary
-	alldata["containerRunning"] = dockerContainerRuning
+	alldata["containerSummary"] = dockerContainerSummary.Data
+	alldata["containerRunning"] = dockerContainerRuning.Data
 
 	ResultData.Code = utils.Success
 	ResultData.Data = alldata
@@ -161,8 +168,13 @@ func AddHostProcessing(h Host) interface{} {
 	}
 
 	// get host metric by hostname
-	hostMetricInfo := GetHostMetricInfo_M(h.HostName)
-	pureMetric := utils.ExtractHostInfo(hostMetricInfo)
+	ResultData = Internal_HostMetricInfo_M(h.HostName)
+	if ResultData.Code != 200 {
+		ResultData.Code = utils.ElasticConnErr
+		ResultData.Message = "Cant Connect ElaticSearch"
+		return ResultData
+	}
+	pureMetric := utils.ExtractHostInfo(ResultData.Data.([]interface{}))
 
 	if len(pureMetric) == 0 {
 		ResultData.Code = utils.GetHostMetricError

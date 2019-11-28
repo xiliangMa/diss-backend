@@ -284,13 +284,21 @@ func ESString(queryTag string) string {
 	return QueryDefine[queryTag]
 }
 
-func GetHostMetricInfo_M(hostname string) []interface{} {
+func Internal_HostMetricInfo_M(hostname string) Result{
+	var ResultData Result
+
 	esclient := utils.GetESClient()
+	if _, err := esclient.Info(); err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.ElasticConnErr
+		return ResultData
+	}
 
 	esqueryStr := strings.Replace(ESString("msearch_host_metric"), "!Param@hostname!", hostname, 4)
 	mres, _ := esclient.API.Msearch(strings.NewReader(esqueryStr), esclient.Msearch.WithIndex("metric*"))
 
-	logs.Info("msearch is ok ,  %s", mres.Status())
+	logs.Info("host metric info is ok ,  %s", mres.Status())
+
 	var hostInfo map[string]interface{}
 	json.NewDecoder(mres.Body).Decode(&hostInfo)
 
@@ -303,16 +311,21 @@ func GetHostMetricInfo_M(hostname string) []interface{} {
 		hostInfoPure = append(hostInfoPure, hostInfoRefine3)
 	}
 
-	return hostInfoPure
+	ResultData.Data = hostInfo
+	ResultData.Data = utils.Success
+	return ResultData
 }
 
 /// -- 因为结构复杂不使用的方法 ，通过 search - aggregation 方式获取es数据
 func GetHostMetricInfo(hostname string) interface{} {
+	var ResultData Result
 
 	esclient := utils.GetESClient()
-	//curhost := Internal_GetHost(hostname)
-	//fmt.Print(curhost)
-
+	if _, err := esclient.Info(); err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.ElasticConnErr
+		return ResultData
+	}
 	res, _ := esclient.API.Search(esclient.Search.WithContext(context.Background()),
 		esclient.Search.WithIndex("metric*"),
 		esclient.Search.WithBody(strings.NewReader(ESString("host_metric"))),
@@ -327,9 +340,15 @@ func GetHostMetricInfo(hostname string) interface{} {
 	return hostInfoPure
 }
 
-func GetContainerListMetricInfo(hostname string) []interface{} {
-	esclient := utils.GetESClient()
+func Internal_ContainerListMetricInfo(hostname string) Result {
+	var ResultData Result
 
+	esclient := utils.GetESClient()
+	if _, err := esclient.Info(); err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.ElasticConnErr
+		return ResultData
+	}
 	esqueryStr := strings.Replace(ESString("container_metric"), "!Param@hostname!", hostname, 1)
 	res, _ := esclient.API.Search(esclient.Search.WithContext(context.Background()),
 		esclient.Search.WithIndex("metric*"),
@@ -347,12 +366,21 @@ func GetContainerListMetricInfo(hostname string) []interface{} {
 		hostInfoPure = append(hostInfoPure, x)
 	}
 
-	hostInfoPure = hostInfoPure
-	return hostInfoPure
+	ResultData.Data = hostInfoPure
+	ResultData.Data = utils.Success
+	return ResultData
 }
 
-func GetContainerSummaryInfo(hostname string) interface{} {
+
+func Internal_ContainerSummaryInfo(hostname string) Result {
+	var ResultData Result
+
 	esclient := utils.GetESClient()
+	if _, err := esclient.Info(); err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.ElasticConnErr
+		return ResultData
+	}
 
 	esqueryStr := strings.Replace(ESString("container_summary"), "!Param@hostname!", hostname, 1)
 	res, _ := esclient.API.Search(esclient.Search.WithContext(context.Background()),
@@ -366,5 +394,7 @@ func GetContainerSummaryInfo(hostname string) interface{} {
 
 	containerInfoPure := containerSummaryInfo["aggregations"].(map[string]interface{})
 
-	return containerInfoPure
+	ResultData.Data = containerInfoPure
+	ResultData.Data = utils.Success
+	return ResultData
 }
