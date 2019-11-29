@@ -317,8 +317,10 @@ func Internal_HostMetricInfo_M(hostname string) Result {
 		hostInfoRefine1 := x.(map[string]interface{})["hits"]
 		hostInfoRefine2 := hostInfoRefine1.(map[string]interface{})["hits"]
 		hostInfoRefine2a := hostInfoRefine2.([]interface{})
-		hostInfoRefine3 := hostInfoRefine2a[0].(map[string]interface{})["_source"]
-		hostInfoPure = append(hostInfoPure, hostInfoRefine3)
+		if len(hostInfoRefine2a) > 0 {
+			hostInfoRefine3 := hostInfoRefine2a[0].(map[string]interface{})["_source"]
+			hostInfoPure = append(hostInfoPure, hostInfoRefine3)
+		}
 	}
 
 	ResultData.Data = hostInfoPure
