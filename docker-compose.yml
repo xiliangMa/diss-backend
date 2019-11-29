@@ -21,7 +21,7 @@ services:
   diss-db:
     restart: unless-stopped
     container_name: diss-db
-    image: mysql:8.0
+    image: mysql:5.7.14
     environment:
       MYSQL_ROOT_PASSWORD: diss
       MYSQL_USER: diss

@@ -9,6 +9,7 @@ import (
 	"github.com/astaxie/beego/plugins/cors"
 	"github.com/xiliangMa/diss-backend/controllers"
 	"github.com/xiliangMa/diss-backend/utils"
+	"net/http"
 )
 
 func init() {
@@ -33,8 +34,8 @@ func init() {
 	var isLogin = func(ctx *context.Context) {
 		if ctx.Request.Method != "OPTIONS" {
 			_, code := utils.CheckToken(ctx.Input.Header("token"))
-			if code != 200 {
-				ctx.Redirect(401, "/swagger")
+			if code != http.StatusOK {
+				ctx.Redirect(http.StatusUnauthorized, "/swagger")
 			}
 		}
 
