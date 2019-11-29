@@ -62,9 +62,6 @@ func Internal_GetHost(hostname string) map[string]interface{} {
 	if err == orm.ErrNoRows {
 		fmt.Print(err)
 		logs.Error("GetHost failed, code: %d, err: %s", utils.GetHostZero, "Get Host Zero")
-		//data["Message"] = "Get Host Error"
-		//data["Code"] = utils.GetHostErr
-		//return data
 	}
 
 	if host.Id != 0 {
