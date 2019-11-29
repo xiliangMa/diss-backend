@@ -17,13 +17,11 @@ type Host struct {
 	HostDesc      string    `xorm:"default '' comment('主机说明') VARCHAR(255)"`
 	State         string    `xorm:"default '' comment('状态') VARCHAR(255)"`
 	PublicAddress string    `xorm:"default '' comment('外部访问地址') VARCHAR(255)"`
-	CreateTime    time.Time `xorm:"comment('记录添加时间') DATETIME"`
-	UpdateTime    time.Time `xorm:"comment('记录更改时间') DATETIME"`
+	CreateTime    time.Time `xorm:"comment('记录添加时间') DEFAULT:current_timestamp"`
+	UpdateTime    time.Time `xorm:"comment('记录更改时间') DEFAULT:current_timestamp"`
 	CpuKernel     float64   `xorm:"DOUBLE"`
-	CpuFrequency  float64   `xorm:"DOUBLE"`
 	Mem           float64   `xorm:"DOUBLE"`
 	Disk          float64   `xorm:"DOUBLE"`
-	Network       float64   `xorm:"DOUBLE"`
 }
 
 func init() {
@@ -54,7 +52,6 @@ func GetHostList(name, ip string, from, limit int) Result {
 	return ResultData
 }
 
-/// 内部处理函数，不返回ResultData，仅仅返回基础数据
 func Internal_GetHost(hostname string) map[string]interface{} {
 	o := orm.NewOrm()
 	o.Using("default")
@@ -78,17 +75,6 @@ func Internal_GetHost(hostname string) map[string]interface{} {
 	}
 
 	return data
-}
-
-/// ---- 暂时不使用这个函数，使用的GetHostWithMetric，加入获取Metric数据
-func GetHost(hostname string) Result {
-	var ResultData Result
-
-	data := Internal_GetHost(hostname)
-
-	ResultData.Code = http.StatusOK
-	ResultData.Data = data
-	return ResultData
 }
 
 func GetHostWithMetric(hostname string) Result {
@@ -117,16 +103,10 @@ func GetHostWithMetric(hostname string) Result {
 	return ResultData
 }
 
-/// ---- 暂时不使用这个函数，使用的AddHostProcessing，加入处理一些如主机已存在的异常
 func AddHost(host *Host) Result {
 	o := orm.NewOrm()
 	o.Using("default")
 	var ResultData Result
-
-	//createTime
-	timenow := time.Now().Unix()
-	formatTime := time.Unix(timenow, 0)
-	host.CreateTime = formatTime
 
 	id, err := o.Insert(host)
 	if err != nil {
@@ -185,7 +165,6 @@ func AddHostProcessing(h Host) interface{} {
 	if len(pureMetric) == 0 {
 		ResultData.Code = utils.GetHostMetricError
 		ResultData.Message = "Host Metric cant acquire"
-		ResultData.Data = h
 		logs.Error("AddHost failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}

@@ -34,13 +34,12 @@ func (this *HostController) HostList() {
 // @Title AddHost
 // @Description Add Host
 // @Param token header string true "Auth token"
-// @Param Host body models.Host true "host object"
+// @Param Host body models.Host true "host object , remove CreateTime and CreateTime before POST"
 // @Success 200 {object} models.Result
 // @router /addhost [post]
 func (this *HostController) AddHost() {
 	var h models.Host
 	json.Unmarshal(this.Ctx.Input.RequestBody, &h)
-
 	this.Data["json"] = models.AddHostProcessing(h)
 	this.ServeJSON(false)
 }
