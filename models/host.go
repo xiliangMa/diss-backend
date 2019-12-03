@@ -9,18 +9,18 @@ import (
 )
 
 type Host struct {
-	Id            int       `xorm:"not null pk autoincr INT(11)"`
-	HostLabel     string    `xorm:"not null default '' comment('用于界面显示的标签') VARCHAR(255)"`
-	HostName      string    `xorm:"not null default '' comment('主机名称') VARCHAR(255)"`
-	HostIp        string    `xorm:"not null default '' comment('主机IP') VARCHAR(255)"`
-	HostDesc      string    `xorm:"default '' comment('主机说明') VARCHAR(255)"`
-	State         string    `xorm:"default '' comment('状态') VARCHAR(255)"`
-	PublicAddress string    `xorm:"default '' comment('外部访问地址') VARCHAR(255)"`
-	CreateTime    time.Time `xorm:"not null comment('记录添加时间') DEFAULT:current_timestamp"`
-	UpdateTime    time.Time `xorm:"comment('记录更改时间') DEFAULT:current_timestamp"`
-	CpuKernel     float64   `xorm:"DOUBLE"`
-	Mem           float64   `xorm:"DOUBLE"`
-	Disk          float64   `xorm:"DOUBLE"`
+	Id            int    `orm:"not null;auto;description(主机id)"`
+	HostLabel     string `orm:"not null;description(标签)"`
+	HostName      string `orm:"not null;description(主机名)"`
+	HostIp        string `orm:"not null;description(主机IP)"`
+	HostDesc      string `orm:"null;description(主机名)"`
+	State         string `orm:"null;description(状态)"`
+	PublicAddress string `orm:"description(主机名)"`
+	CreateTime    time.Time `orm:"not null;description(创建时间);auto_now_add;type(datetime)"`
+	UpdateTime    time.Time `orm:"null;description(更新时间);auto_now;type(datetime)"`
+	CpuKernel     float64 `orm:"null;;description(cpu)"`
+	Mem           float64 `orm:"null;description(内存)"`
+	Disk          float64 `orm:"null;description(磁盘)"`
 }
 
 func init() {
