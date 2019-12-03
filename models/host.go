@@ -72,7 +72,7 @@ func Internal_GetHost(hostname string) map[string]interface{} {
 	return data
 }
 
-func GetHostWithMetric(hostname string) Result {
+func GetHostWithMetric_Processing(hostname string) Result {
 	var ResultData Result
 
 	alldata := make(map[string]interface{})
@@ -98,12 +98,12 @@ func GetHostWithMetric(hostname string) Result {
 	return ResultData
 }
 
-func AddHost(host *Host) Result {
+func Internal_AddHost(host *Host) Result {
 	o := orm.NewOrm()
 	o.Using("default")
 	var ResultData Result
 
-	id, err := o.Insert(host)
+	_, err := o.Insert(host)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddHostErr
@@ -111,11 +111,28 @@ func AddHost(host *Host) Result {
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK
-	ResultData.Data = id
+	ResultData.Data = host
 	return ResultData
 }
 
-func AddHostProcessing(h Host) interface{} {
+func Internal_EditHost(host *Host) Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData Result
+
+	_, err := o.Update(host)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditHostErr
+		logs.Error("EditHost failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = host
+	return ResultData
+}
+
+func AddHost_Processing(h Host, isEdit int) interface{} {
 	var ResultData Result
 
 	// host exist detect
@@ -152,9 +169,14 @@ func AddHostProcessing(h Host) interface{} {
 	h.Disk = pureMetric["filesystem.total"].(float64)
 	h.Mem = pureMetric["memory.total"].(float64)
 
-	// add host
-	hostadded := AddHost(&h)
-	ResultData.Data = hostadded
+	// isEdit = 0, add host
+	// isEdit = 1, edit host
+	if isEdit == 0 {
+		ResultData.Data = Internal_AddHost(&h)
+	} else {
+		ResultData.Data = Internal_EditHost(&h)
+	}
+
 	ResultData.Code = http.StatusOK
 
 	return ResultData

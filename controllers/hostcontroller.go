@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
-	"time"
 )
 
 // Hosts object api list
@@ -39,9 +38,22 @@ func (this *HostController) HostList() {
 func (this *HostController) AddHost() {
 	var h models.Host
 	json.Unmarshal(this.Ctx.Input.RequestBody, &h)
-	h.CreateTime = time.Now()
 
-	this.Data["json"] = models.AddHostProcessing(h)
+	this.Data["json"] = models.AddHost_Processing(h, 0)
+	this.ServeJSON(false)
+}
+
+// @Title EditHost
+// @Description Edit Host
+// @Param token header string true "Auth token"
+// @Param Host body models.Host true "host object , remove CreateTime and UpdateTime before POST"
+// @Success 200 {object} models.Result
+// @router /edithost [post]
+func (this *HostController) EditHost() {
+	var h models.Host
+	json.Unmarshal(this.Ctx.Input.RequestBody, &h)
+
+	this.Data["json"] = models.AddHost_Processing(h, 1)
 	this.ServeJSON(false)
 }
 
@@ -54,7 +66,7 @@ func (this *HostController) AddHost() {
 func (this *HostController) GetHost() {
 	hostname := this.GetString("hostname")
 
-	this.Data["json"] = models.GetHostWithMetric(hostname)
+	this.Data["json"] = models.GetHostWithMetric_Processing(hostname)
 	this.ServeJSON(false)
 }
 

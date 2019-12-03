@@ -8,6 +8,7 @@ var (
 	GetHostZero        = 5
 	HostExistError     = 6
 	GetHostMetricError = 7
+	EditHostErr        = 8
 	SiginErr           = 17
 	AuthorizeErr       = 18
 	GetUserInfoErr     = 19

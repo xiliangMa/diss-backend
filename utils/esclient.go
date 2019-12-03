@@ -12,7 +12,7 @@ var (
 	ESClient *elasticsearch.Client
 )
 
-func InitEsClient()  {
+func InitEsClient() {
 	var Adress []string
 	var UserName string
 	var Password string
