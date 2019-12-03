@@ -9,18 +9,18 @@ import (
 )
 
 type Host struct {
-	Id            int    `orm:"not null;auto;description(主机id)"`
-	HostLabel     string `orm:"not null;description(标签)"`
-	HostName      string `orm:"not null;description(主机名)"`
-	HostIp        string `orm:"not null;description(主机IP)"`
-	HostDesc      string `orm:"null;description(主机名)"`
-	State         string `orm:"null;description(状态)"`
-	PublicAddress string `orm:"description(主机名)"`
-	CreateTime    time.Time `orm:"not null;description(创建时间);auto_now_add;type(datetime)"`
-	UpdateTime    time.Time `orm:"null;description(更新时间);auto_now;type(datetime)"`
-	CpuKernel     float64 `orm:"null;;description(cpu)"`
-	Mem           float64 `orm:"null;description(内存)"`
-	Disk          float64 `orm:"null;description(磁盘)"`
+	Id           int       `orm:"auto;description(主机id)"`
+	HostLabel    string    `orm:"description(标签)"`
+	HostName     string    `orm:"description(主机名)"`
+	InternalAddr string    `orm:"description(内部访问主机地址，通常为IP)"`
+	PublicAddr   string    `orm:"null; description(外部访问地址，IP或域名)"`
+	HostDesc     string    `orm:"null;description(主机描述)"`
+	State        string    `orm:"null;description(状态)"`
+	CreateTime   time.Time `orm:"description(创建时间);auto_now_add;type(datetime)"`
+	UpdateTime   time.Time `orm:"null;description(更新时间);auto_now;type(datetime)"`
+	CpuKernel    float64   `orm:"null;;description(cpu)"`
+	Mem          float64   `orm:"null;description(内存)"`
+	Disk         float64   `orm:"null;description(磁盘)"`
 }
 
 func init() {

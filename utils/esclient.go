@@ -12,7 +12,7 @@ var (
 	ESClient *elasticsearch.Client
 )
 
-func InitEsClient() {
+func InitEsClient()  {
 	var Adress []string
 	var UserName string
 	var Password string
@@ -30,14 +30,14 @@ func InitEsClient() {
 		Addresses: Adress,
 		Username:  UserName,
 		Password:  Password,
-// 		Transport: &http.Transport{
-// 			MaxIdleConnsPerHost:   10,
-// 			ResponseHeaderTimeout: time.Second,
-// 			DialContext:           (&net.Dialer{Timeout: time.Second}).DialContext,
-// 			TLSClientConfig: &tls.Config{
-// 				MinVersion: tls.VersionTLS11,
-// 			},
-// 		},
+		//Transport: &http.Transport{
+		//	MaxIdleConnsPerHost:   10,
+		//	ResponseHeaderTimeout: time.Second,
+		//	DialContext:           (&net.Dialer{Timeout: time.Second}).DialContext,
+		//	TLSClientConfig: &tls.Config{
+		//		MinVersion: tls.VersionTLS11,
+		//	},
+		//},
 	}
 
 	client, err := elasticsearch.NewClient(cfg)
@@ -47,6 +47,7 @@ func InitEsClient() {
 	}
 
 	ESClient = client
+	//return client
 }
 
 func GetESClient() *elasticsearch.Client {
