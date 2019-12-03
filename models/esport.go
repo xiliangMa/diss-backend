@@ -289,9 +289,9 @@ func Internal_HostMetricInfo_M(hostname string) Result {
 	var ResultData Result
 	esclient := utils.GetESClient()
 
-	if _, err := esclient.Info(); err != nil {
-		logs.Error("esclient connect error:", err.Error())
-		ResultData.Message = err.Error()
+	if _, errConnect := esclient.Info(); errConnect != nil {
+		logs.Error("esclient connect error:", errConnect.Error())
+		ResultData.Message = errConnect.Error()
 		ResultData.Code = utils.ElasticConnErr
 		return ResultData
 	}
@@ -328,7 +328,7 @@ func Internal_HostMetricInfo_M(hostname string) Result {
 	return ResultData
 }
 
-/// -- 因为结构复杂不使用的方法 ，通过 search - aggregation 方式获取es数据
+// -- 因为结构复杂不使用的方法 ，通过 search - aggregation 方式获取es数据
 func GetHostMetricInfo(hostname string) interface{} {
 	var ResultData Result
 

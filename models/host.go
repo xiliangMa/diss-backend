@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -17,7 +16,7 @@ type Host struct {
 	HostDesc      string    `xorm:"default '' comment('主机说明') VARCHAR(255)"`
 	State         string    `xorm:"default '' comment('状态') VARCHAR(255)"`
 	PublicAddress string    `xorm:"default '' comment('外部访问地址') VARCHAR(255)"`
-	CreateTime    time.Time `xorm:"comment('记录添加时间') DEFAULT:current_timestamp"`
+	CreateTime    time.Time `xorm:"not null comment('记录添加时间') DEFAULT:current_timestamp"`
 	UpdateTime    time.Time `xorm:"comment('记录更改时间') DEFAULT:current_timestamp"`
 	CpuKernel     float64   `xorm:"DOUBLE"`
 	Mem           float64   `xorm:"DOUBLE"`
@@ -60,8 +59,7 @@ func Internal_GetHost(hostname string) map[string]interface{} {
 
 	err := o.QueryTable("host").Filter("host_name", hostname).One(&host)
 	if err == orm.ErrNoRows {
-		fmt.Print(err)
-		logs.Error("GetHost failed, code: %d, err: %s", utils.GetHostZero, "Get Host Zero")
+		logs.Info("Not Get one host , can be forward,  code: %d, warn: %s", utils.GetHostZero, "Get Host Zero")
 	}
 
 	if host.Id != 0 {
@@ -117,21 +115,6 @@ func AddHost(host *Host) Result {
 	return ResultData
 }
 
-func DeleteHost(id int) Result {
-	o := orm.NewOrm()
-	o.Using("default")
-	var ResultData Result
-	_, err := o.Delete(&Host{Id: id})
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.DeleteHostErr
-		logs.Error("DeleteHost failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-	ResultData.Code = http.StatusOK
-	return ResultData
-}
-
 func AddHostProcessing(h Host) interface{} {
 	var ResultData Result
 
@@ -152,7 +135,7 @@ func AddHostProcessing(h Host) interface{} {
 			ResultData.Message = "Cant Connect ElaticSearch, Please retry"
 		}
 		if ResultData.Code == utils.ElasticSearchErr {
-			ResultData.Message = "Elastic Search Error, Please retry"
+			ResultData.Message = "ElasticSearch fetch data Error, Please retry"
 		}
 
 		return ResultData
@@ -174,5 +157,20 @@ func AddHostProcessing(h Host) interface{} {
 	ResultData.Data = hostadded
 	ResultData.Code = http.StatusOK
 
+	return ResultData
+}
+
+func DeleteHost(id int) Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData Result
+	_, err := o.Delete(&Host{Id: id})
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteHostErr
+		logs.Error("DeleteHost failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
 	return ResultData
 }
