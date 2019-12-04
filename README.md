@@ -73,7 +73,3 @@ docker-compose up -d
 ```
 docker-compose down
 ```
-
-## Run in kubernetes cluster
-
-kubectl apply -f deploy-k8s.yml
