@@ -308,7 +308,6 @@ func Internal_HostMetricInfo_M(hostname string) Result {
 	}
 	defer mres.Body.Close()
 
-
 	logs.Info("host metric info is ok , %s", mres.Status())
 
 	var hostInfo map[string]interface{}
