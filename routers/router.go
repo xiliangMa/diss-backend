@@ -1,6 +1,7 @@
 // @APIVersion 1.0.0
 // @Title DISS API
 // @Description DISS API
+// @Schemes http, https
 package routers
 
 import (
