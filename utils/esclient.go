@@ -1,18 +1,22 @@
 package utils
 
 import (
+	"crypto/tls"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/elastic/go-elasticsearch"
+	"net"
+	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 var (
-	ESClient *elasticsearch.Client
+	cfg elasticsearch.Config
 )
 
-func InitEsClient() {
+func initCfg() elasticsearch.Config {
 	var Adress []string
 	var UserName string
 	var Password string
@@ -26,33 +30,29 @@ func InitEsClient() {
 		Password = os.Getenv("Password")
 	}
 
-	cfg := elasticsearch.Config{
+	cfg = elasticsearch.Config{
 		Addresses: Adress,
 		Username:  UserName,
 		Password:  Password,
-		//Transport: &http.Transport{
-		//	MaxIdleConnsPerHost:   10,
-		//	ResponseHeaderTimeout: time.Second,
-		//	DialContext:           (&net.Dialer{Timeout: time.Second}).DialContext,
-		//	TLSClientConfig: &tls.Config{
-		//		MinVersion: tls.VersionTLS11,
-		//	},
-		//},
+		Transport: &http.Transport{
+			MaxIdleConnsPerHost:   10,
+			ResponseHeaderTimeout: time.Second,
+			DialContext:           (&net.Dialer{Timeout: time.Second}).DialContext,
+			TLSClientConfig: &tls.Config{
+				MinVersion: tls.VersionTLS11,
+			},
+		},
 	}
 
-	client, err := elasticsearch.NewClient(cfg)
+	return cfg
+}
+
+func GetESClient() (*elasticsearch.Client, error) {
+	client, err := elasticsearch.NewClient(initCfg())
 
 	if err != nil {
 		logs.Error("Error creating the ES client: %s", err)
+		err = err
 	}
-
-	ESClient = client
-	//return client
-}
-
-func GetESClient() *elasticsearch.Client {
-	if ESClient == nil {
-		InitEsClient()
-	}
-	return ESClient
+	return client, err
 }
