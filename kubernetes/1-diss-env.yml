@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: diss
+  name: diss-env
+data:
+  Address: http://localhost:9200,
+  MYSQL_DATABASE: diss
+  MYSQL_HOST: diss-db
+  MYSQL_PASSWORD: diss
+  MYSQL_ROOT_PASSWORD: diss
+  MYSQL_USER: diss
+  Password: changeme
+  RunMode: prod
+  UserName: elastic

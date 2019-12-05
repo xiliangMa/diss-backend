@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: diss
+  name: diss-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: diss
+  template:
+    metadata:
+      labels:
+        app: diss
+    spec:
+      containers:
+      - name: diss-backend
+        image: xiliangma/diss-backend
+        imagePullPolicy: IfNotPresent
+        ports:
+          - name: dev
+            containerPort: 8080
+            hostPort: 8080
+          - name: https
+            containerPort: 10443
+            hostPort: 10443
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1024Mi
+          requests:
+            cpu: 300m
+            memory: 256Mi
+        livenessProbe:
+          httpGet:
+            path: /swagger
+            port: 10443
+            scheme: HTTPS
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 3
+          failureThreshold: 3
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: MYSQL_ROOT_PASSWORD
+              name: diss-env
+        - name: MYSQL_USER
+          valueFrom:
+            configMapKeyRef:
+              key: MYSQL_USER
+              name: diss-env
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: MYSQL_PASSWORD
+              name: diss-env
+        - name: MYSQL_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              key: MYSQL_DATABASE
+              name: diss-env
+        - name: MYSQL_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: MYSQL_HOST
+              name: diss-env
+        - name: RunMode
+          valueFrom:
+            configMapKeyRef:
+              key: RunMode
+              name: diss-env
+        - name: Address
+          valueFrom:
+            configMapKeyRef:
+              key: Address
+              name: diss-env
+        - name: UserName
+          valueFrom:
+            configMapKeyRef:
+              key: UserName
+              name: diss-env
+        - name: Password
+          valueFrom:
+            configMapKeyRef:
+              key: Password
+              name: diss-env
