@@ -73,3 +73,9 @@ docker-compose up -d
 ```
 docker-compose down
 ```
+
+
+## Run by kubernetes
+```
+kubectl apply -f install.yml
+```
