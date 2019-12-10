@@ -29,6 +29,7 @@ func init() {
 
 func GetHostList(name, ip string, from, limit int) Result {
 	o := orm.NewOrm()
+	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
 	var HostList []*Host
 	var ResultData Result
@@ -72,7 +73,7 @@ func Internal_GetHost(hostname string) map[string]interface{} {
 	return data
 }
 
-func GetHostWithMetric_Processing(hostname string) Result {
+func GetHostWithContainer_Processing(hostname string) Result {
 	var ResultData Result
 
 	alldata := make(map[string]interface{})
@@ -97,6 +98,33 @@ func GetHostWithMetric_Processing(hostname string) Result {
 	ResultData.Data = alldata
 	return ResultData
 }
+
+func GetHostWithImage_Processing(hostname string) Result {
+	var ResultData Result
+
+	alldata := make(map[string]interface{})
+	hostdata := Internal_GetHost(hostname)
+	ResultData = Internal_HostMetricInfo_M(hostname)
+	if ResultData.Message != "" {
+		ResultData.Code = utils.ElasticConnErr
+		ResultData.Message = "Cant Connect ElaticSearch"
+		return ResultData
+	}
+	pureMetric := utils.ExtractHostInfo(ResultData.Data.([]interface{}))
+	dockerImageList := Internal_ImageListMetricInfo(hostname)
+
+	// alldata包含：主机基本配置，主机动态指标获取，运行的容器汇总，运行中的容器列表
+	alldata["hostConfig"] = hostdata
+	alldata["hostMetric"] = pureMetric
+	alldata["containerRunning"] = dockerImageList.Data
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = alldata
+	return ResultData
+}
+
+
+
 
 func Internal_AddHost(host *Host) Result {
 	o := orm.NewOrm()

@@ -152,3 +152,43 @@ func Internal_ContainerSummaryInfo(hostname string) Result {
 	ResultData.Code = http.StatusOK
 	return ResultData
 }
+
+
+func Internal_ImageListMetricInfo(hostname string) Result {
+	var ResultData Result
+
+	esclient, err := utils.GetESClient()
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.ElasticConnErr
+		return ResultData
+	}
+	esqueryStr := strings.Replace(ESString("dockerimage_metric"), "!Param@hostname!", hostname, 1)
+	res, err := esclient.API.Search(esclient.Search.WithContext(context.Background()),
+		esclient.Search.WithIndex("metric*"),
+		esclient.Search.WithBody(strings.NewReader(esqueryStr)),
+		esclient.Search.WithTrackTotalHits(true),
+		esclient.Search.WithPretty())
+	if err != nil {
+		logs.Error("host msearch error: ", err.Error())
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.ElasticSearchErr
+		ResultData.Data = nil
+		return ResultData
+	}
+	defer res.Body.Close()
+
+	var imageInfo map[string]interface{}
+	json.NewDecoder(res.Body).Decode(&imageInfo)
+
+	var hostInfoPure []interface{}
+	containerInfoRefine1 := imageInfo["aggregations"].(map[string]interface{})
+	containerInfoRefine2 := containerInfoRefine1["image_list"].(map[string]interface{})
+	for _, x := range containerInfoRefine2["buckets"].([]interface{}) {
+		hostInfoPure = append(hostInfoPure, x)
+	}
+
+	ResultData.Data = hostInfoPure
+	ResultData.Code = http.StatusOK
+	return ResultData
+}

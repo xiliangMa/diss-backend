@@ -51,3 +51,18 @@ func (this *MetricController) ContainerSummary() {
 	this.Data["json"] = containerSummary
 	this.ServeJSON(false)
 }
+
+
+// @Title GetImageList
+// @Description Get ImageList
+// @Param token header string true "Auth token"
+// @Param name query string false "host name"
+// @Success 200 {object} models.Result
+// @router /imagelist [post]
+func (this *MetricController) ImageList() {
+	hostname := this.GetString("name")
+	containerList := models.Internal_ImageListMetricInfo(hostname)
+
+	this.Data["json"] = containerList
+	this.ServeJSON(false)
+}

@@ -57,18 +57,39 @@ func (this *HostController) EditHost() {
 	this.ServeJSON(false)
 }
 
-// @Title GetHost
-// @Description Get one Host
+// @Title GetHostWithContainer
+// @Description Get one Host and its containers
 // @Param token header string true "Auth token"
 // @Param hostname query string false "Enter hostname"
 // @Success 200 {object} models.Result
-// @router /gethost [post]
+// @router /gethost_container [post]
+func (this *HostController) GetHostContainers() {
+	hostname := this.GetString("hostname")
+
+	this.Data["json"] = models.GetHostWithContainer_Processing(hostname)
+	this.ServeJSON(false)
+}
+
 func (this *HostController) GetHost() {
 	hostname := this.GetString("hostname")
 
-	this.Data["json"] = models.GetHostWithMetric_Processing(hostname)
+	this.Data["json"] = models.GetHostWithContainer_Processing(hostname)
 	this.ServeJSON(false)
 }
+
+// @Title GetHostWithContainer
+// @Description Get one Host and its images
+// @Param token header string true "Auth token"
+// @Param hostname query string false "Enter hostname"
+// @Success 200 {object} models.Result
+// @router /gethost_images [post]
+func (this *HostController) GetHostImages() {
+	hostname := this.GetString("hostname")
+
+	this.Data["json"] = models.GetHostWithImage_Processing(hostname)
+	this.ServeJSON(false)
+}
+
 
 // @Title DelHost
 // @Description Delete Host
@@ -81,5 +102,4 @@ func (this *HostController) DeleteHost() {
 
 	this.Data["json"] = models.DeleteHost(id)
 	this.ServeJSON(false)
-
 }

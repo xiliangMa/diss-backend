@@ -36,7 +36,7 @@ func InitDB() {
 	//数据库端口
 	//dbPort := beego.AppConfig.String(dbType + "::Port")
 
-	datasource := fmt.Sprintf("%s%s%s%s%s%s%s%s", dbUser, ":", dbPwd, "@tcp(", dbHost, ":3306)/", dbName, "?charset=utf8")
+	datasource := fmt.Sprintf("%s%s%s%s%s%s%s%s%s%s", dbUser, ":", dbPwd, "@tcp(", dbHost, ":3306)/", dbName, "?charset=utf8", "&parseTime=true", "&loc=Asia%2FShanghai")
 
 	orm.RegisterDriver("mysql", orm.DRMySQL)
 	orm.RegisterDataBase(dbAlias, "mysql", datasource)

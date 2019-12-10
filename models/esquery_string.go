@@ -272,6 +272,232 @@ func ESString(queryTag string) string {
         }
     }
 }`
+	QueryDefine["dockerimage_metric"] = `{
+    "timeout": "30000ms",
+    "aggs":
+    {
+        "image_list":
+        {
+            "terms":
+            {
+                "field": "container.image.name",
+                "order":
+                {
+                    "_count": "desc"
+                },
+                "size": 15
+            },
+            "aggs":
+            {
+                "container":
+                {
+                    "terms":
+                    {
+                        "field": "container.name",
+                        "order":
+                        {
+                            "_count": "desc"
+                        },
+                        "size": 12
+                    }
+                }
+            }
+        }
+    },
+    "size": 0,
+    "_source":
+    {
+        "excludes": ["service", "agent", "ecs", "host"]
+    },
+    "stored_fields": ["*"],
+    "script_fields":
+    {},
+    "docvalue_fields": [
+    {
+        "field": "@timestamp",
+        "format": "date_time"
+    },
+    {
+        "field": "ceph.monitor_health.last_updated",
+        "format": "date_time"
+    },
+    {
+        "field": "docker.container.created",
+        "format": "date_time"
+    },
+    {
+        "field": "docker.healthcheck.event.end_date",
+        "format": "date_time"
+    },
+    {
+        "field": "docker.healthcheck.event.start_date",
+        "format": "date_time"
+    },
+    {
+        "field": "docker.image.created",
+        "format": "date_time"
+    },
+    {
+        "field": "event.created",
+        "format": "date_time"
+    },
+    {
+        "field": "event.end",
+        "format": "date_time"
+    },
+    {
+        "field": "event.start",
+        "format": "date_time"
+    },
+    {
+        "field": "file.accessed",
+        "format": "date_time"
+    },
+    {
+        "field": "file.created",
+        "format": "date_time"
+    },
+    {
+        "field": "file.ctime",
+        "format": "date_time"
+    },
+    {
+        "field": "file.mtime",
+        "format": "date_time"
+    },
+    {
+        "field": "kubernetes.container.start_time",
+        "format": "date_time"
+    },
+    {
+        "field": "kubernetes.event.metadata.timestamp.created",
+        "format": "date_time"
+    },
+    {
+        "field": "kubernetes.event.timestamp.first_occurrence",
+        "format": "date_time"
+    },
+    {
+        "field": "kubernetes.event.timestamp.last_occurrence",
+        "format": "date_time"
+    },
+    {
+        "field": "kubernetes.node.start_time",
+        "format": "date_time"
+    },
+    {
+        "field": "kubernetes.pod.start_time",
+        "format": "date_time"
+    },
+    {
+        "field": "kubernetes.system.start_time",
+        "format": "date_time"
+    },
+    {
+        "field": "mongodb.replstatus.server_date",
+        "format": "date_time"
+    },
+    {
+        "field": "mongodb.status.background_flushing.last_finished",
+        "format": "date_time"
+    },
+    {
+        "field": "mongodb.status.local_time",
+        "format": "date_time"
+    },
+    {
+        "field": "mssql.transaction_log.stats.backup_time",
+        "format": "date_time"
+    },
+    {
+        "field": "nats.server.time",
+        "format": "date_time"
+    },
+    {
+        "field": "php_fpm.pool.start_time",
+        "format": "date_time"
+    },
+    {
+        "field": "php_fpm.process.start_time",
+        "format": "date_time"
+    },
+    {
+        "field": "postgresql.activity.backend_start",
+        "format": "date_time"
+    },
+    {
+        "field": "postgresql.activity.query_start",
+        "format": "date_time"
+    },
+    {
+        "field": "postgresql.activity.state_change",
+        "format": "date_time"
+    },
+    {
+        "field": "postgresql.activity.transaction_start",
+        "format": "date_time"
+    },
+    {
+        "field": "postgresql.bgwriter.stats_reset",
+        "format": "date_time"
+    },
+    {
+        "field": "postgresql.database.stats_reset",
+        "format": "date_time"
+    },
+    {
+        "field": "process.start",
+        "format": "date_time"
+    },
+    {
+        "field": "system.process.cpu.start_time",
+        "format": "date_time"
+    },
+    {
+        "field": "zookeeper.server.version_date",
+        "format": "date_time"
+    }],
+    "query":
+    {
+        "bool":
+        {
+            "must": [],
+            "filter": [
+            {
+                "match_all":
+                {}
+            },
+            {
+                "bool":
+                {
+                    "should": [
+                    {
+                        "match":
+                        {
+                            "event.module": "docker"
+                        }
+                    }],
+                    "minimum_should_match": 1
+                }
+            },
+            {
+                "bool":
+                {
+                    "should": [
+                    {
+                        "match_phrase":
+                        {
+                            "host.name": "!Param@hostname!"
+                        }
+                    }],
+                    "minimum_should_match": 1
+                }
+            }],
+            "should": [],
+            "must_not": []
+        }
+    }
+}`
 
 	return QueryDefine[queryTag]
 }
