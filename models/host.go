@@ -113,10 +113,10 @@ func GetHostWithImage_Processing(hostname string) Result {
 	pureMetric := utils.ExtractHostInfo(ResultData.Data.([]interface{}))
 	dockerImageList := Internal_ImageListMetricInfo(hostname)
 
-	// alldata包含：主机基本配置，主机动态指标获取，运行的容器汇总，运行中的容器列表
+	// alldata包含：主机基本配置，主机动态指标获取，镜像列表
 	alldata["hostConfig"] = hostdata
 	alldata["hostMetric"] = pureMetric
-	alldata["containerRunning"] = dockerImageList.Data
+	alldata["imageList"] = dockerImageList.Data
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = alldata

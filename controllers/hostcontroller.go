@@ -62,7 +62,7 @@ func (this *HostController) EditHost() {
 // @Param token header string true "Auth token"
 // @Param hostname query string false "Enter hostname"
 // @Success 200 {object} models.Result
-// @router /gethost_container [post]
+// @router /gethost_containers [post]
 func (this *HostController) GetHostContainers() {
 	hostname := this.GetString("hostname")
 
@@ -77,7 +77,7 @@ func (this *HostController) GetHost() {
 	this.ServeJSON(false)
 }
 
-// @Title GetHostWithContainer
+// @Title GetHostWithImage
 // @Description Get one Host and its images
 // @Param token header string true "Auth token"
 // @Param hostname query string false "Enter hostname"
