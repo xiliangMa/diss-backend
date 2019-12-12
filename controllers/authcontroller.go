@@ -36,12 +36,12 @@ func (this *AuthController) Login() {
 
 // @Title Authorization
 // @Description Authorization
-// @Param authorization header string true "Token"
+// @Param token header string true "Auth token"
 // @Success 200 {object} models.Result
 // @router /Authorization [post]
 func (this *AuthController) Authorize() {
 
-	token := this.Ctx.Request.Header.Get("authorization")
+	token := this.Ctx.Request.Header.Get("token")
 	var ResultData models.Result
 	result, code := utils.CheckToken(token)
 	ResultData.Code = code

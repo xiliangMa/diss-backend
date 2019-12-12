@@ -285,7 +285,7 @@ func ESString(queryTag string) string {
                 {
                     "_count": "desc"
                 },
-                "size": 15
+                "size": 80
             },
             "aggs":
             {
@@ -298,7 +298,7 @@ func ESString(queryTag string) string {
                         {
                             "_count": "desc"
                         },
-                        "size": 12
+                        "size": 50
                     }
                 }
             }
