@@ -102,7 +102,7 @@ func ESString(queryTag string) string {
                 {
                     "1": "desc"
                 },
-                "size": 5
+                "size": 100
             },
             "aggs":
             {
@@ -140,7 +140,18 @@ func ESString(queryTag string) string {
                     {
                         "field": "docker.memory.rss.total"
                     }
-                }
+                },
+                "created": {
+                	"max": {
+                		"field" : "docker.container.created"
+                	}
+                },
+                "status" : {
+		            "terms" : {
+		                "field" : "docker.container.status",
+		                "size": 1
+		            }
+        		}
             }
         }
     },
@@ -150,6 +161,153 @@ func ESString(queryTag string) string {
         "excludes": []
     },
     "stored_fields": ["*"],
+   "docvalue_fields": [
+    {
+        "field": "@timestamp",
+        "format": "date_time"
+    },
+    {
+        "field": "ceph.monitor_health.last_updated",
+        "format": "date_time"
+    },
+    {
+        "field": "docker.container.created",
+        "format": "date_time"
+    },
+    {
+        "field": "docker.healthcheck.event.end_date",
+        "format": "date_time"
+    },
+    {
+        "field": "docker.healthcheck.event.start_date",
+        "format": "date_time"
+    },
+    {
+        "field": "docker.image.created"
+    },
+    {
+        "field": "docker.container.status"
+    },
+    {
+        "field": "event.created",
+        "format": "date_time"
+    },
+    {
+        "field": "event.end",
+        "format": "date_time"
+    },
+    {
+        "field": "event.start",
+        "format": "date_time"
+    },
+    {
+        "field": "file.accessed",
+        "format": "date_time"
+    },
+    {
+        "field": "file.created",
+        "format": "date_time"
+    },
+    {
+        "field": "file.ctime",
+        "format": "date_time"
+    },
+    {
+        "field": "file.mtime",
+        "format": "date_time"
+    },
+    {
+        "field": "kubernetes.container.start_time",
+        "format": "date_time"
+    },
+    {
+        "field": "kubernetes.event.metadata.timestamp.created",
+        "format": "date_time"
+    },
+    {
+        "field": "kubernetes.event.timestamp.first_occurrence",
+        "format": "date_time"
+    },
+    {
+        "field": "kubernetes.event.timestamp.last_occurrence",
+        "format": "date_time"
+    },
+    {
+        "field": "kubernetes.node.start_time",
+        "format": "date_time"
+    },
+    {
+        "field": "kubernetes.pod.start_time",
+        "format": "date_time"
+    },
+    {
+        "field": "kubernetes.system.start_time",
+        "format": "date_time"
+    },
+    {
+        "field": "mongodb.replstatus.server_date",
+        "format": "date_time"
+    },
+    {
+        "field": "mongodb.status.background_flushing.last_finished",
+        "format": "date_time"
+    },
+    {
+        "field": "mongodb.status.local_time",
+        "format": "date_time"
+    },
+    {
+        "field": "mssql.transaction_log.stats.backup_time",
+        "format": "date_time"
+    },
+    {
+        "field": "nats.server.time",
+        "format": "date_time"
+    },
+    {
+        "field": "php_fpm.pool.start_time",
+        "format": "date_time"
+    },
+    {
+        "field": "php_fpm.process.start_time",
+        "format": "date_time"
+    },
+    {
+        "field": "postgresql.activity.backend_start",
+        "format": "date_time"
+    },
+    {
+        "field": "postgresql.activity.query_start",
+        "format": "date_time"
+    },
+    {
+        "field": "postgresql.activity.state_change",
+        "format": "date_time"
+    },
+    {
+        "field": "postgresql.activity.transaction_start",
+        "format": "date_time"
+    },
+    {
+        "field": "postgresql.bgwriter.stats_reset",
+        "format": "date_time"
+    },
+    {
+        "field": "postgresql.database.stats_reset",
+        "format": "date_time"
+    },
+    {
+        "field": "process.start",
+        "format": "date_time"
+    },
+    {
+        "field": "system.process.cpu.start_time",
+        "format": "date_time"
+    },
+    {
+        "field": "zookeeper.server.version_date",
+        "format": "date_time"
+    }],
     "sort": { "@timestamp": { "order": "desc" }},
     "query":
     {
@@ -195,7 +353,16 @@ func ESString(queryTag string) string {
                     }],
                     "minimum_should_match": 1
                 }
-            }],
+            },
+			{
+			  "range": {
+				"@timestamp": {
+				  "format": "strict_date_optional_time",
+				  "gte": "!Param@gteTime!",
+				  "lte": "!Param@lteTime!"
+				}
+			  }
+			}],
             "should": [],
             "must_not": []
         }
@@ -266,7 +433,16 @@ func ESString(queryTag string) string {
                     }],
                     "minimum_should_match": 1
                 }
-            }],
+            },
+			{
+			  "range": {
+				"@timestamp": {
+				  "format": "strict_date_optional_time",
+				  "gte": "!Param@gteTime!",
+				  "lte": "!Param@lteTime!"
+				}
+			  }
+			}],
             "should": [],
             "must_not": []
         }
@@ -285,7 +461,7 @@ func ESString(queryTag string) string {
                 {
                     "_count": "desc"
                 },
-                "size": 80
+                "size": 100
             },
             "aggs":
             {
@@ -298,7 +474,7 @@ func ESString(queryTag string) string {
                         {
                             "_count": "desc"
                         },
-                        "size": 50
+                        "size": 100
                     }
                 }
             }

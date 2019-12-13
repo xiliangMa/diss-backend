@@ -16,6 +16,13 @@ var (
 	cfg elasticsearch.Config
 )
 
+func LteandGteTime() (string, string) {
+	timeDur, _ := time.ParseDuration("-10m")
+	lteTime := time.Now().Format(time.RFC3339)
+	gteTime := time.Now().Add(timeDur).Format(time.RFC3339)
+	return lteTime, gteTime
+}
+
 func initCfg() elasticsearch.Config {
 	var Adress []string
 	var UserName string
