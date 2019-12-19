@@ -474,7 +474,7 @@ func ESString(queryTag string) string {
                         {
                             "_count": "desc"
                         },
-                        "size": 100
+                        "size": 5
                     }
                 }
             }
@@ -668,9 +668,20 @@ func ESString(queryTag string) string {
                     }],
                     "minimum_should_match": 1
                 }
-            }],
+            },
+			{
+			  "range": {
+				"@timestamp": {
+				  "format": "strict_date_optional_time",
+				  "gte": "!Param@gteTime!",
+				  "lte": "!Param@lteTime!"
+				}
+			  }
+			}],
             "should": [],
-            "must_not": []
+            "must_not": [{
+				"prefix" :{"container.image.name":"sha256:"}
+			}]
         }
     }
 }`

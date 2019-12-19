@@ -89,10 +89,10 @@ func Internal_ContainerListMetricInfo(hostname string) Result {
 	}
 
 	lteTime, gteTime := utils.LteandGteTime()
-
 	esqueryStr := strings.Replace(ESString("container_metric"), "!Param@gteTime!", gteTime, 1)
 	esqueryStr = strings.Replace(esqueryStr, "!Param@lteTime!", lteTime, 1)
 	esqueryStr = strings.Replace(esqueryStr, "!Param@hostname!", hostname, 1)
+
 	res, err := esclient.API.Search(esclient.Search.WithContext(context.Background()),
 		esclient.Search.WithIndex("metric*"),
 		esclient.Search.WithBody(strings.NewReader(esqueryStr)),
@@ -122,6 +122,7 @@ func Internal_ContainerListMetricInfo(hostname string) Result {
 	return ResultData
 }
 
+
 func Internal_ContainerSummaryInfo(hostname string) Result {
 	var ResultData Result
 
@@ -133,10 +134,10 @@ func Internal_ContainerSummaryInfo(hostname string) Result {
 	}
 
 	lteTime, gteTime := utils.LteandGteTime()
-
 	esqueryStr := strings.Replace(ESString("container_summary"), "!Param@gteTime!", gteTime, 1)
 	esqueryStr = strings.Replace(esqueryStr, "!Param@lteTime!", lteTime, 1)
 	esqueryStr = strings.Replace(esqueryStr, "!Param@hostname!", hostname, 1)
+
 	res, err := esclient.API.Search(esclient.Search.WithContext(context.Background()),
 		esclient.Search.WithIndex("metric*"),
 		esclient.Search.WithBody(strings.NewReader(esqueryStr)),
@@ -163,7 +164,6 @@ func Internal_ContainerSummaryInfo(hostname string) Result {
 }
 
 
-
 func Internal_ImageListMetricInfo(hostname string) Result {
 	var ResultData Result
 
@@ -173,7 +173,12 @@ func Internal_ImageListMetricInfo(hostname string) Result {
 		ResultData.Code = utils.ElasticConnErr
 		return ResultData
 	}
-	esqueryStr := strings.Replace(ESString("dockerimage_metric"), "!Param@hostname!", hostname, 1)
+
+	lteTime, gteTime := utils.LteandGteTime()
+	esqueryStr := strings.Replace(ESString("dockerimage_metric"), "!Param@gteTime!", gteTime, 1)
+	esqueryStr = strings.Replace(esqueryStr, "!Param@lteTime!", lteTime, 1)
+	esqueryStr = strings.Replace(esqueryStr, "!Param@hostname!", hostname, 1)
+
 	res, err := esclient.API.Search(esclient.Search.WithContext(context.Background()),
 		esclient.Search.WithIndex("metric*"),
 		esclient.Search.WithBody(strings.NewReader(esqueryStr)),
