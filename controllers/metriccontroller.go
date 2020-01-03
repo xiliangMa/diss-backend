@@ -52,7 +52,6 @@ func (this *MetricController) ContainerSummary() {
 	this.ServeJSON(false)
 }
 
-
 // @Title GetImageList
 // @Description Get ImageList
 // @Param token header string true "Auth token"

@@ -688,6 +688,3 @@ func ESString(queryTag string) string {
 
 	return QueryDefine[queryTag]
 }
-
-
-

@@ -90,7 +90,6 @@ func (this *HostController) GetHostImages() {
 	this.ServeJSON(false)
 }
 
-
 // @Title DelHost
 // @Description Delete Host
 // @Param token header string true "Auth token"

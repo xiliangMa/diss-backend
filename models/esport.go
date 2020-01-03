@@ -122,7 +122,6 @@ func Internal_ContainerListMetricInfo(hostname string) Result {
 	return ResultData
 }
 
-
 func Internal_ContainerSummaryInfo(hostname string) Result {
 	var ResultData Result
 
@@ -162,7 +161,6 @@ func Internal_ContainerSummaryInfo(hostname string) Result {
 	ResultData.Code = http.StatusOK
 	return ResultData
 }
-
 
 func Internal_ImageListMetricInfo(hostname string) Result {
 	var ResultData Result

@@ -123,9 +123,6 @@ func GetHostWithImage_Processing(hostname string) Result {
 	return ResultData
 }
 
-
-
-
 func Internal_AddHost(host *Host) Result {
 	o := orm.NewOrm()
 	o.Using("default")
