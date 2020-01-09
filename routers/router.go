@@ -32,6 +32,9 @@ func init() {
 		),
 	)
 
+	// add route for ws
+	beego.Router("/metrics", &controllers.WSMetricController{}, "*:Metrics")
+
 	var isLogin = func(ctx *context.Context) {
 		if ctx.Request.Method != "OPTIONS" {
 			_, code := utils.CheckToken(ctx.Input.Header("token"))
