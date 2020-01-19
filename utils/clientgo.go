@@ -12,7 +12,7 @@ import (
 
 type ClientGo struct {
 	ClientSet *kubernetes.Clientset
-	err error
+	err       error
 }
 
 func CreateK8sClient(kubeconfig, path, configName string) ClientGo {
@@ -38,7 +38,6 @@ func CreateK8sClient(kubeconfig, path, configName string) ClientGo {
 func (clientgo *ClientGo) GetPodsByNameSpace(namespace string) (*v1.PodList, error) {
 	return clientgo.ClientSet.CoreV1().Pods(namespace).List(metav1.ListOptions{})
 }
-
 
 func (clientgo *ClientGo) GetNodes() (*v1.NodeList, error) {
 	return clientgo.ClientSet.CoreV1().Nodes().List(metav1.ListOptions{})
