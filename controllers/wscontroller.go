@@ -4,7 +4,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/gorilla/websocket"
-	"log"
+	"github.com/xiliangMa/diss-backend/service"
 	"net/http"
 )
 
@@ -28,14 +28,17 @@ func (this *WSMetricController) Metrics() {
 	for {
 		mt, message, err := wsconn.ReadMessage()
 		if err != nil {
-			log.Println("read:", err)
+			logs.Error("read:", err)
 			break
 		}
+		wsmh := &service.WSMetricsService{message}
+		wsmh.Save()
+
 		logs.Info("recv: %s", message)
 
 		err = wsconn.WriteMessage(mt, message)
 		if err != nil {
-			logs.Info("write:", err)
+			logs.Error("write:", err)
 			break
 		}
 	}

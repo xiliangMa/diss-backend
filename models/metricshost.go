@@ -41,23 +41,23 @@ func init() {
 	orm.RegisterModel(new(HostConfig), new(HostInfo))
 }
 
-func inner_AddHostConfig(hostConfig *HostConfig) error {
+func (hostConfig *HostConfig) Inner_AddHostConfig() error {
 	o := orm.NewOrm()
 	o.Using("default")
 	_, err := o.Insert(hostConfig)
 	if err != nil {
-		logs.Error("Metrics data --- Add HostConfig failed, err: %s", err.Error())
+		logs.Error("DB Metrics data --- Add %s failed, err: %s", Tag_HostConfig, err.Error())
 		return err
 	}
 	return nil
 }
 
-func inner_AddHostInfo(hostInfo *HostInfo) error {
+func (hostInfo *HostInfo) Inner_AddHostInfo() error {
 	o := orm.NewOrm()
 	o.Using("default")
 	_, err := o.Insert(hostInfo)
 	if err != nil {
-		logs.Error("Metrics data --- Add HostInfo failed, err: %s", err.Error())
+		logs.Error("DB Metrics data --- Add %s failed, err: %s", Tag_HostInfo, err.Error())
 		return err
 	}
 	return nil
