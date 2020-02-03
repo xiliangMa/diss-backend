@@ -4,8 +4,10 @@ import (
 	"flag"
 	"github.com/astaxie/beego/logs"
 	v1 "k8s.io/api/core/v1"
+	batchv1 "k8s.io/api/batch/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"path/filepath"
 )
@@ -41,4 +43,12 @@ func (clientgo *ClientGo) GetPodsByNameSpace(namespace string) (*v1.PodList, err
 
 func (clientgo *ClientGo) GetNodes() (*v1.NodeList, error) {
 	return clientgo.ClientSet.CoreV1().Nodes().List(metav1.ListOptions{})
+}
+
+func (clientgo *ClientGo) GetPodLogs(namespace, pod string) *restclient.Request {
+	return clientgo.ClientSet.CoreV1().Pods(namespace).GetLogs(pod, &v1.PodLogOptions{})
+}
+
+func (clientgo *ClientGo) GetJob(namespace, job string) (*batchv1.Job, error) {
+	return clientgo.ClientSet.BatchV1().Jobs(namespace).Get(job, metav1.GetOptions{})
 }

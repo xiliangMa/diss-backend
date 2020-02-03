@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"io/ioutil"
 	"testing"
 )
 
@@ -9,6 +10,7 @@ var (
 	configName = "config"
 	path       = "../kubeconfig"
 	namespaces = "default"
+	pod        = "kube-bench"
 	clientgo   ClientGo
 )
 
@@ -37,6 +39,32 @@ func Test_GetPodsByNameSpace(t *testing.T) {
 		pods, err := clientgo.GetPodsByNameSpace(namespaces)
 		if err == nil {
 			t.Logf("default 命名空间下的 pod个数 %d", len(pods.Items))
+		}
+	} else {
+		t.Error("K8S Client create Fail")
+	}
+}
+
+func Test_GetPodLogsByNameSpace(t *testing.T) {
+	if clientgo.err == nil {
+		request := clientgo.GetPodLogs(namespaces, pod)
+		if body, _ :=request.Stream(); body != nil {
+			log,  _ := ioutil.ReadAll(body)
+			t.Logf("Pod logs： %s", log)
+		}
+	} else {
+		t.Error("K8S Client create Fail")
+	}
+}
+
+
+func Test_GetJob(t *testing.T) {
+	if clientgo.err == nil {
+		job, err := clientgo.GetJob(namespaces, pod)
+		if err != nil && job == nil {
+			t.Logf("Get pod err, %s", err)
+		} else {
+			t.Logf("Pod status %d", job.Status.Succeeded)
 		}
 	} else {
 		t.Error("K8S Client create Fail")
