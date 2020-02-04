@@ -9,6 +9,7 @@ var (
 	kubeconfig string
 	configName = "config"
 	path       = "../kubeconfig"
+	jobfile    = "../conf/kube-bench/kube-bench-job.yml"
 	namespaces = "default"
 	pod        = "kube-bench"
 	clientgo   ClientGo
@@ -48,8 +49,8 @@ func Test_GetPodsByNameSpace(t *testing.T) {
 func Test_GetPodLogsByNameSpace(t *testing.T) {
 	if clientgo.err == nil {
 		request := clientgo.GetPodLogs(namespaces, pod)
-		if body, _ :=request.Stream(); body != nil {
-			log,  _ := ioutil.ReadAll(body)
+		if body, _ := request.Stream(); body != nil {
+			log, _ := ioutil.ReadAll(body)
 			t.Logf("Pod logs： %s", log)
 		}
 	} else {
@@ -57,14 +58,26 @@ func Test_GetPodLogsByNameSpace(t *testing.T) {
 	}
 }
 
-
 func Test_GetJob(t *testing.T) {
 	if clientgo.err == nil {
 		job, err := clientgo.GetJob(namespaces, pod)
 		if err != nil && job == nil {
-			t.Logf("Get pod err, %s", err)
+			t.Logf("Get job err, %s", err)
 		} else {
-			t.Logf("Pod status %d", job.Status.Succeeded)
+			t.Logf("Job status %d", job.Status.Succeeded)
+		}
+	} else {
+		t.Error("K8S Client create Fail")
+	}
+}
+
+func Test_CreateJobByYml(t *testing.T) {
+	if clientgo.err == nil {
+		job, err := clientgo.CreateJobByYml(jobfile, namespaces)
+		if err != nil {
+			t.Logf("Create job err, %s", err)
+		} else {
+			t.Logf("Job status %d", job.Status.Succeeded)
 		}
 	} else {
 		t.Error("K8S Client create Fail")

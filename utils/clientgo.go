@@ -3,8 +3,10 @@ package utils
 import (
 	"flag"
 	"github.com/astaxie/beego/logs"
-	v1 "k8s.io/api/core/v1"
+	"github.com/ghodss/yaml"
+	"io/ioutil"
 	batchv1 "k8s.io/api/batch/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
@@ -51,4 +53,21 @@ func (clientgo *ClientGo) GetPodLogs(namespace, pod string) *restclient.Request 
 
 func (clientgo *ClientGo) GetJob(namespace, job string) (*batchv1.Job, error) {
 	return clientgo.ClientSet.BatchV1().Jobs(namespace).Get(job, metav1.GetOptions{})
+}
+
+func (clientgo *ClientGo) CreateJob(namespace string, job *batchv1.Job) (*batchv1.Job, error) {
+	return clientgo.ClientSet.BatchV1().Jobs(namespace).Create(job)
+}
+
+func (clientgo *ClientGo) CreateJobByYml(file, namespace string) (*batchv1.Job, error) {
+	bytes, err := ioutil.ReadFile(file)
+	if err != nil {
+		logs.Error("Read file: %s,  error:  %s", file, err)
+	}
+	var job *batchv1.Job
+	err = yaml.Unmarshal(bytes, &job)
+	if err != nil {
+		logs.Error("Job Unmarshal error:  %s", err)
+	}
+	return clientgo.ClientSet.BatchV1().Jobs(namespace).Create(job)
 }
