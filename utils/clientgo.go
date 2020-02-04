@@ -55,10 +55,6 @@ func (clientgo *ClientGo) GetJob(namespace, job string) (*batchv1.Job, error) {
 	return clientgo.ClientSet.BatchV1().Jobs(namespace).Get(job, metav1.GetOptions{})
 }
 
-func (clientgo *ClientGo) CreateJob(namespace string, job *batchv1.Job) (*batchv1.Job, error) {
-	return clientgo.ClientSet.BatchV1().Jobs(namespace).Create(job)
-}
-
 func (clientgo *ClientGo) CreateJobByYml(file, namespace string) (*batchv1.Job, error) {
 	bytes, err := ioutil.ReadFile(file)
 	if err != nil {
@@ -70,4 +66,9 @@ func (clientgo *ClientGo) CreateJobByYml(file, namespace string) (*batchv1.Job, 
 		logs.Error("Job Unmarshal error:  %s", err)
 	}
 	return clientgo.ClientSet.BatchV1().Jobs(namespace).Create(job)
+}
+
+func (clientgo *ClientGo) DeleteJob(namespace, jobName string) error {
+	deletePolicy := metav1.DeletePropagationForeground
+	return clientgo.ClientSet.BatchV1().Jobs(namespace).Delete(jobName, &metav1.DeleteOptions{PropagationPolicy: &deletePolicy})
 }

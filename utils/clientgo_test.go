@@ -9,9 +9,10 @@ var (
 	kubeconfig string
 	configName = "config"
 	path       = "../kubeconfig"
-	jobfile    = "../conf/kube-bench/kube-bench-job.yml"
+	jobFile    = "../conf/kube-bench/kube-bench-job.yml"
 	namespaces = "default"
-	pod        = "kube-bench"
+	jobName    = "kube-bench"
+	podName    = "kube-bench"
 	clientgo   ClientGo
 )
 
@@ -39,7 +40,7 @@ func Test_GetPodsByNameSpace(t *testing.T) {
 	if clientgo.err == nil {
 		pods, err := clientgo.GetPodsByNameSpace(namespaces)
 		if err == nil {
-			t.Logf("default 命名空间下的 pod个数 %d", len(pods.Items))
+			t.Logf("default 命名空间下的 pod 个数 %d", len(pods.Items))
 		}
 	} else {
 		t.Error("K8S Client create Fail")
@@ -48,7 +49,7 @@ func Test_GetPodsByNameSpace(t *testing.T) {
 
 func Test_GetPodLogsByNameSpace(t *testing.T) {
 	if clientgo.err == nil {
-		request := clientgo.GetPodLogs(namespaces, pod)
+		request := clientgo.GetPodLogs(namespaces, podName)
 		if body, _ := request.Stream(); body != nil {
 			log, _ := ioutil.ReadAll(body)
 			t.Logf("Pod logs： %s", log)
@@ -58,9 +59,22 @@ func Test_GetPodLogsByNameSpace(t *testing.T) {
 	}
 }
 
+func Test_CreateJobByYml(t *testing.T) {
+	if clientgo.err == nil {
+		job, err := clientgo.CreateJobByYml(jobFile, namespaces)
+		if err != nil {
+			t.Logf("Create job err, %s", err)
+		} else {
+			t.Logf("Job status %d", job.Status.Succeeded)
+		}
+	} else {
+		t.Error("K8S Client create Fail")
+	}
+}
+
 func Test_GetJob(t *testing.T) {
 	if clientgo.err == nil {
-		job, err := clientgo.GetJob(namespaces, pod)
+		job, err := clientgo.GetJob(namespaces, podName)
 		if err != nil && job == nil {
 			t.Logf("Get job err, %s", err)
 		} else {
@@ -71,13 +85,13 @@ func Test_GetJob(t *testing.T) {
 	}
 }
 
-func Test_CreateJobByYml(t *testing.T) {
+func Test_DeleteJob(t *testing.T) {
 	if clientgo.err == nil {
-		job, err := clientgo.CreateJobByYml(jobfile, namespaces)
+		err := clientgo.DeleteJob(namespaces, jobName)
 		if err != nil {
-			t.Logf("Create job err, %s", err)
+			t.Logf("Delete job err, %s", err)
 		} else {
-			t.Logf("Job status %d", job.Status.Succeeded)
+			t.Logf("Delete job %s success", jobName)
 		}
 	} else {
 		t.Error("K8S Client create Fail")
