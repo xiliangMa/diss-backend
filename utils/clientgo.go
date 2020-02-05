@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"flag"
 	"github.com/astaxie/beego/logs"
 	"github.com/ghodss/yaml"
 	"io/ioutil"
@@ -11,33 +10,25 @@ import (
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"path/filepath"
 )
 
 type ClientGo struct {
 	ClientSet *kubernetes.Clientset
-	err       error
+	Err       interface{}
 }
 
-func CreateK8sClient(path, configName string) ClientGo {
-	var kubeconfig string
-	// 配置k8s集群 kubeconfig 配置文件
-	if path != "" {
-		kubeconfig = *flag.String("kubeconfig", filepath.Join(path, configName), "(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = *flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-	}
-	flag.Parse()
-
-	logs.Info("path %s", filepath.Join(path, "config"))
-
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
+func CreateK8sClient(path string) ClientGo {
+	clientgo := ClientGo{nil, nil}
+	config, err := clientcmd.BuildConfigFromFlags("", path)
 	if err != nil {
-		panic(err.Error())
+		clientgo.Err = "BuildConfigFromFlags"
+		return clientgo
 	}
 	// 根据指定的 config 创建 clientset
 	clientSet, err := kubernetes.NewForConfig(config)
-	return ClientGo{clientSet, err}
+	clientgo.ClientSet = clientSet
+	clientgo.Err = err
+	return clientgo
 }
 
 func (clientgo *ClientGo) GetPodsByNameSpace(namespace string) (*v1.PodList, error) {

@@ -1,6 +1,8 @@
 package system
 
 import (
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"mime/multipart"
@@ -9,8 +11,7 @@ import (
 	"path"
 )
 
-func CheckK8sFile(ext, fileName string) int {
-	// 后缀名不符合上传要求
+func CheckK8sFilePost(ext, fName string) int {
 	var AllowExtMap map[string]bool = map[string]bool{
 		".yml":  true,
 		".yaml": true,
@@ -18,24 +19,36 @@ func CheckK8sFile(ext, fileName string) int {
 	if _, ok := AllowExtMap[ext]; !ok {
 		return utils.CheckK8sFilePostErr
 	}
+	return http.StatusOK
+}
 
-	// 检查文件是否存在
-	if _, err := os.Stat("kubeconfig/" + fileName); err == nil {
-		return utils.CheckK8sFileExistErr
+func CheckK8sFileIsExist(fpath, fName string) int {
+	if _, err := os.Stat(fpath + fName); err == nil {
+		return utils.CheckK8sFileIsExistErr
 	}
 	return http.StatusOK
 }
 
-func UploadK8sFile(f multipart.File, h *multipart.FileHeader) (models.Result, string) {
-	fpath := "kubeconfig/"
+func Check(f multipart.File, h *multipart.FileHeader) (models.Result, string) {
+	var fpath = getK8sFilePath()
 	var result models.Result
-	fileName := h.Filename
-	ext := path.Ext(fileName)
-	if code := CheckK8sFile(ext, fileName); code != http.StatusOK {
+	fName := h.Filename
+	ext := path.Ext(fName)
+
+	// 后缀名不符合上传要求
+	if code := CheckK8sFilePost(ext, fName); code != http.StatusOK {
 		result.Code = code
 		result.Message = "CheckK8sFilePostErr"
 		return result, fpath
 	}
+
+	// 检查文件是否存在
+	if code := CheckK8sFileIsExist(fpath, fName); code != http.StatusOK {
+		result.Code = code
+		result.Message = "CheckK8sFileIsExistErr"
+		return result, fpath
+	}
+
 	//创建目录
 	//uploadDir := "kubeconfig/" + time.Now().Format("2006/01/02/")
 	//err := os.MkdirAll(uploadDir, 777)
@@ -49,9 +62,21 @@ func UploadK8sFile(f multipart.File, h *multipart.FileHeader) (models.Result, st
 	//randNum := fmt.Sprintf("%d", rand.Intn(9999)+1000)
 	//hashName := md5.Sum([]byte(time.Now().Format("2006_01_02_15_04_05_") + randNum))
 	//
-	//fileName := fmt.Sprintf("%x", hashName) + ext
-	////this.Ctx.WriteString(  fileName )
+	//fName := fmt.Sprintf("%x", hashName) + ext
+	////this.Ctx.WriteString(  fName )
 	fpath = fpath + h.Filename
 	result.Code = http.StatusOK
 	return result, fpath
+}
+
+func TestK8sFile(fpath string) int {
+	if clientgo := utils.CreateK8sClient(fpath); clientgo.Err != nil {
+		logs.Error("K8s file test not connect, err: %s", clientgo.Err)
+		return utils.CheckK8sFileTestErr
+	}
+	return http.StatusOK
+}
+
+func getK8sFilePath() string {
+	return beego.AppConfig.String("k8s::KubeCongigPath")
 }

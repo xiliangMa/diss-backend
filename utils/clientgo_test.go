@@ -7,8 +7,7 @@ import (
 
 var (
 	kubeconfig string
-	configName = "config"
-	path       = "../kubeconfig"
+	path       = "../kubeconfig/config"
 	jobFile    = "../conf/kube-bench/kube-bench-job.yml"
 	namespaces = "default"
 	jobName    = "kube-bench"
@@ -17,8 +16,8 @@ var (
 )
 
 func Test_CreateK8sClient(t *testing.T) {
-	clientgo = CreateK8sClient(path, configName)
-	if clientgo.err == nil {
+	clientgo = CreateK8sClient(path)
+	if clientgo.Err == nil {
 		t.Log("K8S Client create Success")
 	} else {
 		t.Error("K8S Client create Fail")
@@ -26,7 +25,7 @@ func Test_CreateK8sClient(t *testing.T) {
 }
 
 func Test_GetNodes(t *testing.T) {
-	if clientgo.err == nil {
+	if clientgo.Err == nil {
 		nodes, err := clientgo.GetNodes()
 		if err == nil {
 			t.Logf("集群节点个数 %d", len(nodes.Items))
@@ -37,7 +36,7 @@ func Test_GetNodes(t *testing.T) {
 }
 
 func Test_GetPodsByNameSpace(t *testing.T) {
-	if clientgo.err == nil {
+	if clientgo.Err == nil {
 		pods, err := clientgo.GetPodsByNameSpace(namespaces)
 		if err == nil {
 			t.Logf("default 命名空间下的 pod 个数 %d", len(pods.Items))
@@ -48,7 +47,7 @@ func Test_GetPodsByNameSpace(t *testing.T) {
 }
 
 func Test_GetPodLogsByNameSpace(t *testing.T) {
-	if clientgo.err == nil {
+	if clientgo.Err == nil {
 		request := clientgo.GetPodLogs(namespaces, podName)
 		if body, _ := request.Stream(); body != nil {
 			log, _ := ioutil.ReadAll(body)
@@ -60,7 +59,7 @@ func Test_GetPodLogsByNameSpace(t *testing.T) {
 }
 
 func Test_CreateJobByYml(t *testing.T) {
-	if clientgo.err == nil {
+	if clientgo.Err == nil {
 		job, err := clientgo.CreateJobByYml(jobFile, namespaces)
 		if err != nil {
 			t.Logf("Create job err, %s", err)
@@ -73,7 +72,7 @@ func Test_CreateJobByYml(t *testing.T) {
 }
 
 func Test_GetJob(t *testing.T) {
-	if clientgo.err == nil {
+	if clientgo.Err == nil {
 		job, err := clientgo.GetJob(namespaces, podName)
 		if err != nil && job == nil {
 			t.Logf("Get job err, %s", err)
@@ -86,7 +85,7 @@ func Test_GetJob(t *testing.T) {
 }
 
 func Test_DeleteJob(t *testing.T) {
-	if clientgo.err == nil {
+	if clientgo.Err == nil {
 		err := clientgo.DeleteJob(namespaces, jobName)
 		if err != nil {
 			t.Logf("Delete job err, %s", err)

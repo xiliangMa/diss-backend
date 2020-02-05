@@ -5,6 +5,7 @@ import (
 	css "github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"os"
 )
 
 type K8sController struct {
@@ -19,15 +20,23 @@ type K8sController struct {
 // @router /system/k8s/upload [post]
 func (this *K8sController) UploadK8sFile() {
 	f, h, _ := this.GetFile("k8sfile")
-	result, fpath := css.UploadK8sFile(f, h)
-	defer f.Close() //关闭上传的文件，不然的话会出现临时文件不能清除的情况
+	result, fpath := css.Check(f, h)
+	defer f.Close()
 	if result.Code == http.StatusOK {
 		err := this.SaveToFile("k8sfile", fpath)
 		if err != nil {
 			result.Code = utils.UploadK8sFileErr
 			result.Message = err.Error()
+		} else {
+			//检查连接是否可用
+			if code := css.TestK8sFile(fpath); code != http.StatusOK {
+				result.Code = code
+				result.Message = "CheckK8sFileTestErr"
+				os.Remove(fpath)
+			}
 		}
 	}
+
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }

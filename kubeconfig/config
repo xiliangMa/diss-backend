@@ -3,7 +3,7 @@ kind: Config
 clusters:
 - name: "001"
   cluster:
-    server: "https://111.229.167.6/k8s/clusters/c-7zfsh"
+    server: "https://111.2219.167.6/k8s/clusters/c-7zfsh"
     certificate-authority-data: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM3akNDQ\
       WRhZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFvTVJJd0VBWURWUVFLRXdsMGFHVXQKY\
       21GdVkyZ3hFakFRQmdOVkJBTVRDV05oZEhSc1pTMWpZVEFlRncweE9URXlNall3TXpVeE5EWmFGd\
