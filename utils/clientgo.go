@@ -19,7 +19,8 @@ type ClientGo struct {
 	err       error
 }
 
-func CreateK8sClient(kubeconfig, path, configName string) ClientGo {
+func CreateK8sClient(path, configName string) ClientGo {
+	var kubeconfig string
 	// 配置k8s集群 kubeconfig 配置文件
 	if path != "" {
 		kubeconfig = *flag.String("kubeconfig", filepath.Join(path, configName), "(optional) absolute path to the kubeconfig file")

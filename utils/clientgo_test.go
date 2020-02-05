@@ -17,7 +17,7 @@ var (
 )
 
 func Test_CreateK8sClient(t *testing.T) {
-	clientgo = CreateK8sClient(kubeconfig, path, configName)
+	clientgo = CreateK8sClient(path, configName)
 	if clientgo.err == nil {
 		t.Log("K8S Client create Success")
 	} else {
