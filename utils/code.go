@@ -14,4 +14,10 @@ var (
 	GetUserInfoErr     = 19
 	ElasticConnErr     = 21
 	ElasticSearchErr   = 22
+
+	//system
+	CheckK8sFilePostErr         = 60
+	CheckK8sFileCreateClientErr = 61
+	CheckK8sFileExistErr        = 62
+	UploadK8sFileErr            = 63
 )
