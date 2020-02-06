@@ -14,20 +14,23 @@ import (
 
 type ClientGo struct {
 	ClientSet *kubernetes.Clientset
-	Err       interface{}
+	ErrMessage       string
 }
 
 func CreateK8sClient(path string) ClientGo {
-	clientgo := ClientGo{nil, nil}
+	clientgo := ClientGo{nil, ""}
 	config, err := clientcmd.BuildConfigFromFlags("", path)
 	if err != nil {
-		clientgo.Err = "BuildConfigFromFlags"
+		clientgo.ErrMessage = "BuildConfigFromFlags"
 		return clientgo
 	}
+
 	// 根据指定的 config 创建 clientset
 	clientSet, err := kubernetes.NewForConfig(config)
 	clientgo.ClientSet = clientSet
-	clientgo.Err = err
+	if err != nil {
+		clientgo.ErrMessage = err.Error()
+	}
 	return clientgo
 }
 

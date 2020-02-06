@@ -43,7 +43,7 @@ func Check(f multipart.File, h *multipart.FileHeader) (models.Result, string) {
 	}
 
 	// 检查文件是否存在
-	if code := CheckK8sFileIsExist(fpath, fName); code != http.StatusOK {
+	if code := CheckK8sFileIsExist(fpath, fName); code != http.StatusOK{
 		result.Code = code
 		result.Message = "CheckK8sFileIsExistErr"
 		return result, fpath
@@ -70,8 +70,8 @@ func Check(f multipart.File, h *multipart.FileHeader) (models.Result, string) {
 }
 
 func TestK8sFile(fpath string) int {
-	if clientgo := utils.CreateK8sClient(fpath); clientgo.Err != nil {
-		logs.Error("K8s file test not connect, err: %s", clientgo.Err)
+	if clientgo := utils.CreateK8sClient(fpath); clientgo.ErrMessage != "" {
+		logs.Error("K8s file test not connect, err: %s", clientgo.ErrMessage)
 		return utils.CheckK8sFileTestErr
 	}
 	return http.StatusOK
