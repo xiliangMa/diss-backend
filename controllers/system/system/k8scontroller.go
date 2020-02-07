@@ -22,7 +22,7 @@ type K8sController struct {
 // @router /system/k8s/upload [post]
 func (this *K8sController) UploadK8sFile() {
 	key := "k8sFile"
-	isForce, _ := this.GetBool("isForce",true)
+	isForce, _ := this.GetBool("isForce", true)
 	f, h, _ := this.GetFile(key)
 	result, fpath := css.Check(f, h)
 	defer f.Close()

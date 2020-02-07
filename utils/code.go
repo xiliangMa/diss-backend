@@ -21,4 +21,10 @@ var (
 	CheckK8sFileIsExistErr      = 62
 	UploadK8sFileErr            = 63
 	CheckK8sFileTestErr         = 64
+
+	//k8s
+	AddNameSpaceErr  = 100
+	AddPodErr        = 101
+	AddClusterErr    = 102
+	AddHostConfigErr = 103
 )

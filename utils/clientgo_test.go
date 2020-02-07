@@ -96,3 +96,16 @@ func Test_DeleteJob(t *testing.T) {
 		t.Error("K8S Client create Fail")
 	}
 }
+
+func Test_GetNameSpaces(t *testing.T) {
+	if clientgo.ErrMessage == "" {
+		ns, err := clientgo.GetNameSpaces()
+		if err != nil {
+			t.Logf("Get namespaces err: %s", err)
+		} else {
+			t.Logf("集群内的 namespace 个数为: %d ", len(ns.Items))
+		}
+	} else {
+		t.Error("K8S Client create Fail")
+	}
+}

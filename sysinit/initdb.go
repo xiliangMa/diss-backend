@@ -3,11 +3,11 @@ package sysinit
 import (
 	"fmt"
 	"github.com/astaxie/beego"
-	_ "github.com/xiliangMa/diss-backend/models"
-	"os"
-
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/xiliangMa/diss-backend/models"
+	_ "github.com/xiliangMa/diss-backend/models/k8s"
+	"os"
 )
 
 func InitDB() {
