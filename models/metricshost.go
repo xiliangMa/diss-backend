@@ -16,6 +16,7 @@ type HostConfig struct {
 	TenantId   string `orm:"description(租户id)"`
 	Group      string `orm:"description(分组)"`
 	Type       uint8  `orm:"description(系统类型，服务器或者虚拟机)"`
+	IsInK8s    bool   `orm:"description(是否在k8s集群)"`
 }
 
 type HostInfo struct {
