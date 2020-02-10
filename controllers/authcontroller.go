@@ -34,8 +34,8 @@ func (this *AuthController) Login() {
 	this.ServeJSON(false)
 }
 
-// @Title Authorization
-// @Description Authorization
+// @Title authorization
+// @Description authorization
 // @Param token header string true "Auth token"
 // @Success 200 {object} models.Result
 // @router /Authorization [post]

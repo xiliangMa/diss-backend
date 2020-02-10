@@ -4,7 +4,7 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
-type CLuster struct {
+type Cluster struct {
 	Id       string `orm:"pk;description(集群id)"`
 	Name     string `orm:"description(集群名)"`
 	FileName string `orm:"description(k8s 文件)"`
@@ -13,7 +13,7 @@ type CLuster struct {
 }
 
 func init() {
-	orm.RegisterModel(new(CLuster))
+	orm.RegisterModel(new(Cluster))
 }
 
 type ClusterInterface interface {
