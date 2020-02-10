@@ -32,6 +32,7 @@ func GreateToken(name, pwd string) (string, int) {
 }
 
 func CheckToken(tokenString string) (string, int) {
+
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -40,9 +41,13 @@ func CheckToken(tokenString string) (string, int) {
 		return secret, nil
 	})
 
+	if err != nil {
+		return err.Error(), AuthorizeErr
+	}
+
 	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		return "", http.StatusOK
 	} else {
-		return err.Error(), AuthorizeErr
+		return "AuthorizeErr", AuthorizeErr
 	}
 }

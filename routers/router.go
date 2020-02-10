@@ -15,13 +15,13 @@ import (
 )
 
 func init() {
-	ns := beego.NewNamespace("/v1",
-		beego.NSNamespace("/hosts",
+	ns := beego.NewNamespace("/api",
+		beego.NSNamespace("/v1/hosts",
 			beego.NSInclude(
 				&controllers.HostController{},
 			),
 		),
-		beego.NSNamespace("/merticinfo",
+		beego.NSNamespace("/v1/merticinfo",
 			beego.NSInclude(
 				&controllers.MetricController{},
 			),
@@ -31,7 +31,7 @@ func init() {
 				&controllers.AuthController{},
 			),
 		),
-		beego.NSNamespace("/system",
+		beego.NSNamespace("/v1/system",
 			beego.NSInclude(
 				&css.K8sController{},
 			),
@@ -50,7 +50,7 @@ func init() {
 		}
 
 	}
-	beego.InsertFilter("/v1/hosts/*", beego.BeforeRouter, isLogin)
+	beego.InsertFilter("/api/v1/*", beego.BeforeRouter, isLogin)
 
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins:  true,
