@@ -11,6 +11,12 @@ type K8STaskHandler struct {
 	Clientgo utils.ClientGo
 }
 
+func NewK8STaskHandler(path string) *K8STaskHandler {
+	return &K8STaskHandler{
+		Clientgo: utils.CreateK8sClient(path),
+	}
+}
+
 func (this *K8STaskHandler) SyncCluster() {
 }
 

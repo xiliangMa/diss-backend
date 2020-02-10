@@ -27,4 +27,8 @@ var (
 	AddPodErr        = 101
 	AddClusterErr    = 102
 	AddHostConfigErr = 103
+
+	//task
+	AddTaskErr = 130
+	GetTaskErr = 131
 )

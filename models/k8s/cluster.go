@@ -16,7 +16,7 @@ func init() {
 	orm.RegisterModel(new(CLuster))
 }
 
-type ClusterINterface interface {
+type ClusterInterface interface {
 	Add()
 	Delete()
 	Edit()

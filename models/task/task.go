@@ -21,7 +21,6 @@ func init() {
 	orm.RegisterModel(new(Task))
 }
 
-
 type TaskInterface interface {
 	Add()
 	Delete()
@@ -46,4 +45,3 @@ func (this *Task) Add() models.Result {
 	ResultData.Data = this
 	return ResultData
 }
-
