@@ -27,6 +27,3 @@ func (this *HostConfigController) GetHostConfigList() {
 	this.ServeJSON(false)
 
 }
-
-
-

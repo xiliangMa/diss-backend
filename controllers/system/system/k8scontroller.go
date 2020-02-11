@@ -40,6 +40,8 @@ func (this *K8sController) UploadK8sFile() {
 				os.Remove(fpath)
 			} else {
 				logs.Info("Upload k8s file success, file name: %s", h.Filename)
+				// 添加集群记录
+				css.Add(h.Filename, fpath)
 			}
 		}
 	} else {
@@ -67,6 +69,7 @@ func (this *K8sController) UploadK8sFile() {
 					os.Remove(fpath)
 				} else {
 					logs.Info("Force update k8s file success, file name: %s", h.Filename)
+					// to do 强制更新后文件名相同、内容不一样
 				}
 			}
 		}

@@ -1,7 +1,11 @@
 package k8s
 
 import (
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
+	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/utils"
+	"net/http"
 )
 
 type Cluster struct {
@@ -22,4 +26,21 @@ type ClusterInterface interface {
 	Edit()
 	Get()
 	List()
+}
+
+func (this *Cluster) Add() models.Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData models.Result
+
+	_, err := o.Insert(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.AddClusterErr
+		logs.Error("Add Cluster failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
 }

@@ -3,7 +3,9 @@ package system
 import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
+	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/models/k8s"
 	"github.com/xiliangMa/diss-backend/utils"
 	"mime/multipart"
 	"net/http"
@@ -79,4 +81,15 @@ func TestK8sFile(fpath string) int {
 
 func getK8sFilePath() string {
 	return beego.AppConfig.String("k8s::KubeCongigPath")
+}
+
+func Add(name, path string) {
+	var cluster k8s.Cluster
+	id, _ := uuid.FromString(name)
+	cluster.Id = id.String()
+	cluster.Name = name
+	cluster.Status = k8s.Cluster_Status_RUN
+	cluster.IsSync = false
+	cluster.FileName = path
+	cluster.Add()
 }

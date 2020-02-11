@@ -26,5 +26,3 @@ func (this *HostInfoController) GetHostInfoList() {
 	this.ServeJSON(false)
 
 }
-
-
