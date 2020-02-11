@@ -10,7 +10,7 @@ import (
 
 type Pod struct {
 	Id     string `orm:"pk;description(pod id)"`
-	Name   string `orm:"description(集群名)"`
+	Name   string `orm:"unique;description(集群名)"`
 	Status uint8  `orm:"description(集群状态)"`
 }
 

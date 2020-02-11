@@ -10,11 +10,14 @@ import (
 )
 
 type Cluster struct {
-	Id       string `orm:"pk;description(集群id)"`
-	Name     string `orm:"description(集群名)"`
-	FileName string `orm:"description(k8s 文件)"`
-	Status   uint8  `orm:"description(集群状态)"`
-	IsSync   bool   `orm:"description(是否同步)"`
+	Id         string    `orm:"pk;description(集群id)"`
+	Name       string    `orm:"unique;description(集群名)"`
+	FileName   string    `orm:"description(k8s 文件)"`
+	Status     uint8     `orm:"default(0);description(集群状态)"`
+	IsSync     bool      `orm:"default(false);description(是否同步)"`
+	Synced     bool      `orm:"default(false);description(同步状态)"`
+	CreateTime time.Time `orm:"description(创建时间);auto_now_add;type(datetime)"`
+	UpdateTime time.Time `orm:"null;description(更新时间);auto_now;type(datetime)"`
 }
 
 func init() {
@@ -63,10 +66,30 @@ func (this *Cluster) List() models.Result {
 
 	total, _ := o.QueryTable(utils.Cluster).Count()
 	data := make(map[string]interface{})
-	data["items"] = ClusterList
 	data["total"] = total
+	data["items"] = ClusterList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
+	return ResultData
+}
+
+func (this *Cluster) Update() models.Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData models.Result
+
+	_, err := o.Update(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditHostErr
+		logs.Error("Update cluster: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
 	return ResultData
 }

@@ -17,12 +17,14 @@ type K8sController struct {
 // @Description UpLoad K8s File
 // @Param token header string true "auth token"
 // @Param k8sFile formData file true "k8s file"
+// @Param clusterName formData string true "cluster name"
 // @Param isForce formData bool true true "force update file"
 // @Success 200 {object} models.Result
 // @router /system/k8s/upload [post]
 func (this *K8sController) UploadK8sFile() {
 	key := "k8sFile"
 	isForce, _ := this.GetBool("isForce", true)
+	clusterName := this.GetString("clusterName")
 	f, h, _ := this.GetFile(key)
 	result, fpath := css.Check(f, h)
 	defer f.Close()
@@ -41,7 +43,7 @@ func (this *K8sController) UploadK8sFile() {
 			} else {
 				logs.Info("Upload k8s file success, file name: %s", h.Filename)
 				// 添加集群记录
-				css.Add(h.Filename, fpath)
+				css.Add(clusterName, fpath)
 			}
 		}
 	} else {

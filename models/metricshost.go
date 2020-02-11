@@ -6,22 +6,23 @@ import (
 )
 
 type HostConfig struct {
-	Id         string `orm:"pk;description(主机id)"`
-	HostName   string `orm:"description(主机名)"`
-	OS         string `orm:"description(系统)"`
-	PG         string `orm:"description(安全策略组)"`
-	Status     uint8  `orm:"description(主机状态)"`
-	Diss       uint8  `orm:"description(安全容器)"`
-	DissStatus uint8  `orm:"description(安全状态)"`
-	TenantId   string `orm:"description(租户id)"`
-	Group      string `orm:"description(分组)"`
-	Type       uint8  `orm:"description(系统类型，服务器或者虚拟机)"`
-	IsInK8s    bool   `orm:"description(是否在k8s集群)"`
+	Id           string `orm:"pk;description(主机id)"`
+	HostName     string `orm:"unique;description(主机名)"`
+	OS           string `orm:"description(系统)"`
+	PG           string `orm:"description(安全策略组)"`
+	Status       uint8  `orm:"description(主机状态)"`
+	Diss         uint8  `orm:"description(安全容器)"`
+	DissStatus   uint8  `orm:"description(安全状态)"`
+	TenantId     string `orm:"description(租户id)"`
+	Group        string `orm:"description(分组)"`
+	Type         uint8  `orm:"description(系统类型，服务器或者虚拟机)"`
+	IsInK8s      bool   `orm:"description(是否在k8s集群)"`
+	DockerStatus string `orm:"description(容器状态)"`
 }
 
 type HostInfo struct {
 	Id            string `orm:"pk;description(主机id)"`
-	HostName      string `orm:"description(主机名称)"`
+	HostName      string `orm:"unique;description(主机名称)"`
 	InternalAddr  string `orm:"description(主机ip 内)"`
 	PublicAddr    string `orm:"description(主机ip 外)"`
 	CpuCore       uint8  `orm:"description(cpu)"`
