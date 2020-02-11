@@ -6,6 +6,7 @@ import (
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"time"
 )
 
 type Cluster struct {
@@ -42,5 +43,30 @@ func (this *Cluster) Add() models.Result {
 	}
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
+	return ResultData
+}
+
+func (this *Cluster) List() models.Result {
+	o := orm.NewOrm()
+	orm.DefaultTimeLoc = time.Local
+	o.Using("default")
+	var ClusterList []*Cluster
+	var ResultData models.Result
+
+	_, err := o.QueryTable(utils.Cluster).All(&ClusterList)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetHostListErr
+		logs.Error("Get Cluster List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	total, _ := o.QueryTable(utils.Cluster).Count()
+	data := make(map[string]interface{})
+	data["items"] = ClusterList
+	data["total"] = total
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
 	return ResultData
 }
