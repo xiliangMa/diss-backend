@@ -7,6 +7,7 @@ import (
 	"github.com/xiliangMa/diss-backend/models/k8s"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strconv"
 )
 
 type K8STaskHandler struct {
@@ -47,10 +48,13 @@ func (this *K8STaskHandler) SyncHostConfig(clusterId string) {
 			} else {
 				info.InternalAddr = n.Status.Addresses[1].Address
 			}
-			c, _ := n.Status.Capacity.Cpu().AsInt64()
+			capacity := n.Status.Capacity
+			c, _ := capacity.Cpu().AsInt64()
 			info.CpuCore = c
-			m, _ := n.Status.Capacity.Memory().AsInt64()
-			info.Mem = m
+			m, _ := capacity.Memory().AsInt64()
+			info.Mem = m / 1024 / 1024 / 1024
+			d, _ := capacity.StorageEphemeral().AsInt64()
+			info.Disk = strconv.FormatInt(d / 1024 / 1024 / 1024, 10)
 			info.Id = uid.String()
 			nStatusNodeinfo := n.Status.NodeInfo
 			info.OS = nStatusNodeinfo.OSImage
