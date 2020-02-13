@@ -22,55 +22,91 @@ func NewK8STaskHandler(path string) *K8STaskHandler {
 func (this *K8STaskHandler) SyncCluster() {
 }
 
-func (this *K8STaskHandler) SyncHostConfig() {
+func (this *K8STaskHandler) SyncHostConfig(clusterId string) {
 	nodes, err := this.Clientgo.GetNodes()
 	if err != nil {
 		logs.Error("Sync node err: %s", err.Error())
 	} else {
-		for _, ns := range nodes.Items {
+		for _, n := range nodes.Items {
 			uid, _ := uuid.NewV4()
 			ob := new(models.HostConfig)
-			ob.HostName = ns.ObjectMeta.Name
+			ob.HostName = n.ObjectMeta.Name
 			ob.Id = uid.String()
+			ob.OS = n.Status.NodeInfo.OSImage
+			ob.IsInK8s = true
+			ob.ClusterId = clusterId
 			ob.Inner_AddHostConfig()
 		}
 	}
 }
 
-func (this *K8STaskHandler) SyncNameSpace() {
+func (this *K8STaskHandler) SyncHostInfo() {
+	nodes, err := this.Clientgo.GetNodes()
+	if err != nil {
+		logs.Error("Sync node err: %s", err.Error())
+	} else {
+		for _, n := range nodes.Items {
+			uid, _ := uuid.NewV4()
+			ob := new(models.HostInfo)
+			ob.HostName = n.ObjectMeta.Name
+			if n.Status.Addresses[0].Type == "InternalIP" {
+				ob.InternalAddr = n.Status.Addresses[0].Address
+			} else {
+				ob.InternalAddr = n.Status.Addresses[1].Address
+			}
+			c, _ := n.Status.Capacity.Cpu().AsInt64()
+			ob.CpuCore = c
+			m, _ := n.Status.Capacity.Memory().AsInt64()
+			ob.Mem = m
+			ob.Id = uid.String()
+			nStatusNodeinfo := n.Status.NodeInfo
+			ob.OS = nStatusNodeinfo.OSImage
+			ob.Kernel = nStatusNodeinfo.KernelVersion
+			ob.Architecture = nStatusNodeinfo.Architecture
+			ob.DockerRuntime = nStatusNodeinfo.ContainerRuntimeVersion
+			ob.KubeletVer = nStatusNodeinfo.KubeletVersion
+			ob.Kubeproxy = nStatusNodeinfo.KubeProxyVersion
+			ob.KubernetesVer = nStatusNodeinfo.KubeletVersion
+			ob.Inner_AddHostInfo()
+		}
+	}
+}
+
+func (this *K8STaskHandler) SyncNameSpace(clusterId string) {
 	nameSpaces, err := this.Clientgo.GetNameSpaces()
 	if err != nil {
 		logs.Error("Sync namspace err: %s", err.Error())
 	} else {
 		for _, ns := range nameSpaces.Items {
+			nsName := ns.ObjectMeta.Name
 			ob := new(k8s.NameSpace)
-
 			NID, _ := uuid.NewV4()
-			ob.Id = NID.String()
-			ob.Name = ns.ObjectMeta.Name
+			nsId := NID.String()
+			ob.Id = nsId
+			ob.Name = nsName
+			ob.ClusterId = clusterId
 			ob.Add()
-			this.SyncPod(ns.ObjectMeta.Name)
+			this.SyncPod(nsName, nsId, clusterId)
 		}
 	}
 
 }
 
-func (this *K8STaskHandler) SyncPod(namespace string) {
-	pods, err := this.Clientgo.GetPodsByNameSpace(namespace)
+func (this *K8STaskHandler) SyncPod(nsName, clusterId, nsId string) {
+	pods, err := this.Clientgo.GetPodsByNameSpace(nsName)
 	if err != nil {
-		logs.Error("Sync namespace: %s pods err: %s", namespace, err.Error())
+		logs.Error("Sync namespace: %s pods err: %s", nsName, err.Error())
 	} else {
 		for _, pod := range pods.Items {
 			ob := new(k8s.Pod)
-
 			NID, _ := uuid.NewV4()
 			ob.Id = NID.String()
 			ob.Name = pod.ObjectMeta.Name
-
+			ob.ClusterId = clusterId
+			ob.NameSpaceId = nsId
 			ob.Add()
 		}
 	}
-
 }
 
 type Data struct {
@@ -92,10 +128,10 @@ func SyncAll() {
 				this := NewK8STaskHandler(c.FileName)
 
 				// 同步主机
-				this.SyncHostConfig()
+				this.SyncHostConfig(c.Id)
 
 				// 同步 ns &&  ns 下的 pod
-				this.SyncNameSpace()
+				this.SyncNameSpace(c.Id)
 				logs.Info("Sync end...., cluster name: %s ", c.Name)
 				// 更新初始化状态
 				c.Synced = k8s.Cluster_Synced

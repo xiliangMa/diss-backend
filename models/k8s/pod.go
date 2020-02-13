@@ -9,9 +9,11 @@ import (
 )
 
 type Pod struct {
-	Id     string `orm:"pk;description(pod id)"`
-	Name   string `orm:"unique;description(集群名)"`
-	Status uint8  `orm:"description(集群状态)"`
+	Id          string `orm:"pk;description(pod id)"`
+	Name        string `orm:"unique;description(集群名)"`
+	Status      uint8  `orm:"description(集群状态)"`
+	ClusterId   string `orm:"default(null);description(集群id)"`
+	NameSpaceId string `orm:"default(null);description(命名空间id)"`
 }
 
 type PodInterface interface {
