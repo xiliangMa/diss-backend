@@ -43,7 +43,7 @@ func (this *K8sController) UploadK8sFile() {
 			} else {
 				logs.Info("Upload k8s file success, file name: %s", h.Filename)
 				// 添加集群记录
-				css.Add(clusterName, fpath)
+				css.AddCluster(clusterName, fpath)
 			}
 		}
 	} else {

@@ -83,7 +83,7 @@ func getK8sFilePath() string {
 	return beego.AppConfig.String("k8s::KubeCongigPath")
 }
 
-func Add(clusterName, path string) {
+func AddCluster(clusterName, path string) {
 	var cluster k8s.Cluster
 	uid, _ := uuid.NewV4()
 	cluster.Id = uid.String()
