@@ -28,14 +28,39 @@ func (this *K8STaskHandler) SyncHostConfig(clusterId string) {
 		logs.Error("Sync node err: %s", err.Error())
 	} else {
 		for _, n := range nodes.Items {
+			name := n.ObjectMeta.Name
+			// 同步 hostconfig
 			uid, _ := uuid.NewV4()
-			ob := new(models.HostConfig)
-			ob.HostName = n.ObjectMeta.Name
-			ob.Id = uid.String()
-			ob.OS = n.Status.NodeInfo.OSImage
-			ob.IsInK8s = true
-			ob.ClusterId = clusterId
-			ob.Inner_AddHostConfig()
+			config := new(models.HostConfig)
+			config.HostName = name
+			config.Id = uid.String()
+			config.OS = n.Status.NodeInfo.OSImage
+			config.IsInK8s = true
+			config.ClusterId = clusterId
+			config.Inner_AddHostConfig()
+
+			// 同步 hostinfo
+			info := new(models.HostInfo)
+			info.HostName = name
+			if n.Status.Addresses[0].Type == "InternalIP" {
+				info.InternalAddr = n.Status.Addresses[0].Address
+			} else {
+				info.InternalAddr = n.Status.Addresses[1].Address
+			}
+			c, _ := n.Status.Capacity.Cpu().AsInt64()
+			info.CpuCore = c
+			m, _ := n.Status.Capacity.Memory().AsInt64()
+			info.Mem = m
+			info.Id = uid.String()
+			nStatusNodeinfo := n.Status.NodeInfo
+			info.OS = nStatusNodeinfo.OSImage
+			info.Kernel = nStatusNodeinfo.KernelVersion
+			info.Architecture = nStatusNodeinfo.Architecture
+			info.DockerRuntime = nStatusNodeinfo.ContainerRuntimeVersion
+			info.KubeletVer = nStatusNodeinfo.KubeletVersion
+			info.Kubeproxy = nStatusNodeinfo.KubeProxyVersion
+			info.KubernetesVer = nStatusNodeinfo.KubeletVersion
+			info.Inner_AddHostInfo()
 		}
 	}
 }
