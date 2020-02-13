@@ -9,11 +9,16 @@ import (
 )
 
 type Pod struct {
-	Id          string `orm:"pk;description(pod id)"`
-	Name        string `orm:"unique;description(集群名)"`
-	Status      uint8  `orm:"description(集群状态)"`
-	ClusterId   string `orm:"default(null);description(集群id)"`
-	NameSpaceId string `orm:"default(null);description(命名空间id)"`
+	Id           string `orm:"pk;description(pod id)"`
+	Name         string `orm:"unique;description(集群名)"`
+	PodIP        string `orm:"default(null);description(pod ip)"`
+	Status       string `orm:"description(pod状态)"`
+	GroupId      string `orm:"default(null);description(租户id)"`
+	GroupName    string `orm:"default(null);description(租户名)"`
+	ClusterId    string `orm:"default(null);description(集群id)"`
+	HostIP       string `orm:"default(null);description(主机ip， 默认内网ip)"`
+	NameSpaceId  string `orm:"default(null);description(命名空间id)"`
+	NamSpaceName string `orm:"default(null);description(命名空间)"`
 }
 
 type PodInterface interface {
@@ -21,7 +26,7 @@ type PodInterface interface {
 	Delete()
 	Edit()
 	Get()
-	List()
+	List() å
 }
 
 func init() {

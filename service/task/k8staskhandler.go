@@ -54,7 +54,7 @@ func (this *K8STaskHandler) SyncHostConfig(clusterId string) {
 			m, _ := capacity.Memory().AsInt64()
 			info.Mem = m / 1024 / 1024 / 1024
 			d, _ := capacity.StorageEphemeral().AsInt64()
-			info.Disk = strconv.FormatInt(d / 1024 / 1024 / 1024, 10)
+			info.Disk = strconv.FormatInt(d/1024/1024/1024, 10)
 			info.Id = uid.String()
 			nStatusNodeinfo := n.Status.NodeInfo
 			info.OS = nStatusNodeinfo.OSImage
@@ -133,6 +133,10 @@ func (this *K8STaskHandler) SyncPod(nsName, clusterId, nsId string) {
 			ob.Name = pod.ObjectMeta.Name
 			ob.ClusterId = clusterId
 			ob.NameSpaceId = nsId
+			ob.NamSpaceName = nsName
+			ob.HostIP = pod.Status.HostIP
+			ob.PodIP = pod.Status.PodIP
+			ob.Status = string(pod.Status.Phase)
 			ob.Add()
 		}
 	}
