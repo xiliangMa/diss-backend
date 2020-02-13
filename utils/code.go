@@ -26,7 +26,14 @@ var (
 	AddNameSpaceErr  = 100
 	AddPodErr        = 101
 	AddClusterErr    = 102
-	AddHostConfigErr = 103
+	GetClusterErr    = 103
+	AddHostConfigErr = 104
+	GetHostConfigErr = 105
+	AddImageErr      = 106
+	GetImageErr      = 107
+	GetPodErr        = 108
+	AddContainerErr  = 109
+	GetContainerErr  = 110
 
 	//task
 	AddTaskErr = 130

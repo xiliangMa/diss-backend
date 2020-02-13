@@ -7,5 +7,7 @@ var (
 	Cluster    = "cluster"
 	NameSpace  = "name_space"
 	Pod        = "pod"
+	Image      = "image"
+	Container  = "container"
 	Task       = "task"
 )

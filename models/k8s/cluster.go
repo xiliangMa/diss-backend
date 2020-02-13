@@ -59,7 +59,7 @@ func (this *Cluster) List() models.Result {
 	_, err := o.QueryTable(utils.Cluster).All(&ClusterList)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetHostListErr
+		ResultData.Code = utils.GetClusterErr
 		logs.Error("Get Cluster List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}

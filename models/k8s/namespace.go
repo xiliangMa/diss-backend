@@ -34,7 +34,7 @@ func (this *NameSpace) Add() models.Result {
 	_, err := o.Insert(this)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.AddHostErr
+		ResultData.Code = utils.AddNameSpaceErr
 		logs.Error("Add NameSpace failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
