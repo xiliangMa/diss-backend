@@ -15,9 +15,8 @@ type Pod struct {
 	Status       string `orm:"description(pod状态)"`
 	GroupId      string `orm:"default(null);description(租户id)"`
 	GroupName    string `orm:"default(null);description(租户名)"`
-	ClusterId    string `orm:"default(null);description(集群id)"`
 	HostIP       string `orm:"default(null);description(主机ip， 默认内网ip)"`
-	NameSpaceId  string `orm:"default(null);description(命名空间id)"`
+	HostName     string `orm:"default(null);description(host name)"`
 	NamSpaceName string `orm:"default(null);description(命名空间)"`
 }
 

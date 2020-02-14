@@ -29,10 +29,10 @@ func (this *K8STaskHandler) SyncHost(clusterId string) {
 		for _, n := range nodes.Items {
 			name := n.ObjectMeta.Name
 			// 同步 hostconfig
-			hostId, _ := uuid.NewV4()
+			nodeId := n.Status.NodeInfo.MachineID
 			config := new(models.HostConfig)
 			config.HostName = name
-			config.Id = hostId.String()
+			config.Id = nodeId
 			config.OS = n.Status.NodeInfo.OSImage
 			config.IsInK8s = true
 			config.ClusterId = clusterId
@@ -53,7 +53,7 @@ func (this *K8STaskHandler) SyncHost(clusterId string) {
 			info.Mem = m / 1024 / 1024 / 1024
 			d, _ := capacity.StorageEphemeral().AsInt64()
 			info.Disk = strconv.FormatInt(d/1024/1024/1024, 10)
-			info.Id = hostId.String()
+			info.Id = nodeId
 			nStatusNodeinfo := n.Status.NodeInfo
 			info.OS = nStatusNodeinfo.OSImage
 			info.Kernel = nStatusNodeinfo.KernelVersion
@@ -70,7 +70,7 @@ func (this *K8STaskHandler) SyncHost(clusterId string) {
 				imageId, _ := uuid.NewV4()
 				image := new(models.ImageConfig)
 				image.Id = imageId.String()
-				image.HostId = hostId.String()
+				image.HostId = nodeId
 				if len(o.Names) == 1 {
 					image.Name = o.Names[0]
 				} else {
@@ -81,7 +81,7 @@ func (this *K8STaskHandler) SyncHost(clusterId string) {
 					}
 					image.Name = imageName
 				}
-				image.Size = o.SizeBytes / 1024 / 1024 / 1024
+				image.Size = o.SizeBytes
 				// to do image create time
 
 				image.Add()
@@ -96,7 +96,7 @@ func (this *K8STaskHandler) SyncHostInfo() {
 		logs.Error("Sync node err: %s", err.Error())
 	} else {
 		for _, n := range nodes.Items {
-			uid, _ := uuid.NewV4()
+			nodeId := n.Status.NodeInfo.MachineID
 			ob := new(models.HostInfo)
 			ob.HostName = n.ObjectMeta.Name
 			if n.Status.Addresses[0].Type == "InternalIP" {
@@ -108,7 +108,7 @@ func (this *K8STaskHandler) SyncHostInfo() {
 			ob.CpuCore = c
 			m, _ := n.Status.Capacity.Memory().AsInt64()
 			ob.Mem = m
-			ob.Id = uid.String()
+			ob.Id = nodeId
 			nStatusNodeinfo := n.Status.NodeInfo
 			ob.OS = nStatusNodeinfo.OSImage
 			ob.Kernel = nStatusNodeinfo.KernelVersion
@@ -130,35 +130,58 @@ func (this *K8STaskHandler) SyncNameSpace(clusterId string) {
 		for _, ns := range nameSpaces.Items {
 			nsName := ns.ObjectMeta.Name
 			ob := new(k8s.NameSpace)
-			NID, _ := uuid.NewV4()
-			nsId := NID.String()
+			nId := string(ns.UID)
+			nsId := nId
 			ob.Id = nsId
 			ob.Name = nsName
 			ob.ClusterId = clusterId
 			ob.Add()
-			this.SyncPod(nsName, nsId, clusterId)
+
+			//同步pod
+			this.SyncPod(nsName)
 		}
 	}
 
 }
 
-func (this *K8STaskHandler) SyncPod(nsName, clusterId, nsId string) {
+func (this *K8STaskHandler) SyncPod(nsName string) {
 	pods, err := this.Clientgo.GetPodsByNameSpace(nsName)
 	if err != nil {
 		logs.Error("Sync namespace: %s pods err: %s", nsName, err.Error())
 	} else {
 		for _, pod := range pods.Items {
-			ob := new(k8s.Pod)
-			NID, _ := uuid.NewV4()
-			ob.Id = NID.String()
-			ob.Name = pod.ObjectMeta.Name
-			ob.ClusterId = clusterId
-			ob.NameSpaceId = nsId
-			ob.NamSpaceName = nsName
-			ob.HostIP = pod.Status.HostIP
-			ob.PodIP = pod.Status.PodIP
-			ob.Status = string(pod.Status.Phase)
-			ob.Add()
+			// 同步 pod
+			podob := new(k8s.Pod)
+			pId := string(pod.UID)
+			podob.Id = pId
+			podob.Name = pod.ObjectMeta.Name
+			podob.NamSpaceName = nsName
+			podob.HostIP = pod.Status.HostIP
+			podob.HostName = pod.Spec.NodeName
+			podob.PodIP = pod.Status.PodIP
+			podob.Status = string(pod.Status.Phase)
+			podob.Add()
+
+			//同步 containerconfig
+			for _, c := range pod.Status.ContainerStatuses {
+				ccob := new(models.ContainerConfig)
+				ccob.Id = strings.Replace(c.ContainerID, "docker://", "", 1)
+				ccob.Name = c.Name
+				ccob.PodId = pId
+				ccob.PodName = pod.ObjectMeta.Name
+				ccob.NameSpaceName = nsName
+				//var commandArr string
+				//for _, commad := range c.Command {
+				//	commandArr = commandArr + commad + ","
+				//}
+				//ccob.Command = commandArr
+				ccob.ImageName = c.Image
+				ccob.HostName = pod.Spec.NodeName
+				//ccob.Status = c.State.Running.StartedAt.String()
+				ccob.UpdateTime = pod.Status.StartTime.Time
+				ccob.Add()
+			}
+
 		}
 	}
 }
@@ -181,11 +204,12 @@ func SyncAll() {
 				// 创建k8s客户端
 				this := NewK8STaskHandler(c.FileName)
 
-				// 同步 hostconfig & hostinfo & 同步主机上所有镜像
+				// 同步 hostconfig & hostinfo & imageconfig
 				this.SyncHost(c.Id)
 
 				// 同步 ns &&  ns 下的 pod
 				this.SyncNameSpace(c.Id)
+
 				logs.Info("Sync end...., cluster name: %s ", c.Name)
 				// 更新初始化状态
 				c.Synced = k8s.Cluster_Synced

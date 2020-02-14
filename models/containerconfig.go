@@ -11,10 +11,10 @@ import (
 type ContainerConfig struct {
 	Id            string    `orm:"pk;description(id)"`
 	Name          string    `orm:"unique;description(容器名)"`
-	NameSpaceId   string    `orm:"description(命名空间id)"`
 	NameSpaceName string    `orm:"description(命名空间)"`
 	PodId         string    `orm:"description(pod id)"`
 	PodName       string    `orm:"description(pod 名)"`
+	HostName      string    `orm:"description(主机名)"`
 	Status        string    `orm:"default(null);description(状态)"`
 	Command       string    `orm:"default(null);description(命令)"`
 	ImageName     string    `orm:"default(null);description(镜像名)"`
