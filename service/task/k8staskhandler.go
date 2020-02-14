@@ -15,15 +15,6 @@ type K8STaskHandler struct {
 	Clientgo utils.ClientGo
 }
 
-type ContainerImage struct {
-	// Names by which this image is known.
-	// e.g. ["k8s.gcr.io/hyperkube:v1.0.7", "dockerhub.io/google_containers/hyperkube:v1.0.7"]
-	Names []string `json:"names" protobuf:"bytes,1,rep,name=names"`
-	// The size of the image in bytes.
-	// +optional
-	SizeBytes int64 `json:"sizeBytes,omitempty" protobuf:"varint,2,opt,name=sizeBytes"`
-}
-
 func NewK8STaskHandler(path string) *K8STaskHandler {
 	return &K8STaskHandler{
 		Clientgo: utils.CreateK8sClient(path),
@@ -77,8 +68,9 @@ func (this *K8STaskHandler) SyncHost(clusterId string) {
 			for _, o := range n.Status.Images {
 				var imageName string
 				imageId, _ := uuid.NewV4()
-				image := new(k8s.Image)
+				image := new(models.ImageConfig)
 				image.Id = imageId.String()
+				image.HostId = hostId.String()
 				if len(o.Names) == 1 {
 					image.Name = o.Names[0]
 				} else {
@@ -89,7 +81,7 @@ func (this *K8STaskHandler) SyncHost(clusterId string) {
 					}
 					image.Name = imageName
 				}
-				image.Size = image.Size / 1024 / 1024 / 1024
+				image.Size = o.SizeBytes / 1024 / 1024 / 1024
 				// to do image create time
 
 				image.Add()

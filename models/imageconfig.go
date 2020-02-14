@@ -1,30 +1,28 @@
-package k8s
+package models
 
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"time"
 )
 
-type Image struct {
+type ImageConfig struct {
 	Id         string    `orm:"pk;description(镜像id)"`
+	HostId     string    `orm:"description(主机id)"`
 	Name       string    `orm:"unique;description(镜像名)"`
 	Size       int64     `orm:"description(大小)"`
-	GroupId    string    `orm:"default(null);description(组id)"`
-	GroupName  string    `orm:"default(null);description(组名)"`
+	OS         string    `orm:"description(镜像名)"`
 	DissStatus int8      `orm:"description(安全状态)"`
-	CreateTime time.Time `orm:"description(创建时间);auto_now_add;type(datetime)"`
-	UpdateTime time.Time `orm:"null;description(更新时间);auto_now;type(datetime)"`
+	CreateTime time.Time `orm:"null;description(创建时间);type(datetime)"`
 }
 
 func init() {
-	orm.RegisterModel(new(Image))
+	orm.RegisterModel(new(ImageConfig))
 }
 
-type ImageInterface interface {
+type ImageConfigInterface interface {
 	Add()
 	Delete()
 	Edit()
@@ -32,16 +30,16 @@ type ImageInterface interface {
 	List()
 }
 
-func (this *Image) Add() models.Result {
+func (this *ImageConfig) Add() Result {
 	o := orm.NewOrm()
 	o.Using("default")
-	var ResultData models.Result
+	var ResultData Result
 
 	_, err := o.Insert(this)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.AddImageErr
-		logs.Error("Add Image failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.AddImageConfigErr
+		logs.Error("Add ImageConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK
@@ -49,22 +47,22 @@ func (this *Image) Add() models.Result {
 	return ResultData
 }
 
-func (this *Image) List() models.Result {
+func (this *ImageConfig) List() Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
-	var ImageList []*Image
-	var ResultData models.Result
+	var ImageList []*ImageConfig
+	var ResultData Result
 
-	_, err := o.QueryTable(utils.Image).All(&ImageList)
+	_, err := o.QueryTable(utils.ImageConfig).All(&ImageList)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetImageErr
-		logs.Error("Get Image List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.GetImageConfigErr
+		logs.Error("Get ImageConfig List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.Image).Count()
+	total, _ := o.QueryTable(utils.ImageConfig).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = ImageList
