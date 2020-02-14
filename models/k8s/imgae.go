@@ -12,7 +12,7 @@ import (
 type Image struct {
 	Id         string    `orm:"pk;description(镜像id)"`
 	Name       string    `orm:"unique;description(镜像名)"`
-	Size       uint8     `orm:"description(大小)"`
+	Size       int64     `orm:"description(大小)"`
 	GroupId    string    `orm:"default(null);description(组id)"`
 	GroupName  string    `orm:"default(null);description(组名)"`
 	DissStatus int8      `orm:"description(安全状态)"`

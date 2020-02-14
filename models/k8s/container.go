@@ -14,7 +14,7 @@ type Container struct {
 	Name          string    `orm:"unique;description(容器名)"`
 	NameSpaceId   string    `orm:"description(命名空间id)"`
 	NameSpaceName string    `orm:"description(命名空间)"`
-	Status        uint8     `orm:"default(0);description(状态)"`
+	Status        string    `orm:"default(null);description(状态)"`
 	Command       string    `orm:"default(null);description(命令)"`
 	Image         string    `orm:"default(null);description(镜像)"`
 	CreateTime    time.Time `orm:"description(创建时间);auto_now_add;type(datetime)"`
@@ -32,7 +32,6 @@ type ContainerInterface interface {
 	Get()
 	List()
 }
-
 
 func (this *Container) Add() models.Result {
 	o := orm.NewOrm()

@@ -26,7 +26,7 @@ type PodInterface interface {
 	Delete()
 	Edit()
 	Get()
-	List() å
+	List()
 }
 
 func init() {

@@ -8,10 +8,20 @@ import (
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type K8STaskHandler struct {
 	Clientgo utils.ClientGo
+}
+
+type ContainerImage struct {
+	// Names by which this image is known.
+	// e.g. ["k8s.gcr.io/hyperkube:v1.0.7", "dockerhub.io/google_containers/hyperkube:v1.0.7"]
+	Names []string `json:"names" protobuf:"bytes,1,rep,name=names"`
+	// The size of the image in bytes.
+	// +optional
+	SizeBytes int64 `json:"sizeBytes,omitempty" protobuf:"varint,2,opt,name=sizeBytes"`
 }
 
 func NewK8STaskHandler(path string) *K8STaskHandler {
@@ -20,10 +30,7 @@ func NewK8STaskHandler(path string) *K8STaskHandler {
 	}
 }
 
-func (this *K8STaskHandler) SyncCluster() {
-}
-
-func (this *K8STaskHandler) SyncHostConfig(clusterId string) {
+func (this *K8STaskHandler) SyncHost(clusterId string) {
 	nodes, err := this.Clientgo.GetNodes()
 	if err != nil {
 		logs.Error("Sync node err: %s", err.Error())
@@ -31,10 +38,10 @@ func (this *K8STaskHandler) SyncHostConfig(clusterId string) {
 		for _, n := range nodes.Items {
 			name := n.ObjectMeta.Name
 			// 同步 hostconfig
-			uid, _ := uuid.NewV4()
+			hostId, _ := uuid.NewV4()
 			config := new(models.HostConfig)
 			config.HostName = name
-			config.Id = uid.String()
+			config.Id = hostId.String()
 			config.OS = n.Status.NodeInfo.OSImage
 			config.IsInK8s = true
 			config.ClusterId = clusterId
@@ -55,7 +62,7 @@ func (this *K8STaskHandler) SyncHostConfig(clusterId string) {
 			info.Mem = m / 1024 / 1024 / 1024
 			d, _ := capacity.StorageEphemeral().AsInt64()
 			info.Disk = strconv.FormatInt(d/1024/1024/1024, 10)
-			info.Id = uid.String()
+			info.Id = hostId.String()
 			nStatusNodeinfo := n.Status.NodeInfo
 			info.OS = nStatusNodeinfo.OSImage
 			info.Kernel = nStatusNodeinfo.KernelVersion
@@ -65,6 +72,28 @@ func (this *K8STaskHandler) SyncHostConfig(clusterId string) {
 			info.Kubeproxy = nStatusNodeinfo.KubeProxyVersion
 			info.KubernetesVer = nStatusNodeinfo.KubeletVersion
 			info.Inner_AddHostInfo()
+
+			// 同步主机images
+			for _, o := range n.Status.Images {
+				var imageName string
+				imageId, _ := uuid.NewV4()
+				image := new(k8s.Image)
+				image.Id = imageId.String()
+				if len(o.Names) == 1 {
+					image.Name = o.Names[0]
+				} else {
+					for _, name := range o.Names {
+						if !strings.Contains(name, "@sha256:") {
+							imageName = imageName + name + ","
+						}
+					}
+					image.Name = imageName
+				}
+				image.Size = image.Size / 1024 / 1024 / 1024
+				// to do image create time
+
+				image.Add()
+			}
 		}
 	}
 }
@@ -160,8 +189,8 @@ func SyncAll() {
 				// 创建k8s客户端
 				this := NewK8STaskHandler(c.FileName)
 
-				// 同步主机
-				this.SyncHostConfig(c.Id)
+				// 同步 hostconfig & hostinfo & 同步主机上所有镜像
+				this.SyncHost(c.Id)
 
 				// 同步 ns &&  ns 下的 pod
 				this.SyncNameSpace(c.Id)
