@@ -22,14 +22,9 @@ func init() {
 				&controllers.HostController{},
 			),
 		),
-		beego.NSNamespace("/v1/asset/hostconfig",
+		beego.NSNamespace("/v1/asset/hosts",
 			beego.NSInclude(
-				&ca.HostConfigController{},
-			),
-		),
-		beego.NSNamespace("/v1/asset/hostinfo",
-			beego.NSInclude(
-				&ca.HostInfoController{},
+				&ca.HostController{},
 			),
 		),
 		beego.NSNamespace("/v1/merticinfo",

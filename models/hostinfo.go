@@ -8,12 +8,21 @@ import (
 	"time"
 )
 
-func GetHostInfoList(id string, from, limit int) Result {
+type HostInfoInterface interface {
+	Add()
+	Delete()
+	Edit()
+	Get()
+	List()
+}
+
+func (this *HostInfo) List(id string, from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
-	var HostInfoList []*HostInfo
+	var HostInfoList []*HostInfo = nil
 	var ResultData Result
+	var total = 0
 
 	_, err := o.QueryTable(utils.HostInfo).Filter("id", id).Limit(limit, from).All(&HostInfoList)
 	if err != nil {
@@ -23,7 +32,9 @@ func GetHostInfoList(id string, from, limit int) Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.HostInfo).Count()
+	if HostInfoList != nil {
+		total = len(HostInfoList)
+	}
 	data := make(map[string]interface{})
 	data["items"] = HostInfoList
 	data["total"] = total

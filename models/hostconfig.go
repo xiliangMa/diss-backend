@@ -8,15 +8,24 @@ import (
 	"time"
 )
 
-func GetHostConfigList(name string, from, limit int) Result {
+type HostConfigInterface interface {
+	Add()
+	Delete()
+	Edit()
+	Get()
+	List()
+}
+
+func (this *HostConfig) List(from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
-	var HostConfigList []*HostConfig
+	var HostConfigList []*HostConfig = nil
+	var total = 0
 	var ResultData Result
 	var err error
-	if name != "" {
-		_, err = o.QueryTable(utils.HostConfig).Filter("host_name", name).Limit(limit, from).All(&HostConfigList)
+	if this.HostName != "" {
+		_, err = o.QueryTable(utils.HostConfig).Filter("host_name", this.HostName).Limit(limit, from).All(&HostConfigList)
 	} else {
 		_, err = o.QueryTable(utils.HostConfig).Limit(limit, from).All(&HostConfigList)
 	}
@@ -28,8 +37,9 @@ func GetHostConfigList(name string, from, limit int) Result {
 		return ResultData
 	}
 
-
-	total, _ := o.QueryTable(utils.HostConfig).Count()
+	if HostConfigList != nil {
+		total = len(HostConfigList)
+	}
 	data := make(map[string]interface{})
 	data["items"] = HostConfigList
 	data["total"] = total

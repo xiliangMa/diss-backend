@@ -156,9 +156,9 @@ func (this *K8STaskHandler) SyncPod(nsName string) {
 			podob.Id = pId
 			podob.Name = pod.ObjectMeta.Name
 			podob.NamSpaceName = nsName
-			podob.HostIP = pod.Status.HostIP
+			podob.HostIp = pod.Status.HostIP
 			podob.HostName = pod.Spec.NodeName
-			podob.PodIP = pod.Status.PodIP
+			podob.PodIp = pod.Status.PodIP
 			podob.Status = string(pod.Status.Phase)
 			podob.Add()
 
