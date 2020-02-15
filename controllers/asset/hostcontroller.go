@@ -68,3 +68,24 @@ func (this *HostController) GetHostPodList() {
 	this.ServeJSON(false)
 
 }
+
+// @Title HostImage
+// @Description Get HostImage List
+// @Param token header string true "auth token"
+// @Param hostId path string "" true "hostId"
+// @Param name query string "" false "image name"
+// @Param limit query int 20 false "limit"
+// @Success 200 {object} models.Result
+// @router /:hostId/images [post]
+func (this *HostController) GetHostImagesList() {
+	name := this.GetString("name")
+	hostId := this.GetString(":hostId")
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+
+	imageConfig := new(models.ImageConfig)
+	imageConfig.Name = name
+	this.Data["json"] = imageConfig.List(hostId, from, limit)
+	this.ServeJSON(false)
+
+}

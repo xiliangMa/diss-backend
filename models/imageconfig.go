@@ -47,14 +47,21 @@ func (this *ImageConfig) Add() Result {
 	return ResultData
 }
 
-func (this *ImageConfig) List() Result {
+func (this *ImageConfig) List(hostId string, from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
 	var ImageList []*ImageConfig
 	var ResultData Result
+	var err error
+	var total = 0
 
-	_, err := o.QueryTable(utils.ImageConfig).All(&ImageList)
+	if this.Name != "" {
+		_, err = o.QueryTable(utils.ImageConfig).Filter("name__icontains", this.Name).Limit(limit, from).Filter("host_id", hostId).All(&ImageList)
+	} else {
+		_, err = o.QueryTable(utils.ImageConfig).Limit(limit, from).Filter("host_id", hostId).All(&ImageList)
+	}
+
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetImageConfigErr
@@ -62,7 +69,9 @@ func (this *ImageConfig) List() Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.ImageConfig).Count()
+	if ImageList != nil {
+		total = len(ImageList)
+	}
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = ImageList

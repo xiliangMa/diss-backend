@@ -60,9 +60,9 @@ func (this *Pod) List(hostName string, from, limit int) models.Result {
 	var err error
 	// to do Multiple conditions
 	if this.Name != "" {
-		_, err = o.QueryTable(utils.Pod).Filter("name", this.Name).Limit(limit, from).Filter("host_name", hostName).All(&PodList)
+		_, err = o.QueryTable(utils.Pod).Filter("name", this.Name).Limit(limit, from).Filter("host_name__icontains", hostName).All(&PodList)
 	} else {
-		_, err = o.QueryTable(utils.Pod).Limit(limit, from).Filter("host_name", hostName).All(&PodList)
+		_, err = o.QueryTable(utils.Pod).Limit(limit, from).Filter("host_name__icontains", hostName).All(&PodList)
 	}
 	if err != nil {
 		ResultData.Message = err.Error()

@@ -25,7 +25,7 @@ func (this *HostConfig) List(from, limit int) Result {
 	var ResultData Result
 	var err error
 	if this.HostName != "" {
-		_, err = o.QueryTable(utils.HostConfig).Filter("host_name", this.HostName).Limit(limit, from).All(&HostConfigList)
+		_, err = o.QueryTable(utils.HostConfig).Filter("host_name__icontains", this.HostName).Limit(limit, from).All(&HostConfigList)
 	} else {
 		_, err = o.QueryTable(utils.HostConfig).Limit(limit, from).All(&HostConfigList)
 	}
