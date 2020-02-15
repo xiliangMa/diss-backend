@@ -51,14 +51,20 @@ func (this *ContainerConfig) Add() Result {
 	return ResultData
 }
 
-func (this *ContainerConfig) List() Result {
+func (this *ContainerConfig) List(hostName string, from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
-	var ContainerList []*ContainerConfig
+	var ContainerList []*ContainerConfig = nil
 	var ResultData Result
+	var total = 0
+	var err error
+	if this.Name != "" {
+		_, err = o.QueryTable(utils.ContainerConfig).Filter("name__icontains", this.Name).Limit(limit, from).Filter("host_name", hostName).All(&ContainerList)
+	} else {
+		_, err = o.QueryTable(utils.ContainerConfig).Limit(limit, from).Filter("host_name", hostName).All(&ContainerList)
+	}
 
-	_, err := o.QueryTable(utils.ContainerConfig).All(&ContainerList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetContainerConfigErr
@@ -66,7 +72,9 @@ func (this *ContainerConfig) List() Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.ContainerConfig).Count()
+	if ContainerList != nil {
+		total = len(ContainerList)
+	}
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = ContainerList
