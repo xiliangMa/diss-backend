@@ -11,4 +11,6 @@ var (
 	ImageInfo       = "image_info"
 	ContainerConfig = "container_config"
 	Task            = "task"
+	BenchMark       = "bench_mark"
+	BenchMarkLog    = "bench_mark_log"
 )

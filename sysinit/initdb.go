@@ -7,6 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/xiliangMa/diss-backend/models"
 	_ "github.com/xiliangMa/diss-backend/models/k8s"
+	_ "github.com/xiliangMa/diss-backend/models/securitylog"
 	_ "github.com/xiliangMa/diss-backend/models/task"
 	"os"
 )

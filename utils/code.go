@@ -14,6 +14,10 @@ var (
 	GetUserInfoErr     = 19
 	ElasticConnErr     = 21
 	ElasticSearchErr   = 22
+	AddBenchMarkErr    = 23
+	GetBenchMarkErr    = 24
+	AddBenchMarkLogErr = 25
+	GetBenchMarkLogErr = 26
 
 	//system
 	CheckK8sFilePostErr         = 60
