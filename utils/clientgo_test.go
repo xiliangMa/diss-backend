@@ -109,3 +109,41 @@ func Test_GetNameSpaces(t *testing.T) {
 		t.Error("K8S Client create Fail")
 	}
 }
+
+func Test_GetPodMetricsAndList(t *testing.T) {
+	if clientgo.ErrMessage == "" {
+		podMetrics, err := clientgo.GetPodMetrics("default", "nginx-5b48b4bf7c-d7flv")
+		if err != nil {
+			t.Logf("Get PodMetrics err: %s", err)
+		} else {
+			t.Log("Get PodMetrics", podMetrics)
+		}
+		podMetricsList, err := clientgo.GetPodMetricsList("default")
+		if err != nil {
+			t.Logf("Get PodMetricsList err: %s", err)
+		} else {
+			t.Log("Get PodMetricsList", podMetricsList)
+		}
+	} else {
+		t.Error("K8S Client create Fail")
+	}
+}
+
+func Test_GetNodeMetricsAndList(t *testing.T) {
+	if clientgo.ErrMessage == "" {
+		nodeMetricsList, err := clientgo.GetNodeMetricsList()
+		if err != nil {
+			t.Logf("Get GetNodeMetricsList err: %s", err)
+		} else {
+			t.Log("Get NodeMetricsList", nodeMetricsList)
+		}
+		nodeMetrics, err := clientgo.GetNodeMetrics("izm5e3cntl0pztm4dj3phrz")
+		if err != nil {
+			t.Logf("Get nodeMetrics err: %s", err)
+		} else {
+			t.Log("Get nodeMetrics", nodeMetrics)
+		}
+	} else {
+		t.Error("K8S Client create Fail")
+	}
+}
