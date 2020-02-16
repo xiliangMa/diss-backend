@@ -8,16 +8,17 @@ import (
 	"time"
 )
 
-type BenchMark struct {
+type BenchMarkTemplate struct {
 	Id          string `orm:"pk;description(基线id)"`
 	Name        string `orm:"description(名称)"`
 	Description string `orm:"description(描述)"`
-	Type        int8   `orm:"description(类型 docker kubernetes)"`
-	path        string `orm:"null;description(模版路径)"`
+	Type        int8   `orm:"description(类型 docker 0  kubernetes 1)"`
+	Path        string `orm:"null;description(模版路径)"`
+	Commands    string `orm:"null;description(操作命令)"`
 }
 
 func init() {
-	orm.RegisterModel(new(BenchMark))
+	orm.RegisterModel(new(BenchMarkTemplate))
 }
 
 type BenchMarkInterface interface {
@@ -28,7 +29,7 @@ type BenchMarkInterface interface {
 	List()
 }
 
-func (this *BenchMark) Add() Result {
+func (this *BenchMarkTemplate) Add() Result {
 	o := orm.NewOrm()
 	o.Using("default")
 	var ResultData Result
@@ -36,8 +37,8 @@ func (this *BenchMark) Add() Result {
 	_, err := o.Insert(this)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.AddBenchMarkErr
-		logs.Error("Add BenchMark failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.AddBenchMarkTemplateErr
+		logs.Error("Add BenchMarkTemplate failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK
@@ -45,25 +46,25 @@ func (this *BenchMark) Add() Result {
 	return ResultData
 }
 
-func (this *BenchMark) List() Result {
+func (this *BenchMarkTemplate) List() Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
-	var BenchMarkList []*BenchMark
+	var BenchMarkTemplateList []*BenchMarkTemplate
 	var ResultData Result
 
-	_, err := o.QueryTable(utils.BenchMark).All(&BenchMarkList)
+	_, err := o.QueryTable(utils.BenchMarkTemplate).All(&BenchMarkTemplateList)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetBenchMarkErr
-		logs.Error("Get BenchMark List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.GetBenchMarkTemplateErr
+		logs.Error("Get BenchMarkTemplate List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
 	total, _ := o.QueryTable(utils.Cluster).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
-	data["items"] = BenchMarkList
+	data["items"] = BenchMarkTemplateList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data

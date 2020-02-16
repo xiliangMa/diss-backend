@@ -1,23 +1,23 @@
 package utils
 
 var (
-	Fail               = 1
-	GetHostListErr     = 2
-	AddHostErr         = 3
-	DeleteHostErr      = 4
-	GetHostZero        = 5
-	HostExistError     = 6
-	GetHostMetricError = 7
-	EditHostErr        = 8
-	SiginErr           = 17
-	AuthorizeErr       = 18
-	GetUserInfoErr     = 19
-	ElasticConnErr     = 21
-	ElasticSearchErr   = 22
-	AddBenchMarkErr    = 23
-	GetBenchMarkErr    = 24
-	AddBenchMarkLogErr = 25
-	GetBenchMarkLogErr = 26
+	Fail                    = 1
+	GetHostListErr          = 2
+	AddHostErr              = 3
+	DeleteHostErr           = 4
+	GetHostZero             = 5
+	HostExistError          = 6
+	GetHostMetricError      = 7
+	EditHostErr             = 8
+	SiginErr                = 17
+	AuthorizeErr            = 18
+	GetUserInfoErr          = 19
+	ElasticConnErr          = 21
+	ElasticSearchErr        = 22
+	AddBenchMarkTemplateErr = 23
+	GetBenchMarkTemplateErr = 24
+	AddBenchMarkLogErr      = 25
+	GetBenchMarkLogErr      = 26
 
 	//system
 	CheckK8sFilePostErr         = 60

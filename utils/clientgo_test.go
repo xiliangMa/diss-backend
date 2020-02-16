@@ -6,14 +6,14 @@ import (
 )
 
 var (
-	kubeconfig string
-	path       = "../kubeconfig/config"
-	jobFile    = "../conf/kube-bench/kube-bench-job.yml"
-	namespaces = "default"
-	jobName    = "kube-bench"
-	podName    = "kube-bench"
-	clientgo   ClientGo
-	kubeBenchJobCommand    = []string{"kube-bench", "node", "--benchmark", "cis-1.3"}
+	kubeconfig          string
+	path                = "../kubeconfig/config"
+	jobFile             = "../conf/kube-bench/kube-bench-job.yml"
+	namespaces          = "default"
+	jobName             = "kube-bench"
+	podName             = "kube-bench"
+	clientgo            ClientGo
+	kubeBenchJobCommand = []string{"kube-bench", "node", "--benchmark", "cis-1.3"}
 )
 
 func Test_CreateK8sClient(t *testing.T) {
