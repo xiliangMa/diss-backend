@@ -13,6 +13,7 @@ var (
 	jobName    = "kube-bench"
 	podName    = "kube-bench"
 	clientgo   ClientGo
+	kubeBenchJobCommand    = []string{"kube-bench", "node", "--benchmark", "cis-1.3"}
 )
 
 func Test_CreateK8sClient(t *testing.T) {
@@ -60,7 +61,7 @@ func Test_GetPodLogsByNameSpace(t *testing.T) {
 
 func Test_CreateJobByYml(t *testing.T) {
 	if clientgo.ErrMessage == "" {
-		job, err := clientgo.CreateJobByYml(jobFile, namespaces)
+		job, err := clientgo.CreateJobByYml(kubeBenchJobCommand, jobFile, namespaces)
 		if err != nil {
 			t.Logf("Create job err, %s", err)
 		} else {
@@ -84,18 +85,18 @@ func Test_GetJob(t *testing.T) {
 	}
 }
 
-func Test_DeleteJob(t *testing.T) {
-	if clientgo.ErrMessage == "" {
-		err := clientgo.DeleteJob(namespaces, jobName)
-		if err != nil {
-			t.Logf("Delete job err, %s", err)
-		} else {
-			t.Logf("Delete job %s success", jobName)
-		}
-	} else {
-		t.Error("K8S Client create Fail")
-	}
-}
+//func Test_DeleteJob(t *testing.T) {
+//	if clientgo.ErrMessage == "" {
+//		err := clientgo.DeleteJob(namespaces, jobName)
+//		if err != nil {
+//			t.Logf("Delete job err, %s", err)
+//		} else {
+//			t.Logf("Delete job %s success", jobName)
+//		}
+//	} else {
+//		t.Error("K8S Client create Fail")
+//	}
+//}
 
 func Test_GetNameSpaces(t *testing.T) {
 	if clientgo.ErrMessage == "" {

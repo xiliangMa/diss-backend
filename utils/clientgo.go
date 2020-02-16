@@ -140,13 +140,15 @@ func (clientgo *ClientGo) GetJob(namespace, job string) (*batchv1.Job, error) {
 	return clientgo.ClientSet.BatchV1().Jobs(namespace).Get(job, metav1.GetOptions{})
 }
 
-func (clientgo *ClientGo) CreateJobByYml(file, namespace string) (*batchv1.Job, error) {
+func (clientgo *ClientGo) CreateJobByYml(kubeBenchJobCommand []string, file, namespace string) (*batchv1.Job, error) {
 	bytes, err := ioutil.ReadFile(file)
 	if err != nil {
 		logs.Error("Read file: %s,  error:  %s", file, err)
 	}
 	var job *batchv1.Job
 	err = yaml.Unmarshal(bytes, &job)
+	// 更新 kube-bench  脚本
+	job.Spec.Template.Spec.Containers[0].Command = kubeBenchJobCommand
 	if err != nil {
 		logs.Error("Job Unmarshal error:  %s", err)
 	}
