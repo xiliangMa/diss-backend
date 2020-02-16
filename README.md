@@ -37,7 +37,6 @@ macos 系统:
             
 build image:
  ```
-cd deploy/docker
 docker build -t diss-backend .
 ```
 > 前提：安装mysql 5.7+

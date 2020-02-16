@@ -12,10 +12,10 @@ RUN mkdir -p /usr/share/diss-backend/conf && \
     mkdir -p /usr/share/diss-backend/swagger
 
 
-COPY ../../entrypoint.sh /usr/share/diss-backend/
-COPY ../../bin/diss-backend /usr/share/diss-backend/
-COPY ../../conf /usr/share/diss-backend/conf
-COPY ../../swagger /usr/share/diss-backend/swagger
+COPY entrypoint.sh /usr/share/diss-backend/
+COPY bin/diss-backend /usr/share/diss-backend/
+COPY conf /usr/share/diss-backend/conf
+COPY swagger /usr/share/diss-backend/swagger
 
 RUN chmod +x /usr/share/diss-backend/entrypoint.sh
 
