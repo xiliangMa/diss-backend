@@ -81,7 +81,7 @@ func (this *K8STaskHandler) SyncHost(clusterId string) {
 					}
 					image.Name = imageName
 				}
-				image.Size = o.SizeBytes
+				image.Size = string(o.SizeBytes)
 				// to do image create time
 
 				image.Add()

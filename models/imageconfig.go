@@ -12,9 +12,10 @@ type ImageConfig struct {
 	Id         string    `orm:"pk;description(镜像id)"`
 	HostId     string    `orm:"description(主机id)"`
 	Name       string    `orm:"unique;description(镜像名)"`
-	Size       int64     `orm:"description(大小)"`
+	Size       string     `orm:"description(大小)"`
 	OS         string    `orm:"description(镜像名)"`
 	DissStatus int8      `orm:"description(安全状态)"`
+	Age        string    `orm:"default(null);description(运行时长)"`
 	CreateTime time.Time `orm:"null;description(创建时间);type(datetime)"`
 }
 
