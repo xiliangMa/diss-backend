@@ -15,6 +15,7 @@ type BenchMarkTemplate struct {
 	Type        int8   `orm:"description(类型 docker 0  kubernetes 1)"`
 	Path        string `orm:"null;description(模版路径)"`
 	Commands    string `orm:"null;description(操作命令)"`
+	Status      int8   `orm:"default(0);description(类型 停用 0  启用 1)"`
 }
 
 func init() {
@@ -46,14 +47,21 @@ func (this *BenchMarkTemplate) Add() Result {
 	return ResultData
 }
 
-func (this *BenchMarkTemplate) List() Result {
+func (this *BenchMarkTemplate) List(from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
 	var BenchMarkTemplateList []*BenchMarkTemplate
 	var ResultData Result
+	var total = 0
+	var err error
 
-	_, err := o.QueryTable(utils.BenchMarkTemplate).All(&BenchMarkTemplateList)
+	// to do Multiple conditions search
+	if this.Name == "" {
+		_, err = o.QueryTable(utils.BenchMarkTemplate).Limit(limit, from).All(&BenchMarkTemplateList)
+	} else {
+		_, err = o.QueryTable(utils.BenchMarkTemplate).Filter("name__icontains", this.Name).Limit(limit, from).All(&BenchMarkTemplateList)
+	}
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetBenchMarkTemplateErr
@@ -61,7 +69,9 @@ func (this *BenchMarkTemplate) List() Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.Cluster).Count()
+	if BenchMarkTemplateList != nil {
+		total = len(BenchMarkTemplateList)
+	}
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = BenchMarkTemplateList
