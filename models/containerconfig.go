@@ -18,6 +18,7 @@ type ContainerConfig struct {
 	Status        string    `orm:"default(null);description(状态)"`
 	Command       string    `orm:"default(null);description(命令)"`
 	ImageName     string    `orm:"default(null);description(镜像名)"`
+	Age           string    `orm:"null;description(运行时长)"`
 	CreateTime    time.Time `orm:"null;description(创建时间);type(datetime)"`
 	UpdateTime    time.Time `orm:"null;description(更新时间);type(datetime)"`
 }
