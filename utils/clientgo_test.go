@@ -85,18 +85,18 @@ func Test_GetJob(t *testing.T) {
 	}
 }
 
-//func Test_DeleteJob(t *testing.T) {
-//	if clientgo.ErrMessage == "" {
-//		err := clientgo.DeleteJob(namespaces, jobName)
-//		if err != nil {
-//			t.Logf("Delete job err, %s", err)
-//		} else {
-//			t.Logf("Delete job %s success", jobName)
-//		}
-//	} else {
-//		t.Error("K8S Client create Fail")
-//	}
-//}
+func Test_DeleteJob(t *testing.T) {
+	if clientgo.ErrMessage == "" {
+		err := clientgo.DeleteJob(namespaces, jobName)
+		if err != nil {
+			t.Logf("Delete job err, %s", err)
+		} else {
+			t.Logf("Delete job %s success", jobName)
+		}
+	} else {
+		t.Error("K8S Client create Fail")
+	}
+}
 
 func Test_GetNameSpaces(t *testing.T) {
 	if clientgo.ErrMessage == "" {
