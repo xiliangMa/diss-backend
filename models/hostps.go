@@ -4,6 +4,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
+	"github.com/xiliangMa/restapi/models"
 	"net/http"
 	"time"
 )
@@ -19,6 +20,10 @@ type HostPs struct {
 	Start   string `orm:"description(运行时长 非mac)"`
 	Started string `orm:"description(运行时长 mac)"`
 	Command string `orm:"description(Command)"`
+}
+
+func init() {
+	orm.RegisterModel(new(HostPs))
 }
 
 type HostPsInterface interface {
@@ -41,7 +46,7 @@ func (this *HostPs) List(from, limit int) Result {
 
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetHostListErr
+		ResultData.Code = utils.GetHostPsErr
 		logs.Error("GetHostPs List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
@@ -55,5 +60,22 @@ func (this *HostPs) List(from, limit int) Result {
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
+	return ResultData
+}
+
+func (this *HostPs) Add() models.Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData models.Result
+
+	_, err := o.Insert(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.AddHostPsErr
+		logs.Error("Add HostPs failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
 	return ResultData
 }

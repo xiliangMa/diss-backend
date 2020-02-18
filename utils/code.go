@@ -18,6 +18,8 @@ var (
 	GetBenchMarkTemplateErr = 24
 	AddBenchMarkLogErr      = 25
 	GetBenchMarkLogErr      = 26
+	GetHostPsErr            = 27
+	AddHostPsErr            = 28
 
 	//system
 	CheckK8sFilePostErr         = 60
