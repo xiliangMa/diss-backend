@@ -13,4 +13,5 @@ var (
 	Task              = "task"
 	BenchMarkTemplate = "bench_mark_template"
 	BenchMarkLog      = "bench_mark_log"
+	HostPs            = "host_ps"
 )
