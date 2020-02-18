@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/ghodss/yaml"
 	"io/ioutil"
+	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -148,7 +149,9 @@ func (clientgo *ClientGo) CreateJobByYml(kubeBenchJobCommand []string, file, nam
 	var job *batchv1.Job
 	err = yaml.Unmarshal(bytes, &job)
 	// 更新 kube-bench  脚本
-	job.Spec.Template.Spec.Containers[0].Command = kubeBenchJobCommand
+	if kubeBenchJobCommand != nil {
+		job.Spec.Template.Spec.Containers[0].Command = kubeBenchJobCommand
+	}
 	if err != nil {
 		logs.Error("Job Unmarshal error:  %s", err)
 	}
@@ -206,4 +209,18 @@ func (clientgo *ClientGo) GetNodeMetrics(nodeName string) (*NodeMetrics, error) 
 		err = json.Unmarshal(data, &nodeMetrics)
 	}
 	return nodeMetrics, err
+}
+
+func (clientgo *ClientGo) CreateDaemonSetByYml(kubeBenchJobCommand []string, file, namespace string) (*appsv1.DaemonSet, error) {
+	bytes, err := ioutil.ReadFile(file)
+	if err != nil {
+		logs.Error("Read file: %s,  error:  %s", file, err)
+	}
+	var daemonSet *appsv1.DaemonSet
+	err = yaml.Unmarshal(bytes, &daemonSet)
+
+	if err != nil {
+		logs.Error("DaemonSet Unmarshal error:  %s", err)
+	}
+	return clientgo.ClientSet.AppsV1().DaemonSets(namespace).Create(daemonSet)
 }
