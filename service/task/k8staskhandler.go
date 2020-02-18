@@ -194,7 +194,7 @@ type Data struct {
 func SyncAll() {
 	// cluster
 	var cluster k8s.Cluster
-	result := cluster.List()
+	result := cluster.List(0, 100000)
 
 	if result.Code == http.StatusOK && result.Data != nil {
 		data := result.Data.(map[string]interface{})

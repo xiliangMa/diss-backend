@@ -11,6 +11,7 @@ type HostController struct {
 	beego.Controller
 }
 
+// host api list
 // @Title GetHostConfig
 // @Description Get HostConfig List
 // @Param token header string true "auth token"
@@ -18,7 +19,7 @@ type HostController struct {
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router / [post]
+// @router /hosts [post]
 func (this *HostController) GetHostConfigList() {
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
@@ -36,7 +37,7 @@ func (this *HostController) GetHostConfigList() {
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /:hostId/info [post]
+// @router /hosts/:hostId/info [post]
 func (this *HostController) GetHostInfoList() {
 	id := this.GetString(":hostId")
 	limit, _ := this.GetInt("limit")
@@ -55,7 +56,7 @@ func (this *HostController) GetHostInfoList() {
 // @Param name query string "" false "podName"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /:hostName/pods [post]
+// @router /hosts/:hostName/pods [post]
 func (this *HostController) GetHostPodList() {
 	name := this.GetString("name")
 	hostName := this.GetString(":hostName")
@@ -76,7 +77,7 @@ func (this *HostController) GetHostPodList() {
 // @Param name query string "" false "imageName"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /:hostId/images [post]
+// @router /hosts/:hostId/images [post]
 func (this *HostController) GetHostImagesList() {
 	name := this.GetString("name")
 	hostId := this.GetString(":hostId")
@@ -97,7 +98,7 @@ func (this *HostController) GetHostImagesList() {
 // @Param name query string "" false "containerName"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /:hostName/containers [post]
+// @router /hosts/:hostName/containers [post]
 func (this *HostController) GetHostContainerList() {
 	name := this.GetString("name")
 	hostId := this.GetString(":hostName")

@@ -49,14 +49,21 @@ func (this *Cluster) Add() models.Result {
 	return ResultData
 }
 
-func (this *Cluster) List() models.Result {
+func (this *Cluster) List(from, limit int) models.Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
 	var ClusterList []*Cluster
+	var total = 0
 	var ResultData models.Result
+	var err error
 
-	_, err := o.QueryTable(utils.Cluster).All(&ClusterList)
+	if this.Name != "" {
+		_, err = o.QueryTable(utils.Cluster).Filter("name", this.Name).Limit(limit, from).All(&ClusterList)
+	} else {
+		_, err = o.QueryTable(utils.Cluster).Limit(limit, from).All(&ClusterList)
+	}
+
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetClusterErr
@@ -64,7 +71,9 @@ func (this *Cluster) List() models.Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.Cluster).Count()
+	if ClusterList != nil {
+		total = len(ClusterList)
+	}
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = ClusterList
