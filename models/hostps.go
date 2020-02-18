@@ -4,14 +4,13 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
-	"github.com/xiliangMa/restapi/models"
 	"net/http"
 	"time"
 )
 
 type HostPs struct {
 	Id      string `orm:"pk;description(id)"`
-	HostId  string `orm:"pk;description(主机id)"`
+	HostId  string `orm:"description(主机id)"`
 	PID     string `orm:"description(PID)"`
 	User    string `orm:"description(用户)"`
 	CPU     string `orm:"description(CPU)"`
@@ -63,10 +62,10 @@ func (this *HostPs) List(from, limit int) Result {
 	return ResultData
 }
 
-func (this *HostPs) Add() models.Result {
+func (this *HostPs) Add() Result {
 	o := orm.NewOrm()
 	o.Using("default")
-	var ResultData models.Result
+	var ResultData Result
 
 	_, err := o.Insert(this)
 	if err != nil {

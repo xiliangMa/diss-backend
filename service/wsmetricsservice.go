@@ -64,6 +64,18 @@ func (wsmh *WSMetricsService) Save() error {
 				return errors.New(result.Message)
 			}
 		}
+	case models.Tag_HostPs:
+		hostPsList := []models.HostPs{}
+		s, _ := json.Marshal(ms.Metric)
+		if err := json.Unmarshal(s, &hostPsList); err != nil {
+			logs.Error("Paraces %s error %s", ms.ResTag, err)
+			return err
+		}
+		for _, hostPs := range hostPsList {
+			if result := hostPs.Add(); result.Code != http.StatusOK {
+				return errors.New(result.Message)
+			}
+		}
 	}
 
 	return nil
