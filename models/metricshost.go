@@ -1,8 +1,11 @@
 package models
 
 import (
+	"errors"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
+	"github.com/xiliangMa/diss-backend/utils"
+	"net/http"
 )
 
 type HostConfig struct {
@@ -44,10 +47,32 @@ func init() {
 	orm.RegisterModel(new(HostConfig), new(HostInfo))
 }
 
-func (hostConfig *HostConfig) Inner_AddHostConfig() error {
+func (this *HostConfig) Inner_AddHostConfig() error {
 	o := orm.NewOrm()
 	o.Using("default")
-	_, err := o.Insert(hostConfig)
+	var err error
+	var hostConfigList []*HostConfig = nil
+	_, err = o.QueryTable(utils.HostConfig).Filter("id", this.Id).All(&hostConfigList)
+	if err != nil {
+		return err
+	}
+
+	if hostConfigList != nil {
+		updateHostConfig := hostConfigList[0]
+		// agent 或者 k8s 数据更新
+		updateHostConfig.HostName = this.HostName
+		updateHostConfig.IsInK8s = this.IsInK8s
+		updateHostConfig.Status = this.Status
+
+		resilt := updateHostConfig.Update()
+		if resilt.Code != http.StatusOK {
+			return errors.New(resilt.Message)
+		}
+	} else {
+		// 插入数据
+		_, err = o.Insert(this)
+	}
+
 	if err != nil {
 		logs.Error("DB Metrics data --- Add %s failed, err: %s", Tag_HostConfig, err.Error())
 		return err

@@ -48,3 +48,20 @@ func (this *HostConfig) List(from, limit int) Result {
 	ResultData.Data = data
 	return ResultData
 }
+
+func (this *HostConfig) Update() Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData Result
+
+	_, err := o.Update(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditHostErr
+		logs.Error("Update HostConfig: %s failed, code: %d, err: %s", this.HostName, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
