@@ -27,6 +27,10 @@ services:
       MYSQL_USER: diss
       MYSQL_PASSWORD: diss
       MYSQL_DATABASE: diss
+    command: [ #使用 command 可以覆盖容器启动后默认执行的命令
+      '--character-set-server=utf8', #设置数据库表的数据集
+      '--collation-server=utf8_general_ci' #设置数据库表的数据集
+    ]
     ports:
       - 3306:3306
     volumes:
