@@ -30,6 +30,7 @@ var (
 	GetImageConfigErr       = 36
 	AddContainerConfigErr   = 37
 	GetContainerConfigErr   = 38
+	EditImageConfigErr      = 39
 
 	//system
 	CheckK8sFilePostErr         = 60

@@ -35,14 +35,30 @@ func (this *ImageConfig) Add() Result {
 	o := orm.NewOrm()
 	o.Using("default")
 	var ResultData Result
+	var err error
+	var imageConfiggList []*HostConfig = nil
 
-	_, err := o.Insert(this)
+	_, err = o.QueryTable(utils.ImageConfig).Filter("id", this.Id).All(&imageConfiggList)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.AddImageConfigErr
-		logs.Error("Add ImageConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.GetContainerConfigErr
+		logs.Error("Get ContainerConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
+
+	if imageConfiggList != nil {
+		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接更新）
+		return this.Update()
+	} else {
+		_, err = o.Insert(this)
+		if err != nil {
+			ResultData.Message = err.Error()
+			ResultData.Code = utils.AddImageConfigErr
+			logs.Error("Add ImageConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+			return ResultData
+		}
+	}
+
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
@@ -82,5 +98,22 @@ func (this *ImageConfig) List(hostId string, from, limit int) Result {
 	if total == 0 {
 		ResultData.Data = nil
 	}
+	return ResultData
+}
+
+func (this *ImageConfig) Update() Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData Result
+
+	_, err := o.Update(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditImageConfigErr
+		logs.Error("Update ImageConfig: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
 	return ResultData
 }

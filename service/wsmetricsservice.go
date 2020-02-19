@@ -80,7 +80,3 @@ func (wsmh *WSMetricsService) Save() error {
 
 	return nil
 }
-
-func (wsmh *WSMetricsService) Update() error {
-	return nil
-}
