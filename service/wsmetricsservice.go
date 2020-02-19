@@ -71,6 +71,14 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
+		if len(hostPsList) != 0 {
+			data := hostPsList[0].ListById().Data.(map[string]interface{})
+			if data["total"] != 0 {
+				for _, v := range data["items"].([]*models.HostPs) {
+					v.Delete()
+				}
+			}
+		}
 		for _, hostPs := range hostPsList {
 			if result := hostPs.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)

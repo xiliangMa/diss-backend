@@ -6,6 +6,7 @@ import (
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"time"
 )
 
 type NameSpace struct {
@@ -30,12 +31,82 @@ func (this *NameSpace) Add() models.Result {
 	o := orm.NewOrm()
 	o.Using("default")
 	var ResultData models.Result
+	var nameSpaceList []*NameSpace
+	var err error
 
-	_, err := o.Insert(this)
+	_, err = o.QueryTable(utils.NameSpace).Filter("id", this.Id).All(&nameSpaceList)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.AddNameSpaceErr
-		logs.Error("Add NameSpace failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.GetNameSpaceErr
+		logs.Error("Get NameSpace failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	if len(nameSpaceList) != 0 {
+		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接更新）
+		return this.Update()
+	} else {
+		_, err = o.Insert(this)
+		if err != nil {
+			ResultData.Message = err.Error()
+			ResultData.Code = utils.AddNameSpaceErr
+			logs.Error("Add NameSpace failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+			return ResultData
+		}
+	}
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+func (this *NameSpace) List(from, limit int) models.Result {
+	o := orm.NewOrm()
+	orm.DefaultTimeLoc = time.Local
+	o.Using("default")
+	var nameSpaceList []*NameSpace
+	var total = 0
+	var ResultData models.Result
+	var err error
+
+	if this.Name != "" {
+		_, err = o.QueryTable(utils.NameSpace).Filter("name", this.Name).Limit(limit, from).All(&nameSpaceList)
+	} else {
+		_, err = o.QueryTable(utils.NameSpace).Limit(limit, from).All(&nameSpaceList)
+	}
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetClusterErr
+		logs.Error("Get NameSpace List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	if nameSpaceList != nil {
+		total = len(nameSpaceList)
+	}
+	data := make(map[string]interface{})
+	data["total"] = total
+	data["items"] = nameSpaceList
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
+	return ResultData
+}
+
+func (this *NameSpace) Update() models.Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData models.Result
+
+	_, err := o.Update(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditNameSpaceErr
+		logs.Error("Update NameSpace: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK

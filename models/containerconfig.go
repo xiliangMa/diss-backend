@@ -40,7 +40,7 @@ func (this *ContainerConfig) Add() Result {
 	o.Using("default")
 	var ResultData Result
 	var err error
-	var containerConfiggList []*ContainerConfig = nil
+	var containerConfiggList []*ContainerConfig
 
 	_, err = o.QueryTable(utils.ContainerConfig).Filter("id", this.Id).All(&containerConfiggList)
 	if err != nil {
@@ -50,7 +50,7 @@ func (this *ContainerConfig) Add() Result {
 		return ResultData
 	}
 
-	if containerConfiggList != nil {
+	if len(containerConfiggList) != 0 {
 		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接更新）
 		return this.Update()
 	} else {

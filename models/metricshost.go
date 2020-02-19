@@ -51,13 +51,12 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 	o := orm.NewOrm()
 	o.Using("default")
 	var err error
-	var hostConfigList []*HostConfig = nil
+	var hostConfigList []*HostConfig
 	_, err = o.QueryTable(utils.HostConfig).Filter("id", this.Id).All(&hostConfigList)
 	if err != nil {
 		return err
 	}
-
-	if hostConfigList != nil {
+	if len(hostConfigList) != 0 {
 		updateHostConfig := hostConfigList[0]
 		// agent 或者 k8s 数据更新 （因为有diss-backend的关系数据，防止覆盖diss-backend的数据，需要替换更新）
 		updateHostConfig.HostName = this.HostName
@@ -85,13 +84,13 @@ func (this *HostInfo) Inner_AddHostInfo() error {
 	o := orm.NewOrm()
 	o.Using("default")
 	var err error
-	var hostInfoList []*HostConfig = nil
+	var hostInfoList []*HostConfig
 	_, err = o.QueryTable(utils.HostConfig).Filter("id", this.Id).All(&hostInfoList)
 	if err != nil {
 		return err
 	}
 
-	if hostInfoList != nil {
+	if len(hostInfoList) != 0 {
 		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接更新）
 		resilt := this.Update()
 		if resilt.Code != http.StatusOK {

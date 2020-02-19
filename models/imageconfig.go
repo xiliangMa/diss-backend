@@ -36,7 +36,7 @@ func (this *ImageConfig) Add() Result {
 	o.Using("default")
 	var ResultData Result
 	var err error
-	var imageConfiggList []*ImageConfig = nil
+	var imageConfiggList []*ImageConfig
 
 	_, err = o.QueryTable(utils.ImageConfig).Filter("id", this.Id).All(&imageConfiggList)
 	if err != nil {
@@ -46,7 +46,7 @@ func (this *ImageConfig) Add() Result {
 		return ResultData
 	}
 
-	if imageConfiggList != nil {
+	if len(imageConfiggList) != 0 {
 		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接更新）
 		return this.Update()
 	} else {

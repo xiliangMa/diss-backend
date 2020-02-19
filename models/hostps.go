@@ -31,6 +31,7 @@ type HostPsInterface interface {
 	Edit()
 	Get()
 	List()
+	ListById()
 }
 
 func (this *HostPs) List(from, limit int) Result {
@@ -66,24 +67,8 @@ func (this *HostPs) Add() Result {
 	o := orm.NewOrm()
 	o.Using("default")
 	var ResultData Result
-	var err error
-	var hostPsList []*HostPs = nil
 
-	_, err = o.QueryTable(utils.HostPs).Filter("id", this.Id).All(&hostPsList)
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetHostPsErr
-		logs.Error("Get HostPs failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-
-	if hostPsList != nil {
-		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接更新） 进程比较特殊 直接清除主机所有进程
-		for _, hostPs := range hostPsList {
-			hostPs.Delete()
-		}
-	}
-	_, err = o.Insert(this)
+	_, err := o.Insert(this)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddHostPsErr
@@ -117,14 +102,42 @@ func (this *HostPs) Delete() Result {
 	o := orm.NewOrm()
 	o.Using("default")
 	var ResultData Result
-	_, err := o.Delete(&HostPs{HostId: this.HostId})
+	_, err := o.Delete(&HostPs{Id: this.Id, HostId: this.HostId})
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteHostPsErr
 		logs.Error("Delete HostPs failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
-	logs.Error("Get HostPs failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 	ResultData.Code = http.StatusOK
+	return ResultData
+}
+
+func (this *HostPs) ListById() Result {
+	o := orm.NewOrm()
+	orm.DefaultTimeLoc = time.Local
+	o.Using("default")
+	var hostPsList []*HostPs = nil
+	var total = 0
+	var ResultData Result
+
+	_, err := o.QueryTable(utils.HostPs).Filter("host_id", this.HostId).All(&hostPsList)
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetHostPsErr
+		logs.Error("GetHostPs List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	if hostPsList != nil {
+		total = len(hostPsList)
+	}
+	data := make(map[string]interface{})
+	data["items"] = hostPsList
+	data["total"] = total
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
 	return ResultData
 }

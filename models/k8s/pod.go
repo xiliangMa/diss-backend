@@ -37,14 +37,38 @@ func (this *Pod) Add() models.Result {
 	o := orm.NewOrm()
 	o.Using("default")
 	var ResultData models.Result
+	var podList []*Pod
+	var err error
 
-	_, err := o.Insert(this)
+	_, err = o.QueryTable(utils.Pod).Filter("id", this.Id).All(&podList)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.AddPodErr
-		logs.Error("Add Pod failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.GetPodErr
+		logs.Error("Get Pod failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
+
+	if len(podList) != 0 {
+		updatePod := podList[0]
+		// agent 或者 k8s 数据更新 （因为有diss-backend的关系数据，防止覆盖diss-backend的数据，需要替换更新）
+		updatePod.HostName = this.HostName
+		updatePod.Name = this.Name
+		updatePod.PodIp = this.PodIp
+		updatePod.Status = this.Status
+		updatePod.HostIp = this.HostIp
+		updatePod.HostName = this.HostName
+		updatePod.NamSpaceName = this.NamSpaceName
+		return updatePod.Update()
+	} else {
+		_, err = o.Insert(this)
+		if err != nil {
+			ResultData.Message = err.Error()
+			ResultData.Code = utils.AddPodErr
+			logs.Error("Add Pod failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+			return ResultData
+		}
+	}
+
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
@@ -83,5 +107,22 @@ func (this *Pod) List(hostName string, from, limit int) models.Result {
 	if total == 0 {
 		ResultData.Data = nil
 	}
+	return ResultData
+}
+
+func (this *Pod) Update() models.Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData models.Result
+
+	_, err := o.Update(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditPodErr
+		logs.Error("Update Pod: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
 	return ResultData
 }

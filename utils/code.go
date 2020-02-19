@@ -42,11 +42,14 @@ var (
 	CheckK8sFileTestErr         = 64
 
 	//k8s
-	AddNameSpaceErr = 100
-	AddPodErr       = 101
-	AddClusterErr   = 102
-	GetClusterErr   = 103
-	GetPodErr       = 108
+	AddNameSpaceErr  = 100
+	AddPodErr        = 101
+	AddClusterErr    = 102
+	GetClusterErr    = 103
+	GetPodErr        = 104
+	EditNameSpaceErr = 105
+	EditPodErr       = 106
+	GetNameSpaceErr  = 107
 
 	//task
 	AddTaskErr = 130
