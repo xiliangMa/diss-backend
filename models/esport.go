@@ -206,8 +206,7 @@ func Internal_ImageListMetricInfo(hostname string) Result {
 	return ResultData
 }
 
-
-func Internal_IntrudeDetectMetricInfo(hostId , fromTime , toTime string) Result {
+func Internal_IntrudeDetectMetricInfo(hostId, fromTime, toTime string) Result {
 	var ResultData Result
 
 	esclient, err := utils.GetESClient()

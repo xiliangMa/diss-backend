@@ -6,7 +6,7 @@ import (
 )
 
 // Intrude Detect Log api list
-type IntDetectController struct {
+type IntrudeDetectLogController struct {
 	beego.Controller
 }
 
@@ -19,9 +19,9 @@ type IntDetectController struct {
 // @Param starttime query string "" false "starttime"
 // @Param totime query string "" false "totime"
 // @Success 200 {object} models.Result
-// @router / [post]
-func (this *IntDetectController) GetIntrudeLogList() {
-	starttime  := this.GetString("starttime")
+// @router /intrudedetect [post]
+func (this *IntrudeDetectLogController) GetIntrudeLogList() {
+	starttime := this.GetString("starttime")
 	totime := this.GetString("totime")
 	hostid := this.GetString("hostid")
 

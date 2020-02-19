@@ -11,7 +11,7 @@ import (
 	"github.com/xiliangMa/diss-backend/controllers"
 	ca "github.com/xiliangMa/diss-backend/controllers/asset"
 	ck "github.com/xiliangMa/diss-backend/controllers/k8s"
-	cl "github.com/xiliangMa/diss-backend/controllers/securitylog"
+	csl "github.com/xiliangMa/diss-backend/controllers/securitylog"
 	cs "github.com/xiliangMa/diss-backend/controllers/securitypolicy"
 	css "github.com/xiliangMa/diss-backend/controllers/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -37,9 +37,9 @@ func init() {
 				&cs.BMTController{},
 			),
 		),
-		beego.NSNamespace("/v1/securitylog/intrudedetect",
+		beego.NSNamespace("/v1/securitylog",
 			beego.NSInclude(
-				&cl.IntDetectController{},
+				&csl.IntrudeDetectLogController{},
 			),
 		),
 		beego.NSNamespace("/v1/merticinfo",
