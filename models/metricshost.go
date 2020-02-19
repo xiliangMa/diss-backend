@@ -59,9 +59,10 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 
 	if hostConfigList != nil {
 		updateHostConfig := hostConfigList[0]
-		// agent 或者 k8s 数据更新
+		// agent 或者 k8s 数据更新 （因为有diss-backend的关系数据，防止覆盖diss-backend的数据，需要替换更新）
 		updateHostConfig.HostName = this.HostName
 		updateHostConfig.IsInK8s = this.IsInK8s
+		updateHostConfig.OS = this.OS
 		updateHostConfig.Status = this.Status
 
 		resilt := updateHostConfig.Update()
@@ -80,10 +81,26 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 	return nil
 }
 
-func (hostInfo *HostInfo) Inner_AddHostInfo() error {
+func (this *HostInfo) Inner_AddHostInfo() error {
 	o := orm.NewOrm()
 	o.Using("default")
-	_, err := o.Insert(hostInfo)
+	var err error
+	var hostInfoList []*HostConfig = nil
+	_, err = o.QueryTable(utils.HostConfig).Filter("id", this.Id).All(&hostInfoList)
+	if err != nil {
+		return err
+	}
+
+	if hostInfoList != nil {
+		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接更新）
+		resilt := this.Update()
+		if resilt.Code != http.StatusOK {
+			return errors.New(resilt.Message)
+		}
+	} else {
+		// 插入数据
+		_, err = o.Insert(this)
+	}
 	if err != nil {
 		logs.Error("DB Metrics data --- Add %s failed, err: %s", Tag_HostInfo, err.Error())
 		return err
