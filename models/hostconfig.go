@@ -32,8 +32,8 @@ func (this *HostConfig) List(from, limit int) Result {
 
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetHostListErr
-		logs.Error("GetHostList failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.GetHostConfigErr
+		logs.Error("GetHostConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
@@ -57,7 +57,7 @@ func (this *HostConfig) Update() Result {
 	_, err := o.Update(this)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.EditHostErr
+		ResultData.Code = utils.EditHostConfigErr
 		logs.Error("Update HostConfig: %s failed, code: %d, err: %s", this.HostName, ResultData.Code, ResultData.Message)
 		return ResultData
 	}

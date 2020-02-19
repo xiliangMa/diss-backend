@@ -39,13 +39,28 @@ func (this *ContainerConfig) Add() Result {
 	o := orm.NewOrm()
 	o.Using("default")
 	var ResultData Result
+	var err error
+	var containerConfiggList []*HostConfig = nil
 
-	_, err := o.Insert(this)
+	_, err = o.QueryTable(utils.ContainerConfig).Filter("id", this.Id).All(&containerConfiggList)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.AddContainerConfigErr
-		logs.Error("Add ContainerConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.GetContainerConfigErr
+		logs.Error("Get ContainerConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
+	}
+
+	if containerConfiggList != nil {
+		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接更新）
+		return this.Update()
+	} else {
+		_, err = o.Insert(this)
+		if err != nil {
+			ResultData.Message = err.Error()
+			ResultData.Code = utils.AddContainerConfigErr
+			logs.Error("Add ContainerConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+			return ResultData
+		}
 	}
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
@@ -85,5 +100,22 @@ func (this *ContainerConfig) List(hostName string, from, limit int) Result {
 	if total == 0 {
 		ResultData.Data = nil
 	}
+	return ResultData
+}
+
+func (this *ContainerConfig) Update() Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData Result
+
+	_, err := o.Update(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditContainerConfigErr
+		logs.Error("Update ContainerConfig: %s failed, code: %d, err: %s", this.HostName, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
 	return ResultData
 }

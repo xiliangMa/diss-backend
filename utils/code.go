@@ -20,6 +20,16 @@ var (
 	GetBenchMarkLogErr      = 26
 	GetHostPsErr            = 27
 	AddHostPsErr            = 28
+	EditHostInfoErr         = 29
+	GetHostInfoErr          = 30
+	AddHostConfigErr        = 31
+	EditHostConfigErr       = 32
+	GetHostConfigErr        = 33
+	EditContainerConfigErr  = 34
+	AddImageConfigErr       = 35
+	GetImageConfigErr       = 36
+	AddContainerConfigErr   = 37
+	GetContainerConfigErr   = 38
 
 	//system
 	CheckK8sFilePostErr         = 60
@@ -29,17 +39,11 @@ var (
 	CheckK8sFileTestErr         = 64
 
 	//k8s
-	AddNameSpaceErr       = 100
-	AddPodErr             = 101
-	AddClusterErr         = 102
-	GetClusterErr         = 103
-	AddHostConfigErr      = 104
-	GetHostConfigErr      = 105
-	AddImageConfigErr     = 106
-	GetImageConfigErr     = 107
-	GetPodErr             = 108
-	AddContainerConfigErr = 109
-	GetContainerConfigErr = 110
+	AddNameSpaceErr = 100
+	AddPodErr       = 101
+	AddClusterErr   = 102
+	GetClusterErr   = 103
+	GetPodErr       = 108
 
 	//task
 	AddTaskErr = 130

@@ -72,12 +72,12 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 	} else {
 		// 插入数据
 		_, err = o.Insert(this)
+		if err != nil {
+			logs.Error("DB Metrics data --- Add %s failed, err: %s", Tag_HostConfig, err.Error())
+			return err
+		}
 	}
 
-	if err != nil {
-		logs.Error("DB Metrics data --- Add %s failed, err: %s", Tag_HostConfig, err.Error())
-		return err
-	}
 	return nil
 }
 
@@ -100,10 +100,11 @@ func (this *HostInfo) Inner_AddHostInfo() error {
 	} else {
 		// 插入数据
 		_, err = o.Insert(this)
+		if err != nil {
+			logs.Error("DB Metrics data --- Add %s failed, err: %s", Tag_HostInfo, err.Error())
+			return err
+		}
 	}
-	if err != nil {
-		logs.Error("DB Metrics data --- Add %s failed, err: %s", Tag_HostInfo, err.Error())
-		return err
-	}
+
 	return nil
 }

@@ -27,7 +27,7 @@ func (this *HostInfo) List(id string, from, limit int) Result {
 	_, err := o.QueryTable(utils.HostInfo).Filter("id", id).Limit(limit, from).All(&HostInfoList)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetHostListErr
+		ResultData.Code = utils.GetHostInfoErr
 		logs.Error("GetHostInfoList failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
@@ -52,7 +52,7 @@ func (this *HostInfo) Update() Result {
 	_, err := o.Update(this)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.EditHostErr
+		ResultData.Code = utils.EditHostInfoErr
 		logs.Error("Update HostInfo: %s failed, code: %d, err: %s", this.HostName, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
