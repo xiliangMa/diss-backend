@@ -40,7 +40,7 @@ func (this *ContainerConfig) Add() Result {
 	o.Using("default")
 	var ResultData Result
 	var err error
-	var containerConfiggList []*HostConfig = nil
+	var containerConfiggList []*ContainerConfig = nil
 
 	_, err = o.QueryTable(utils.ContainerConfig).Filter("id", this.Id).All(&containerConfiggList)
 	if err != nil {

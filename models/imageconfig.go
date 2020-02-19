@@ -36,7 +36,7 @@ func (this *ImageConfig) Add() Result {
 	o.Using("default")
 	var ResultData Result
 	var err error
-	var imageConfiggList []*HostConfig = nil
+	var imageConfiggList []*ImageConfig = nil
 
 	_, err = o.QueryTable(utils.ImageConfig).Filter("id", this.Id).All(&imageConfiggList)
 	if err != nil {

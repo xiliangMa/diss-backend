@@ -31,6 +31,8 @@ var (
 	AddContainerConfigErr   = 37
 	GetContainerConfigErr   = 38
 	EditImageConfigErr      = 39
+	EditHostPsErr           = 40
+	DeleteHostPsErr         = 41
 
 	//system
 	CheckK8sFilePostErr         = 60

@@ -37,11 +37,11 @@ func (this *HostPs) List(from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
-	var HostPsList []*HostPs = nil
+	var hostPsList []*HostPs = nil
 	var total = 0
 	var ResultData Result
 
-	_, err := o.QueryTable(utils.HostPs).Limit(limit, from).All(&HostPsList)
+	_, err := o.QueryTable(utils.HostPs).Limit(limit, from).All(&hostPsList)
 
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -50,11 +50,11 @@ func (this *HostPs) List(from, limit int) Result {
 		return ResultData
 	}
 
-	if HostPsList != nil {
-		total = len(HostPsList)
+	if hostPsList != nil {
+		total = len(hostPsList)
 	}
 	data := make(map[string]interface{})
-	data["items"] = HostPsList
+	data["items"] = hostPsList
 	data["total"] = total
 
 	ResultData.Code = http.StatusOK
@@ -66,15 +66,65 @@ func (this *HostPs) Add() Result {
 	o := orm.NewOrm()
 	o.Using("default")
 	var ResultData Result
+	var err error
+	var hostPsList []*HostPs = nil
 
-	_, err := o.Insert(this)
+	_, err = o.QueryTable(utils.HostPs).Filter("id", this.Id).All(&hostPsList)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetHostPsErr
+		logs.Error("Get HostPs failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	if hostPsList != nil {
+		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接更新） 进程比较特殊 直接清除主机所有进程
+		for _, hostPs := range hostPsList {
+			hostPs.Delete()
+		}
+	}
+	_, err = o.Insert(this)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddHostPsErr
 		logs.Error("Add HostPs failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
+
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
+	return ResultData
+}
+
+func (this *HostPs) Update() Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData Result
+
+	_, err := o.Update(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditHostPsErr
+		logs.Error("Update HostPs: %s failed, code: %d, err: %s", this.Id, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+func (this *HostPs) Delete() Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData Result
+	_, err := o.Delete(&HostPs{HostId: this.HostId})
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteHostPsErr
+		logs.Error("Delete HostPs failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	logs.Error("Get HostPs failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+	ResultData.Code = http.StatusOK
 	return ResultData
 }
