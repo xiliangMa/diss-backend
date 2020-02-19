@@ -685,6 +685,30 @@ func ESString(queryTag string) string {
         }
     }
 }`
+	QueryDefine["intrude_detect"] = `{
+	"timeout": "30000ms",
+	
+	"sort": {
+		"vtm": { "order": "desc" }
+	},
+	"size":"100",
+	"query":{
+	  "bool":{
+	    "filter": [
+	    	{
+                "range":
+                {
+                    "vtm":
+                    {
+                        "format": "strict_date_optional_time",
+                        "gte": "!Param@gteTime!",
+                        "lte": "!Param@lteTime!"
+                    }
+                }
+            }]
+	   }
+	}
+}`
 
 	return QueryDefine[queryTag]
 }

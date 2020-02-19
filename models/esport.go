@@ -205,3 +205,44 @@ func Internal_ImageListMetricInfo(hostname string) Result {
 	ResultData.Code = http.StatusOK
 	return ResultData
 }
+
+
+func Internal_IntrudeDetectMetricInfo(hostId , fromTime , toTime string) Result {
+	var ResultData Result
+
+	esclient, err := utils.GetESClient()
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.ElasticConnErr
+		return ResultData
+	}
+
+	esqueryStr := strings.Replace(ESString("intrude_detect"), "!Param@gteTime!", fromTime, 1)
+	esqueryStr = strings.Replace(esqueryStr, "!Param@lteTime!", toTime, 1)
+	esqueryStr = strings.Replace(esqueryStr, "!Param@hostname!", hostId, 1)
+
+	res, err := esclient.API.Search(esclient.Search.WithContext(context.Background()),
+		esclient.Search.WithIndex(hostId),
+		esclient.Search.WithBody(strings.NewReader(esqueryStr)),
+		esclient.Search.WithTrackTotalHits(true),
+		esclient.Search.WithPretty())
+	if err != nil {
+		logs.Error("host msearch error: ", err.Error())
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.ElasticSearchErr
+		ResultData.Data = nil
+		return ResultData
+	}
+	defer res.Body.Close()
+
+	var indDetInfo map[string]interface{}
+	json.NewDecoder(res.Body).Decode(&indDetInfo)
+
+	var intDetPure []interface{}
+	intDetPureRefine1 := indDetInfo["hits"].(map[string]interface{})
+	intDetPure = intDetPureRefine1["hits"].([]interface{})
+
+	ResultData.Data = intDetPure
+	ResultData.Code = http.StatusOK
+	return ResultData
+}
