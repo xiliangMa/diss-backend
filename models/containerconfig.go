@@ -10,7 +10,7 @@ import (
 
 type ContainerConfig struct {
 	Id            string    `orm:"pk;description(id)"`
-	Name          string    `orm:"unique;description(容器名)"`
+	Name          string    `orm:"description(容器名)"`
 	NameSpaceName string    `orm:"description(命名空间)"`
 	PodId         string    `orm:"description(pod id)"`
 	PodName       string    `orm:"description(pod 名)"`

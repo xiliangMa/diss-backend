@@ -84,8 +84,8 @@ func (this *HostInfo) Inner_AddHostInfo() error {
 	o := orm.NewOrm()
 	o.Using("default")
 	var err error
-	var hostInfoList []*HostConfig
-	_, err = o.QueryTable(utils.HostConfig).Filter("id", this.Id).All(&hostInfoList)
+	var hostInfoList []*HostInfo
+	_, err = o.QueryTable(utils.HostInfo).Filter("id", this.Id).All(&hostInfoList)
 	if err != nil {
 		return err
 	}
