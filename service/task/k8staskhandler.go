@@ -6,7 +6,6 @@ import (
 	"github.com/xiliangMa/diss-backend/models/k8s"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -65,7 +64,7 @@ func (this *K8STaskHandler) SyncHostInfo(clusterName string) {
 			m, _ := capacity.Memory().AsInt64()
 			info.Mem = m / 1024 / 1024 / 1024
 			d, _ := capacity.StorageEphemeral().AsInt64()
-			info.Disk = strconv.FormatInt(d/1024/1024/1024, 10)
+			info.Disk = utils.UnitConvert(d)
 			nStatusNodeinfo := n.Status.NodeInfo
 			info.OS = nStatusNodeinfo.OSImage
 			info.Kernel = nStatusNodeinfo.KernelVersion
@@ -89,20 +88,14 @@ func (this *K8STaskHandler) SyncHostImageConfig() {
 			//同步主机images
 			nodeId := n.Status.NodeInfo.SystemUUID
 			for _, o := range n.Status.Images {
-				image := new(models.ImageConfig)
-				image.HostId = nodeId
-				//image.Size = string(o.SizeBytes)
-				// to do image create time
-				if len(o.Names) == 1 {
-					image.Name = o.Names[0]
-					image.Id = nodeId + "---" + image.Name
-					image.Add()
-				} else {
-					for _, name := range o.Names {
-						if !strings.Contains(name, "@sha256:") {
-							image.Name = name
-							image.Id = nodeId + "---" + image.Name
-						}
+				for _, name := range o.Names {
+					image := new(models.ImageConfig)
+					image.HostId = nodeId
+					image.Size = utils.UnitConvert(o.SizeBytes)
+					// to do image create time
+					if !strings.Contains(name, "@sha256:") {
+						image.Name = name
+						image.Id = nodeId + "---" + image.Name
 						image.Add()
 					}
 				}
@@ -141,7 +134,7 @@ func (this *K8STaskHandler) SyncNamespacePod() {
 			if err != nil {
 				logs.Error("Sync namespace: %s pods err: %s", nsName, err.Error())
 			} else {
-				logs.Info("Sync NameSpace: %s Pod, size: %d, NSName", nsName, len(pods.Items), nsName)
+				logs.Info("Sync NameSpace: %s Pod, size: %d, NSName %s", nsName, len(pods.Items), nsName)
 				for _, pod := range pods.Items {
 					// 同步 pod
 					podob := new(k8s.Pod)
@@ -216,6 +209,9 @@ func SyncAll() {
 				// 创建k8s客户端
 				this := NewK8STaskHandler(c.FileName)
 
+				// 同步 namespace
+				this.SyncNameSpace(c.Name, c.Id)
+
 				// 同步 hostconfig
 				this.SyncHostConfig(c.Name, c.Id)
 
@@ -223,10 +219,7 @@ func SyncAll() {
 				this.SyncHostInfo(c.Name)
 
 				// 同步HostImageConfig
-				//this.SyncHostImageConfig()
-
-				// 同步 namespace
-				this.SyncNameSpace(c.Name, c.Id)
+				this.SyncHostImageConfig()
 
 				// 同步 namespace 下的 pod
 				this.SyncNamespacePod()
