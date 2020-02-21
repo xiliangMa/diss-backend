@@ -1,10 +1,13 @@
 package service
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/models/securitylog"
+	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
 
@@ -84,6 +87,52 @@ func (wsmh *WSMetricsService) Save() error {
 				return errors.New(result.Message)
 			}
 		}
+	case models.Tag_DockerBenchMarkLog:
+		benchMarkLog := securitylog.BenchMarkLog{}
+		s, _ := json.Marshal(ms.Metric)
+		if err := json.Unmarshal(s, &benchMarkLog); err != nil {
+			logs.Error("Paraces %s error %s", ms.ResTag, err)
+			return err
+		}
+		if result := benchMarkLog.Add(); result.Code != http.StatusOK {
+			return errors.New(result.Message)
+		}
+
+		// 上报es
+		esClient, err := utils.GetESClient()
+		if err != nil {
+			logs.Error("Get ESClient err: %s", err)
+		}
+
+		respones, err := esClient.Create("security_log", benchMarkLog.Id, bytes.NewReader(s))
+		if err != nil {
+			logs.Error("Add security_log to es fail, benchMarkLog.Id: %s", benchMarkLog.Id)
+		} else {
+			logs.Info("Add security_log to es success, benchMarkLog.Id: %s", benchMarkLog.Id)
+		}
+		defer respones.Body.Close()
+	case models.Tag_KubernetesBenchMarkLog:
+		benchMarkLog := securitylog.BenchMarkLog{}
+		s, _ := json.Marshal(ms.Metric)
+		if err := json.Unmarshal(s, &benchMarkLog); err != nil {
+			logs.Error("Paraces %s error %s", ms.ResTag, err)
+			return err
+		}
+		if result := benchMarkLog.Add(); result.Code != http.StatusOK {
+			return errors.New(result.Message)
+		}
+		// 上报es
+		esClient, err := utils.GetESClient()
+		if err != nil {
+			logs.Error("Get ESClient err: %s", err)
+		}
+		respones, err := esClient.Create("security_log", benchMarkLog.Id, bytes.NewReader(s))
+		if err != nil {
+			logs.Error("Add security_log to es fail, benchMarkLog.Id: %s", benchMarkLog.Id)
+		} else {
+			logs.Info("Add security_log to es success, benchMarkLog.Id: %s", benchMarkLog.Id)
+		}
+		defer respones.Body.Close()
 	}
 
 	return nil
