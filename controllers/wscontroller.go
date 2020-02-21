@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/gorilla/websocket"
 	"github.com/xiliangMa/diss-backend/service"
+	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
 
@@ -19,7 +20,10 @@ var upgrader = websocket.Upgrader{
 }
 
 func (this *WSMetricController) Metrics() {
-	wsconn, err := upgrader.Upgrade(this.Ctx.ResponseWriter, this.Ctx.Request, nil)
+	wsm := new(utils.WSManager)
+	// 创建全局ws控制对象
+	wsm.NewWSManager(this.Ctx.ResponseWriter, this.Ctx.Request)
+	err, wsconn := wsm.GetWSManager().Err, wsm.GetWSManager().Conn
 	if err != nil {
 		logs.Info("upgrade:", err)
 		return
