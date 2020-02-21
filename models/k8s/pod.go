@@ -10,15 +10,15 @@ import (
 )
 
 type Pod struct {
-	Id           string `orm:"pk;description(pod id)"`
-	Name         string `orm:"unique;description(集群名)"`
-	PodIp        string `orm:"default(null);description(pod ip)"`
-	Status       string `orm:"description(pod状态)"`
-	GroupId      string `orm:"default(null);description(租户id)"`
-	GroupName    string `orm:"default(null);description(租户名)"`
-	HostIp       string `orm:"default(null);description(主机ip， 默认内网ip)"`
-	HostName     string `orm:"default(null);description(host name)"`
-	NamSpaceName string `orm:"default(null);description(命名空间)"`
+	Id            string `orm:"pk;description(pod id)"`
+	Name          string `orm:"unique;description(集群名)"`
+	PodIp         string `orm:"default(null);description(pod ip)"`
+	Status        string `orm:"description(pod状态)"`
+	GroupId       string `orm:"default(null);description(租户id)"`
+	GroupName     string `orm:"default(null);description(租户名)"`
+	HostIp        string `orm:"default(null);description(主机ip， 默认内网ip)"`
+	HostName      string `orm:"default(null);description(host name)"`
+	NameSpaceName string `orm:"default(null);description(命名空间)"`
 }
 
 type PodInterface interface {
@@ -57,7 +57,7 @@ func (this *Pod) Add() models.Result {
 		updatePod.Status = this.Status
 		updatePod.HostIp = this.HostIp
 		updatePod.HostName = this.HostName
-		updatePod.NamSpaceName = this.NamSpaceName
+		updatePod.NameSpaceName = this.NameSpaceName
 		return updatePod.Update()
 	} else {
 		_, err = o.Insert(this)
@@ -74,7 +74,7 @@ func (this *Pod) Add() models.Result {
 	return ResultData
 }
 
-func (this *Pod) List(hostName string, from, limit int) models.Result {
+func (this *Pod) List(from, limit int) models.Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
@@ -83,11 +83,16 @@ func (this *Pod) List(hostName string, from, limit int) models.Result {
 	var ResultData models.Result
 	var err error
 	// to do Multiple conditions
+	cond := orm.NewCondition()
 	if this.Name != "" {
-		_, err = o.QueryTable(utils.Pod).Filter("name", this.Name).Limit(limit, from).Filter("host_name__icontains", hostName).All(&PodList)
-	} else {
-		_, err = o.QueryTable(utils.Pod).Limit(limit, from).Filter("host_name__icontains", hostName).All(&PodList)
+		cond = cond.And("name__icontains", this.Name)
+	} else if this.HostName != "" {
+		cond = cond.And("host_name", this.HostName)
+	} else if this.NameSpaceName != "" {
+		cond = cond.And("name_space_name", this.NameSpaceName)
 	}
+	_, err = o.QueryTable(utils.Pod).SetCond(cond).All(&PodList)
+
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetPodErr

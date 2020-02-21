@@ -140,7 +140,7 @@ func (this *K8STaskHandler) SyncNamespacePod() {
 					podob := new(k8s.Pod)
 					podob.Id = string(pod.UID)
 					podob.Name = pod.ObjectMeta.Name
-					podob.NamSpaceName = nsName
+					podob.NameSpaceName = nsName
 					podob.HostIp = pod.Status.HostIP
 					podob.HostName = pod.Spec.NodeName
 					podob.PodIp = pod.Status.PodIP

@@ -65,7 +65,8 @@ func (this *HostController) GetHostPodList() {
 
 	pod := new(k8s.Pod)
 	pod.Name = name
-	this.Data["json"] = pod.List(hostName, from, limit)
+	pod.HostName = hostName
+	this.Data["json"] = pod.List(from, limit)
 	this.ServeJSON(false)
 
 }
