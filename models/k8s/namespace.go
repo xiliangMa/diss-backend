@@ -69,8 +69,8 @@ func (this *NameSpace) List(from, limit int) models.Result {
 	var ResultData models.Result
 	var err error
 
-	if this.Name != "" {
-		_, err = o.QueryTable(utils.NameSpace).Filter("name", this.Name).Limit(limit, from).All(&nameSpaceList)
+	if this.ClusterId != "" {
+		_, err = o.QueryTable(utils.NameSpace).Filter("cluster_id", this.ClusterId).Limit(limit, from).All(&nameSpaceList)
 	} else {
 		_, err = o.QueryTable(utils.NameSpace).Limit(limit, from).All(&nameSpaceList)
 	}

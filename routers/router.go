@@ -10,7 +10,6 @@ import (
 	"github.com/astaxie/beego/plugins/cors"
 	"github.com/xiliangMa/diss-backend/controllers"
 	ca "github.com/xiliangMa/diss-backend/controllers/asset"
-	ck "github.com/xiliangMa/diss-backend/controllers/k8s"
 	csl "github.com/xiliangMa/diss-backend/controllers/securitylog"
 	cs "github.com/xiliangMa/diss-backend/controllers/securitypolicy"
 	css "github.com/xiliangMa/diss-backend/controllers/system/system"
@@ -29,7 +28,7 @@ func init() {
 			beego.NSInclude(
 				// Asset api list
 				&ca.HostController{},
-				&ck.K8SController{},
+				&ca.K8SController{},
 			),
 		),
 		beego.NSNamespace("/v1/securitypolicy/bmts",
