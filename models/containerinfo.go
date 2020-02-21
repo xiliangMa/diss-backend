@@ -17,15 +17,15 @@ type ContainerInfo struct {
 	ImageName     string `orm:"description(image名称)"`
 	HostId        string `orm:"description(主机id)"`
 	HostName      string `orm:"description(主机名)"`
-	Command       string `orm:"default(null),description(命令)"`
-	SartedAt      string `orm:"default(null),description(启动时间)"`
-	CreatedAt     string `orm:"default(null),description(创建时间)"`
-	Status        string `orm:"default(null),description(状态)"`
-	Ports         string `orm:"default(null),description(端口)"`
-	Ip            string `orm:"default(null),description(ip)"`
-	Labels        string `orm:"default(null),description(标签)"`
-	Volumes       string `orm:"default(null),description(Volumes)"`
-	Mounts        string `orm:"default(null),description(Mounts)"`
+	Command       string `orm:"default(null);description(命令)"`
+	SartedAt      string `orm:"default(null);description(启动时间)"`
+	CreatedAt     string `orm:"default(null);description(创建时间)"`
+	Status        string `orm:"default(null);description(状态)"`
+	Ports         string `orm:"default(null);description(端口)"`
+	Ip            string `orm:"default(null);description(ip)"`
+	Labels        string `orm:"default(null);description(标签)"`
+	Volumes       string `orm:"default(null);description(Volumes)"`
+	Mounts        string `orm:"default(null);description(Mounts)"`
 }
 
 func init() {
@@ -87,8 +87,6 @@ func (this *ContainerInfo) List(from, limit int) Result {
 		cond = cond.And("name__icontains", this.Name)
 	} else if this.HostName != "" {
 		cond = cond.And("host_name", this.HostName)
-	} else if this.ImageName != "" {
-		cond = cond.And("image_name", this.ImageName)
 	} else if this.NameSpaceName != "" {
 		cond = cond.And("name_space_name", this.NameSpaceName)
 	} else if this.PodId != "" {

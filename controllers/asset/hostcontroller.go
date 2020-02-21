@@ -92,15 +92,15 @@ func (this *HostController) GetHostImagesList() {
 
 }
 
-// @Title HostContainer
-// @Description Get HostContainer List
+// @Title HostContainerConfig
+// @Description Get HostContainerConfig List
 // @Param token header string true "auth token"
 // @Param hostName path string "" true "hostName"
 // @Param name query string "" false "containerName"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router /hosts/:hostName/containers [post]
-func (this *HostController) GetHostContainerList() {
+func (this *HostController) GetHostContainerConfigList() {
 	name := this.GetString("name")
 	hostName := this.GetString(":hostName")
 	limit, _ := this.GetInt("limit")
@@ -129,6 +129,28 @@ func (this *HostController) GetHostPsList() {
 	hostPs := new(models.HostPs)
 	hostPs.HostId = hostId
 	this.Data["json"] = hostPs.List(from, limit)
+	this.ServeJSON(false)
+
+}
+
+// @Title HostContainerInfo
+// @Description Get HostContainerInfo List
+// @Param token header string true "auth token"
+// @Param hostName path string "" true "hostName"
+// @Param hostName path string "" true "containerId"
+// @Param limit query int 20 false "limit"
+// @Success 200 {object} models.Result
+// @router /hosts/:hostName/containers/:containerId [post]
+func (this *HostController) GetHostContainerInfoList() {
+	hostName := this.GetString(":hostName")
+	containerId := this.GetString(":containerId")
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+
+	containerInfo := new(models.ContainerInfo)
+	containerInfo.HostName = hostName
+	containerInfo.Id = containerId
+	this.Data["json"] = containerInfo.List(from, limit)
 	this.ServeJSON(false)
 
 }
