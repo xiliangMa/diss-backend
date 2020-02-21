@@ -2,6 +2,7 @@ package asset
 
 import (
 	"github.com/astaxie/beego"
+	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/k8s"
 )
 
@@ -64,6 +65,35 @@ func (this *K8SController) GetPods() {
 	pod := new(k8s.Pod)
 	pod.NameSpaceName = nsName
 	this.Data["json"] = pod.List(from, limit)
+	this.ServeJSON(false)
+
+}
+
+// @Title GetContainerList
+// @Description Get Pod List
+// @Param token header string true "auth token"
+// @Param nsName path string "" true "namespaceName"
+// @Param podId path string "" true "podId"
+// @Param name query string "" false "containerName"
+// @Param imageName query string "" false "imageName"
+// @Param from query int 0 false "from"
+// @Param limit query int 20 false "limit"
+// @Success 200 {object} models.Result
+// @router /k8s/namespaces/:nsName/pods/:podId [post]
+func (this *K8SController) GetContainerConfig() {
+	nsName := this.GetString(":nsName")
+	podId := this.GetString(":podId")
+	imageName := this.GetString("imageName")
+	name := this.GetString("name")
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+
+	containerConfig := new(models.ContainerConfig)
+	containerConfig.NameSpaceName = nsName
+	containerConfig.PodId = podId
+	containerConfig.Name = name
+	containerConfig.ImageName = imageName
+	this.Data["json"] = containerConfig.List(from, limit)
 	this.ServeJSON(false)
 
 }

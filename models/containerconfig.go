@@ -67,7 +67,7 @@ func (this *ContainerConfig) Add() Result {
 	return ResultData
 }
 
-func (this *ContainerConfig) List(hostName string, from, limit int) Result {
+func (this *ContainerConfig) List(from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
@@ -75,11 +75,20 @@ func (this *ContainerConfig) List(hostName string, from, limit int) Result {
 	var ResultData Result
 	var total = 0
 	var err error
+
+	cond := orm.NewCondition()
 	if this.Name != "" {
-		_, err = o.QueryTable(utils.ContainerConfig).Filter("name__icontains", this.Name).Limit(limit, from).Filter("host_name", hostName).All(&ContainerList)
-	} else {
-		_, err = o.QueryTable(utils.ContainerConfig).Limit(limit, from).Filter("host_name", hostName).All(&ContainerList)
+		cond = cond.And("name__icontains", this.Name)
+	} else if this.HostName != "" {
+		cond = cond.And("host_name", this.HostName)
+	} else if this.ImageName != "" {
+		cond = cond.And("image_name", this.ImageName)
+	} else if this.NameSpaceName != "" {
+		cond = cond.And("name_space_name", this.NameSpaceName)
+	} else if this.PodId != "" {
+		cond = cond.And("pod_id", this.PodId)
 	}
+	_, err = o.QueryTable(utils.ContainerConfig).SetCond(cond).All(&ContainerList)
 
 	if err != nil {
 		ResultData.Message = err.Error()

@@ -102,13 +102,14 @@ func (this *HostController) GetHostImagesList() {
 // @router /hosts/:hostName/containers [post]
 func (this *HostController) GetHostContainerList() {
 	name := this.GetString("name")
-	hostId := this.GetString(":hostName")
+	hostName := this.GetString(":hostName")
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 
 	containerConfig := new(models.ContainerConfig)
 	containerConfig.Name = name
-	this.Data["json"] = containerConfig.List(hostId, from, limit)
+	containerConfig.HostName = hostName
+	this.Data["json"] = containerConfig.List(from, limit)
 	this.ServeJSON(false)
 
 }

@@ -82,7 +82,6 @@ func (this *Pod) List(from, limit int) models.Result {
 	var total = 0
 	var ResultData models.Result
 	var err error
-	// to do Multiple conditions
 	cond := orm.NewCondition()
 	if this.Name != "" {
 		cond = cond.And("name__icontains", this.Name)
