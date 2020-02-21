@@ -10,11 +10,16 @@ import (
 )
 
 type Task struct {
-	Id         int       `orm:"auto;descripion(任务id)"`
-	Type       string    `orm:"description(类型)"`
-	Status     string    `orm:"null;description(状态)"`
-	CreateTime time.Time `orm:"description(创建时间);auto_now_add;type(datetime)"`
-	UpdateTime time.Time `orm:"null;description(更新时间);auto_now;type(datetime)"`
+	Id              string    `orm:"pk;descripion(任务id)"`
+	Name            string    `orm:"descripion(名称)"`
+	Spec            string    `orm:"descripion(定时器)"`
+	BmtName         string    `orm:"descripion(入侵检测模版)"`
+	BmtComman       string    `orm:"descripion(入侵检测命令)"`
+	Type            string    `orm:"description(类型 重复执行 单词执行 )"`
+	SecurityGroupId string    `orm:"description(安全策略组)"`
+	Status          string    `orm:"null;description(状态  未开始、 执行中、完成、 暂停)"`
+	CreateTime      time.Time `orm:"description(创建时间);auto_now_add;type(datetime)"`
+	UpdateTime      time.Time `orm:"null;description(更新时间);auto_now;type(datetime)"`
 }
 
 func init() {

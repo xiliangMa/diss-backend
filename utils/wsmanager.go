@@ -12,7 +12,7 @@ var (
 
 type WSManager struct {
 	Conn *websocket.Conn
-	Err error
+	Err  error
 }
 
 func (this *WSManager) NewWSManager(response *context.Response, request *http.Request) {
