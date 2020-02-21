@@ -111,3 +111,22 @@ func (this *HostController) GetHostContainerList() {
 	this.ServeJSON(false)
 
 }
+
+// @Title HostPs
+// @Description Get HostPs List
+// @Param token header string true "auth token"
+// @Param hostId path string "" true "hostId"
+// @Param limit query int 20 false "limit"
+// @Success 200 {object} models.Result
+// @router /hosts/:hostId/ps [post]
+func (this *HostController) GetHostPsList() {
+	hostId := this.GetString(":hostId")
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+
+	hostPs := new(models.HostPs)
+	hostPs.HostId = hostId
+	this.Data["json"] = hostPs.List(from, limit)
+	this.ServeJSON(false)
+
+}

@@ -42,7 +42,7 @@ func (this *HostPs) List(from, limit int) Result {
 	var total = 0
 	var ResultData Result
 
-	_, err := o.QueryTable(utils.HostPs).Limit(limit, from).All(&hostPsList)
+	_, err := o.QueryTable(utils.HostPs).Filter("host_id", this.HostId).Limit(limit, from).All(&hostPsList)
 
 	if err != nil {
 		ResultData.Message = err.Error()
