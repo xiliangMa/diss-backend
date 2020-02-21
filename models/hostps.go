@@ -9,16 +9,16 @@ import (
 )
 
 type HostPs struct {
-	Id      string `orm:"pk;description(id)"`
-	HostId  string `orm:"description(主机id)"`
-	PID     string `orm:"description(PID)"`
-	User    string `orm:"description(用户)"`
-	CPU     string `orm:"description(CPU)"`
-	Mem     string `orm:"description(内存)"`
-	Time    string `orm:"description(时间)"`
-	Start   string `orm:"description(运行时长 非mac)"`
-	Started string `orm:"description(运行时长 mac)"`
-	Command string `orm:"description(Command)"`
+	Id      string        `orm:"pk;description(id)"`
+	HostId  string        `orm:"description(主机id)"`
+	PID     string        `orm:"description(PID)"`
+	User    string        `orm:"description(用户)"`
+	CPU     string        `orm:"description(CPU)"`
+	Mem     string        `orm:"description(内存)"`
+	Time    string        `orm:"description(时间)"`
+	Start   string        `orm:"description(运行时长 非mac)"`
+	Started string        `orm:"description(运行时长 mac)"`
+	Command orm.TextField `orm:"description(Command)"`
 }
 
 func init() {

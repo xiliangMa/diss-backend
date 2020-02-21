@@ -14,11 +14,12 @@ type ContainerInfo struct {
 	NameSpaceName string `orm:"description(命名空间)"`
 	PodId         string `orm:"description(Pod Id)"`
 	PodName       string `orm:"description(Pod 名称)"`
+	ImageId       string `orm:"description(imageId)"`
 	ImageName     string `orm:"description(image名称)"`
 	HostId        string `orm:"description(主机id)"`
 	HostName      string `orm:"description(主机名)"`
 	Command       string `orm:"default(null);description(命令)"`
-	SartedAt      string `orm:"default(null);description(启动时间)"`
+	StartedAt      string `orm:"default(null);description(启动时间)"`
 	CreatedAt     string `orm:"default(null);description(创建时间)"`
 	Status        string `orm:"default(null);description(状态)"`
 	Ports         string `orm:"default(null);description(端口)"`

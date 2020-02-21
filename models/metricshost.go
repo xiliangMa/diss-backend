@@ -10,7 +10,7 @@ import (
 
 type HostConfig struct {
 	Id         string `orm:"pk;description(主机id)"`
-	HostName   string `orm:"unique;description(主机名)"`
+	HostName   string `orm:"description(主机名)"`
 	OS         string `orm:"description(系统)"`
 	PG         string `orm:"description(安全策略组)"`
 	Status     int8   `orm:"description(主机状态)"`
@@ -25,7 +25,7 @@ type HostConfig struct {
 
 type HostInfo struct {
 	Id            string `orm:"pk;description(主机id)"`
-	HostName      string `orm:"unique;description(主机名称)"`
+	HostName      string `orm:"description(主机名称)"`
 	InternalAddr  string `orm:"default(null);description(主机ip 内)"`
 	PublicAddr    string `orm:"default(null);description(主机ip 外)"`
 	CpuCore       int64  `orm:"description(cpu)"`
