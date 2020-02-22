@@ -19,7 +19,7 @@ type ContainerInfo struct {
 	HostId        string `orm:"description(主机id)"`
 	HostName      string `orm:"description(主机名)"`
 	Command       string `orm:"default(null);description(命令)"`
-	StartedAt      string `orm:"default(null);description(启动时间)"`
+	StartedAt     string `orm:"default(null);description(启动时间)"`
 	CreatedAt     string `orm:"default(null);description(创建时间)"`
 	Status        string `orm:"default(null);description(状态)"`
 	Ports         string `orm:"default(null);description(端口)"`

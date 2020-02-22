@@ -4,6 +4,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/k8s"
+	msl "github.com/xiliangMa/diss-backend/models/securitylog"
 )
 
 // Asset host object api list
@@ -151,6 +152,28 @@ func (this *HostController) GetHostContainerInfoList() {
 	containerInfo.HostName = hostName
 	containerInfo.Id = containerId
 	this.Data["json"] = containerInfo.List(from, limit)
+	this.ServeJSON(false)
+
+}
+
+// @Title HostBenchMarkLog
+// @Description Get HostBenchMarkLog List
+// @Param token header string true "auth token"
+// @Param hostId path string "" true "hostId"
+// @Param bmtName query string "" false "bench mark template name"
+// @Param limit query int 20 false "limit"
+// @Success 200 {object} models.Result
+// @router /hosts/:hostId/hostbmls [post]
+func (this *HostController) GetHostBenchMarkLogList() {
+	bmtName := this.GetString("bmtName")
+	hostId := this.GetString(":hostId")
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+
+	benchMarkLog := new(msl.BenchMarkLog)
+	benchMarkLog.BenchMarkName = bmtName
+	benchMarkLog.HostId = hostId
+	this.Data["json"] = benchMarkLog.List(from, limit)
 	this.ServeJSON(false)
 
 }

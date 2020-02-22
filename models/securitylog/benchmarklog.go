@@ -68,6 +68,8 @@ func (this *BenchMarkLog) List(from, limit int) models.Result {
 	var ResultData models.Result
 	var err error
 	cond := orm.NewCondition()
+
+	cond = cond.And("host_id", this.HostId)
 	if this.BenchMarkName != "" {
 		cond = cond.And("bench_mark_name", this.BenchMarkName)
 	}
