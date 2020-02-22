@@ -41,8 +41,12 @@ func (this *HostPs) List(from, limit int) Result {
 	var hostPsList []*HostPs = nil
 	var total = 0
 	var ResultData Result
+	cond := orm.NewCondition()
+	if this.HostId != "" {
+		cond = cond.And("host_id", this.HostId)
+	}
 
-	_, err := o.QueryTable(utils.HostPs).Filter("host_id", this.HostId).Limit(limit, from).All(&hostPsList)
+	_, err := o.QueryTable(utils.HostPs).SetCond(cond).Limit(limit, from).All(&hostPsList)
 
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -120,8 +124,12 @@ func (this *HostPs) ListById() Result {
 	var hostPsList []*HostPs = nil
 	var total = 0
 	var ResultData Result
+	cond := orm.NewCondition()
+	if this.HostId != "" {
+		cond = cond.And("host_id", this.HostId)
+	}
 
-	_, err := o.QueryTable(utils.HostPs).Filter("host_id", this.HostId).All(&hostPsList)
+	_, err := o.QueryTable(utils.HostPs).SetCond(cond).All(&hostPsList)
 
 	if err != nil {
 		ResultData.Message = err.Error()

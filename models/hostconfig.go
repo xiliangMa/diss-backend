@@ -24,12 +24,12 @@ func (this *HostConfig) List(from, limit int) Result {
 	var total = 0
 	var ResultData Result
 	var err error
+	cond := orm.NewCondition()
 	if this.HostName != "" {
-		_, err = o.QueryTable(utils.HostConfig).Filter("host_name__icontains", this.HostName).Limit(limit, from).All(&HostConfigList)
-	} else {
-		_, err = o.QueryTable(utils.HostConfig).Limit(limit, from).All(&HostConfigList)
+		cond = cond.And("host_name__contains", this.HostName)
 	}
 
+	_, err = o.QueryTable(utils.HostConfig).SetCond(cond).Limit(limit, from).All(&HostConfigList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetHostConfigErr

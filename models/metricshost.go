@@ -52,7 +52,12 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 	o.Using("default")
 	var err error
 	var hostConfigList []*HostConfig
-	_, err = o.QueryTable(utils.HostConfig).Filter("id", this.Id).All(&hostConfigList)
+	cond := orm.NewCondition()
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+
+	_, err = o.QueryTable(utils.HostConfig).SetCond(cond).All(&hostConfigList)
 	if err != nil {
 		return err
 	}
@@ -85,7 +90,11 @@ func (this *HostInfo) Inner_AddHostInfo() error {
 	o.Using("default")
 	var err error
 	var hostInfoList []*HostInfo
-	_, err = o.QueryTable(utils.HostInfo).Filter("id", this.Id).All(&hostInfoList)
+	cond := orm.NewCondition()
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	_, err = o.QueryTable(utils.HostInfo).SetCond(cond).All(&hostInfoList)
 	if err != nil {
 		return err
 	}

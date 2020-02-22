@@ -44,7 +44,8 @@ func (this *ImageInfo) Add() Result {
 	cond = cond.And("id", this.Id)
 	if this.HostId != "" {
 		cond = cond.And("host_id", this.HostId)
-	} else if this.ImageId != "" {
+	}
+	if this.ImageId != "" {
 		cond = cond.And("image_id", this.ImageId)
 	}
 
@@ -75,24 +76,27 @@ func (this *ImageInfo) Add() Result {
 	return ResultData
 }
 
-func (this *ImageInfo) List(from, limit int) Result {
+func (this *ImageInfo) List() Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
-	var ImageList []*ImageInfo
+	var imageList []*ImageInfo
 	var ResultData Result
 	var err error
 	var total = 0
 
 	cond := orm.NewCondition()
-	cond = cond.And("id", this.Id)
 	if this.HostId != "" {
 		cond = cond.And("host_id", this.HostId)
-	} else if this.ImageId != "" {
+	}
+	if this.ImageId != "" {
 		cond = cond.And("image_id", this.ImageId)
 	}
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
 
-	_, err = o.QueryTable(utils.ImageInfo).SetCond(cond).Limit(limit, from).All(&ImageList)
+	_, err = o.QueryTable(utils.ImageInfo).SetCond(cond).All(&imageList)
 
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -101,12 +105,12 @@ func (this *ImageInfo) List(from, limit int) Result {
 		return ResultData
 	}
 
-	if ImageList != nil {
-		total = len(ImageList)
+	if imageList != nil {
+		total = len(imageList)
 	}
 	data := make(map[string]interface{})
 	data["total"] = total
-	data["items"] = ImageList
+	data["items"] = imageList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data

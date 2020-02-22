@@ -33,8 +33,15 @@ func (this *NameSpace) Add() models.Result {
 	var ResultData models.Result
 	var nameSpaceList []*NameSpace
 	var err error
-
-	_, err = o.QueryTable(utils.NameSpace).Filter("id", this.Id).All(&nameSpaceList)
+	cond := orm.NewCondition()
+	cond = cond.And("id", this.Id)
+	if this.Name != "" {
+		cond = cond.And("name__contains", this.Name)
+	}
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	_, err = o.QueryTable(utils.NameSpace).SetCond(cond).All(&nameSpaceList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetNameSpaceErr
@@ -68,12 +75,20 @@ func (this *NameSpace) List(from, limit int) models.Result {
 	var total = 0
 	var ResultData models.Result
 	var err error
+	cond := orm.NewCondition()
+	cond = cond.And("id", this.Id)
+	if this.Name != "" {
+		cond = cond.And("name__contains", this.Name)
+	}
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
 
 	if this.ClusterId != "" {
-		_, err = o.QueryTable(utils.NameSpace).Filter("cluster_id", this.ClusterId).Limit(limit, from).All(&nameSpaceList)
-	} else {
-		_, err = o.QueryTable(utils.NameSpace).Limit(limit, from).All(&nameSpaceList)
+		cond = cond.And("cluster_id", this.ClusterId)
 	}
+
+	_, err = o.QueryTable(utils.NameSpace).SetCond(cond).Limit(limit, from).All(&nameSpaceList)
 
 	if err != nil {
 		ResultData.Message = err.Error()

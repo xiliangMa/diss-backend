@@ -39,8 +39,13 @@ func (this *Pod) Add() models.Result {
 	var ResultData models.Result
 	var podList []*Pod
 	var err error
+	cond := orm.NewCondition()
+	cond = cond.And("id", this.Id)
+	if this.Name != "" {
+		cond = cond.And("id", this.Id)
+	}
 
-	_, err = o.QueryTable(utils.Pod).Filter("id", this.Id).All(&podList)
+	_, err = o.QueryTable(utils.Pod).SetCond(cond).All(&podList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetPodErr
@@ -85,9 +90,11 @@ func (this *Pod) List(from, limit int) models.Result {
 	cond := orm.NewCondition()
 	if this.Name != "" {
 		cond = cond.And("name__icontains", this.Name)
-	} else if this.HostName != "" {
+	}
+	if this.HostName != "" {
 		cond = cond.And("host_name", this.HostName)
-	} else if this.NameSpaceName != "" {
+	}
+	if this.NameSpaceName != "" {
 		cond = cond.And("name_space_name", this.NameSpaceName)
 	}
 	_, err = o.QueryTable(utils.Pod).SetCond(cond).All(&PodList)

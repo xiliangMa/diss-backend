@@ -35,8 +35,13 @@ func (this *ContainerTop) Add() Result {
 	var ResultData Result
 	var err error
 	var containerTopList []*ContainerTop
+	cond := orm.NewCondition()
+	cond = cond.And("id", this.Id)
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
 
-	_, err = o.QueryTable(utils.ContainerTop).Filter("id", this.Id).All(&containerTopList)
+	_, err = o.QueryTable(utils.ContainerTop).SetCond(cond).All(&containerTopList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetContainerTopErr

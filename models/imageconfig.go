@@ -40,13 +40,17 @@ func (this *ImageConfig) Add() Result {
 	var imageConfiggList []*ImageConfig
 
 	cond := orm.NewCondition()
-	cond = cond.And("id", this.Id)
 	if this.HostId != "" {
 		cond = cond.And("host_id", this.HostId)
-	} else if this.ImageId != "" {
+	}
+	if this.ImageId != "" {
 		cond = cond.And("image_id", this.ImageId)
-	} else if this.Name != "" {
+	}
+	if this.Name != "" {
 		cond = cond.And("name", this.Name)
+	}
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
 	}
 	_, err = o.QueryTable(utils.ImageConfig).SetCond(cond).All(&imageConfiggList)
 	if err != nil {
@@ -74,20 +78,30 @@ func (this *ImageConfig) Add() Result {
 	return ResultData
 }
 
-func (this *ImageConfig) List(hostId string, from, limit int) Result {
+func (this *ImageConfig) List(from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
-	var ImageList []*ImageConfig
+	var imageList []*ImageConfig
 	var ResultData Result
 	var err error
 	var total = 0
 
-	if this.Name != "" {
-		_, err = o.QueryTable(utils.ImageConfig).Filter("name__icontains", this.Name).Limit(limit, from).Filter("host_id", hostId).All(&ImageList)
-	} else {
-		_, err = o.QueryTable(utils.ImageConfig).Limit(limit, from).Filter("host_id", hostId).All(&ImageList)
+	cond := orm.NewCondition()
+	if this.HostId != "" {
+		cond = cond.And("host_id", this.HostId)
 	}
+	if this.ImageId != "" {
+		cond = cond.And("image_id", this.ImageId)
+	}
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	if this.Name != "" {
+		cond = cond.And("name__contains", this.Name)
+	}
+
+	_, err = o.QueryTable(utils.ImageConfig).SetCond(cond).Limit(limit, from).All(&imageList)
 
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -96,12 +110,12 @@ func (this *ImageConfig) List(hostId string, from, limit int) Result {
 		return ResultData
 	}
 
-	if ImageList != nil {
-		total = len(ImageList)
+	if imageList != nil {
+		total = len(imageList)
 	}
 	data := make(map[string]interface{})
 	data["total"] = total
-	data["items"] = ImageList
+	data["items"] = imageList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data

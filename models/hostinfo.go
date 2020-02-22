@@ -23,8 +23,15 @@ func (this *HostInfo) List(id string, from, limit int) Result {
 	var HostInfoList []*HostInfo = nil
 	var ResultData Result
 	var total = 0
+	cond := orm.NewCondition()
+	if this.HostName != "" {
+		cond = cond.And("host_name__contains", this.HostName)
+	}
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
 
-	_, err := o.QueryTable(utils.HostInfo).Filter("id", id).Limit(limit, from).All(&HostInfoList)
+	_, err := o.QueryTable(utils.HostInfo).SetCond(cond).Limit(limit, from).All(&HostInfoList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetHostInfoErr

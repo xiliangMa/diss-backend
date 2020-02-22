@@ -52,7 +52,8 @@ func (this *ContainerInfo) Add() Result {
 	cond = cond.And("id", this.Id)
 	if this.HostId != "" {
 		cond = cond.And("host_id", this.HostId)
-	} else if this.ImageId != "" {
+	}
+	if this.ImageId != "" {
 		cond = cond.And("image_id", this.ImageId)
 	}
 
@@ -93,14 +94,19 @@ func (this *ContainerInfo) List() Result {
 	var err error
 
 	cond := orm.NewCondition()
-	cond = cond.And("id", this.Id)
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
 	if this.Name != "" {
 		cond = cond.And("name__icontains", this.Name)
-	} else if this.HostName != "" {
+	}
+	if this.HostName != "" {
 		cond = cond.And("host_name", this.HostName)
-	} else if this.NameSpaceName != "" {
+	}
+	if this.NameSpaceName != "" {
 		cond = cond.And("name_space_name", this.NameSpaceName)
-	} else if this.PodId != "" {
+	}
+	if this.PodId != "" {
 		cond = cond.And("pod_id", this.PodId)
 	}
 	_, err = o.QueryTable(utils.ContainerInfo).SetCond(cond).All(&ContainerList)

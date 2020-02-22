@@ -42,7 +42,12 @@ func (this *ContainerConfig) Add() Result {
 	var err error
 	var containerConfiggList []*ContainerConfig
 
-	_, err = o.QueryTable(utils.ContainerConfig).Filter("id", this.Id).All(&containerConfiggList)
+	cond := orm.NewCondition()
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+
+	_, err = o.QueryTable(utils.ContainerConfig).SetCond(cond).All(&containerConfiggList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetContainerConfigErr
@@ -79,13 +84,17 @@ func (this *ContainerConfig) List(from, limit int) Result {
 	cond := orm.NewCondition()
 	if this.Name != "" {
 		cond = cond.And("name__icontains", this.Name)
-	} else if this.HostName != "" {
+	}
+	if this.HostName != "" {
 		cond = cond.And("host_name", this.HostName)
-	} else if this.ImageName != "" {
+	}
+	if this.ImageName != "" {
 		cond = cond.And("image_name", this.ImageName)
-	} else if this.NameSpaceName != "" {
+	}
+	if this.NameSpaceName != "" {
 		cond = cond.And("name_space_name", this.NameSpaceName)
-	} else if this.PodId != "" {
+	}
+	if this.PodId != "" {
 		cond = cond.And("pod_id", this.PodId)
 	}
 	_, err = o.QueryTable(utils.ContainerConfig).SetCond(cond).All(&ContainerList)
