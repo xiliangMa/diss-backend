@@ -100,6 +100,18 @@ func (wsmh *WSMetricsService) Save() error {
 				return errors.New(result.Message)
 			}
 		}
+	case models.Tag_ContainerTop:
+		containerTopList := []models.ContainerTop{}
+		s, _ := json.Marshal(ms.Metric)
+		if err := json.Unmarshal(s, &containerTopList); err != nil {
+			logs.Error("Paraces %s error %s", ms.ResTag, err)
+			return err
+		}
+		for _, containerTop := range containerTopList {
+			if result := containerTop.Add(); result.Code != http.StatusOK {
+				return errors.New(result.Message)
+			}
+		}
 	case models.Tag_DockerBenchMarkLog:
 		index := beego.AppConfig.String("security_log::BenchMarkIndex")
 		benchMarkLog := securitylog.BenchMarkLog{}

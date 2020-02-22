@@ -1,0 +1,140 @@
+package models
+
+import (
+	"github.com/astaxie/beego/logs"
+	"github.com/astaxie/beego/orm"
+	"github.com/xiliangMa/diss-backend/utils"
+	"net/http"
+	"time"
+)
+
+type ContainerTop struct {
+	Id      string `orm:"pk;description(主机id)"`
+	HostId  string `orm:"description(主机Id)"`
+	PID     string `orm:"description(PID)"`
+	User    string `orm:"description(用户)"`
+	Time    string `orm:"description(时间)"`
+	Command string `orm:"description(命令)"`
+}
+
+func init() {
+	orm.RegisterModel(new(ContainerTop))
+}
+
+type ContainerTopInterface interface {
+	Add()
+	Delete()
+	Edit()
+	Get()
+	List()
+}
+
+func (this *ContainerTop) Add() Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData Result
+	var err error
+	var containerTopList []*ContainerTop
+
+	_, err = o.QueryTable(utils.ContainerTop).Filter("id", this.Id).All(&containerTopList)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetContainerTopErr
+		logs.Error("Get ContainerTop failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	if len(containerTopList) != 0 {
+		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接删除在添加）
+		if result := this.Delete(); result.Code != http.StatusOK {
+			return result
+		}
+	}
+	_, err = o.Insert(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.AddContainerTopErr
+		logs.Error("Add ContainerTop failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+func (this *ContainerTop) List() Result {
+	o := orm.NewOrm()
+	orm.DefaultTimeLoc = time.Local
+	o.Using("default")
+	var ContainerList []*ContainerTop = nil
+	var ResultData Result
+	var total = 0
+	var err error
+
+	cond := orm.NewCondition()
+	cond = cond.And("id", this.Id)
+	//if this.Name != "" {
+	//	cond = cond.And("name__icontains", this.Name)
+	//} else if this.HostName != "" {
+	//	cond = cond.And("host_name", this.HostName)
+	//} else if this.NameSpaceName != "" {
+	//	cond = cond.And("name_space_name", this.NameSpaceName)
+	//} else if this.PodId != "" {
+	//	cond = cond.And("pod_id", this.PodId)
+	//}
+	_, err = o.QueryTable(utils.ContainerTop).SetCond(cond).All(&ContainerList)
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetContainerTopErr
+		logs.Error("Get ContainerTop List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	if ContainerList != nil {
+		total = len(ContainerList)
+	}
+	data := make(map[string]interface{})
+	data["total"] = total
+	data["items"] = ContainerList
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
+	return ResultData
+}
+
+func (this *ContainerTop) Update() Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData Result
+
+	_, err := o.Update(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditContainerTopErr
+		logs.Error("Update ContainerTop: %s failed, code: %d, err: %s", this.Id, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+func (this *ContainerTop) Delete() Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData Result
+	_, err := o.Delete(&ContainerTop{Id: this.Id})
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteContainerTopErr
+		logs.Error("Delete ContainerTop failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	return ResultData
+}

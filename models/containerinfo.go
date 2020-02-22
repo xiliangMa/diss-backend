@@ -85,7 +85,7 @@ func (this *ContainerInfo) List() Result {
 	var err error
 
 	cond := orm.NewCondition()
-	cond = cond.And("id__icontains", this.Id)
+	cond = cond.And("id", this.Id)
 	if this.Name != "" {
 		cond = cond.And("name__icontains", this.Name)
 	} else if this.HostName != "" {
@@ -128,7 +128,7 @@ func (this *ContainerInfo) Update() Result {
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.EditContainerInfoErr
-		logs.Error("Update ContainerInfo: %s failed, code: %d, err: %s", this.HostName, ResultData.Code, ResultData.Message)
+		logs.Error("Update ContainerInfo: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK

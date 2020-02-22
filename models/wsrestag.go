@@ -6,6 +6,7 @@ const (
 	Tag_ImageConfig            = "ImageConfig"
 	Tag_ContainerConfig        = "ContainerConfig"
 	Tag_ContainerInfo          = "ContainerInfo"
+	Tag_ContainerTop           = "ContainerTop"
 	Tag_HostPs                 = "HostPs"
 	Tag_DockerBenchMarkLog     = "DockerBenchMarkLog"
 	Tag_KubernetesBenchMarkLog = "KubernetesBenchMarkLog"
