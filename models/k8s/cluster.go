@@ -58,9 +58,13 @@ func (this *Cluster) List(from, limit int) models.Result {
 	var ResultData models.Result
 	var err error
 	cond := orm.NewCondition()
-	cond = cond.And("id", this.Id)
+
 	if this.Name != "" {
 		cond = cond.And("name__contains", this.Name)
+	}
+
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
 	}
 
 	_, err = o.QueryTable(utils.Cluster).SetCond(cond).Limit(limit, from).All(&ClusterList)

@@ -89,5 +89,6 @@ func AddCluster(clusterName, path string) {
 	cluster.Id = uid.String()
 	cluster.Name = clusterName
 	cluster.FileName = path
+	cluster.IsSync = models.Cluster_IsSync
 	cluster.Add()
 }
