@@ -36,6 +36,7 @@ var (
 	AddContainerInfoErr     = 42
 	EditContainerInfoErr    = 43
 	DeleteHostPsErr         = 44
+	DeleteContainerInfoErr  = 45
 
 	//system
 	CheckK8sFilePostErr         = 60

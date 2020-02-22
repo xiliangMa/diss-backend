@@ -57,17 +57,19 @@ func (this *ContainerInfo) Add() Result {
 	}
 
 	if len(ContainerInfogList) != 0 {
-		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接更新）
-		return this.Update()
-	} else {
-		_, err = o.Insert(this)
-		if err != nil {
-			ResultData.Message = err.Error()
-			ResultData.Code = utils.AddContainerInfoErr
-			logs.Error("Add ContainerInfo failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-			return ResultData
+		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接删除在添加）
+		if result := this.Delete(); result.Code != http.StatusOK {
+			return result
 		}
 	}
+	_, err = o.Insert(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.AddContainerInfoErr
+		logs.Error("Add ContainerInfo failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
@@ -131,5 +133,20 @@ func (this *ContainerInfo) Update() Result {
 	}
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
+	return ResultData
+}
+
+func (this *ContainerInfo) Delete() Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData Result
+	_, err := o.Delete(&ContainerInfo{Id: this.Id})
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteContainerInfoErr
+		logs.Error("Delete ContainerInfo failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
 	return ResultData
 }
