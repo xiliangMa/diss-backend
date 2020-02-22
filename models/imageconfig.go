@@ -37,7 +37,7 @@ func (this *ImageConfig) Add() Result {
 	o.Using("default")
 	var ResultData Result
 	var err error
-	var imageConfiggList []*ImageConfig
+	var imageConfigList []*ImageConfig
 
 	cond := orm.NewCondition()
 	if this.HostId != "" {
@@ -52,7 +52,7 @@ func (this *ImageConfig) Add() Result {
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
-	_, err = o.QueryTable(utils.ImageConfig).SetCond(cond).All(&imageConfiggList)
+	_, err = o.QueryTable(utils.ImageConfig).SetCond(cond).All(&imageConfigList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetContainerConfigErr
@@ -60,7 +60,7 @@ func (this *ImageConfig) Add() Result {
 		return ResultData
 	}
 
-	if len(imageConfiggList) != 0 {
+	if len(imageConfigList) != 0 {
 		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接更新）
 		return this.Update()
 	} else {
@@ -82,7 +82,7 @@ func (this *ImageConfig) List(from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
-	var imageList []*ImageConfig
+	var imageConfigList []*ImageConfig
 	var ResultData Result
 	var err error
 	var total = 0
@@ -101,7 +101,7 @@ func (this *ImageConfig) List(from, limit int) Result {
 		cond = cond.And("name__contains", this.Name)
 	}
 
-	_, err = o.QueryTable(utils.ImageConfig).SetCond(cond).Limit(limit, from).All(&imageList)
+	_, err = o.QueryTable(utils.ImageConfig).SetCond(cond).Limit(limit, from).All(&imageConfigList)
 
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -110,12 +110,12 @@ func (this *ImageConfig) List(from, limit int) Result {
 		return ResultData
 	}
 
-	if imageList != nil {
-		total = len(imageList)
+	if imageConfigList != nil {
+		total = len(imageConfigList)
 	}
 	data := make(map[string]interface{})
 	data["total"] = total
-	data["items"] = imageList
+	data["items"] = imageConfigList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data

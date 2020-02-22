@@ -70,7 +70,7 @@ func (this *K8SController) GetPods() {
 }
 
 // @Title GetContainerList
-// @Description Get Pod List
+// @Description Get pod Container List
 // @Param token header string true "auth token"
 // @Param nsName path string "" true "namespaceName"
 // @Param podId path string "" true "podId"

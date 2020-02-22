@@ -3,13 +3,16 @@ services:
   diss-backend:
     restart: always
     container_name: diss-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: diss-backend
     ports:
       - "8080:8080"
       - "10443:10443"
       - "8889:8889"
     env_file:
-      - ../diss-backend.env
+      - deploy/diss-backend.env
     links:
       - diss-db
     depends_on:

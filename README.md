@@ -64,10 +64,6 @@ diss-backend
 
 
 ## Run by docker-compose
-```
-cd deploy/docker-compose
-```
-
 启动
 ```
 docker-compose up -d
