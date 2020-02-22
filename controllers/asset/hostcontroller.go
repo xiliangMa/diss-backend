@@ -20,7 +20,7 @@ type HostController struct {
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /hosts [post]
+// @router / [post]
 func (this *HostController) GetHostConfigList() {
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
@@ -38,7 +38,7 @@ func (this *HostController) GetHostConfigList() {
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /hosts/:hostId/info [post]
+// @router /:hostId/info [post]
 func (this *HostController) GetHostInfoList() {
 	id := this.GetString(":hostId")
 	limit, _ := this.GetInt("limit")
@@ -57,7 +57,7 @@ func (this *HostController) GetHostInfoList() {
 // @Param name query string "" false "podName"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /hosts/:hostName/pods [post]
+// @router /:hostName/pods [post]
 func (this *HostController) GetHostPodList() {
 	name := this.GetString("name")
 	hostName := this.GetString(":hostName")
@@ -79,7 +79,7 @@ func (this *HostController) GetHostPodList() {
 // @Param name query string "" false "imageName"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /hosts/:hostId/images [post]
+// @router /:hostId/images [post]
 func (this *HostController) GetHostImagesList() {
 	name := this.GetString("name")
 	hostId := this.GetString(":hostId")
@@ -100,7 +100,7 @@ func (this *HostController) GetHostImagesList() {
 // @Param name query string "" false "containerName"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /hosts/:hostName/containers [post]
+// @router /:hostName/containers [post]
 func (this *HostController) GetHostContainerConfigList() {
 	name := this.GetString("name")
 	hostName := this.GetString(":hostName")
@@ -121,7 +121,7 @@ func (this *HostController) GetHostContainerConfigList() {
 // @Param hostId path string "" true "hostId"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /hosts/:hostId/ps [post]
+// @router /:hostId/ps [post]
 func (this *HostController) GetHostPsList() {
 	hostId := this.GetString(":hostId")
 	limit, _ := this.GetInt("limit")
@@ -141,7 +141,7 @@ func (this *HostController) GetHostPsList() {
 // @Param hostName path string "" true "containerId"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /hosts/:hostName/containers/:containerId [post]
+// @router /:hostName/containers/:containerId [post]
 func (this *HostController) GetHostContainerInfoList() {
 	hostName := this.GetString(":hostName")
 	containerId := this.GetString(":containerId")
@@ -163,7 +163,7 @@ func (this *HostController) GetHostContainerInfoList() {
 // @Param bmtName query string "" false "bench mark template name"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /hosts/:hostId/hostbmls [post]
+// @router /:hostId/hostbmls [post]
 func (this *HostController) GetHostBenchMarkLogList() {
 	bmtName := this.GetString("bmtName")
 	hostId := this.GetString(":hostId")

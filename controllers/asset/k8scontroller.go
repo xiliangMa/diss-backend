@@ -18,7 +18,7 @@ type K8SController struct {
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /k8s/clusters [post]
+// @router /clusters [post]
 func (this *K8SController) GetClusterList() {
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
@@ -36,7 +36,7 @@ func (this *K8SController) GetClusterList() {
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /k8s/clusters/:clusterId/namespaces [post]
+// @router /clusters/:clusterId/namespaces [post]
 func (this *K8SController) GetNameSpaces() {
 	clusterId := this.GetString(":clusterId")
 	limit, _ := this.GetInt("limit")
@@ -56,7 +56,7 @@ func (this *K8SController) GetNameSpaces() {
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /k8s/namespaces/:nsName/pods [post]
+// @router /namespaces/:nsName/pods [post]
 func (this *K8SController) GetPods() {
 	nsName := this.GetString(":nsName")
 	limit, _ := this.GetInt("limit")
@@ -79,7 +79,7 @@ func (this *K8SController) GetPods() {
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /k8s/namespaces/:nsName/pods/:podId [post]
+// @router /namespaces/:nsName/pods/:podId [post]
 func (this *K8SController) GetContainerConfig() {
 	nsName := this.GetString(":nsName")
 	podId := this.GetString(":podId")
