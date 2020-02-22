@@ -41,6 +41,8 @@ var (
 	AddContainerTopErr      = 47
 	EditContainerTopErr     = 48
 	DeleteContainerTopErr   = 49
+	AddImageInfoErr         = 50
+	GetImageInfoErr         = 51
 
 	//system
 	CheckK8sFilePostErr         = 60

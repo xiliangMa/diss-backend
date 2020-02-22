@@ -4,6 +4,7 @@ const (
 	Tag_HostConfig             = "HostConfig"
 	Tag_HostInfo               = "HostInfo"
 	Tag_ImageConfig            = "ImageConfig"
+	Tag_ImageInfo              = "ImageInfo"
 	Tag_ContainerConfig        = "ContainerConfig"
 	Tag_ContainerInfo          = "ContainerInfo"
 	Tag_ContainerTop           = "ContainerTop"

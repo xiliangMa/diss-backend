@@ -68,6 +68,18 @@ func (wsmh *WSMetricsService) Save() error {
 				return errors.New(result.Message)
 			}
 		}
+	case models.Tag_ImageInfo:
+		imageInfoList := []models.ImageInfo{}
+		s, _ := json.Marshal(ms.Metric)
+		if err := json.Unmarshal(s, &imageInfoList); err != nil {
+			logs.Error("Paraces %s error %s", ms.ResTag, err)
+			return err
+		}
+		for _, imageInfo := range imageInfoList {
+			if result := imageInfo.Add(); result.Code != http.StatusOK {
+				return errors.New(result.Message)
+			}
+		}
 	case models.Tag_HostPs:
 		hostPsList := []models.HostPs{}
 		s, _ := json.Marshal(ms.Metric)

@@ -9,7 +9,8 @@ import (
 )
 
 type ImageConfig struct {
-	Id         string    `orm:"pk;description(镜像id   k8s拿不到镜像id, 用主机id+镜像名称填充"`
+	Id         string    `orm:"pk;description(镜像id   k8s拿不到镜像id, 用主机id+镜像名称填充)"`
+	ImageId    string    `orm:"description(镜像id)"`
 	HostId     string    `orm:"description(主机id)"`
 	Name       string    `orm:"description(镜像名)"`
 	Size       string    `orm:"description(大小)"`
@@ -38,7 +39,16 @@ func (this *ImageConfig) Add() Result {
 	var err error
 	var imageConfiggList []*ImageConfig
 
-	_, err = o.QueryTable(utils.ImageConfig).Filter("name", this.Name).Filter("host_id", this.HostId).All(&imageConfiggList)
+	cond := orm.NewCondition()
+	cond = cond.And("id", this.Id)
+	if this.HostId != "" {
+		cond = cond.And("host_id", this.HostId)
+	} else if this.ImageId != "" {
+		cond = cond.And("image_id", this.ImageId)
+	} else if this.Name != "" {
+		cond = cond.And("name", this.Name)
+	}
+	_, err = o.QueryTable(utils.ImageConfig).SetCond(cond).All(&imageConfiggList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetContainerConfigErr

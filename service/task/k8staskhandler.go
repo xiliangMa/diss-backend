@@ -95,6 +95,7 @@ func (this *K8STaskHandler) SyncHostImageConfig() {
 					// to do image create time
 					if !strings.Contains(name, "@sha256:") {
 						image.Name = name
+						image.ImageId = nodeId + "---" + image.Name
 						image.Id = nodeId + "---" + image.Name
 						image.Add()
 					}

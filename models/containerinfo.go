@@ -48,7 +48,15 @@ func (this *ContainerInfo) Add() Result {
 	var err error
 	var ContainerInfogList []*ContainerInfo
 
-	_, err = o.QueryTable(utils.ContainerInfo).Filter("id", this.Id).All(&ContainerInfogList)
+	cond := orm.NewCondition()
+	cond = cond.And("id", this.Id)
+	if this.HostId != "" {
+		cond = cond.And("host_id", this.HostId)
+	} else if this.ImageId != "" {
+		cond = cond.And("image_id", this.ImageId)
+	}
+
+	_, err = o.QueryTable(utils.ContainerInfo).SetCond(cond).All(&ContainerInfogList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetContainerInfoErr
