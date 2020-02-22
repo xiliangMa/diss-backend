@@ -73,7 +73,7 @@ func (this *ContainerInfo) Add() Result {
 	return ResultData
 }
 
-func (this *ContainerInfo) List(from, limit int) Result {
+func (this *ContainerInfo) List() Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")

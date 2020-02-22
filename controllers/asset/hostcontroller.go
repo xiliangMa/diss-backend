@@ -5,6 +5,7 @@ import (
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/k8s"
 	msl "github.com/xiliangMa/diss-backend/models/securitylog"
+	ssl "github.com/xiliangMa/diss-backend/service/securitylog"
 )
 
 // Asset host object api list
@@ -55,6 +56,7 @@ func (this *HostController) GetHostInfoList() {
 // @Param token header string true "auth token"
 // @Param hostName path string "" true "hostName"
 // @Param name query string "" false "podName"
+// @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router /:hostName/pods [post]
@@ -77,6 +79,7 @@ func (this *HostController) GetHostPodList() {
 // @Param token header string true "auth token"
 // @Param hostId path string "" true "hostId"
 // @Param name query string "" false "imageName"
+// @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router /:hostId/images [post]
@@ -98,6 +101,7 @@ func (this *HostController) GetHostImagesList() {
 // @Param token header string true "auth token"
 // @Param hostName path string "" true "hostName"
 // @Param name query string "" false "containerName"
+// @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router /:hostName/containers [post]
@@ -119,6 +123,7 @@ func (this *HostController) GetHostContainerConfigList() {
 // @Description Get HostPs List
 // @Param token header string true "auth token"
 // @Param hostId path string "" true "hostId"
+// @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router /:hostId/ps [post]
@@ -138,20 +143,17 @@ func (this *HostController) GetHostPsList() {
 // @Description Get HostContainerInfo List
 // @Param token header string true "auth token"
 // @Param hostName path string "" true "hostName"
-// @Param hostName path string "" true "containerId"
-// @Param limit query int 20 false "limit"
+// @Param containerId path string "" true "containerId"
 // @Success 200 {object} models.Result
 // @router /:hostName/containers/:containerId [post]
 func (this *HostController) GetHostContainerInfoList() {
 	hostName := this.GetString(":hostName")
 	containerId := this.GetString(":containerId")
-	limit, _ := this.GetInt("limit")
-	from, _ := this.GetInt("from")
 
 	containerInfo := new(models.ContainerInfo)
 	containerInfo.HostName = hostName
 	containerInfo.Id = containerId
-	this.Data["json"] = containerInfo.List(from, limit)
+	this.Data["json"] = containerInfo.List()
 	this.ServeJSON(false)
 
 }
@@ -161,6 +163,7 @@ func (this *HostController) GetHostContainerInfoList() {
 // @Param token header string true "auth token"
 // @Param hostId path string "" true "hostId"
 // @Param bmtName query string "" false "bench mark template name"
+// @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router /:hostId/hostbmls [post]
@@ -174,6 +177,29 @@ func (this *HostController) GetHostBenchMarkLogList() {
 	benchMarkLog.BenchMarkName = bmtName
 	benchMarkLog.HostId = hostId
 	this.Data["json"] = benchMarkLog.List(from, limit)
+	this.ServeJSON(false)
+
+}
+
+// @Title HostBenchMarkLogInfo
+// @Description Get HostBenchMarkLog Info
+// @Param token header string true "auth token"
+// @Param hostId path string "" true "hostId"
+// @Param bmlId path string "" true "bench mark log id"
+// @Param bmtName query string "" false "bench mark template name"
+// @Success 200 {object} models.Result
+// @router /:hostId/hostbmls/:bmlId [post]
+func (this *HostController) GetHostBenchMarkLogInfo() {
+	bmtName := this.GetString("bmtName")
+	hostId := this.GetString(":hostId")
+	bmlId := this.GetString(":bmlId")
+
+	benchMarkLog := new(msl.BenchMarkLog)
+	benchMarkLog.BenchMarkName = bmtName
+	benchMarkLog.HostId = hostId
+	benchMarkLog.Id = bmlId
+	var securityLogService = ssl.SecurityLogService{benchMarkLog}
+	this.Data["json"] = securityLogService.GetSecurityLogInfo()
 	this.ServeJSON(false)
 
 }

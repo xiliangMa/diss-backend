@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/securitylog"
@@ -88,6 +89,7 @@ func (wsmh *WSMetricsService) Save() error {
 			}
 		}
 	case models.Tag_DockerBenchMarkLog:
+		index := beego.AppConfig.String("security_log::BenchMarkIndex")
 		benchMarkLog := securitylog.BenchMarkLog{}
 		s, _ := json.Marshal(ms.Metric)
 		if err := json.Unmarshal(s, &benchMarkLog); err != nil {
@@ -104,7 +106,7 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Get ESClient err: %s", err)
 		}
 
-		respones, err := esClient.Create("security_log", benchMarkLog.Id, bytes.NewReader(s))
+		respones, err := esClient.Create(index, benchMarkLog.Id, bytes.NewReader(s))
 		if err != nil {
 			logs.Error("Add security_log to es fail, benchMarkLog.Id: %s", benchMarkLog.Id)
 		} else {
@@ -112,6 +114,7 @@ func (wsmh *WSMetricsService) Save() error {
 		}
 		defer respones.Body.Close()
 	case models.Tag_KubernetesBenchMarkLog:
+		index := beego.AppConfig.String("security_log::BenchMarkIndex")
 		benchMarkLog := securitylog.BenchMarkLog{}
 		s, _ := json.Marshal(ms.Metric)
 		if err := json.Unmarshal(s, &benchMarkLog); err != nil {
@@ -126,7 +129,7 @@ func (wsmh *WSMetricsService) Save() error {
 		if err != nil {
 			logs.Error("Get ESClient err: %s", err)
 		}
-		respones, err := esClient.Create("security_log", benchMarkLog.Id, bytes.NewReader(s))
+		respones, err := esClient.Create(index, benchMarkLog.Id, bytes.NewReader(s))
 		if err != nil {
 			logs.Error("Add security_log to es fail, benchMarkLog.Id: %s", benchMarkLog.Id)
 		} else {
