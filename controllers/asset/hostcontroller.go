@@ -101,6 +101,30 @@ func (this *HostController) GetHostImagesList() {
 
 }
 
+// @Title HostCmdHistory
+// @Description Get HostCmdHistory List
+// @Param token header string true "auth token"
+// @Param hostId path string "" true "hostId"
+// @Param command query string "" false "command"
+// @Param from query int 0 false "from"
+// @Param limit query int 20 false "limit"
+// @Success 200 {object} models.Result
+// @router /:hostId/cmdhistory [post]
+func (this *HostController) GetHostCmdHistoryList() {
+	command := this.GetString("command")
+	hostId := this.GetString(":hostId")
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+
+	cmdHistory := new(models.CmdHistory)
+	cmdHistory.Command = command
+	cmdHistory.HostId = hostId
+	cmdHistory.Type = 0
+	this.Data["json"] = cmdHistory.List(from, limit)
+	this.ServeJSON(false)
+
+}
+
 // @Title HostImageInfo
 // @Description Get HostImage Info
 // @Param token header string true "auth token"

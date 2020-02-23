@@ -71,7 +71,7 @@ func (this *CmdHistoryList) MultiAdd() Result {
 	return ResultData
 }
 
-func (this *CmdHistory) List() Result {
+func (this *CmdHistory) List(from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
@@ -81,7 +81,7 @@ func (this *CmdHistory) List() Result {
 	var total = 0
 
 	cond := orm.NewCondition()
-
+	cond = cond.And("type", this.Type)
 	if this.HostId != "" {
 		cond = cond.And("host_id", this.HostId)
 	}
@@ -89,7 +89,11 @@ func (this *CmdHistory) List() Result {
 		cond = cond.And("container_id", this.ContainerId)
 	}
 
-	_, err = o.QueryTable(utils.CmdHistory).SetCond(cond).All(&imageList)
+	if this.Command != "" {
+		cond = cond.And("command__contains", this.Command)
+	}
+
+	_, err = o.QueryTable(utils.CmdHistory).SetCond(cond).Limit(limit, from).All(&imageList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetCmdHistoryErr
