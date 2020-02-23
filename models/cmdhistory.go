@@ -1,0 +1,137 @@
+package models
+
+import (
+	"github.com/astaxie/beego/logs"
+	"github.com/astaxie/beego/orm"
+	"github.com/xiliangMa/diss-backend/utils"
+	"net/http"
+	"time"
+)
+
+type CmdHistory struct {
+	Id          string `orm:"pk;description(id)"`
+	HostId      string `orm:"description(主机id)"`
+	ContainerId string `orm:"description(容器id)"`
+	User        string `orm:"description(用户)"`
+	Command     string `orm:"size(1000);description(命令)"`
+	CreateTime  string `orm:"null;description(更新时间)"`
+	Type        int8   `orm:"default(0); description(类型 0 host 1 container)"`
+}
+
+func init() {
+	orm.RegisterModel(new(CmdHistory))
+}
+
+type CmdHistoryInterface interface {
+	Add()
+	Delete()
+	Edit()
+	Get()
+	List()
+}
+
+func (this *CmdHistory) Add() Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData Result
+	var err error
+	var cmdHistoryList []*CmdHistory
+	cond := orm.NewCondition()
+	if this.HostId != "" {
+		cond = cond.And("host_id", this.HostId)
+	}
+	if this.ContainerId != "" {
+		cond = cond.And("host_id", this.HostId)
+	}
+
+	_, err = o.QueryTable(utils.CmdHistory).SetCond(cond).All(&cmdHistoryList)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetCmdHistoryErr
+		logs.Error("Get CmdHistory failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	if len(cmdHistoryList) != 0 {
+		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接删除在添加）
+		if result := this.Delete(); result.Code != http.StatusOK {
+			return result
+		}
+	}
+	_, err = o.Insert(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.AddCmdHistoryErr
+		logs.Error("Add CmdHistory failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+func (this *CmdHistory) List() Result {
+	o := orm.NewOrm()
+	orm.DefaultTimeLoc = time.Local
+	o.Using("default")
+	var imageList []*CmdHistory
+	var ResultData Result
+	var err error
+	var total = 0
+
+	cond := orm.NewCondition()
+
+	if this.HostId != "" {
+		cond = cond.And("host_id", this.HostId)
+	}
+	if this.ContainerId != "" {
+		cond = cond.And("container_id", this.ContainerId)
+	}
+
+	_, err = o.QueryTable(utils.CmdHistory).SetCond(cond).All(&imageList)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetCmdHistoryErr
+		logs.Error("Get CmdHistory List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	if imageList != nil {
+		total = len(imageList)
+	}
+	data := make(map[string]interface{})
+	data["total"] = total
+	data["items"] = imageList
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
+	return ResultData
+}
+
+func (this *CmdHistory) Delete() Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData Result
+	cond := orm.NewCondition()
+
+	if this.HostId != "" {
+		cond = cond.And("host_id", this.HostId)
+	}
+	if this.ContainerId != "" {
+		cond = cond.And("container_id", this.ContainerId)
+	}
+	_, err := o.QueryTable(utils.CmdHistory).SetCond(cond).Delete()
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteCmdHistoryErr
+		logs.Error("Delete CmdHistory failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	return ResultData
+}

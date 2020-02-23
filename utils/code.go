@@ -43,6 +43,10 @@ var (
 	DeleteContainerTopErr   = 49
 	AddImageInfoErr         = 50
 	GetImageInfoErr         = 51
+	GetCmdHistoryErr        = 52
+	AddCmdHistoryErr        = 53
+	DeleteCmdHistoryErr     = 54
+	DeleteImageInfoErr      = 55
 
 	//system
 	CheckK8sFilePostErr         = 60

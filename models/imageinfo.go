@@ -41,7 +41,11 @@ func (this *ImageInfo) Add() Result {
 	var imageInfoList []*ImageInfo
 
 	cond := orm.NewCondition()
-	cond = cond.And("id", this.Id)
+
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+
 	if this.HostId != "" {
 		cond = cond.And("host_id", this.HostId)
 	}
@@ -127,8 +131,8 @@ func (this *ImageInfo) Delete() Result {
 	_, err := o.Delete(&ImageInfo{Id: this.Id})
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.DeleteContainerInfoErr
-		logs.Error("Delete ContainerInfo failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.DeleteImageInfoErr
+		logs.Error("Delete ImageInfo failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK
