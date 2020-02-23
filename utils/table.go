@@ -17,5 +17,5 @@ var (
 	BenchMarkTemplate = "bench_mark_template"
 	BenchMarkLog      = "bench_mark_log"
 	HostPs            = "host_ps"
-	CmdHistory        = "cmd_historys"
+	CmdHistory        = "cmd_history"
 )

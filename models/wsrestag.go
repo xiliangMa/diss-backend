@@ -11,4 +11,6 @@ const (
 	Tag_HostPs                 = "HostPs"
 	Tag_DockerBenchMarkLog     = "DockerBenchMarkLog"
 	Tag_KubernetesBenchMarkLog = "KubernetesBenchMarkLog"
+	Tag_HostCmdHistory         = "HostCmdHistory"
+	Tag_ContainerCmdHistory    = "ContainerCmdHistory"
 )

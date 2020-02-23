@@ -172,6 +172,32 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Info("Add security_log to es success, benchMarkLog.Id: %s", benchMarkLog.Id)
 		}
 		defer respones.Body.Close()
+	case models.Tag_HostCmdHistory:
+		cmdHistoryList := models.CmdHistoryList{}
+		s, _ := json.Marshal(ms.Metric)
+		if err := json.Unmarshal(s, &cmdHistoryList.List); err != nil {
+			logs.Error("Paraces %s error %s", ms.ResTag, err)
+			return err
+		}
+		// 删除 host_id 下所有的记录
+		if len(cmdHistoryList.List) != 0 {
+			cmdHistoryList.List[0].Delete()
+		}
+		if result := cmdHistoryList.MultiAdd(); result.Code != http.StatusOK {
+			return errors.New(result.Message)
+		}
+	case models.Tag_ContainerCmdHistory:
+		cmdHistoryList := []models.CmdHistory{}
+		s, _ := json.Marshal(ms.Metric)
+		if err := json.Unmarshal(s, &cmdHistoryList); err != nil {
+			logs.Error("Paraces %s error %s", ms.ResTag, err)
+			return err
+		}
+		for _, containerInfo := range cmdHistoryList {
+			if result := containerInfo.Add(); result.Code != http.StatusOK {
+				return errors.New(result.Message)
+			}
+		}
 	}
 
 	return nil

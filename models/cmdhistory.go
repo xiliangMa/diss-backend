@@ -18,12 +18,17 @@ type CmdHistory struct {
 	Type        int8   `orm:"default(0); description(类型 0 host 1 container)"`
 }
 
+type CmdHistoryList struct {
+	List []*CmdHistory
+}
+
 func init() {
 	orm.RegisterModel(new(CmdHistory))
 }
 
 type CmdHistoryInterface interface {
 	Add()
+	MultiAdd()
 	Delete()
 	Edit()
 	Get()
@@ -35,30 +40,25 @@ func (this *CmdHistory) Add() Result {
 	o.Using("default")
 	var ResultData Result
 	var err error
-	var cmdHistoryList []*CmdHistory
-	cond := orm.NewCondition()
-	if this.HostId != "" {
-		cond = cond.And("host_id", this.HostId)
-	}
-	if this.ContainerId != "" {
-		cond = cond.And("host_id", this.HostId)
-	}
-
-	_, err = o.QueryTable(utils.CmdHistory).SetCond(cond).All(&cmdHistoryList)
+	_, err = o.Insert(this)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetCmdHistoryErr
-		logs.Error("Get CmdHistory failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.AddCmdHistoryErr
+		logs.Error("Add CmdHistory failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
-	if len(cmdHistoryList) != 0 {
-		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接删除在添加）
-		if result := this.Delete(); result.Code != http.StatusOK {
-			return result
-		}
-	}
-	_, err = o.Insert(this)
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+func (this *CmdHistoryList) MultiAdd() Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData Result
+	var err error
+	_, err = o.InsertMulti(len(this.List), this.List)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddCmdHistoryErr
