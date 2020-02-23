@@ -11,7 +11,7 @@ type K8SController struct {
 	beego.Controller
 }
 
-// @Title GetClusterList
+// @Title GetClusters
 // @Description Get Cluster List
 // @Param token header string true "auth token"
 // @Param name query string "" false "name"
@@ -19,7 +19,7 @@ type K8SController struct {
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router /clusters [post]
-func (this *K8SController) GetClusterList() {
+func (this *K8SController) GetClusters() {
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 	cluster := new(k8s.Cluster)
@@ -79,7 +79,7 @@ func (this *K8SController) GetPods() {
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /namespaces/:nsName/pods/:podId [post]
+// @router /namespaces/:nsName/pods/:podId/containers [post]
 func (this *K8SController) GetContainerConfig() {
 	nsName := this.GetString(":nsName")
 	podId := this.GetString(":podId")
@@ -94,6 +94,30 @@ func (this *K8SController) GetContainerConfig() {
 	containerConfig.Name = name
 	containerConfig.ImageName = imageName
 	this.Data["json"] = containerConfig.List(from, limit)
+	this.ServeJSON(false)
+
+}
+
+// @Title GetContainerCmdHistorys
+// @Description Get Container CmdHistory  List
+// @Param token header string true "auth token"
+// @Param containersId path string "" true "containersId"
+// @Param command query string "" false "command"
+// @Param from query int 0 false "from"
+// @Param limit query int 20 false "limit"
+// @Success 200 {object} models.Result
+// @router /containers/:containersId/cmdhistorys [post]
+func (this *K8SController) GetContainerCmdHistorys() {
+	containersId := this.GetString(":containersId")
+	command := this.GetString("command")
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+
+	cmdHistory := new(models.CmdHistory)
+	cmdHistory.Command = command
+	cmdHistory.ContainerId = containersId
+	cmdHistory.Type = 1
+	this.Data["json"] = cmdHistory.List(from, limit)
 	this.ServeJSON(false)
 
 }
