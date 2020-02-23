@@ -9,18 +9,18 @@ import (
 )
 
 type ContainerConfig struct {
-	Id            string    `orm:"pk;description(id)"`
-	Name          string    `orm:"description(容器名)"`
-	NameSpaceName string    `orm:"description(命名空间)"`
-	PodId         string    `orm:"description(pod id)"`
-	PodName       string    `orm:"description(pod 名)"`
-	HostName      string    `orm:"description(主机名)"`
-	Status        string    `orm:"default(null);description(状态)"`
-	Command       string    `orm:"default(null);description(命令)"`
-	ImageName     string    `orm:"default(null);description(镜像名)"`
-	Age           string    `orm:"null;description(运行时长)"`
-	CreateTime    time.Time `orm:"null;description(创建时间);type(datetime)"`
-	UpdateTime    time.Time `orm:"null;description(更新时间);type(datetime)"`
+	Id            string `orm:"pk;description(id)"`
+	Name          string `orm:"description(容器名)"`
+	NameSpaceName string `orm:"description(命名空间)"`
+	PodId         string `orm:"description(pod id)"`
+	PodName       string `orm:"description(pod 名)"`
+	HostName      string `orm:"description(主机名)"`
+	Status        string `orm:"default(null);size(1000);description(状态)"`
+	Command       string `orm:"default(null);size(1000);description(命令)"`
+	ImageName     string `orm:"default(null);description(镜像名)"`
+	Age           string `orm:"null;description(运行时长)"`
+	CreateTime    string `orm:"null;description(创建时间);"`
+	UpdateTime    string `orm:"null;description(更新时间);"`
 }
 
 func init() {

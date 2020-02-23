@@ -1,6 +1,7 @@
 package task
 
 import (
+	"encoding/json"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/k8s"
@@ -19,12 +20,12 @@ func NewK8STaskHandler(path string) *K8STaskHandler {
 	}
 }
 
-func (this *K8STaskHandler) SyncHostConfig(clusterName, clusterId string) {
+func (this *K8STaskHandler) SyncHostConfigAndInfo(clusterName, clusterId string) {
 	nodes, err := this.Clientgo.GetNodes()
 	if err != nil {
 		logs.Error("Sync node err: %s", err.Error())
 	} else {
-		logs.Info("Sync cluster: %s HostConfig, size: %d", clusterName, len(nodes.Items))
+		logs.Info("########## Sync HostConfig && HostInfo, cluster: %s >>> strat <<< ##########, size: %d", clusterName, len(nodes.Items))
 		for _, n := range nodes.Items {
 			name := n.ObjectMeta.Name
 			// 同步 hostconfig
@@ -35,8 +36,37 @@ func (this *K8STaskHandler) SyncHostConfig(clusterName, clusterId string) {
 			config.OS = n.Status.NodeInfo.OSImage
 			config.IsInK8s = true
 			config.ClusterId = clusterId
-			config.Inner_AddHostConfig()
+
+			// 同步 hostinfo
+			info := new(models.HostInfo)
+			info.HostName = name
+			info.Id = nodeId
+			if n.Status.Addresses[0].Type == "InternalIP" {
+				info.InternalAddr = n.Status.Addresses[0].Address
+			} else {
+				info.InternalAddr = n.Status.Addresses[1].Address
+			}
+			capacity := n.Status.Capacity
+			c, _ := capacity.Cpu().AsInt64()
+			info.CpuCore = c
+			m, _ := capacity.Memory().AsInt64()
+			info.Mem = m / 1024 / 1024 / 1024
+			d, _ := capacity.StorageEphemeral().AsInt64()
+			info.Disk = utils.UnitConvert(d)
+			nStatusNodeinfo := n.Status.NodeInfo
+			info.OS = nStatusNodeinfo.OSImage
+			info.Kernel = nStatusNodeinfo.KernelVersion
+			info.Architecture = nStatusNodeinfo.Architecture
+			info.DockerRuntime = nStatusNodeinfo.ContainerRuntimeVersion
+			info.KubeletVer = nStatusNodeinfo.KubeletVersion
+			info.Kubeproxy = nStatusNodeinfo.KubeProxyVersion
+			info.KubernetesVer = nStatusNodeinfo.KubeletVersion
+
+			config.Inner_AddHostConfig() // 添加 hostconfig
+			info.Inner_AddHostInfo()     // 添加 hostinfo
+
 		}
+		logs.Info("########## Sync HostConfig && HostInfo, cluster: %s >>> end <<< ##########, size: %d", clusterName, len(nodes.Items))
 	}
 }
 
@@ -45,7 +75,7 @@ func (this *K8STaskHandler) SyncHostInfo(clusterName string) {
 	if err != nil {
 		logs.Error("Sync node err: %s", err.Error())
 	} else {
-		logs.Info("Sync cluster: %s HostInfo, size: %d", clusterName, len(nodes.Items))
+		logs.Info("########## Sync cluster: %s HostInfo >>> strat <<< ##########, size: %d", clusterName, len(nodes.Items))
 		for _, n := range nodes.Items {
 			name := n.ObjectMeta.Name
 			nodeId := n.Status.NodeInfo.SystemUUID
@@ -75,6 +105,7 @@ func (this *K8STaskHandler) SyncHostInfo(clusterName string) {
 			info.KubernetesVer = nStatusNodeinfo.KubeletVersion
 			info.Inner_AddHostInfo()
 		}
+		logs.Info("########## Sync cluster: %s HostInfo >>> end <<< ##########, size: %d", clusterName, len(nodes.Items))
 	}
 }
 
@@ -84,11 +115,12 @@ func (this *K8STaskHandler) SyncHostImageConfig() {
 		logs.Error("Sync node err: %s", err.Error())
 	} else {
 		for _, n := range nodes.Items {
-			logs.Info("Sync host: %s ImageConfig, size: %d", n.Name, len(n.Status.Images))
+			logs.Info("########## Sync ImageConfig, Host: %s >>> strat <<< ########## , size: %d", n.Name, len(n.Status.Images))
 			//同步主机images
 			nodeId := n.Status.NodeInfo.SystemUUID
 			for _, o := range n.Status.Images {
 				for _, name := range o.Names {
+					// 同步imageinfo
 					image := new(models.ImageConfig)
 					image.HostId = nodeId
 					image.Size = utils.UnitConvert(o.SizeBytes)
@@ -101,6 +133,7 @@ func (this *K8STaskHandler) SyncHostImageConfig() {
 					}
 				}
 			}
+			logs.Info("########## Sync ImageConfig, Host: %s  >>> end <<< ########## , size: %d", n.Name, len(n.Status.Images))
 		}
 	}
 }
@@ -110,7 +143,7 @@ func (this *K8STaskHandler) SyncNameSpace(clusetrName, clusterId string) {
 	if err != nil {
 		logs.Error("Sync namspace err: %s", err.Error())
 	} else {
-		logs.Info("Sync Cluster: %s NameSpace, size: %d", clusetrName, len(nameSpaces.Items))
+		logs.Info("########## Sync NameSpace, Cluster: %s >>> strat <<< ##########, size: %d", clusetrName, len(nameSpaces.Items))
 		for _, ns := range nameSpaces.Items {
 			nsName := ns.ObjectMeta.Name
 			ob := new(k8s.NameSpace)
@@ -121,6 +154,7 @@ func (this *K8STaskHandler) SyncNameSpace(clusetrName, clusterId string) {
 			ob.ClusterId = clusterId
 			ob.Add()
 		}
+		logs.Info("########## Sync NameSpace, Cluster: %s >>> end <<< ##########, size: %d", clusetrName, len(nameSpaces.Items))
 	}
 }
 
@@ -135,7 +169,7 @@ func (this *K8STaskHandler) SyncNamespacePod() {
 			if err != nil {
 				logs.Error("Sync namespace: %s pods err: %s", nsName, err.Error())
 			} else {
-				logs.Info("Sync NameSpace: %s Pod, size: %d, NSName %s", nsName, len(pods.Items), nsName)
+				logs.Info("########## Sync Pod, NameSpace: %s >>> strat <<< ##########, size: %d, NSName %s", nsName, len(pods.Items), nsName)
 				for _, pod := range pods.Items {
 					// 同步 pod
 					podob := new(k8s.Pod)
@@ -148,13 +182,14 @@ func (this *K8STaskHandler) SyncNamespacePod() {
 					podob.Status = string(pod.Status.Phase)
 					podob.Add()
 				}
+				logs.Info("########## Sync Pod, NameSpace: %s >>> end <<< ##########, size: %d, NSName %s", nsName, len(pods.Items), nsName)
 			}
 		}
 
 	}
 }
 
-func (this *K8STaskHandler) SyncPodContainerConfig() {
+func (this *K8STaskHandler) SyncPodContainerConfigAndInfo() {
 	nameSpaces, err := this.Clientgo.GetNameSpaces()
 	if err != nil {
 		logs.Error("Sync namspace err: %s", err.Error())
@@ -166,26 +201,86 @@ func (this *K8STaskHandler) SyncPodContainerConfig() {
 				logs.Error("Sync namespace: %s pods err: %s", nsName, err.Error())
 			} else {
 				for _, pod := range pods.Items {
-					logs.Info("Sync Pod: %s ContainerConfig, size: %d, NSName: %s", pod.ObjectMeta.Name, len(pods.Items), nsName)
-					//同步 containerconfig
+					// pod 相关数据
+					podIp := pod.Status.PodIP
+					hostName := pod.Spec.NodeName
+
+					labelsByte, _ := json.Marshal(pod.Labels)
+					labels := string(labelsByte)
+
+					volumesByte, _ := json.Marshal(pod.Labels)
+					volumes := string(volumesByte)
+
+					podName := pod.ObjectMeta.Name
+
+					logs.Info("########## Sync ContainerConfig && ContainerInfo, Pod: %s >>> strat <<< ##########, size: %d, NSName: %s", podName, len(pods.Items), nsName)
+
 					for _, c := range pod.Status.ContainerStatuses {
+						//公用变量
 						ccob := new(models.ContainerConfig)
-						ccob.Id = strings.Replace(c.ContainerID, "docker://", "", 1)
-						ccob.Name = c.Name
-						ccob.PodId = string(pod.UID)
-						ccob.PodName = pod.ObjectMeta.Name
+						cid := strings.Replace(c.ContainerID, "docker://", "", 1)
+						cname := c.Name
+						podId := string(pod.UID)
+						imageId := c.ImageID
+						imageName := c.Image
+						hostName := hostName
+						startAt := pod.Status.StartTime.String()
+						status := c.State.String() // 动态数据随时变化
+
+						//同步 containerconfig
+						ccob.Id = cid
+						ccob.Name = cname
+						ccob.PodId = podId
+						ccob.PodName = podName
 						ccob.NameSpaceName = nsName
-						//var commandArr string
-						//for _, commad := range c.Command {
-						//	commandArr = commandArr + commad + ","
-						//}
-						//ccob.Command = commandArr
-						ccob.ImageName = c.Image
-						ccob.HostName = pod.Spec.NodeName
-						//ccob.Status = c.State.Running.StartedAt.String()
-						ccob.UpdateTime = pod.Status.StartTime.Time
-						ccob.Add()
+						ccob.ImageName = imageName
+						ccob.HostName = hostName
+						ccob.Status = status
+						ccob.CreateTime = startAt
+						//ccob.UpdateTime = pod.Status.StartTime.Time
+
+						//同步 containerinfo
+						ciob := new(models.ContainerInfo)
+						ciob.Id = cid
+						ciob.Name = cname
+						ciob.HostName = pod.Spec.NodeName
+						ciob.NameSpaceName = nsName
+						ciob.PodId = podId
+						ciob.PodName = podName
+						ciob.ImageId = imageId
+						ciob.ImageName = imageName
+						//ciob.HostId = ""
+						ciob.HostName = hostName
+						ciob.Command = ""
+						ciob.StartedAt = startAt
+						ciob.CreatedAt = startAt
+						ciob.Status = status
+						ciob.Ports = ""
+						ciob.Ip = podIp
+						ciob.Labels = labels
+						ciob.Volumes = volumes
+
+						// 通过 containers获取的数据
+						for _, cs := range pod.Spec.Containers {
+							if cs.Name == cname {
+								commandByte, _ := json.Marshal(cs.Command)
+								command := string(commandByte)
+								ccob.Command = command
+
+								volumeMountsByte, _ := json.Marshal(cs.VolumeMounts)
+								volumeMounts := string(volumeMountsByte)
+								ciob.Mounts = volumeMounts
+								ciob.Command = command
+							}
+						}
+
+						ccob.Add() // 添加 containerconfig
+						ciob.Add() // 添加contain儿info
+
 					}
+
+					logs.Info("########## Sync ContainerConfig && ContainerInfo, Pod: %s >>> end <<< ##########, size: %d, NSName: %s", podName, len(pods.Items), nsName)
+
 				}
 			}
 		}
@@ -213,11 +308,11 @@ func SyncAll() {
 				// 同步 namespace
 				this.SyncNameSpace(c.Name, c.Id)
 
-				// 同步 hostconfig
-				this.SyncHostConfig(c.Name, c.Id)
+				// 同步 集群内的 hostconfig && hostInfo
+				this.SyncHostConfigAndInfo(c.Name, c.Id)
 
-				// 同步 hostinfo
-				this.SyncHostInfo(c.Name)
+				// 单独同步 hostinfo
+				//this.SyncHostInfo(c.Name)
 
 				// 同步HostImageConfig
 				this.SyncHostImageConfig()
@@ -225,8 +320,8 @@ func SyncAll() {
 				// 同步 namespace 下的 pod
 				this.SyncNamespacePod()
 
-				// 同步 pod 下的 container
-				this.SyncPodContainerConfig()
+				// 同步 pod 内的 containerconfig && containerinfo
+				this.SyncPodContainerConfigAndInfo()
 
 				logs.Info("Sync end...., cluster name: %s ", c.Name)
 				// 更新初始化状态

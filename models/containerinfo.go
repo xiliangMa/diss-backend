@@ -18,15 +18,15 @@ type ContainerInfo struct {
 	ImageName     string `orm:"description(image名称)"`
 	HostId        string `orm:"description(主机id)"`
 	HostName      string `orm:"description(主机名)"`
-	Command       string `orm:"default(null);description(命令)"`
+	Command       string `orm:"default(null);size(1000);description(命令)"`
 	StartedAt     string `orm:"default(null);description(启动时间)"`
 	CreatedAt     string `orm:"default(null);description(创建时间)"`
-	Status        string `orm:"default(null);description(状态)"`
+	Status        string `orm:"default(null);size(1000);description(状态)"`
 	Ports         string `orm:"default(null);description(端口)"`
 	Ip            string `orm:"default(null);description(ip)"`
-	Labels        string `orm:"default(null);description(标签)"`
-	Volumes       string `orm:"default(null);description(Volumes)"`
-	Mounts        string `orm:"default(null);description(Mounts)"`
+	Labels        string `orm:"default(null);size(1000);description(标签)"`
+	Volumes       string `orm:"default(null);size(1000);description(Volumes)"`
+	Mounts        string `orm:"default(null);size(1000);description(Mounts)"`
 }
 
 func init() {
