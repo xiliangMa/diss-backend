@@ -207,7 +207,7 @@ func Internal_ImageListMetricInfo(hostname string) Result {
 	return ResultData
 }
 
-func Internal_IntrudeDetectMetricInfo(hostId, targetType, fromTime, toTime, limit string) Result {
+func Internal_IntrudeDetectMetricInfo(hostId, targetType, containerid, fromTime, toTime, limit string) Result {
 	var ResultData Result
 
 	esclient, err := utils.GetESClient()
@@ -217,18 +217,24 @@ func Internal_IntrudeDetectMetricInfo(hostId, targetType, fromTime, toTime, limi
 		return ResultData
 	}
 	matchMode := "should"
+	containerFilterStr := ""
 	if targetType == "container" {
 		targetType = "host"
 		matchMode = "must_not"
+		if containerid != "" {
+			containerFilterStr = strings.Replace(containerFilterPattern, "!Param@containerId!", containerid, 1)
+		}
 	}
+
 	esqueryStr := strings.Replace(ESString("intrude_detect"), "!Param@gteTime!", fromTime, 1)
 	esqueryStr = strings.Replace(esqueryStr, "!Param@lteTime!", toTime, 1)
 	esqueryStr = strings.Replace(esqueryStr, "!Param@hostname!", hostId, 1)
 	esqueryStr = strings.Replace(esqueryStr, "!Param@targetTypeM!", matchMode, 1)
 	esqueryStr = strings.Replace(esqueryStr, "!Param@targetType!", targetType, 1)
+	esqueryStr = strings.Replace(esqueryStr, "!Filter@container!", containerFilterStr, 1)
 	esqueryStr = strings.Replace(esqueryStr, "!Param@limit!", limit, 1)
 
-	fmt.Println("esqueryStr\n", esqueryStr)
+	fmt.Println("esqueryStr\n",  esqueryStr)
 	res, err := esclient.API.Search(esclient.Search.WithContext(context.Background()),
 		esclient.Search.WithIndex(hostId),
 		esclient.Search.WithBody(strings.NewReader(esqueryStr)),
@@ -247,8 +253,11 @@ func Internal_IntrudeDetectMetricInfo(hostId, targetType, fromTime, toTime, limi
 	json.NewDecoder(res.Body).Decode(&indDetInfo)
 
 	var intDetPure []interface{}
-	intDetPureRefine1 := indDetInfo["hits"].(map[string]interface{})
-	intDetPure = intDetPureRefine1["hits"].([]interface{})
+
+	if indDetInfo != nil {
+		intDetPureRefine1 := indDetInfo["hits"].(map[string]interface{})
+		intDetPure = intDetPureRefine1["hits"].([]interface{})
+	}
 
 	ResultData.Data = intDetPure
 	ResultData.Code = http.StatusOK

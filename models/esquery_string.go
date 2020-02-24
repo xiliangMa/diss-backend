@@ -707,7 +707,7 @@ func ESString(queryTag string) string {
                     }],
                     "minimum_should_match": 1
                 }
-            },
+            } !Filter@container!	,
 	    	{
                 "range":
                 {
@@ -725,3 +725,18 @@ func ESString(queryTag string) string {
 
 	return QueryDefine[queryTag]
 }
+
+var containerFilterPattern = `,
+{
+	"bool":
+	{
+		"should": [
+			{
+			"match":
+				{
+					"output_fields.container.id": "!Param@containerId!"
+				}
+		}],
+		"minimum_should_match": 1
+	}
+}`
