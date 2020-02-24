@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -206,7 +207,7 @@ func Internal_ImageListMetricInfo(hostname string) Result {
 	return ResultData
 }
 
-func Internal_IntrudeDetectMetricInfo(hostId, fromTime, toTime string) Result {
+func Internal_IntrudeDetectMetricInfo(hostId, targetType, fromTime, toTime, limit string) Result {
 	var ResultData Result
 
 	esclient, err := utils.GetESClient()
@@ -215,11 +216,19 @@ func Internal_IntrudeDetectMetricInfo(hostId, fromTime, toTime string) Result {
 		ResultData.Code = utils.ElasticConnErr
 		return ResultData
 	}
-
+	matchMode := "should"
+	if targetType == "container" {
+		targetType = "host"
+		matchMode = "must_not"
+	}
 	esqueryStr := strings.Replace(ESString("intrude_detect"), "!Param@gteTime!", fromTime, 1)
 	esqueryStr = strings.Replace(esqueryStr, "!Param@lteTime!", toTime, 1)
 	esqueryStr = strings.Replace(esqueryStr, "!Param@hostname!", hostId, 1)
+	esqueryStr = strings.Replace(esqueryStr, "!Param@targetTypeM!", matchMode, 1)
+	esqueryStr = strings.Replace(esqueryStr, "!Param@targetType!", targetType, 1)
+	esqueryStr = strings.Replace(esqueryStr, "!Param@limit!", limit, 1)
 
+	fmt.Println("esqueryStr\n", esqueryStr)
 	res, err := esclient.API.Search(esclient.Search.WithContext(context.Background()),
 		esclient.Search.WithIndex(hostId),
 		esclient.Search.WithBody(strings.NewReader(esqueryStr)),

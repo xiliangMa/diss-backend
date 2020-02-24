@@ -691,10 +691,23 @@ func ESString(queryTag string) string {
 	"sort": {
 		"vtm": { "order": "desc" }
 	},
-	"size":"100",
+	"size":"!Param@limit!",
 	"query":{
 	  "bool":{
 	    "filter": [
+            {
+                "bool":
+                {
+                    "!Param@targetTypeM!": [
+                    {
+                        "match":
+                        {
+                            "output_fields.container.id": "!Param@targetType!"
+                        }
+                    }],
+                    "minimum_should_match": 1
+                }
+            },
 	    	{
                 "range":
                 {
