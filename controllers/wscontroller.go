@@ -41,7 +41,6 @@ func (this *WSMetricController) Metrics() {
 
 		logs.Info("recv: %s", message)
 
-
 		//err = wsconn.WriteMessage(mt, message)
 		respmsg := "received ok: " + strconv.Itoa(len(message)) + " bytes "
 		err = wsconn.WriteMessage(websocket.TextMessage, []byte(respmsg))

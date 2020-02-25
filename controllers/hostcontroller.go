@@ -13,7 +13,7 @@ type HostController struct {
 
 // @Title GetHost
 // @Description Get Hosts
-// @Param token header string true "Auth token"
+// @Param token header string true "authToken"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
@@ -31,7 +31,7 @@ func (this *HostController) HostList() {
 
 // @Title AddHost
 // @Description Add Host
-// @Param token header string true "Auth token"
+// @Param token header string true "authToken"
 // @Param Host body models.Host true "host object , remove CreateTime and UpdateTime before POST"
 // @Success 200 {object} models.Result
 // @router /addhost [post]
@@ -45,7 +45,7 @@ func (this *HostController) AddHost() {
 
 // @Title EditHost
 // @Description Edit Host
-// @Param token header string true "Auth token"
+// @Param token header string true "authToken"
 // @Param Host body models.Host true "host object , remove CreateTime and UpdateTime before POST"
 // @Success 200 {object} models.Result
 // @router /edithost [post]
@@ -59,8 +59,8 @@ func (this *HostController) EditHost() {
 
 // @Title GetHostWithContainer
 // @Description Get one Host and its containers
-// @Param token header string true "Auth token"
-// @Param hostname query string false "Enter hostname"
+// @Param token header string true "authToken"
+// @Param hostname query string false "hostName"
 // @Success 200 {object} models.Result
 // @router /gethost_containers [post]
 func (this *HostController) GetHostContainers() {
@@ -79,8 +79,8 @@ func (this *HostController) GetHost() {
 
 // @Title GetHostWithImage
 // @Description Get one Host and its images
-// @Param token header string true "Auth token"
-// @Param hostname query string false "Enter hostname"
+// @Param token header string true "authToken"
+// @Param hostname query string false "hostName"
 // @Success 200 {object} models.Result
 // @router /gethost_images [post]
 func (this *HostController) GetHostImages() {
@@ -92,8 +92,8 @@ func (this *HostController) GetHostImages() {
 
 // @Title DelHost
 // @Description Delete Host
-// @Param token header string true "Auth token"
-// @Param id path int true "host id"
+// @Param token header string true "authToken"
+// @Param id path int true "hostId"
 // @Success 200 {object} models.Result
 // @router /:id [delete]
 func (this *HostController) DeleteHost() {

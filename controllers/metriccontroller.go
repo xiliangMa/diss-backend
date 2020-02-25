@@ -12,27 +12,27 @@ type MetricController struct {
 
 // @Title HostInfo
 // @Description HostMetricBasicInfo
-// @Param token header string true "Auth token"
-// @Param hostname query string false "Enter hostname"
+// @Param token header string true "authToken"
+// @Param hostName query string false "hostName"
 // @Success 200 {object} models.Result
 // @router /hostinfo [post]
 func (this *MetricController) HostMetricInfo() {
-	hostname := this.GetString("hostname")
-	hostdata := models.Internal_HostMetricInfo_M(hostname)
+	hostName := this.GetString("hostName")
+	hostData := models.Internal_HostMetricInfo_M(hostName)
 
-	this.Data["json"] = hostdata
+	this.Data["json"] = hostData
 	this.ServeJSON(false)
 }
 
 // @Title GetContainerList
 // @Description Get ContainerList
-// @Param token header string true "Auth token"
-// @Param name query string false "host name"
+// @Param token header string true "authToken"
+// @Param hostName query string false "hostName"
 // @Success 200 {object} models.Result
 // @router /containerlist [post]
 func (this *MetricController) ContainerList() {
-	hostname := this.GetString("name")
-	containerList := models.Internal_ContainerListMetricInfo(hostname)
+	hostName := this.GetString("hostName")
+	containerList := models.Internal_ContainerListMetricInfo(hostName)
 
 	this.Data["json"] = containerList
 	this.ServeJSON(false)
@@ -40,13 +40,13 @@ func (this *MetricController) ContainerList() {
 
 // @Title ContainerSummary
 // @Description Get Container Summary counts
-// @Param token header string true "Auth token"
-// @Param hostname query string false "Enter hostname"
+// @Param token header string true "authToken"
+// @Param hostName query string false "hostName"
 // @Success 200 {object} models.Result
 // @router /containersummary [post]
 func (this *MetricController) ContainerSummary() {
-	hostname := this.GetString("hostname")
-	containerSummary := models.Internal_ContainerSummaryInfo(hostname)
+	hostName := this.GetString("hostName")
+	containerSummary := models.Internal_ContainerSummaryInfo(hostName)
 
 	this.Data["json"] = containerSummary
 	this.ServeJSON(false)
@@ -54,13 +54,13 @@ func (this *MetricController) ContainerSummary() {
 
 // @Title GetImageList
 // @Description Get ImageList
-// @Param token header string true "Auth token"
-// @Param name query string false "host name"
+// @Param token header string true "authToken"
+// @Param hostName query string false "hostName"
 // @Success 200 {object} models.Result
 // @router /imagelist [post]
 func (this *MetricController) ImageList() {
-	hostname := this.GetString("name")
-	containerList := models.Internal_ImageListMetricInfo(hostname)
+	hostName := this.GetString("hostName")
+	containerList := models.Internal_ImageListMetricInfo(hostName)
 
 	this.Data["json"] = containerList
 	this.ServeJSON(false)

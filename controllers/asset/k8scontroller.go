@@ -13,7 +13,7 @@ type K8SController struct {
 
 // @Title GetClusters
 // @Description Get Cluster List
-// @Param token header string true "auth token"
+// @Param token header string true "authToken"
 // @Param name query string "" false "name"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -31,7 +31,7 @@ func (this *K8SController) GetClusters() {
 
 // @Title GetNameSpaceList
 // @Description Get NameSpace List
-// @Param token header string true "auth token"
+// @Param token header string true "authToken"
 // @Param clusterId path string "" true "clusterId"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -51,7 +51,7 @@ func (this *K8SController) GetNameSpaces() {
 
 // @Title GetPodList
 // @Description Get Pod List
-// @Param token header string true "auth token"
+// @Param token header string true "authToken"
 // @Param nsName path string "" true "namespaceName"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -71,7 +71,7 @@ func (this *K8SController) GetPods() {
 
 // @Title GetContainerList
 // @Description Get pod Container List
-// @Param token header string true "auth token"
+// @Param token header string true "authToken"
 // @Param nsName path string "" true "namespaceName"
 // @Param podId path string "" true "podId"
 // @Param name query string "" false "containerName"
@@ -100,22 +100,22 @@ func (this *K8SController) GetContainerConfig() {
 
 // @Title GetContainerCmdHistorys
 // @Description Get Container CmdHistory  List
-// @Param token header string true "auth token"
-// @Param containersId path string "" true "containersId"
+// @Param token header string true "authToken"
+// @Param containerId path string "" true "containerId"
 // @Param command query string "" false "command"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /containers/:containersId/cmdhistorys [post]
+// @router /containers/:containerId/cmdhistorys [post]
 func (this *K8SController) GetContainerCmdHistorys() {
-	containersId := this.GetString(":containersId")
+	containerId := this.GetString(":containerId")
 	command := this.GetString("command")
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 
 	cmdHistory := new(models.CmdHistory)
 	cmdHistory.Command = command
-	cmdHistory.ContainerId = containersId
+	cmdHistory.ContainerId = containerId
 	cmdHistory.Type = 1
 	this.Data["json"] = cmdHistory.List(from, limit)
 	this.ServeJSON(false)

@@ -12,25 +12,25 @@ type IntrudeDetectLogController struct {
 
 // @Title GetIntrudeLogList
 // @Description Get IntrudeLog List
-// @Param token header string true "auth token"
-// @Param hostid path string "" true "hostid"
-// @Param targetype query string "host" true "targetype"
-// @Param containerid query string "" false "containerid"
+// @Param token header string true "authToken"
+// @Param hostId path string "" true "hostId"
+// @Param targeType query string "host" true "targeType"
+// @Param containerId query string "" false "containerId"
 ////@Param from query int 0 true "from"
 // @Param limit query int 20 true "limit"
-// @Param starttime query string "" true "starttime"
-// @Param totime query string "" true "totime"
+// @Param starTime query string "" true "starTime"
+// @Param toTime query string "" true "toTime"
 // @Success 200 {object} models.Result
-// @router /intrudedetect/:hostid [post]
+// @router /intrudedetect/:hostId [post]
 func (this *IntrudeDetectLogController) GetIntrudeLogList() {
-	starttime := this.GetString("starttime")
-	totime := this.GetString("totime")
-	hostid := this.GetString(":hostid")
-	targetype := this.GetString("targetype")
-	containerid := this.GetString("containerid")
+	startTime := this.GetString("startTime")
+	toTime := this.GetString("toTime")
+	hostId := this.GetString(":hostId")
+	targeType := this.GetString("targeType")
+	containerId := this.GetString("containerId")
 	limit := this.GetString("limit")
 
-	intrudelog := models.Internal_IntrudeDetectMetricInfo(hostid, targetype, containerid, starttime, totime, limit)
+	intrudelog := models.Internal_IntrudeDetectMetricInfo(hostId, targeType, containerId, startTime, toTime, limit)
 
 	this.Data["json"] = intrudelog
 	this.ServeJSON(false)

@@ -12,7 +12,7 @@ type BMTController struct {
 
 // @Title GetBMTList
 // @Description Get BenchMarkTemplate List
-// @Param token header string true "auth token"
+// @Param token header string true "authToken"
 // @Param name query string "" false "name"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"

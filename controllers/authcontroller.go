@@ -14,8 +14,8 @@ type AuthController struct {
 
 // @Title login
 // @Description login
-// @Param name query string true "UserName"
-// @Param pwd query string true "UserPwd"
+// @Param name query string true "userName"
+// @Param pwd query string true "userPwd"
 // @Success 200 {object} models.Result
 // @router /login [post]
 func (this *AuthController) Login() {
@@ -36,7 +36,7 @@ func (this *AuthController) Login() {
 
 // @Title authorization
 // @Description authorization
-// @Param token header string true "Auth token"
+// @Param token header string true "authToken"
 // @Success 200 {object} models.Result
 // @router /Authorization [post]
 func (this *AuthController) Authorize() {

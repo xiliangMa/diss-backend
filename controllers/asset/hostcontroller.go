@@ -16,7 +16,7 @@ type HostController struct {
 // host api list
 // @Title GetHostConfig
 // @Description Get HostConfig List
-// @Param token header string true "auth token"
+// @Param token header string true "authToken"
 // @Param name query string "" false "name"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -34,7 +34,7 @@ func (this *HostController) GetHostConfigList() {
 
 // @Title GetHostConfigInfo
 // @Description Get HostConfigInfo
-// @Param token header string true "auth token"
+// @Param token header string true "authToken"
 // @Param hostId path string "" true "hostId"
 // @Param name query string "" false "name"
 // @Param from query int 0 false "from"
@@ -57,7 +57,7 @@ func (this *HostController) GetHostInfoList() {
 
 // @Title GetHostPod
 // @Description Get HostPod List
-// @Param token header string true "auth token"
+// @Param token header string true "authToken"
 // @Param hostName path string "" true "hostName"
 // @Param name query string "" false "podName"
 // @Param from query int 0 false "from"
@@ -80,7 +80,7 @@ func (this *HostController) GetHostPodList() {
 
 // @Title HostImage
 // @Description Get HostImage List
-// @Param token header string true "auth token"
+// @Param token header string true "authToken"
 // @Param hostId path string "" true "hostId"
 // @Param name query string "" false "imageName"
 // @Param from query int 0 false "from"
@@ -103,7 +103,7 @@ func (this *HostController) GetHostImagesList() {
 
 // @Title HostCmdHistory
 // @Description Get HostCmdHistory List
-// @Param token header string true "auth token"
+// @Param token header string true "authToken"
 // @Param hostId path string "" true "hostId"
 // @Param command query string "" false "command"
 // @Param from query int 0 false "from"
@@ -127,7 +127,7 @@ func (this *HostController) GetHostCmdHistoryList() {
 
 // @Title HostImageInfo
 // @Description Get HostImage Info
-// @Param token header string true "auth token"
+// @Param token header string true "authToken"
 // @Param hostId path string "" true "hostId"
 // @Param imageId path string "" true "imageId"
 // @Success 200 {object} models.Result
@@ -147,7 +147,7 @@ func (this *HostController) GetHostImageInfo() {
 
 // @Title HostContainerConfig
 // @Description Get HostContainerConfig List
-// @Param token header string true "auth token"
+// @Param token header string true "authToken"
 // @Param hostName path string "" true "hostName"
 // @Param name query string "" false "containerName"
 // @Param from query int 0 false "from"
@@ -170,7 +170,7 @@ func (this *HostController) GetHostContainerConfigList() {
 
 // @Title HostPs
 // @Description Get HostPs List
-// @Param token header string true "auth token"
+// @Param token header string true "authToken"
 // @Param hostId path string "" true "hostId"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -190,7 +190,7 @@ func (this *HostController) GetHostPsList() {
 
 // @Title HostContainerInfo
 // @Description Get HostContainer info
-// @Param token header string true "auth token"
+// @Param token header string true "authToken"
 // @Param hostName path string "" true "hostName"
 // @Param containerId path string "" true "containerId"
 // @Success 200 {object} models.Result
@@ -209,9 +209,9 @@ func (this *HostController) GetHostContainerInfoList() {
 
 // @Title HostBenchMarkLog
 // @Description Get HostBenchMarkLog List
-// @Param token header string true "auth token"
+// @Param token header string true "authToken"
 // @Param hostId path string "" true "hostId"
-// @Param bmtName query string "" false "bench mark template name"
+// @Param bmtName query string "" false "benchMarkTemplateName"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
@@ -232,10 +232,10 @@ func (this *HostController) GetHostBenchMarkLogList() {
 
 // @Title HostBenchMarkLogInfo
 // @Description Get HostBenchMarkLog Info
-// @Param token header string true "auth token"
+// @Param token header string true "authToken"
 // @Param hostId path string "" true "hostId"
-// @Param bmlId path string "" true "bench mark log id"
-// @Param bmtName query string "" false "bench mark template name"
+// @Param bmlId path string "" true "benchMarkLogId"
+// @Param bmtName query string "" false "benchMarkTemplateName"
 // @Success 200 {object} models.Result
 // @router /:hostId/hostbmls/:bmlId [post]
 func (this *HostController) GetHostBenchMarkLogInfo() {

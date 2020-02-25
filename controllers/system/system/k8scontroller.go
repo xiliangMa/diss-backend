@@ -15,10 +15,10 @@ type K8sController struct {
 
 // @Title UpLoadK8sFile
 // @Description UpLoad K8s File
-// @Param token header string true "auth token"
-// @Param k8sFile formData file true "k8s file"
-// @Param clusterName formData string true "cluster name"
-// @Param isForce formData bool true true "force update file"
+// @Param token header string true "authToken"
+// @Param k8sFile formData file true "k8sFile"
+// @Param clusterName formData string true "clusterName"
+// @Param isForce formData bool true true "force"
 // @Success 200 {object} models.Result
 // @router /system/k8s/upload [post]
 func (this *K8sController) UploadK8sFile() {
