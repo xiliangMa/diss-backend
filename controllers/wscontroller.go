@@ -7,6 +7,7 @@ import (
 	"github.com/xiliangMa/diss-backend/service"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strconv"
 )
 
 type WSMetricController struct {
@@ -30,7 +31,7 @@ func (this *WSMetricController) Metrics() {
 	}
 	defer wsconn.Close()
 	for {
-		mt, message, err := wsconn.ReadMessage()
+		_, message, err := wsconn.ReadMessage()
 		if err != nil {
 			logs.Error("read:", err)
 			break
@@ -40,7 +41,10 @@ func (this *WSMetricController) Metrics() {
 
 		logs.Info("recv: %s", message)
 
-		err = wsconn.WriteMessage(mt, message)
+
+		//err = wsconn.WriteMessage(mt, message)
+		respmsg := "received ok: " + strconv.Itoa(len(message)) + " bytes "
+		err = wsconn.WriteMessage(websocket.TextMessage, []byte(respmsg))
 		if err != nil {
 			logs.Error("write:", err)
 			break

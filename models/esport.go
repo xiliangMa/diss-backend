@@ -3,7 +3,6 @@ package models
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -234,7 +233,7 @@ func Internal_IntrudeDetectMetricInfo(hostId, targetType, containerid, fromTime,
 	esqueryStr = strings.Replace(esqueryStr, "!Filter@container!", containerFilterStr, 1)
 	esqueryStr = strings.Replace(esqueryStr, "!Param@limit!", limit, 1)
 
-	fmt.Println("esqueryStr\n",  esqueryStr)
+	// fmt.Println("esqueryStr\n",  esqueryStr)
 	res, err := esclient.API.Search(esclient.Search.WithContext(context.Background()),
 		esclient.Search.WithIndex(hostId),
 		esclient.Search.WithBody(strings.NewReader(esqueryStr)),
