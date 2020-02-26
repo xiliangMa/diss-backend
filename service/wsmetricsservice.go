@@ -30,6 +30,7 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
+		logs.Info("############################ Sync agent data, >>> HostId: %s, Type: %s <<<", hostConfig.Id, models.Tag_HostConfig)
 		if err := hostConfig.Inner_AddHostConfig(); err != nil {
 			return err
 		}
@@ -40,6 +41,7 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
+		logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", hostInfo.Id, models.Tag_HostInfo)
 		if err := hostInfo.Inner_AddHostInfo(); err != nil {
 			return err
 		}
@@ -50,6 +52,7 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
+		logs.Info("############################ Sync agent data, >>>  HostName: %s, Type: %s, Size: %d <<<", containerConfigList[0].HostName, models.Tag_ContainerConfig, len(containerConfigList))
 		for _, containerConfig := range containerConfigList {
 			if result := containerConfig.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
@@ -63,6 +66,7 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
+		logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageConfigList[0].HostId, models.Tag_ImageConfig, len(imageConfigList))
 		for _, imageConfig := range imageConfigList {
 			if result := imageConfig.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
@@ -75,6 +79,7 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
+		logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageInfoList[0].HostId, models.Tag_ImageInfo, len(imageInfoList))
 		for _, imageInfo := range imageInfoList {
 			if result := imageInfo.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
@@ -87,7 +92,9 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
-		if len(hostPsList) != 0 {
+		size := len(hostPsList)
+		logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", hostPsList[0].HostId, models.Tag_HostPs, size)
+		if size != 0 {
 			data := hostPsList[0].ListById().Data.(map[string]interface{})
 			if data["total"] != 0 {
 				for _, v := range data["items"].([]*models.HostPs) {
@@ -107,6 +114,7 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
+		logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerInfoList[0].HostId, models.Tag_ContainerInfo, len(containerInfoList))
 		for _, containerInfo := range containerInfoList {
 			if result := containerInfo.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
@@ -119,6 +127,7 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
+		logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerTopList[0].HostId, models.Tag_ContainerTop, len(containerTopList))
 		for _, containerTop := range containerTopList {
 			if result := containerTop.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
@@ -132,6 +141,7 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
+		logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", benchMarkLog.HostId, models.Tag_DockerBenchMarkLog)
 		if result := benchMarkLog.Add(); result.Code != http.StatusOK {
 			return errors.New(result.Message)
 		}
@@ -157,6 +167,7 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
+		logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", benchMarkLog.HostId, models.Tag_KubernetesBenchMarkLog)
 		if result := benchMarkLog.Add(); result.Code != http.StatusOK {
 			return errors.New(result.Message)
 		}
@@ -179,8 +190,10 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
+		size := len(cmdHistoryList.List)
+		logs.Info("############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Tag_HostCmdHistory, size)
 		// 删除 host_id 下所有的记录
-		if len(cmdHistoryList.List) != 0 {
+		if size != 0 {
 			cmdHistoryList.List[0].Delete()
 		}
 		if result := cmdHistoryList.MultiAdd(); result.Code != http.StatusOK {
@@ -193,6 +206,7 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
+		logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", cmdHistoryList[0].HostId, models.Tag_ContainerCmdHistory, len(cmdHistoryList))
 		for _, containerInfo := range cmdHistoryList {
 			if result := containerInfo.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)

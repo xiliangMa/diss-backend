@@ -33,19 +33,19 @@ func (this *WSMetricController) Metrics() {
 	for {
 		_, message, err := wsconn.ReadMessage()
 		if err != nil {
-			logs.Error("read:", err)
+			logs.Info("############################ Sync agent data fail ############################, err: ", err)
 			break
 		}
+
 		wsmh := &service.WSMetricsService{message}
 		wsmh.Save()
 
-		logs.Info("recv: %s", message)
-
 		//err = wsconn.WriteMessage(mt, message)
 		respmsg := "received ok: " + strconv.Itoa(len(message)) + " bytes "
+
 		err = wsconn.WriteMessage(websocket.TextMessage, []byte(respmsg))
 		if err != nil {
-			logs.Error("write:", err)
+			logs.Info("############################ Received data from agent fail ############################", err)
 			break
 		}
 	}
