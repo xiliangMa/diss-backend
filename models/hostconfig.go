@@ -21,7 +21,6 @@ func (this *HostConfig) List(from, limit int) Result {
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
 	var HostConfigList []*HostConfig = nil
-	var total = 0
 	var ResultData Result
 	var err error
 	cond := orm.NewCondition()
@@ -37,9 +36,7 @@ func (this *HostConfig) List(from, limit int) Result {
 		return ResultData
 	}
 
-	if HostConfigList != nil {
-		total = len(HostConfigList)
-	}
+	total, _ := o.QueryTable(utils.HostConfig).Count()
 	data := make(map[string]interface{})
 	data["items"] = HostConfigList
 	data["total"] = total

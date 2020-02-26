@@ -53,7 +53,6 @@ func (this *BenchMarkTemplate) List(from, limit int) Result {
 	o.Using("default")
 	var BenchMarkTemplateList []*BenchMarkTemplate
 	var ResultData Result
-	var total = 0
 	var err error
 
 	// to do Multiple conditions search
@@ -69,9 +68,7 @@ func (this *BenchMarkTemplate) List(from, limit int) Result {
 		return ResultData
 	}
 
-	if BenchMarkTemplateList != nil {
-		total = len(BenchMarkTemplateList)
-	}
+	total, _ := o.QueryTable(utils.BenchMarkTemplate).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = BenchMarkTemplateList

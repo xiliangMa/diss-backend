@@ -87,7 +87,6 @@ func (this *ImageInfo) List() Result {
 	var imageList []*ImageInfo
 	var ResultData Result
 	var err error
-	var total = 0
 
 	cond := orm.NewCondition()
 	if this.HostId != "" {
@@ -109,9 +108,7 @@ func (this *ImageInfo) List() Result {
 		return ResultData
 	}
 
-	if imageList != nil {
-		total = len(imageList)
-	}
+	total, _ := o.QueryTable(utils.ImageInfo).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = imageList

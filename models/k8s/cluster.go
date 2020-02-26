@@ -54,7 +54,6 @@ func (this *Cluster) List(from, limit int) models.Result {
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
 	var ClusterList []*Cluster
-	var total = 0
 	var ResultData models.Result
 	var err error
 	cond := orm.NewCondition()
@@ -76,9 +75,8 @@ func (this *Cluster) List(from, limit int) models.Result {
 		return ResultData
 	}
 
-	if ClusterList != nil {
-		total = len(ClusterList)
-	}
+	total, _ := o.QueryTable(utils.Cluster).Count()
+
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = ClusterList

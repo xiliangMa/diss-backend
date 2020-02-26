@@ -72,11 +72,10 @@ func (this *NameSpace) List(from, limit int) models.Result {
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
 	var nameSpaceList []*NameSpace
-	var total = 0
 	var ResultData models.Result
 	var err error
 	cond := orm.NewCondition()
-	cond = cond.And("id", this.Id)
+
 	if this.Name != "" {
 		cond = cond.And("name__contains", this.Name)
 	}
@@ -86,6 +85,9 @@ func (this *NameSpace) List(from, limit int) models.Result {
 
 	if this.ClusterId != "" {
 		cond = cond.And("cluster_id", this.ClusterId)
+	}
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
 	}
 
 	_, err = o.QueryTable(utils.NameSpace).SetCond(cond).Limit(limit, from).All(&nameSpaceList)
@@ -97,9 +99,7 @@ func (this *NameSpace) List(from, limit int) models.Result {
 		return ResultData
 	}
 
-	if nameSpaceList != nil {
-		total = len(nameSpaceList)
-	}
+	total, _ := o.QueryTable(utils.NameSpace).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = nameSpaceList

@@ -22,7 +22,6 @@ func (this *HostInfo) List(id string, from, limit int) Result {
 	o.Using("default")
 	var HostInfoList []*HostInfo = nil
 	var ResultData Result
-	var total = 0
 	cond := orm.NewCondition()
 	if this.HostName != "" {
 		cond = cond.And("host_name__contains", this.HostName)
@@ -39,9 +38,7 @@ func (this *HostInfo) List(id string, from, limit int) Result {
 		return ResultData
 	}
 
-	if HostInfoList != nil {
-		total = len(HostInfoList)
-	}
+	total, _ := o.QueryTable(utils.HostInfo).Count()
 	data := make(map[string]interface{})
 	data["items"] = HostInfoList
 	data["total"] = total

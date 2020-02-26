@@ -39,7 +39,6 @@ func (this *HostPs) List(from, limit int) Result {
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
 	var hostPsList []*HostPs = nil
-	var total = 0
 	var ResultData Result
 	cond := orm.NewCondition()
 	if this.HostId != "" {
@@ -55,9 +54,7 @@ func (this *HostPs) List(from, limit int) Result {
 		return ResultData
 	}
 
-	if hostPsList != nil {
-		total = len(hostPsList)
-	}
+	total, _ := o.QueryTable(utils.HostPs).Count()
 	data := make(map[string]interface{})
 	data["items"] = hostPsList
 	data["total"] = total
@@ -122,7 +119,6 @@ func (this *HostPs) ListById() Result {
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
 	var hostPsList []*HostPs = nil
-	var total = 0
 	var ResultData Result
 	cond := orm.NewCondition()
 	if this.HostId != "" {
@@ -138,9 +134,7 @@ func (this *HostPs) ListById() Result {
 		return ResultData
 	}
 
-	if hostPsList != nil {
-		total = len(hostPsList)
-	}
+	total, _ := o.QueryTable(utils.HostPs).Count()
 	data := make(map[string]interface{})
 	data["items"] = hostPsList
 	data["total"] = total

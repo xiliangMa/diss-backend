@@ -78,7 +78,6 @@ func (this *ContainerConfig) List(from, limit int) Result {
 	o.Using("default")
 	var ContainerList []*ContainerConfig = nil
 	var ResultData Result
-	var total = 0
 	var err error
 
 	cond := orm.NewCondition()
@@ -97,7 +96,7 @@ func (this *ContainerConfig) List(from, limit int) Result {
 	if this.PodId != "" {
 		cond = cond.And("pod_id", this.PodId)
 	}
-	_, err = o.QueryTable(utils.ContainerConfig).SetCond(cond).All(&ContainerList)
+	_, err = o.QueryTable(utils.ContainerConfig).SetCond(cond).Limit(limit, from).All(&ContainerList)
 
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -106,9 +105,7 @@ func (this *ContainerConfig) List(from, limit int) Result {
 		return ResultData
 	}
 
-	if ContainerList != nil {
-		total = len(ContainerList)
-	}
+	total, _ := o.QueryTable(utils.ContainerConfig).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = ContainerList

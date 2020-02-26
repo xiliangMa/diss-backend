@@ -90,7 +90,6 @@ func (this *ContainerInfo) List() Result {
 	o.Using("default")
 	var ContainerList []*ContainerInfo = nil
 	var ResultData Result
-	var total = 0
 	var err error
 
 	cond := orm.NewCondition()
@@ -118,9 +117,7 @@ func (this *ContainerInfo) List() Result {
 		return ResultData
 	}
 
-	if ContainerList != nil {
-		total = len(ContainerList)
-	}
+	total, _ := o.QueryTable(utils.ContainerInfo).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = ContainerList

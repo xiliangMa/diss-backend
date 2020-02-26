@@ -64,7 +64,6 @@ func (this *BenchMarkLog) List(from, limit int) models.Result {
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
 	var BenchMarkLogList []*BenchMarkLog = nil
-	var total = 0
 	var ResultData models.Result
 	var err error
 	cond := orm.NewCondition()
@@ -73,7 +72,7 @@ func (this *BenchMarkLog) List(from, limit int) models.Result {
 	if this.BenchMarkName != "" {
 		cond = cond.And("bench_mark_name", this.BenchMarkName)
 	}
-	_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).All(&BenchMarkLogList)
+	_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Limit(limit, from).All(&BenchMarkLogList)
 
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -82,9 +81,7 @@ func (this *BenchMarkLog) List(from, limit int) models.Result {
 		return ResultData
 	}
 
-	if BenchMarkLogList != nil {
-		total = len(BenchMarkLogList)
-	}
+	total, _ := o.QueryTable(utils.BenchMarkLog).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = BenchMarkLogList

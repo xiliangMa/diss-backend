@@ -78,7 +78,6 @@ func (this *CmdHistory) List(from, limit int) Result {
 	var imageList []*CmdHistory
 	var ResultData Result
 	var err error
-	var total = 0
 
 	cond := orm.NewCondition()
 	cond = cond.And("type", this.Type)
@@ -101,9 +100,7 @@ func (this *CmdHistory) List(from, limit int) Result {
 		return ResultData
 	}
 
-	if imageList != nil {
-		total = len(imageList)
-	}
+	total, _ := o.QueryTable(utils.CmdHistory).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = imageList

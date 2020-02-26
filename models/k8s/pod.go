@@ -84,7 +84,6 @@ func (this *Pod) List(from, limit int) models.Result {
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
 	var PodList []*Pod = nil
-	var total = 0
 	var ResultData models.Result
 	var err error
 	cond := orm.NewCondition()
@@ -97,7 +96,7 @@ func (this *Pod) List(from, limit int) models.Result {
 	if this.NameSpaceName != "" {
 		cond = cond.And("name_space_name", this.NameSpaceName)
 	}
-	_, err = o.QueryTable(utils.Pod).SetCond(cond).All(&PodList)
+	_, err = o.QueryTable(utils.Pod).SetCond(cond).Limit(limit, from).All(&PodList)
 
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -106,9 +105,7 @@ func (this *Pod) List(from, limit int) models.Result {
 		return ResultData
 	}
 
-	if PodList != nil {
-		total = len(PodList)
-	}
+	total, _ := o.QueryTable(utils.Pod).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = PodList
