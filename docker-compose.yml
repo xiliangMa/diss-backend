@@ -13,6 +13,7 @@ services:
       - "8889:8889"
     env_file:
       - deploy/diss-backend.env
+      - deploy/diss-backend-db.env
     links:
       - diss-db
     depends_on:
@@ -25,11 +26,8 @@ services:
     restart: unless-stopped
     container_name: diss-db
     image: mysql:5.7.14
-    environment:
-      MYSQL_ROOT_PASSWORD: diss
-      MYSQL_USER: diss
-      MYSQL_PASSWORD: diss
-      MYSQL_DATABASE: diss
+    env_file:
+      - ./deploy/diss-backend-db.env
     command: [ #使用 command 可以覆盖容器启动后默认执行的命令
       '--character-set-server=utf8', #设置数据库表的数据集
       '--collation-server=utf8_general_ci' #设置数据库表的数据集
