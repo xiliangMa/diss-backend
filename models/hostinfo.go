@@ -16,7 +16,7 @@ type HostInfoInterface interface {
 	List()
 }
 
-func (this *HostInfo) List(id string, from, limit int) Result {
+func (this *HostInfo) List() Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
@@ -30,7 +30,7 @@ func (this *HostInfo) List(id string, from, limit int) Result {
 		cond = cond.And("id", this.Id)
 	}
 
-	_, err := o.QueryTable(utils.HostInfo).SetCond(cond).Limit(limit, from).All(&HostInfoList)
+	_, err := o.QueryTable(utils.HostInfo).SetCond(cond).All(&HostInfoList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetHostInfoErr

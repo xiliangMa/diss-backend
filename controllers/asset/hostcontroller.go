@@ -1,6 +1,7 @@
 package asset
 
 import (
+	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/k8s"
@@ -13,11 +14,10 @@ type HostController struct {
 	beego.Controller
 }
 
-// host api list
 // @Title GetHostConfig
 // @Description Get HostConfig List
 // @Param token header string true "authToken"
-// @Param name query string "" false "name"
+// @Param body body models.HostConfig false "主机配置信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
@@ -26,31 +26,23 @@ func (this *HostController) GetHostConfigList() {
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 	hostConfig := new(models.HostConfig)
-	hostConfig.HostName = this.GetString("name")
+	json.Unmarshal(this.Ctx.Input.RequestBody, &hostConfig)
 	this.Data["json"] = hostConfig.List(from, limit)
 	this.ServeJSON(false)
 
 }
 
-// @Title GetHostConfigInfo
-// @Description Get HostConfigInfo
+// @Title GetHostInfo
+// @Description Get HostInfo
 // @Param token header string true "authToken"
 // @Param hostId path string "" true "hostId"
-// @Param name query string "" false "name"
-// @Param from query int 0 false "from"
-// @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
-// @router /:hostId/info [post]
+// @router /:hostId [post]
 func (this *HostController) GetHostInfoList() {
 	id := this.GetString(":hostId")
-	name := this.GetString("name")
-	limit, _ := this.GetInt("limit")
-	from, _ := this.GetInt("from")
-
 	hostInfo := new(models.HostInfo)
 	hostInfo.Id = id
-	hostInfo.HostName = name
-	this.Data["json"] = hostInfo.List(id, from, limit)
+	this.Data["json"] = hostInfo.List()
 	this.ServeJSON(false)
 
 }
@@ -58,20 +50,19 @@ func (this *HostController) GetHostInfoList() {
 // @Title GetHostPod
 // @Description Get HostPod List
 // @Param token header string true "authToken"
-// @Param hostName path string "" true "hostName"
-// @Param name query string "" false "podName"
+// @Param hostName path string "" true "主机名"
+// @Param body body k8s.Pod false "Pod 信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router /:hostName/pods [post]
 func (this *HostController) GetHostPodList() {
-	name := this.GetString("name")
 	hostName := this.GetString(":hostName")
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 
 	pod := new(k8s.Pod)
-	pod.Name = name
+	json.Unmarshal(this.Ctx.Input.RequestBody, &pod)
 	pod.HostName = hostName
 	this.Data["json"] = pod.List(from, limit)
 	this.ServeJSON(false)
@@ -82,19 +73,18 @@ func (this *HostController) GetHostPodList() {
 // @Description Get HostImage List
 // @Param token header string true "authToken"
 // @Param hostId path string "" true "hostId"
-// @Param name query string "" false "imageName"
+// @Param body body models.ImageConfig false "镜像配置信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router /:hostId/images [post]
 func (this *HostController) GetHostImagesList() {
-	name := this.GetString("name")
 	hostId := this.GetString(":hostId")
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 
 	imageConfig := new(models.ImageConfig)
-	imageConfig.Name = name
+	json.Unmarshal(this.Ctx.Input.RequestBody, &imageConfig)
 	imageConfig.HostId = hostId
 	this.Data["json"] = imageConfig.List(from, limit)
 	this.ServeJSON(false)
@@ -105,19 +95,18 @@ func (this *HostController) GetHostImagesList() {
 // @Description Get HostCmdHistory List
 // @Param token header string true "authToken"
 // @Param hostId path string "" true "hostId"
-// @Param command query string "" false "command"
+// @Param body body models.CmdHistory false "主机命令历史信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router /:hostId/cmdhistory [post]
 func (this *HostController) GetHostCmdHistoryList() {
-	command := this.GetString("command")
 	hostId := this.GetString(":hostId")
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 
 	cmdHistory := new(models.CmdHistory)
-	cmdHistory.Command = command
+	json.Unmarshal(this.Ctx.Input.RequestBody, &cmdHistory)
 	cmdHistory.HostId = hostId
 	cmdHistory.Type = 0
 	this.Data["json"] = cmdHistory.List(from, limit)
@@ -149,19 +138,18 @@ func (this *HostController) GetHostImageInfo() {
 // @Description Get HostContainerConfig List
 // @Param token header string true "authToken"
 // @Param hostName path string "" true "hostName"
-// @Param name query string "" false "containerName"
+// @Param body body models.ContainerConfig false "容器配置信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router /:hostName/containers [post]
 func (this *HostController) GetHostContainerConfigList() {
-	name := this.GetString("name")
 	hostName := this.GetString(":hostName")
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 
 	containerConfig := new(models.ContainerConfig)
-	containerConfig.Name = name
+	json.Unmarshal(this.Ctx.Input.RequestBody, &containerConfig)
 	containerConfig.HostName = hostName
 	this.Data["json"] = containerConfig.List(from, limit)
 	this.ServeJSON(false)
@@ -211,19 +199,18 @@ func (this *HostController) GetHostContainerInfoList() {
 // @Description Get HostBenchMarkLog List
 // @Param token header string true "authToken"
 // @Param hostId path string "" true "hostId"
-// @Param bmtName query string "" false "benchMarkTemplateName"
+// @Param body body securitylog.BenchMarkLog false "基线日志信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router /:hostId/hostbmls [post]
 func (this *HostController) GetHostBenchMarkLogList() {
-	bmtName := this.GetString("bmtName")
 	hostId := this.GetString(":hostId")
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 
 	benchMarkLog := new(msl.BenchMarkLog)
-	benchMarkLog.BenchMarkName = bmtName
+	json.Unmarshal(this.Ctx.Input.RequestBody, &benchMarkLog)
 	benchMarkLog.HostId = hostId
 	this.Data["json"] = benchMarkLog.List(from, limit)
 	this.ServeJSON(false)
@@ -235,16 +222,13 @@ func (this *HostController) GetHostBenchMarkLogList() {
 // @Param token header string true "authToken"
 // @Param hostId path string "" true "hostId"
 // @Param bmlId path string "" true "benchMarkLogId"
-// @Param bmtName query string "" false "benchMarkTemplateName"
 // @Success 200 {object} models.Result
 // @router /:hostId/hostbmls/:bmlId [post]
 func (this *HostController) GetHostBenchMarkLogInfo() {
-	bmtName := this.GetString("bmtName")
 	hostId := this.GetString(":hostId")
 	bmlId := this.GetString(":bmlId")
 
 	benchMarkLog := new(msl.BenchMarkLog)
-	benchMarkLog.BenchMarkName = bmtName
 	benchMarkLog.HostId = hostId
 	benchMarkLog.Id = bmlId
 	var securityLogService = ssl.SecurityLogService{benchMarkLog}
