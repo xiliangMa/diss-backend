@@ -117,3 +117,25 @@ func (this *K8SController) GetContainerCmdHistorys() {
 	this.ServeJSON(false)
 
 }
+
+// @Title GetContainerTop
+// @Description Get Container Top  List
+// @Param token header string true "authToken"
+// @Param containerId path string "" true "containerId"
+// @Param body body models.ContainerTop false "容器进程"
+// @Param from query int 0 false "from"
+// @Param limit query int 20 false "limit"
+// @Success 200 {object} models.Result
+// @router /containers/:containerId/containertop [post]
+func (this *K8SController) GetContainerTop() {
+	containerId := this.GetString(":containerId")
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+
+	containerTop := new(models.ContainerTop)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &containerTop)
+	containerTop.Id = containerId
+	this.Data["json"] = containerTop.List(from, limit)
+	this.ServeJSON(false)
+
+}
