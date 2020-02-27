@@ -202,19 +202,22 @@ func (wsmh *WSMetricsService) Save() error {
 			return errors.New(result.Message)
 		}
 	case models.Tag_ContainerCmdHistory:
-		cmdHistoryList := []models.CmdHistory{}
+		cmdHistoryList := models.CmdHistoryList{}
 		s, _ := json.Marshal(ms.Metric)
-		if err := json.Unmarshal(s, &cmdHistoryList); err != nil {
+		if err := json.Unmarshal(s, &cmdHistoryList.List); err != nil {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
-		if len(cmdHistoryList) != 0 {
-			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", cmdHistoryList[0].HostId, models.Tag_ContainerCmdHistory, len(cmdHistoryList))
+		size := len(cmdHistoryList.List)
+		if size != 0 {
+			logs.Info("############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Tag_ContainerCmdHistory, size)
 		}
-		for _, containerInfo := range cmdHistoryList {
-			if result := containerInfo.Add(); result.Code != http.StatusOK {
-				return errors.New(result.Message)
-			}
+		// 删除 容器下的 下所有的记录
+		if size != 0 {
+			cmdHistoryList.List[0].Delete()
+		}
+		if result := cmdHistoryList.MultiAdd(); result.Code != http.StatusOK {
+			return errors.New(result.Message)
 		}
 	}
 
