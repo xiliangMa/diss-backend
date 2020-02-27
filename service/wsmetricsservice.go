@@ -191,7 +191,9 @@ func (wsmh *WSMetricsService) Save() error {
 			return err
 		}
 		size := len(cmdHistoryList.List)
-		logs.Info("############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Tag_HostCmdHistory, size)
+		if size != 0 {
+			logs.Info("############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Tag_HostCmdHistory, size)
+		}
 		// 删除 host_id 下所有的记录
 		if size != 0 {
 			cmdHistoryList.List[0].Delete()
@@ -206,7 +208,9 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
-		logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", cmdHistoryList[0].HostId, models.Tag_ContainerCmdHistory, len(cmdHistoryList))
+		if len(cmdHistoryList) != 0 {
+			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", cmdHistoryList[0].HostId, models.Tag_ContainerCmdHistory, len(cmdHistoryList))
+		}
 		for _, containerInfo := range cmdHistoryList {
 			if result := containerInfo.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
