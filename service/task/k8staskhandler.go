@@ -37,6 +37,7 @@ func (this *K8STaskHandler) SyncHostConfigAndInfo(clusterName, clusterId string)
 			config.OS = n.Status.NodeInfo.OSImage
 			config.IsInK8s = true
 			config.ClusterId = clusterId
+			config.IsInK8s = true
 
 			// 同步 hostinfo
 			info := new(models.HostInfo)
@@ -62,7 +63,7 @@ func (this *K8STaskHandler) SyncHostConfigAndInfo(clusterName, clusterId string)
 			info.KubeletVer = nStatusNodeinfo.KubeletVersion
 			info.Kubeproxy = nStatusNodeinfo.KubeProxyVersion
 			info.KubernetesVer = nStatusNodeinfo.KubeletVersion
-
+			info.DockerStatus = "Running"
 			config.Inner_AddHostConfig() // 添加 hostconfig
 			info.Inner_AddHostInfo()     // 添加 hostinfo
 
