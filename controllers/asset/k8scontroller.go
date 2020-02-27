@@ -1,6 +1,7 @@
 package asset
 
 import (
+	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/k8s"
@@ -14,7 +15,7 @@ type K8SController struct {
 // @Title GetClusters
 // @Description Get Cluster List
 // @Param token header string true "authToken"
-// @Param name query string "" false "name"
+// @Param body body k8s.Cluster false "集群"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
@@ -23,7 +24,7 @@ func (this *K8SController) GetClusters() {
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 	cluster := new(k8s.Cluster)
-	cluster.Name = this.GetString("name")
+	json.Unmarshal(this.Ctx.Input.RequestBody, &cluster)
 	this.Data["json"] = cluster.List(from, limit)
 	this.ServeJSON(false)
 
@@ -74,8 +75,7 @@ func (this *K8SController) GetPods() {
 // @Param token header string true "authToken"
 // @Param nsName path string "" true "namespaceName"
 // @Param podId path string "" true "podId"
-// @Param name query string "" false "containerName"
-// @Param imageName query string "" false "imageName"
+// @Param body body models.ContainerConfig false "容器配置信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
@@ -83,16 +83,13 @@ func (this *K8SController) GetPods() {
 func (this *K8SController) GetContainerConfig() {
 	nsName := this.GetString(":nsName")
 	podId := this.GetString(":podId")
-	imageName := this.GetString("imageName")
-	name := this.GetString("name")
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 
 	containerConfig := new(models.ContainerConfig)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &containerConfig)
 	containerConfig.NameSpaceName = nsName
 	containerConfig.PodId = podId
-	containerConfig.Name = name
-	containerConfig.ImageName = imageName
 	this.Data["json"] = containerConfig.List(from, limit)
 	this.ServeJSON(false)
 
@@ -102,19 +99,18 @@ func (this *K8SController) GetContainerConfig() {
 // @Description Get Container CmdHistory  List
 // @Param token header string true "authToken"
 // @Param containerId path string "" true "containerId"
-// @Param command query string "" false "command"
+// @Param body body models.CmdHistory false "主机命令历史"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router /containers/:containerId/cmdhistorys [post]
 func (this *K8SController) GetContainerCmdHistorys() {
 	containerId := this.GetString(":containerId")
-	command := this.GetString("command")
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 
 	cmdHistory := new(models.CmdHistory)
-	cmdHistory.Command = command
+	json.Unmarshal(this.Ctx.Input.RequestBody, &cmdHistory)
 	cmdHistory.ContainerId = containerId
 	cmdHistory.Type = 1
 	this.Data["json"] = cmdHistory.List(from, limit)
