@@ -25,6 +25,8 @@ type BenchMarkLog struct {
 	PassCount     string `orm:"description(检查通过个数)"`
 	InfoCount     string `orm:"description(检查提示个数)"`
 	RawLog        string `orm:"description(结果原始内容)"`
+	Type          string `orm:"description(分类)"`
+	Result        string `orm:"description(测试结果)"`
 }
 
 func init() {

@@ -68,12 +68,17 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 		updateHostConfig.IsInK8s = this.IsInK8s
 		updateHostConfig.OS = this.OS
 		updateHostConfig.Status = this.Status
-
 		resilt := updateHostConfig.Update()
 		if resilt.Code != http.StatusOK {
 			return errors.New(resilt.Message)
 		}
 	} else {
+		// 填写默认数据
+		this.Group = "未分组"
+		this.DissStatus = 0 // running
+		this.Diss = 0       // 已安装
+		this.Status = 0     // running
+		this.PG = "sys-default"
 		// 插入数据
 		_, err = o.Insert(this)
 		if err != nil {
