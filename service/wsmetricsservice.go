@@ -198,8 +198,10 @@ func (wsmh *WSMetricsService) Save() error {
 		if size != 0 {
 			cmdHistoryList.List[0].Delete()
 		}
-		if result := cmdHistoryList.MultiAdd(); result.Code != http.StatusOK {
-			return errors.New(result.Message)
+		for _, cmdHistory := range cmdHistoryList.List {
+			if result := cmdHistory.Add(); result.Code != http.StatusOK {
+				return errors.New(result.Message)
+			}
 		}
 	case models.Tag_ContainerCmdHistory:
 		cmdHistoryList := models.CmdHistoryList{}
@@ -216,8 +218,10 @@ func (wsmh *WSMetricsService) Save() error {
 		if size != 0 {
 			cmdHistoryList.List[0].Delete()
 		}
-		if result := cmdHistoryList.MultiAdd(); result.Code != http.StatusOK {
-			return errors.New(result.Message)
+		for _, cmdHistory := range cmdHistoryList.List {
+			if result := cmdHistory.Add(); result.Code != http.StatusOK {
+				return errors.New(result.Message)
+			}
 		}
 	}
 
