@@ -232,13 +232,13 @@ func (this *K8STaskHandler) SyncPodContainerConfigAndInfo() {
 						createTime, _ := time.Parse(time.RFC3339Nano, startTime)
 						created := now.Sub(createTime)
 
-						status := "Running"
+						//动态的回去容器状态
+						status := models.Pod_Container_Statue_Running
 						if c.State.Terminated != nil {
-							status = "Terminated"
+							status = models.Pod_Container_Statue_Terminated
 						}
-
 						if c.State.Waiting != nil {
-							status = "Waiting"
+							status = models.Pod_Container_Statue_Waiting
 						}
 
 						//同步 containerconfig
