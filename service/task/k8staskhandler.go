@@ -324,8 +324,8 @@ func SyncAll() {
 				// 单独同步 hostinfo
 				//this.SyncHostInfo(c.Name)
 
-				// 同步HostImageConfig
-				this.SyncHostImageConfig()
+				// 同步HostImageConfig（无法通过k8s采集镜像的详细信息 imageconfig & imageinfo 均由agent采集）
+				//this.SyncHostImageConfig()
 
 				// 同步 namespace 下的 pod
 				this.SyncNamespacePod()
