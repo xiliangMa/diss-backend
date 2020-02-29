@@ -93,8 +93,8 @@ func (wsmh *WSMetricsService) Save() error {
 			return err
 		}
 		size := len(hostPsList)
-		logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", hostPsList[0].HostId, models.Tag_HostPs, size)
 		if size != 0 {
+			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", hostPsList[0].HostId, models.Tag_HostPs, size)
 			data := hostPsList[0].ListById().Data.(map[string]interface{})
 			if data["total"] != 0 {
 				for _, v := range data["items"].([]*models.HostPs) {
@@ -127,7 +127,10 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
-		logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerTopList[0].HostId, models.Tag_ContainerTop, len(containerTopList))
+		size := len(containerTopList)
+		if size != 0 {
+			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerTopList[0].HostId, models.Tag_ContainerTop, len(containerTopList))
+		}
 		for _, containerTop := range containerTopList {
 			if result := containerTop.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
@@ -193,11 +196,10 @@ func (wsmh *WSMetricsService) Save() error {
 		size := len(cmdHistoryList.List)
 		if size != 0 {
 			logs.Info("############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Tag_HostCmdHistory, size)
-		}
-		// 删除 host_id 下所有的记录
-		if size != 0 {
+			// 删除 host_id 下所有的记录
 			cmdHistoryList.List[0].Delete()
 		}
+
 		for _, cmdHistory := range cmdHistoryList.List {
 			if result := cmdHistory.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
@@ -212,10 +214,8 @@ func (wsmh *WSMetricsService) Save() error {
 		}
 		size := len(cmdHistoryList.List)
 		if size != 0 {
-			logs.Info("############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Tag_ContainerCmdHistory, size)
-		}
-		// 删除 容器下的 下所有的记录
-		if size != 0 {
+			logs.Info("############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Tag_HostCmdHistory, size)
+			// 删除 host_id 下所有的记录
 			cmdHistoryList.List[0].Delete()
 		}
 		for _, cmdHistory := range cmdHistoryList.List {
