@@ -9,12 +9,13 @@ import (
 )
 
 type ContainerTop struct {
-	Id      string `orm:"pk;description(主机id)"`
-	HostId  string `orm:"description(主机Id)"`
-	PID     string `orm:"description(PID)"`
-	User    string `orm:"description(用户)"`
-	Time    string `orm:"description(时间)"`
-	Command string `orm:"description(命令)"`
+	Id          string `orm:"pk;description(容器 top id)"`
+	HostId      string `orm:"description(主机Id)"`
+	ContainerId string `orm:"description(容器id)"`
+	PID         string `orm:"description(PID)"`
+	User        string `orm:"description(用户)"`
+	Time        string `orm:"description(时间)"`
+	Command     string `orm:"description(命令)"`
 }
 
 func init() {
@@ -78,7 +79,7 @@ func (this *ContainerTop) List(from, limit int) Result {
 
 	cond := orm.NewCondition()
 	if this.Id != "" {
-		cond = cond.And("id", this.Id)
+		cond = cond.And("container_id", this.ContainerId)
 	}
 	if this.Command != "" {
 		cond = cond.And("command__icontains", this.Command)
@@ -126,7 +127,14 @@ func (this *ContainerTop) Delete() Result {
 	o := orm.NewOrm()
 	o.Using("default")
 	var ResultData Result
-	_, err := o.Delete(&ContainerTop{Id: this.Id})
+
+	cond := orm.NewCondition()
+
+	if this.ContainerId != "" {
+		cond = cond.And("container_id", this.ContainerId)
+	}
+	_, err := o.QueryTable(utils.ContainerTop).SetCond(cond).Delete()
+
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteContainerTopErr

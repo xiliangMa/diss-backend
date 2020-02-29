@@ -134,7 +134,7 @@ func (this *K8SController) GetContainerTop() {
 
 	containerTop := new(models.ContainerTop)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &containerTop)
-	containerTop.Id = containerId
+	containerTop.ContainerId = containerId
 	this.Data["json"] = containerTop.List(from, limit)
 	this.ServeJSON(false)
 

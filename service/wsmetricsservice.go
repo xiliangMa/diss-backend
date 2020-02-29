@@ -128,9 +128,13 @@ func (wsmh *WSMetricsService) Save() error {
 			return err
 		}
 		size := len(containerTopList)
+
 		if size != 0 {
 			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerTopList[0].HostId, models.Tag_ContainerTop, len(containerTopList))
+			// 删除该容器下所有的记录
+			containerTopList[0].Delete()
 		}
+
 		for _, containerTop := range containerTopList {
 			if result := containerTop.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
@@ -196,7 +200,7 @@ func (wsmh *WSMetricsService) Save() error {
 		size := len(cmdHistoryList.List)
 		if size != 0 {
 			logs.Info("############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Tag_HostCmdHistory, size)
-			// 删除 host_id 下所有的记录
+			// 删除该主机下所有的记录
 			cmdHistoryList.List[0].Delete()
 		}
 
@@ -215,7 +219,7 @@ func (wsmh *WSMetricsService) Save() error {
 		size := len(cmdHistoryList.List)
 		if size != 0 {
 			logs.Info("############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Tag_HostCmdHistory, size)
-			// 删除 host_id 下所有的记录
+			// 删除该主机下所有的记录
 			cmdHistoryList.List[0].Delete()
 		}
 		for _, cmdHistory := range cmdHistoryList.List {
