@@ -232,7 +232,14 @@ func (this *K8STaskHandler) SyncPodContainerConfigAndInfo() {
 						createTime, _ := time.Parse(time.RFC3339Nano, startTime)
 						created := now.Sub(createTime)
 
-						status := c.State.String() // 动态数据随时变化
+						status := "Running"
+						if c.State.Terminated != nil {
+							status = "Terminated"
+						}
+
+						if c.State.Waiting != nil {
+							status = "Waiting"
+						}
 
 						//同步 containerconfig
 						ccob := new(models.ContainerConfig)
