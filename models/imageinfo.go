@@ -13,6 +13,7 @@ type ImageInfo struct {
 	ImageId     string `orm:"description(镜像id)"`
 	Name        string `orm:"description(镜像名)"`
 	HostId      string `orm:"description(主机id)"`
+	HostName    string `orm:"description(主机名称)"`
 	RepoTags    string `orm:"description(RepoTags)"`
 	RepoDigests string `orm:"description(RepoDigests)"`
 	Os          string `orm:"description(系统)"`
@@ -97,6 +98,12 @@ func (this *ImageInfo) List() Result {
 	}
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
+	}
+	if this.Name != "" {
+		cond = cond.And("name", this.Name)
+	}
+	if this.HostName != "" {
+		cond = cond.And("host_name", this.HostName)
 	}
 
 	_, err = o.QueryTable(utils.ImageInfo).SetCond(cond).All(&imageList)

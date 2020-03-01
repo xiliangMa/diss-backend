@@ -12,6 +12,7 @@ type ImageConfig struct {
 	Id         string    `orm:"pk;description(镜像id   k8s拿不到镜像id, 用主机id+镜像名称填充)"`
 	ImageId    string    `orm:"description(镜像id)"`
 	HostId     string    `orm:"description(主机id)"`
+	HostName   string    `orm:"description(主机名称)"`
 	Name       string    `orm:"description(镜像名)"`
 	Size       string    `orm:"description(大小)"`
 	OS         string    `orm:"description(镜像名)"`

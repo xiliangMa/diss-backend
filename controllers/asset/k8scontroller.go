@@ -139,3 +139,23 @@ func (this *K8SController) GetContainerTop() {
 	this.ServeJSON(false)
 
 }
+
+// @Title ContainerImageInfo
+// @Description Get ContainerImage Info
+// @Param token header string true "authToken"
+// @Param hostName path string "" true "hostName"
+// @Param imageName path string "" true "imageName"
+// @Success 200 {object} models.Result
+// @router /:hostName/images/:imageName [post]
+func (this *K8SController) GetContainerImageInfo() {
+	hostName := this.GetString(":hostName")
+	imageName := this.GetString(":imageName")
+
+	imageInfo := new(models.ImageInfo)
+	imageInfo.HostName = hostName
+	imageInfo.Name = imageName
+
+	this.Data["json"] = imageInfo.List()
+	this.ServeJSON(false)
+
+}
