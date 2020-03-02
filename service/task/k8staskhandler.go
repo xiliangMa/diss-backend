@@ -251,6 +251,7 @@ func (this *K8STaskHandler) SyncPodContainerConfigAndInfo() {
 						ccob.ImageName = imageName
 						ccob.HostName = hostName
 						ccob.Status = status
+						ccob.Age = "Up " + created.String()
 						ccob.CreateTime = startTime
 						ccob.UpdateTime = startTime
 
