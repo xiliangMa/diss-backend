@@ -78,7 +78,7 @@ func (this *ContainerTop) List(from, limit int) Result {
 	var err error
 
 	cond := orm.NewCondition()
-	if this.Id != "" {
+	if this.ContainerId != "" {
 		cond = cond.And("container_id", this.ContainerId)
 	}
 	if this.Command != "" {
