@@ -141,19 +141,18 @@ func (this *K8SController) GetContainerTop() {
 }
 
 // @Title ContainerImageInfo
-// @Description Get ContainerImage Info
+// @Description Get ContainerImage Info  （根据当前 pod 下容器的 主机名 + 容器名获取 镜像详细信息）
 // @Param token header string true "authToken"
 // @Param hostName path string "" true "hostName"
-// @Param imageName path string "" true "imageName"
+// @Param body body models.ImageInfo false "容器详细信息"
 // @Success 200 {object} models.Result
-// @router /:hostName/images/:imageName [post]
+// @router /:hostName/imageinfo [post]
 func (this *K8SController) GetContainerImageInfo() {
 	hostName := this.GetString(":hostName")
-	imageName := this.GetString(":imageName")
 
 	imageInfo := new(models.ImageInfo)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &imageInfo)
 	imageInfo.HostName = hostName
-	imageInfo.Name = imageName
 
 	this.Data["json"] = imageInfo.List()
 	this.ServeJSON(false)
