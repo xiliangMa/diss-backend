@@ -119,12 +119,11 @@ func (this *CmdHistory) Delete() Result {
 	var ResultData Result
 	cond := orm.NewCondition()
 
+	cond = cond.And("type", this.Type)
 	if this.HostId != "" {
 		cond = cond.And("host_id", this.HostId)
 	}
-	if this.ContainerId != "" {
-		cond = cond.And("container_id", this.ContainerId)
-	}
+
 	_, err := o.QueryTable(utils.CmdHistory).SetCond(cond).Delete()
 
 	if err != nil {

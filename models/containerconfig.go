@@ -40,14 +40,14 @@ func (this *ContainerConfig) Add() Result {
 	o.Using("default")
 	var ResultData Result
 	var err error
-	var containerConfiggList []*ContainerConfig
+	var containerConfigList []*ContainerConfig
 
 	cond := orm.NewCondition()
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
 
-	_, err = o.QueryTable(utils.ContainerConfig).SetCond(cond).All(&containerConfiggList)
+	_, err = o.QueryTable(utils.ContainerConfig).SetCond(cond).All(&containerConfigList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetContainerConfigErr
@@ -55,7 +55,7 @@ func (this *ContainerConfig) Add() Result {
 		return ResultData
 	}
 
-	if len(containerConfiggList) != 0 {
+	if len(containerConfigList) != 0 {
 		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接更新）
 		return this.Update()
 	} else {

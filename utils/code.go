@@ -37,16 +37,17 @@ var (
 	EditContainerInfoErr    = 43
 	DeleteHostPsErr         = 44
 	DeleteContainerInfoErr  = 45
-	GetContainerPsErr      = 46
-	AddContainerPsErr      = 47
-	EditContainerPsErr     = 48
-	DeleteContainerPsErr   = 49
+	GetContainerPsErr       = 46
+	AddContainerPsErr       = 47
+	EditContainerPsErr      = 48
+	DeleteContainerPsErr    = 49
 	AddImageInfoErr         = 50
 	GetImageInfoErr         = 51
 	GetCmdHistoryErr        = 52
 	AddCmdHistoryErr        = 53
 	DeleteCmdHistoryErr     = 54
 	DeleteImageInfoErr      = 55
+	DeleteImageConfigErr    = 56
 
 	//system
 	CheckK8sFilePostErr         = 60

@@ -50,9 +50,6 @@ func (this *ImageConfig) Add() Result {
 	if this.Name != "" {
 		cond = cond.And("name", this.Name)
 	}
-	if this.Id != "" {
-		cond = cond.And("id", this.Id)
-	}
 	_, err = o.QueryTable(utils.ImageConfig).SetCond(cond).All(&imageConfigList)
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -137,5 +134,27 @@ func (this *ImageConfig) Update() Result {
 	}
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
+	return ResultData
+}
+
+func (this *ImageConfig) Delete() Result {
+	o := orm.NewOrm()
+	o.Using("default")
+	var ResultData Result
+	cond := orm.NewCondition()
+
+	// 根据agent同步时 依据 host_id 删除该主机上所有的容器历史记录
+	if this.HostId != "" {
+		cond = cond.And("host_id", this.HostId)
+	}
+	_, err := o.QueryTable(utils.ImageConfig).SetCond(cond).Delete()
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteImageInfoErr
+		logs.Error("Delete ImageConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
 	return ResultData
 }

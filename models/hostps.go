@@ -31,7 +31,6 @@ type HostPsInterface interface {
 	Edit()
 	Get()
 	List()
-	ListById()
 }
 
 func (this *HostPs) List(from, limit int) Result {
@@ -103,7 +102,14 @@ func (this *HostPs) Delete() Result {
 	o := orm.NewOrm()
 	o.Using("default")
 	var ResultData Result
-	_, err := o.Delete(&HostPs{Id: this.Id, HostId: this.HostId})
+	cond := orm.NewCondition()
+
+	// 根据agent同步时 依据 host_id 删除该主机上所有的容器历史记录
+	if this.HostId != "" {
+		cond = cond.And("host_id", this.HostId)
+	}
+	_, err := o.QueryTable(utils.HostPs).SetCond(cond).Delete()
+
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteHostPsErr
@@ -111,35 +117,5 @@ func (this *HostPs) Delete() Result {
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK
-	return ResultData
-}
-
-func (this *HostPs) ListById() Result {
-	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
-	o.Using("default")
-	var hostPsList []*HostPs = nil
-	var ResultData Result
-	cond := orm.NewCondition()
-	if this.HostId != "" {
-		cond = cond.And("host_id", this.HostId)
-	}
-
-	_, err := o.QueryTable(utils.HostPs).SetCond(cond).All(&hostPsList)
-
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetHostPsErr
-		logs.Error("GetHostPs List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-
-	total, _ := o.QueryTable(utils.HostPs).Count()
-	data := make(map[string]interface{})
-	data["items"] = hostPsList
-	data["total"] = total
-
-	ResultData.Code = http.StatusOK
-	ResultData.Data = data
 	return ResultData
 }

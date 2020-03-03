@@ -58,7 +58,19 @@ func (wsmh *WSMetricsService) Save() error {
 				return errors.New(result.Message)
 			}
 		}
-
+	case models.Tag_ContainerInfo:
+		containerInfoList := []models.ContainerInfo{}
+		s, _ := json.Marshal(ms.Metric)
+		if err := json.Unmarshal(s, &containerInfoList); err != nil {
+			logs.Error("Paraces %s error %s", ms.ResTag, err)
+			return err
+		}
+		logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerInfoList[0].HostId, models.Tag_ContainerInfo, len(containerInfoList))
+		for _, containerInfo := range containerInfoList {
+			if result := containerInfo.Add(); result.Code != http.StatusOK {
+				return errors.New(result.Message)
+			}
+		}
 	case models.Tag_ImageConfig:
 		imageConfigList := []models.ImageConfig{}
 		s, _ := json.Marshal(ms.Metric)
@@ -66,7 +78,13 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
-		logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageConfigList[0].HostId, models.Tag_ImageConfig, len(imageConfigList))
+		size := len(imageConfigList)
+		if size != 0 {
+			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageConfigList[0].HostId, models.Tag_ImageConfig, len(imageConfigList))
+			//删除主机下的所有imageconfig
+			//imageConfigList[0].Delete()
+		}
+
 		for _, imageConfig := range imageConfigList {
 			if result := imageConfig.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
@@ -79,7 +97,12 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
-		logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageInfoList[0].HostId, models.Tag_ImageInfo, len(imageInfoList))
+		size := len(imageInfoList)
+		if size != 0 {
+			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageInfoList[0].HostId, models.Tag_ImageInfo, len(imageInfoList))
+			//删除主机下的所有imageginfo
+			imageInfoList[0].Delete()
+		}
 		for _, imageInfo := range imageInfoList {
 			if result := imageInfo.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
@@ -95,28 +118,12 @@ func (wsmh *WSMetricsService) Save() error {
 		size := len(hostPsList)
 		if size != 0 {
 			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", hostPsList[0].HostId, models.Tag_HostPs, size)
-			data := hostPsList[0].ListById().Data.(map[string]interface{})
-			if data["total"] != 0 {
-				for _, v := range data["items"].([]*models.HostPs) {
-					v.Delete()
-				}
-			}
+			// 删除该主机下所有的进程
+			hostPsList[0].Delete()
+
 		}
 		for _, hostPs := range hostPsList {
 			if result := hostPs.Add(); result.Code != http.StatusOK {
-				return errors.New(result.Message)
-			}
-		}
-	case models.Tag_ContainerInfo:
-		containerInfoList := []models.ContainerInfo{}
-		s, _ := json.Marshal(ms.Metric)
-		if err := json.Unmarshal(s, &containerInfoList); err != nil {
-			logs.Error("Paraces %s error %s", ms.ResTag, err)
-			return err
-		}
-		logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerInfoList[0].HostId, models.Tag_ContainerInfo, len(containerInfoList))
-		for _, containerInfo := range containerInfoList {
-			if result := containerInfo.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
 			}
 		}
@@ -131,7 +138,6 @@ func (wsmh *WSMetricsService) Save() error {
 
 		if size != 0 {
 			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerPsList[0].HostId, models.Tag_ContainerPs, len(containerPsList))
-			// 删除该主机下所有容器的所有的记录
 			containerPsList[0].Delete()
 		}
 
@@ -200,7 +206,7 @@ func (wsmh *WSMetricsService) Save() error {
 		size := len(cmdHistoryList.List)
 		if size != 0 {
 			logs.Info("############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Tag_HostCmdHistory, size)
-			// 删除该主机下所有的记录
+			// 删除该主机下所有的记录 type = 0
 			cmdHistoryList.List[0].Delete()
 		}
 
@@ -219,7 +225,7 @@ func (wsmh *WSMetricsService) Save() error {
 		size := len(cmdHistoryList.List)
 		if size != 0 {
 			logs.Info("############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Tag_HostCmdHistory, size)
-			// 删除该主机下所有的记录
+			// 删除该主机下所有的记录 type = 1
 			cmdHistoryList.List[0].Delete()
 		}
 		for _, cmdHistory := range cmdHistoryList.List {

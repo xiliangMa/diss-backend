@@ -39,35 +39,7 @@ func (this *ImageInfo) Add() Result {
 	o.Using("default")
 	var ResultData Result
 	var err error
-	var imageInfoList []*ImageInfo
 
-	cond := orm.NewCondition()
-
-	if this.Id != "" {
-		cond = cond.And("id", this.Id)
-	}
-
-	if this.HostId != "" {
-		cond = cond.And("host_id", this.HostId)
-	}
-	if this.ImageId != "" {
-		cond = cond.And("image_id", this.ImageId)
-	}
-
-	_, err = o.QueryTable(utils.ImageInfo).SetCond(cond).All(&imageInfoList)
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetImageInfoErr
-		logs.Error("Get ImageInfo failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-
-	if len(imageInfoList) != 0 {
-		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接删除在添加）
-		if result := this.Delete(); result.Code != http.StatusOK {
-			return result
-		}
-	}
 	_, err = o.Insert(this)
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -132,7 +104,13 @@ func (this *ImageInfo) Delete() Result {
 	o := orm.NewOrm()
 	o.Using("default")
 	var ResultData Result
-	_, err := o.Delete(&ImageInfo{Id: this.Id})
+	cond := orm.NewCondition()
+
+	// 根据agent同步时 依据 host_id 删除该主机上所有的容器历史记录
+	if this.HostId != "" {
+		cond = cond.And("host_id", this.HostId)
+	}
+	_, err := o.QueryTable(utils.ImageInfo).SetCond(cond).Delete()
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteImageInfoErr
