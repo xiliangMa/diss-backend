@@ -12,7 +12,7 @@ var (
 	ContainerConfig   = "container_config"
 	ContainerInfo     = "container_info"
 	ContainerInspect  = "container_inspect"
-	ContainerTop      = "container_top"
+	ContainerPs      = "container_ps"
 	Task              = "task"
 	BenchMarkTemplate = "bench_mark_template"
 	BenchMarkLog      = "bench_mark_log"

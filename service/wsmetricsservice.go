@@ -120,22 +120,22 @@ func (wsmh *WSMetricsService) Save() error {
 				return errors.New(result.Message)
 			}
 		}
-	case models.Tag_ContainerTop:
-		containerTopList := []models.ContainerTop{}
+	case models.Tag_ContainerPs:
+		containerPsList := []models.ContainerPs{}
 		s, _ := json.Marshal(ms.Metric)
-		if err := json.Unmarshal(s, &containerTopList); err != nil {
+		if err := json.Unmarshal(s, &containerPsList); err != nil {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
-		size := len(containerTopList)
+		size := len(containerPsList)
 
 		if size != 0 {
-			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerTopList[0].HostId, models.Tag_ContainerTop, len(containerTopList))
+			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerPsList[0].HostId, models.Tag_ContainerPs, len(containerPsList))
 			// 删除该容器下所有的记录
-			containerTopList[0].Delete()
+			containerPsList[0].Delete()
 		}
 
-		for _, containerTop := range containerTopList {
+		for _, containerTop := range containerPsList {
 			if result := containerTop.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
 			}

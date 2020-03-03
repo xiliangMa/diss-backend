@@ -8,21 +8,25 @@ import (
 	"time"
 )
 
-type ContainerTop struct {
-	Id          string `orm:"pk;description(容器 top id)"`
-	HostId      string `orm:"description(主机Id)"`
-	ContainerId string `orm:"description(容器id)"`
-	PID         string `orm:"description(PID)"`
-	User        string `orm:"description(用户)"`
-	Time        string `orm:"description(时间)"`
-	Command     string `orm:"description(命令)"`
+type ContainerPs struct {
+	Id          string        `orm:"pk;description(id)"`
+	HostId      string        `orm:"description(主机id)"`
+	PID         string        `orm:"description(PID)"`
+	User        string        `orm:"description(用户)"`
+	ContainerId string        `orm:"description(容器id)"`
+	CPU         string        `orm:"description(CPU)"`
+	Mem         string        `orm:"description(内存)"`
+	Time        string        `orm:"description(时间)"`
+	Start       string        `orm:"description(运行时长 非mac)"`
+	Started     string        `orm:"description(运行时长 mac)"`
+	Command     orm.TextField `orm:"description(Command)"`
 }
 
 func init() {
-	orm.RegisterModel(new(ContainerTop))
+	orm.RegisterModel(new(ContainerPs))
 }
 
-type ContainerTopInterface interface {
+type ContainerPsInterface interface {
 	Add()
 	Delete()
 	Edit()
@@ -30,23 +34,23 @@ type ContainerTopInterface interface {
 	List()
 }
 
-func (this *ContainerTop) Add() Result {
+func (this *ContainerPs) Add() Result {
 	o := orm.NewOrm()
 	o.Using("default")
 	var ResultData Result
 	var err error
-	var containerTopList []*ContainerTop
+	var containerTopList []*ContainerPs
 	cond := orm.NewCondition()
 	cond = cond.And("id", this.Id)
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
 
-	_, err = o.QueryTable(utils.ContainerTop).SetCond(cond).All(&containerTopList)
+	_, err = o.QueryTable(utils.ContainerPs).SetCond(cond).All(&containerTopList)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetContainerTopErr
-		logs.Error("Get ContainerTop failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.GetContainerPsErr
+		logs.Error("Get ContainerPs failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
@@ -59,8 +63,8 @@ func (this *ContainerTop) Add() Result {
 	_, err = o.Insert(this)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.AddContainerTopErr
-		logs.Error("Add ContainerTop failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.AddContainerPsErr
+		logs.Error("Add ContainerPs failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
@@ -69,11 +73,11 @@ func (this *ContainerTop) Add() Result {
 	return ResultData
 }
 
-func (this *ContainerTop) List(from, limit int) Result {
+func (this *ContainerPs) List(from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using("default")
-	var ContainerList []*ContainerTop = nil
+	var ContainerList []*ContainerPs = nil
 	var ResultData Result
 	var err error
 
@@ -84,16 +88,16 @@ func (this *ContainerTop) List(from, limit int) Result {
 	if this.Command != "" {
 		cond = cond.And("command__icontains", this.Command)
 	}
-	_, err = o.QueryTable(utils.ContainerTop).SetCond(cond).Limit(limit, from).All(&ContainerList)
+	_, err = o.QueryTable(utils.ContainerPs).SetCond(cond).Limit(limit, from).All(&ContainerList)
 
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetContainerTopErr
-		logs.Error("Get ContainerTop List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.GetContainerPsErr
+		logs.Error("Get ContainerPs List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.ContainerTop).Count()
+	total, _ := o.QueryTable(utils.ContainerPs).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = ContainerList
@@ -106,7 +110,7 @@ func (this *ContainerTop) List(from, limit int) Result {
 	return ResultData
 }
 
-func (this *ContainerTop) Update() Result {
+func (this *ContainerPs) Update() Result {
 	o := orm.NewOrm()
 	o.Using("default")
 	var ResultData Result
@@ -114,8 +118,8 @@ func (this *ContainerTop) Update() Result {
 	_, err := o.Update(this)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.EditContainerTopErr
-		logs.Error("Update ContainerTop: %s failed, code: %d, err: %s", this.Id, ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.EditContainerPsErr
+		logs.Error("Update ContainerPs: %s failed, code: %d, err: %s", this.Id, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK
@@ -123,7 +127,7 @@ func (this *ContainerTop) Update() Result {
 	return ResultData
 }
 
-func (this *ContainerTop) Delete() Result {
+func (this *ContainerPs) Delete() Result {
 	o := orm.NewOrm()
 	o.Using("default")
 	var ResultData Result
@@ -133,12 +137,12 @@ func (this *ContainerTop) Delete() Result {
 	if this.ContainerId != "" {
 		cond = cond.And("container_id", this.ContainerId)
 	}
-	_, err := o.QueryTable(utils.ContainerTop).SetCond(cond).Delete()
+	_, err := o.QueryTable(utils.ContainerPs).SetCond(cond).Delete()
 
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.DeleteContainerTopErr
-		logs.Error("Delete ContainerTop failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.DeleteContainerPsErr
+		logs.Error("Delete ContainerPs failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK

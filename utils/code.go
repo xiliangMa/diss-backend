@@ -37,10 +37,10 @@ var (
 	EditContainerInfoErr    = 43
 	DeleteHostPsErr         = 44
 	DeleteContainerInfoErr  = 45
-	GetContainerTopErr      = 46
-	AddContainerTopErr      = 47
-	EditContainerTopErr     = 48
-	DeleteContainerTopErr   = 49
+	GetContainerPsErr      = 46
+	AddContainerPsErr      = 47
+	EditContainerPsErr     = 48
+	DeleteContainerPsErr   = 49
 	AddImageInfoErr         = 50
 	GetImageInfoErr         = 51
 	GetCmdHistoryErr        = 52
