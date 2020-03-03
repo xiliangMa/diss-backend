@@ -138,9 +138,9 @@ func (this *ContainerPs) Delete() Result {
 	if this.HostId != "" {
 		cond = cond.And("host_id", this.HostId)
 	}
-	if this.ContainerId != "" {
-		cond = cond.And("container_id", this.ContainerId)
-	}
+	//if this.ContainerId != "" {
+	//	cond = cond.And("container_id", this.ContainerId)
+	//}
 	_, err := o.QueryTable(utils.ContainerPs).SetCond(cond).Delete()
 
 	if err != nil {

@@ -224,7 +224,7 @@ func (wsmh *WSMetricsService) Save() error {
 		}
 		size := len(cmdHistoryList.List)
 		if size != 0 {
-			logs.Info("############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Tag_HostCmdHistory, size)
+			logs.Info("############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Tag_ContainerCmdHistory, size)
 			// 删除该主机下所有的记录 type = 1
 			cmdHistoryList.List[0].Delete()
 		}
