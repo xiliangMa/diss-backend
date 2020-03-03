@@ -131,7 +131,7 @@ func (wsmh *WSMetricsService) Save() error {
 
 		if size != 0 {
 			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerPsList[0].HostId, models.Tag_ContainerPs, len(containerPsList))
-			// 删除该容器下所有的记录
+			// 删除该主机下所有容器的所有的记录
 			containerPsList[0].Delete()
 		}
 

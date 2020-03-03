@@ -134,8 +134,9 @@ func (this *ContainerPs) Delete() Result {
 
 	cond := orm.NewCondition()
 
+	// 根据agent同步时 依据 host_id 删除该主机上所有的容器历史记录
 	if this.ContainerId != "" {
-		cond = cond.And("container_id", this.ContainerId)
+		cond = cond.And("host_id", this.HostId)
 	}
 	_, err := o.QueryTable(utils.ContainerPs).SetCond(cond).Delete()
 
