@@ -32,30 +32,30 @@ func (this *SecurityLogService) GetSecurityLogInfo() models.Result {
 	}
 	index := beego.AppConfig.String("security_log::BenchMarkIndex")
 	//esqueryStr := `{
-	// "size": 1,
-	// "query": {
-	//   "bool": {
-	//     "must":[
-	//         {"match":{"HostId": "` + this.HostId + `"}},
-	//         {"match":{"Id": "` + this.Id + `"}}
-	//     ]
-	//   }
+	//"size": 1,
+	//"query": {
+	// "bool": {
+	//   "must":[
+	//       {"match":{"HostId": "` + this.HostId + `"}},
+	//       {"match":{"Id": "` + this.Id + `"}}
+	//   ]
 	// }
+	//}
 	//}`
-	oHostId := make(map[string]interface{})
-	oHostId["HostId"] = this.HostId
+	//oHostId := make(map[string]interface{})
+	//oHostId["HostId"] = this.HostId
 	oId := make(map[string]interface{})
-	oId["Id"] = this.Id
+	oId["_id"] = this.Id
 
-	mustHostId := make(map[string]interface{})
-	mustHostId["match"] = oHostId
+	//mustHostId := make(map[string]interface{})
+	//mustHostId["match"] = oHostId
 
 	mustId := make(map[string]interface{})
 	mustId["match"] = oId
 
 	var must []map[string]interface{}
 	must = append(must, mustId)
-	must = append(must, mustHostId)
+	//must = append(must, mustHostId)
 
 	esqueryStr := map[string]interface{}{
 		"query": map[string]interface{}{
@@ -71,7 +71,6 @@ func (this *SecurityLogService) GetSecurityLogInfo() models.Result {
 		esClient.Search.WithIndex(index),
 		esClient.Search.WithBody(bytes.NewReader(jsonBody)),
 		esClient.Search.WithTrackTotalHits(true),
-
 		esClient.Search.WithPretty())
 	if err != nil {
 		logs.Error("host msearch error: ", err.Error())
