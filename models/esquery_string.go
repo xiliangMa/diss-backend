@@ -726,7 +726,7 @@ func ESString(queryTag string) string {
 	return QueryDefine[queryTag]
 }
 
-var containerFilterPattern = `,
+var ContainerFilterPattern = `,
 {
 	"bool":
 	{

@@ -1,8 +1,10 @@
 package securitypolicy
 
 import (
+	"encoding/json"
 	"github.com/astaxie/beego"
-	"github.com/xiliangMa/diss-backend/models"
+	msl "github.com/xiliangMa/diss-backend/models/securitylog"
+	ssl "github.com/xiliangMa/diss-backend/service/securitylog"
 )
 
 // Intrude Detect Log api list
@@ -10,29 +12,21 @@ type IntrudeDetectLogController struct {
 	beego.Controller
 }
 
-// @Title GetIntrudeLogList
-// @Description Get IntrudeLog List
+// @Title GetIntrudeDetectLogInfo
+// @Description Get IntrudeDetectLogInfo (查询主机/容器的入侵日志， 主机：targeType = host 容器：targeType = container)
 // @Param token header string true "authToken"
 // @Param hostId path string "" true "hostId"
-// @Param targeType query string "host" true "targeType"
-// @Param containerId query string "" false "containerId"
-////@Param from query int 0 true "from"
-// @Param limit query int 20 true "limit"
-// @Param starTime query string "" true "starTime"
-// @Param toTime query string "" true "toTime"
+// @Param body body securitylog.IntrudeDetectLog false "入侵检测日志信息"
 // @Success 200 {object} models.Result
 // @router /intrudedetect/:hostId [post]
-func (this *IntrudeDetectLogController) GetIntrudeLogList() {
-	startTime := this.GetString("startTime")
-	toTime := this.GetString("toTime")
+func (this *IntrudeDetectLogController) GetIntrudeDetectLogInfo() {
 	hostId := this.GetString(":hostId")
-	targeType := this.GetString("targeType")
-	containerId := this.GetString("containerId")
-	limit := this.GetString("limit")
+	intrudeDetectLog := new(msl.IntrudeDetectLog)
+	intrudeDetectLog.HostId = hostId
+	json.Unmarshal(this.Ctx.Input.RequestBody, &intrudeDetectLog)
+	var securityLogService = ssl.SecurityLogService{nil, intrudeDetectLog}
 
-	intrudelog := models.Internal_IntrudeDetectMetricInfo(hostId, targeType, containerId, startTime, toTime, limit)
-
-	this.Data["json"] = intrudelog
+	this.Data["json"] = securityLogService.GetIntrudeDetectLogInfo()
 	this.ServeJSON(false)
 
 }

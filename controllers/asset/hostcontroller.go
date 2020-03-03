@@ -231,8 +231,8 @@ func (this *HostController) GetHostBenchMarkLogInfo() {
 	benchMarkLog := new(msl.BenchMarkLog)
 	benchMarkLog.HostId = hostId
 	benchMarkLog.Id = bmlId
-	var securityLogService = ssl.SecurityLogService{benchMarkLog}
-	this.Data["json"] = securityLogService.GetSecurityLogInfo()
+	var securityLogService = ssl.SecurityLogService{benchMarkLog, nil}
+	this.Data["json"] = securityLogService.GetHostBenchMarkLogInfo()
 	this.ServeJSON(false)
 
 }
