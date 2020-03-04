@@ -24,6 +24,15 @@ func (this *HostConfig) List(from, limit int) Result {
 	var ResultData Result
 	var err error
 	cond := orm.NewCondition()
+	if this.Diss != -1 {
+		cond = cond.And("diss", this.Diss)
+	}
+	if this.DissStatus != -1 {
+		cond = cond.And("diss_status", this.DissStatus)
+	}
+	if this.Label != "" {
+		cond = cond.And("Label__contains", this.Label)
+	}
 	if this.HostName != "" {
 		cond = cond.And("host_name__contains", this.HostName)
 	}

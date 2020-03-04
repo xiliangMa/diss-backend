@@ -21,6 +21,7 @@ type HostConfig struct {
 	Type       int8   `orm:"default(0);description(类型 服务器: 0 虚拟机: 1)"`
 	IsInK8s    bool   `orm:"default(false);description(是否在k8s集群)"`
 	ClusterId  string `orm:"default(null);description(集群id)"`
+	Label      string `orm:"default(null);description(标签)"`
 }
 
 type HostInfo struct {
