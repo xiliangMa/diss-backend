@@ -160,6 +160,7 @@ func (this *HostController) GetHostContainerConfigList() {
 // @Description Get HostPs List
 // @Param token header string true "authToken"
 // @Param hostId path string "" true "hostId"
+// @Param body body models.HostPs false "主机进程"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
@@ -170,6 +171,7 @@ func (this *HostController) GetHostPsList() {
 	from, _ := this.GetInt("from")
 
 	hostPs := new(models.HostPs)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &hostPs)
 	hostPs.HostId = hostId
 	this.Data["json"] = hostPs.List(from, limit)
 	this.ServeJSON(false)

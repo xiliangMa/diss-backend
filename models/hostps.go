@@ -43,6 +43,9 @@ func (this *HostPs) List(from, limit int) Result {
 	if this.HostId != "" {
 		cond = cond.And("host_id", this.HostId)
 	}
+	if this.Command != "" {
+		cond = cond.And("command__contains", this.Command)
+	}
 
 	_, err := o.QueryTable(utils.HostPs).SetCond(cond).Limit(limit, from).All(&hostPsList)
 
