@@ -82,7 +82,7 @@ func (this *ContainerConfig) List(from, limit int) Result {
 
 	cond := orm.NewCondition()
 	if this.Name != "" {
-		cond = cond.And("name__icontains", this.Name)
+		cond = cond.And("name__contains", this.Name)
 	}
 	if this.HostName != "" {
 		cond = cond.And("host_name", this.HostName)
@@ -95,6 +95,15 @@ func (this *ContainerConfig) List(from, limit int) Result {
 	}
 	if this.PodId != "" {
 		cond = cond.And("pod_id", this.PodId)
+	}
+	if this.Status != "" && this.Status != Container_Status_All {
+		switch this.Status {
+		case Container_Status_Run:
+			cond = cond.AndCond(cond.And("status__contains", "Up").Or("status", Pod_Container_Statue_Running).Or("status", Pod_Container_Statue_Terminated))
+		case Container_Status_Pause:
+			cond = cond.AndNotCond(cond.And("status__contains", "Up").Or("status", Pod_Container_Statue_Running).Or("status", Pod_Container_Statue_Terminated))
+
+		}
 	}
 	_, err = o.QueryTable(utils.ContainerConfig).SetCond(cond).Limit(limit, from).All(&ContainerList)
 
