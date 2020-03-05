@@ -74,7 +74,7 @@ func (this *BenchMarkLog) List(from, limit int) models.Result {
 	if this.BenchMarkName != "" {
 		cond = cond.And("bench_mark_name", this.BenchMarkName)
 	}
-	_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Limit(limit, from).All(&BenchMarkLogList)
+	_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Limit(limit, from).OrderBy("-update_time").All(&BenchMarkLogList)
 
 	if err != nil {
 		ResultData.Message = err.Error()
