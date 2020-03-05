@@ -87,7 +87,7 @@ func (this *ImageInfo) List() Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.ImageInfo).Count()
+	total, _ := o.QueryTable(utils.ImageInfo).SetCond(cond).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = imageList

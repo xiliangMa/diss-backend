@@ -100,7 +100,7 @@ func (this *CmdHistory) List(from, limit int) Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.CmdHistory).Count()
+	total, _ := o.QueryTable(utils.CmdHistory).SetCond(cond).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = imageList

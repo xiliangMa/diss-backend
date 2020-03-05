@@ -75,7 +75,7 @@ func (this *Cluster) List(from, limit int) models.Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.Cluster).Count()
+	total, _ := o.QueryTable(utils.Cluster).SetCond(cond).Count()
 
 	data := make(map[string]interface{})
 	data["total"] = total

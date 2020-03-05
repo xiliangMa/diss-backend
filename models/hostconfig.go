@@ -45,7 +45,7 @@ func (this *HostConfig) List(from, limit int) Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.HostConfig).Count()
+	total, _ := o.QueryTable(utils.HostConfig).SetCond(cond).Count()
 	data := make(map[string]interface{})
 	data["items"] = HostConfigList
 	data["total"] = total

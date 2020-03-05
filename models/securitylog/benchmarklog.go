@@ -83,7 +83,7 @@ func (this *BenchMarkLog) List(from, limit int) models.Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.BenchMarkLog).Count()
+	total, _ := o.QueryTable(utils.BenchMarkLog).SetCond(cond).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = BenchMarkLogList

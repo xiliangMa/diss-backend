@@ -99,7 +99,7 @@ func (this *NameSpace) List(from, limit int) models.Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.NameSpace).Count()
+	total, _ := o.QueryTable(utils.NameSpace).SetCond(cond).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = nameSpaceList

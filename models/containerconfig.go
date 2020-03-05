@@ -114,7 +114,7 @@ func (this *ContainerConfig) List(from, limit int) Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.ContainerConfig).Count()
+	total, _ := o.QueryTable(utils.ContainerConfig).SetCond(cond).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = ContainerList

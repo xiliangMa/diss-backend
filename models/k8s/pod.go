@@ -105,7 +105,7 @@ func (this *Pod) List(from, limit int) models.Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.Pod).Count()
+	total, _ := o.QueryTable(utils.Pod).SetCond(cond).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = PodList

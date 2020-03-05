@@ -38,7 +38,7 @@ func (this *HostInfo) List() Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.HostInfo).Count()
+	total, _ := o.QueryTable(utils.HostInfo).SetCond(cond).Count()
 	data := make(map[string]interface{})
 	data["items"] = HostInfoList
 	data["total"] = total

@@ -56,7 +56,7 @@ func (this *HostPs) List(from, limit int) Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.HostPs).Count()
+	total, _ := o.QueryTable(utils.HostPs).SetCond(cond).Count()
 	data := make(map[string]interface{})
 	data["items"] = hostPsList
 	data["total"] = total
