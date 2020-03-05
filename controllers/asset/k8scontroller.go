@@ -141,7 +141,7 @@ func (this *K8SController) GetContainerPs() {
 }
 
 // @Title ContainerImageInfo
-// @Description Get ContainerImage Info  （根据当前 pod 下容器的 主机名 + 容器名获取 镜像详细信息）
+// @Description Get ContainerImage Info  （根据当前 pod 下容器的 主机名 + 镜像名获取 镜像详细信息）
 // @Param token header string true "authToken"
 // @Param hostName path string "" true "hostName"
 // @Param body body models.ImageInfo false "容器详细信息"
