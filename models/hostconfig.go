@@ -24,10 +24,10 @@ func (this *HostConfig) List(from, limit int) Result {
 	var ResultData Result
 	var err error
 	cond := orm.NewCondition()
-	if this.Diss != -1 {
+	if this.Diss != int8(Diss_All) {
 		cond = cond.And("diss", this.Diss)
 	}
-	if this.DissStatus != -1 {
+	if this.DissStatus != int8(Diss_Status_All) {
 		cond = cond.And("diss_status", this.DissStatus)
 	}
 	if this.Label != "" {
