@@ -30,7 +30,7 @@ type HostInfo struct {
 	InternalAddr  string `orm:"default(null);description(主机ip 内)"`
 	PublicAddr    string `orm:"default(null);description(主机ip 外)"`
 	CpuCore       int64  `orm:"description(cpu)"`
-	Mem           int64  `orm:"description(内存)"`
+	Mem           string `orm:"description(内存)"`
 	Disk          string `orm:"description(磁盘)"`
 	OS            string `orm:"description(系统)"`
 	OSVer         string `orm:"description(系统版本)"`

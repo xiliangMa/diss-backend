@@ -2,6 +2,7 @@ package task
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/k8s"
@@ -52,7 +53,7 @@ func (this *K8STaskHandler) SyncHostConfigAndInfo(clusterName, clusterId string)
 			c, _ := capacity.Cpu().AsInt64()
 			info.CpuCore = c
 			m, _ := capacity.Memory().AsInt64()
-			info.Mem = m / 1024 / 1024 / 1024
+			info.Mem = fmt.Sprintf("%.2f", m/1024/1024/1024)
 			d, _ := capacity.StorageEphemeral().AsInt64()
 			info.Disk = utils.UnitConvert(d)
 			nStatusNodeinfo := n.Status.NodeInfo
@@ -94,7 +95,7 @@ func (this *K8STaskHandler) SyncHostInfo(clusterName string) {
 			c, _ := capacity.Cpu().AsInt64()
 			info.CpuCore = c
 			m, _ := capacity.Memory().AsInt64()
-			info.Mem = m / 1024 / 1024 / 1024
+			info.Mem = fmt.Sprintf("%.2f", m/1024/1024/1024)
 			d, _ := capacity.StorageEphemeral().AsInt64()
 			info.Disk = utils.UnitConvert(d)
 			nStatusNodeinfo := n.Status.NodeInfo
