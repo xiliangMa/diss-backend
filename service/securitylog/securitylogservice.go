@@ -111,7 +111,8 @@ func (this *SecurityLogService) GetIntrudeDetectLogInfo() models.Result {
 		targetType = "host"
 		matchMode = "must_not"
 		if containerid != "" {
-			containerFilterStr = strings.Replace(models.ContainerFilterPattern, "!Param@containerId!", containerid, 1)
+			shortId := string([]byte(containerid)[:12])
+			containerFilterStr = strings.Replace(models.ContainerFilterPattern, "!Param@containerId!", shortId, 1)
 		}
 	}
 
