@@ -96,7 +96,7 @@ func (this *SecurityLogService) GetIntrudeDetectLogInfo() models.Result {
 	containerid := this.IntrudeDetectLog.ContainerId
 	startTime := this.IntrudeDetectLog.StartTime
 	toTime := this.IntrudeDetectLog.ToTime
-	hostId := this.IntrudeDetectLog.HostId
+	hostId := strings.ToLower(this.IntrudeDetectLog.HostId)
 	limit := strconv.Itoa(this.IntrudeDetectLog.Limit)
 
 	esclient, err := utils.GetESClient()
