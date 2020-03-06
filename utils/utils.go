@@ -2,6 +2,15 @@ package utils
 
 import "strconv"
 
+var (
+	//启动模式
+	Run_Mode_Dev  = "dev"
+	Run_Mode_Prod = "prod"
+
+	//数据源
+	DS_Default = "default"
+)
+
 func UnitConvert(size int64) string {
 	//如果字节数少于1024，则直接以B为单位，否则先除于1024，后3位因太少无意义
 	if size < 1024 {

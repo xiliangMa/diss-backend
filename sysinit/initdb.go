@@ -3,55 +3,61 @@ package sysinit
 import (
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/xiliangMa/diss-backend/models"
 	_ "github.com/xiliangMa/diss-backend/models/k8s"
 	_ "github.com/xiliangMa/diss-backend/models/securitylog"
 	_ "github.com/xiliangMa/diss-backend/models/task"
+	"github.com/xiliangMa/diss-backend/utils"
 	"os"
 )
 
 func InitDB() {
 
-	dbType := beego.AppConfig.String("db::Type")
+	runMode := beego.AppConfig.String("RunMode")
+	envRunMode := os.Getenv("RunMode")
+	if envRunMode != "" {
+		runMode = envRunMode
+	}
+	DSAlias := utils.DS_Default
+	// true: drop table 后再建表
+	force, _ := beego.AppConfig.Bool("Force")
 
 	//连接名称
-	dbAlias := beego.AppConfig.String(dbType + "::Alias")
-
+	//dbAlias := beego.AppConfig.String(DS + "::Alias")
 	//数据库名称
-	//dbName := beego.AppConfig.String(dbType + "::Name")
-	dbName := os.Getenv("MYSQL_DATABASE")
-
+	dbName := beego.AppConfig.String(DSAlias + "::Name")
 	//数据库连接用户名
-	//dbUser := beego.AppConfig.String(dbType + "::User")
-	dbUser := os.Getenv("MYSQL_USER")
-
+	dbUser := beego.AppConfig.String(DSAlias + "::User")
 	//数据库连接用户名
-	//dbPwd := beego.AppConfig.String(dbType + "::Pwd")
-	dbPwd := os.Getenv("MYSQL_PASSWORD")
-
+	dbPwd := beego.AppConfig.String(DSAlias + "::Pwd")
 	//数据库IP（域名）
-	//dbHost := beego.AppConfig.String(dbType + "::Host")
-	dbHost := os.Getenv("MYSQL_HOST")
+	dbHost := beego.AppConfig.String(DSAlias + "::Host")
+	//端口
+	port := beego.AppConfig.String(DSAlias + "::Port")
+	// 生产环境
+	if runMode == utils.Run_Mode_Prod {
+		//数据库名称
+		dbName = os.Getenv("MYSQL_DATABASE")
+		//数据库连接用户名
+		dbUser = os.Getenv("MYSQL_USER")
+		//数据库连接用户名
+		dbPwd = os.Getenv("MYSQL_PASSWORD")
+		//数据库IP（域名）
+		dbHost = os.Getenv("MYSQL_HOST")
+	}
 
-	//数据库端口
-	//dbPort := beego.AppConfig.String(dbType + "::Port")
-
-	datasource := fmt.Sprintf("%s%s%s%s%s%s%s%s%s%s", dbUser, ":", dbPwd, "@tcp(", dbHost, ":3306)/", dbName, "?charset=utf8", "&parseTime=true", "&loc=Asia%2FShanghai")
-
-	orm.RegisterDriver("mysql", orm.DRMySQL)
-	orm.RegisterDataBase(dbAlias, "mysql", datasource)
-
-	// local
+	// demo
 	//orm.RegisterDataBase("default", "mysql", "root:abc123@tcp(127.0.0.1:3306)/uranus_local?charset=utf8")
 
-	//如果是开发模式，则显示命令信息
-	isDev := (beego.AppConfig.String("RunMode") == "dev")
+	DS := fmt.Sprintf("%s%s%s%s%s%s%s%s", dbUser, ":", dbPwd, "@tcp(", dbHost, ":"+port+")/", dbName, "?charset=utf8")
 
-	// true: drop table 后再建表
-	force := false
+	orm.RegisterDriver("mysql", orm.DRMySQL)
+	err := orm.RegisterDataBase(DSAlias, "mysql", DS)
+	logs.Error("DB Register fail, DSAlias: %s, Err: %s", DSAlias, err)
 
 	//auto create db
-	orm.RunSyncdb("default", force, isDev)
+	orm.RunSyncdb(DSAlias, force, false)
 }
