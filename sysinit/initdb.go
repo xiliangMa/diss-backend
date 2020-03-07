@@ -56,7 +56,9 @@ func InitDB() {
 
 	orm.RegisterDriver("mysql", orm.DRMySQL)
 	err := orm.RegisterDataBase(DSAlias, "mysql", DS)
-	logs.Error("DB Register fail, DSAlias: %s, Err: %s", DSAlias, err)
+	if err != nil {
+		logs.Error("DB Register fail, DSAlias: %s, Err: %s", DSAlias, err)
+	}
 
 	//auto create db
 	orm.RunSyncdb(DSAlias, force, false)

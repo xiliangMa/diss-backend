@@ -13,9 +13,9 @@ MYSQL_HOST=<DB_IP>
 ```
     
 build:
-
+> CGO_ENABLED=0 (alpine容器无法运行go编译的二进制文件问题解决)
 ```
-go build -o bin/diss-backend
+CGO_ENABLED=0 go build -o bin/diss-backend
 ```
 
 run:
@@ -27,11 +27,12 @@ run:
 ## Run in Docker
 
 build:
- 
+ > CGO_ENABLED=0 (alpine容器无法运行go编译的二进制文件问题解决)
 ```
-go build -o bin/diss-backend
+CGO_ENABLED=0 go build -o bin/diss-backend
+
 macos 系统:
-    GOOS=linux GOARCH=amd64 go build -o bin/diss-backend
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/diss-backend
 ```
  
             
@@ -54,11 +55,12 @@ MYSQL_HOST=diss-db
 run:
 ```
 docker run --name=diss-backend -d \
---env-file  ./diss-backend.env \
+--env-file  ./deploy/diss-backend.env \
+--env-file  ./deploy/diss-backend-db.env \
 -p 8080:8080 \
 -p 10443:10443 \
 -p 8889:8889 \
-diss-backend
+diss-backend:latest
 ```
 
 

@@ -19,8 +19,14 @@ services:
     depends_on:
       - diss-db
     volumes:
-      - /tmp/diss/diss-backend:/diss/diss-backend
-    entrypoint: ["./entrypoint.sh"]
+      - log:/opt/diss-backend/logs
+      # to dev
+#      - ./conf:/opt/diss-backend/conf
+#      - ./swagger:/opt/diss-backend/swagger
+#      - ./bin/diss-backend:/opt/diss-backend/diss-backend
+#      - ./entrypoint.sh:/opt/diss-backend/entrypoint.sh
+    entrypoint:
+      - ./entrypoint.sh
 
   diss-db:
     restart: unless-stopped
@@ -35,5 +41,12 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - /tmp/diss/mysql:/var/lib/mysql
+      - mysql:/var/lib/mysql
       - ./conf/my.cnf:/etc/my.cnf
+#      - /tmp/diss/mysql/log:/var/log/mysql
+#      - /etc/localtime:/etc/localtime:ro
+#      - /etc/timezone:/etc/timezone:ro
+#
+volumes:
+  log:
+  mysql:
