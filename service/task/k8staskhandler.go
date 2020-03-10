@@ -319,7 +319,9 @@ func SyncAll() {
 	if result.Code == http.StatusOK && result.Data != nil {
 		data := result.Data.(map[string]interface{})
 		for _, c := range data["items"].([]*k8s.Cluster) {
-			if c.IsSync == models.Cluster_IsSync && c.Synced == models.Cluster_NoSync {
+			if c.IsSync == models.Cluster_IsSync {
+				c.SyncStatus = models.Cluster_Sync_Status_IN_PROGRESS
+				c.Update()
 				logs.Info("########################################## cluster:  %s, Sync start.", c.Name)
 				// 创建k8s客户端
 				this := NewK8STaskHandler(c.FileName)
@@ -343,8 +345,8 @@ func SyncAll() {
 				this.SyncPodContainerConfigAndInfo()
 
 				logs.Info("Sync end...., cluster name: %s ", c.Name)
-				// 更新初始化状态
-				c.Synced = models.Cluster_Synced
+				// 更新同步时间、状态
+				c.SyncStatus = models.Cluster_Sync_Status_OK
 				c.Update()
 				logs.Info("########################################## cluster:  %s, Sync end.", c.Name)
 			}

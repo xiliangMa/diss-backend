@@ -2,7 +2,9 @@ package models
 
 var (
 	// k8s
-	Cluster_Synced                  = true
+	Cluster_Sync_Status_OK          = 0
+	Cluster_Sync_Status_IN_PROGRESS = 1
+	Cluster_Sync_Status_FAIL        = 2
 	Cluster_IsSync                  = true
 	Cluster_NoSync                  = false
 	Pod_Container_Statue_Running    = "Running"

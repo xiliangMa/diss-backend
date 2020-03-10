@@ -15,9 +15,9 @@ type Cluster struct {
 	FileName   string    `orm:"" description:"(k8s 文件)"`
 	Status     uint8     `orm:"default(0);" description:"(集群状态)"`
 	IsSync     bool      `orm:"default(false);" description:"(是否同步)"`
-	Synced     bool      `orm:"default(false);" description:"(同步状态)"`
+	SyncStatus int       `orm:"default(0);" description:"(同步状态 0 成功 1 同步中 2 失败)"`
 	CreateTime time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
-	UpdateTime time.Time `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
+	UpdateTime time.Time `orm:"auto_now;type(datetime)" description:"(更新时间)"`
 }
 
 func init() {
