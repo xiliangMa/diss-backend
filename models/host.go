@@ -9,18 +9,18 @@ import (
 )
 
 type Host struct {
-	Id           int       `orm:"auto;description(主机id)"`
-	HostLabel    string    `orm:"description(标签)"`
-	HostName     string    `orm:"description(主机名)"`
-	InternalAddr string    `orm:"description(内部访问主机地址，通常为IP)"`
-	PublicAddr   string    `orm:"null; description(外部访问地址，IP或域名)"`
-	HostDesc     string    `orm:"null;description(主机描述)"`
-	State        string    `orm:"null;description(状态)"`
-	CreateTime   time.Time `orm:"description(创建时间);auto_now_add;type(datetime)"`
-	UpdateTime   time.Time `orm:"null;description(更新时间);auto_now;type(datetime)"`
-	CpuKernel    float64   `orm:"null;;description(cpu)"`
-	Mem          float64   `orm:"null;description(内存)"`
-	Disk         float64   `orm:"null;description(磁盘)"`
+	Id           int       `orm:"auto;" description:"(主机id)"`
+	HostLabel    string    `orm:"" description:"(标签)"`
+	HostName     string    `orm:"" description:"(主机名)"`
+	InternalAddr string    `orm:"" description:"(内部访问主机地址，通常为IP)"`
+	PublicAddr   string    `orm:"null;" description:"(外部访问地址，IP或域名)"`
+	HostDesc     string    `orm:"null;" description:"(主机描述)"`
+	State        string    `orm:"null;" description:"(状态)"`
+	CreateTime   time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
+	UpdateTime   time.Time `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
+	CpuKernel    float64   `orm:"null;" description:"(cpu)"`
+	Mem          float64   `orm:"null;" description:"(内存)"`
+	Disk         float64   `orm:"null;" description:"(磁盘)"`
 }
 
 func init() {
@@ -30,7 +30,7 @@ func init() {
 func GetHostList(name, ip string, from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var HostList []*Host
 	var ResultData Result
 
@@ -54,7 +54,7 @@ func GetHostList(name, ip string, from, limit int) Result {
 
 func Internal_GetHost(hostname string) map[string]interface{} {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var host Host
 	data := make(map[string]interface{})
 
@@ -125,11 +125,11 @@ func GetHostWithImage_Processing(hostname string) Result {
 
 func Internal_AddHost(host *Host) Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Insert(host)
-	if err != nil {
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddHostErr
 		logs.Error("AddHost failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -142,7 +142,7 @@ func Internal_AddHost(host *Host) Result {
 
 func Internal_EditHost(host *Host) Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Update(host)
@@ -209,7 +209,7 @@ func AddHost_Processing(h Host, isEdit int) interface{} {
 
 func DeleteHost(id int) Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 	_, err := o.Delete(&Host{Id: id})
 	if err != nil {

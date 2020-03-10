@@ -19,7 +19,7 @@ type HostConfigInterface interface {
 func (this *HostConfig) List(from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var HostConfigList []*HostConfig = nil
 	var ResultData Result
 	var err error
@@ -57,7 +57,7 @@ func (this *HostConfig) List(from, limit int) Result {
 
 func (this *HostConfig) Update() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Update(this)

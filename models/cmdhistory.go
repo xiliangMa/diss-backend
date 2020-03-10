@@ -9,13 +9,13 @@ import (
 )
 
 type CmdHistory struct {
-	Id          string `orm:"pk;description(id)"`
-	HostId      string `orm:"description(主机id)"`
-	ContainerId string `orm:"description(容器id)"`
-	User        string `orm:"description(用户)"`
-	Command     string `orm:"size(2000);description(命令)"`
-	CreateTime  string `orm:"null;description(更新时间)"`
-	Type        int8   `orm:"default(0); description(类型 0 host 1 container)"`
+	Id          string `orm:"pk;" description:"(id)"`
+	HostId      string `orm:"" description:"(主机id)"`
+	ContainerId string `orm:"" description:"(容器id)"`
+	User        string `orm:"" description:"(用户)"`
+	Command     string `orm:"size(2000);" description:"(命令)"`
+	CreateTime  string `orm:"null;d" description:"(更新时间)"`
+	Type        int8   `orm:"default(0);" description:"(类型 0 host 1 container)"`
 }
 
 type CmdHistoryList struct {
@@ -37,11 +37,11 @@ type CmdHistoryInterface interface {
 
 func (this *CmdHistory) Add() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 	var err error
 	_, err = o.Insert(this)
-	if err != nil {
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddCmdHistoryErr
 		logs.Error("Add CmdHistory failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -55,11 +55,11 @@ func (this *CmdHistory) Add() Result {
 
 func (this *CmdHistoryList) MultiAdd() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 	var err error
 	_, err = o.InsertMulti(len(this.List), this.List)
-	if err != nil {
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddCmdHistoryErr
 		logs.Error("Add CmdHistory failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -74,7 +74,7 @@ func (this *CmdHistoryList) MultiAdd() Result {
 func (this *CmdHistory) List(from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var imageList []*CmdHistory
 	var ResultData Result
 	var err error
@@ -115,7 +115,7 @@ func (this *CmdHistory) List(from, limit int) Result {
 
 func (this *CmdHistory) Delete() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 	cond := orm.NewCondition()
 

@@ -19,7 +19,7 @@ type HostInfoInterface interface {
 func (this *HostInfo) List() Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var HostInfoList []*HostInfo = nil
 	var ResultData Result
 	cond := orm.NewCondition()
@@ -50,7 +50,7 @@ func (this *HostInfo) List() Result {
 
 func (this *HostInfo) Update() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Update(this)

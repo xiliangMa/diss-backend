@@ -9,24 +9,24 @@ import (
 )
 
 type ContainerInfo struct {
-	Id            string `orm:"pk;description(id)"`
-	Name          string `orm:"description(名称)"`
-	NameSpaceName string `orm:"description(命名空间)"`
-	PodId         string `orm:"description(Pod Id)"`
-	PodName       string `orm:"description(Pod 名称)"`
-	ImageId       string `orm:"description(imageId)"`
-	ImageName     string `orm:"description(image名称)"`
-	HostId        string `orm:"description(主机id)"`
-	HostName      string `orm:"description(主机名)"`
-	Command       string `orm:"default(null);size(1000);description(命令)"`
-	StartedAt     string `orm:"default(null);description(启动时间)"`
-	CreatedAt     string `orm:"default(null);description(创建时间)"`
-	Status        string `orm:"default(null);size(1000);description(状态)"`
-	Ports         string `orm:"default(null);description(端口)"`
-	Ip            string `orm:"default(null);description(ip)"`
-	Labels        string `orm:"default(null);size(1000);description(标签)"`
-	Volumes       string `orm:"default(null);size(1000);description(Volumes)"`
-	Mounts        string `orm:"default(null);size(1000);description(Mounts)"`
+	Id            string `orm:"pk;" description:"(id)"`
+	Name          string `orm:"" description:"(名称)"`
+	NameSpaceName string `orm:"" description:"(命名空间)"`
+	PodId         string `orm:"" description:"(Pod Id)"`
+	PodName       string `orm:"" description:"(Pod 名称)"`
+	ImageId       string `orm:"" description:"(imageId)"`
+	ImageName     string `orm:"" description:"(image名称)"`
+	HostId        string `orm:"" description:"(主机id)"`
+	HostName      string `orm:"" description:"(主机名)"`
+	Command       string `orm:"default(null);size(1000);" description:"(命令)"`
+	StartedAt     string `orm:"default(null);" description:"(启动时间)"`
+	CreatedAt     string `orm:"default(null);" description:"(创建时间)"`
+	Status        string `orm:"default(null);size(1000);" description:"(状态)"`
+	Ports         string `orm:"default(null);" description:"(端口)"`
+	Ip            string `orm:"default(null);" description:"(ip)"`
+	Labels        string `orm:"default(null);size(1000);" description:"(标签)"`
+	Volumes       string `orm:"default(null);size(1000);" description:"(Volumes)"`
+	Mounts        string `orm:"default(null);size(1000);" description:"(Mounts)"`
 }
 
 func init() {
@@ -43,7 +43,7 @@ type ContainerInfoInterface interface {
 
 func (this *ContainerInfo) Add() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 	var err error
 	var ContainerInfogList []*ContainerInfo
@@ -74,7 +74,7 @@ func (this *ContainerInfo) Add() Result {
 		}
 	}
 	_, err = o.Insert(this)
-	if err != nil {
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddContainerInfoErr
 		logs.Error("Add ContainerInfo failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -89,7 +89,7 @@ func (this *ContainerInfo) Add() Result {
 func (this *ContainerInfo) List() Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ContainerList []*ContainerInfo = nil
 	var ResultData Result
 	var err error
@@ -134,7 +134,7 @@ func (this *ContainerInfo) List() Result {
 
 func (this *ContainerInfo) Update() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -151,7 +151,7 @@ func (this *ContainerInfo) Update() Result {
 
 func (this *ContainerInfo) Delete() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 	_, err := o.Delete(&ContainerInfo{Id: this.Id})
 	if err != nil {

@@ -9,13 +9,13 @@ import (
 )
 
 type BenchMarkTemplate struct {
-	Id          string `orm:"pk;description(基线id)"`
-	Name        string `orm:"description(名称)"`
-	Description string `orm:"description(描述)"`
-	Type        int8   `orm:"description(类型 docker 0  kubernetes 1)"`
-	Path        string `orm:"null;description(模版路径)"`
-	Commands    string `orm:"null;description(操作命令)"`
-	Status      int8   `orm:"default(0);description(类型 停用 0  启用 1)"`
+	Id          string `orm:"pk;" description:"(基线id)"`
+	Name        string `orm:"" description:"(名称)"`
+	Description string `orm:"" description:"(描述)"`
+	Type        int8   `orm:"" description:"(类型 docker 0  kubernetes 1)"`
+	Path        string `orm:"null;" description:"(模版路径)"`
+	Commands    string `orm:"null;" description:"(操作命令)"`
+	Status      int8   `orm:"default(0);" description:"(类型 停用 0  启用 1)"`
 }
 
 func init() {
@@ -32,11 +32,11 @@ type BenchMarkInterface interface {
 
 func (this *BenchMarkTemplate) Add() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Insert(this)
-	if err != nil {
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddBenchMarkTemplateErr
 		logs.Error("Add BenchMarkTemplate failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -50,7 +50,7 @@ func (this *BenchMarkTemplate) Add() Result {
 func (this *BenchMarkTemplate) List(from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var BenchMarkTemplateList []*BenchMarkTemplate
 	var ResultData Result
 	var err error

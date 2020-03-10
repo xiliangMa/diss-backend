@@ -10,23 +10,23 @@ import (
 )
 
 type BenchMarkLog struct {
-	Id            string `orm:"pk;description(基线id)"`
-	BenchMarkName string `orm:"description(基线模版名称)"`
-	Level         string `orm:"description(级别)"`
-	ProjectName   string `orm:"description(测试项目)"`
-	HostName      string `orm:"description(主机名称)"`
-	HostId        string `orm:"description(主机Id)"`
-	InternalAddr  string `orm:"description(主机ip 内)"`
-	PublicAddr    string `orm:"description(主机ip 外)"`
-	OS            string `orm:"description(系统)"`
-	UpdateTime    string `orm:"description(更新时间)"`
-	FailCount     string `orm:"description(检查失败个数)"`
-	WarnCount     string `orm:"description(检查警告个数)"`
-	PassCount     string `orm:"description(检查通过个数)"`
-	InfoCount     string `orm:"description(检查提示个数)"`
-	RawLog        string `orm:"description(结果原始内容)"`
-	Type          string `orm:"description(分类)"`
-	Result        string `orm:"description(测试结果)"`
+	Id            string `orm:"pk;" description:"(基线id)"`
+	BenchMarkName string `orm:"" description:"(基线模版名称)"`
+	Level         string `orm:"" description:"(级别)"`
+	ProjectName   string `orm:"" description:"(测试项目)"`
+	HostName      string `orm:"" description:"(主机名称)"`
+	HostId        string `orm:"" description:"(主机Id)"`
+	InternalAddr  string `orm:"" description:"(主机ip 内)"`
+	PublicAddr    string `orm:"" description:"(主机ip 外)"`
+	OS            string `orm:"" description:"(系统)"`
+	UpdateTime    string `orm:"" description:"(更新时间)"`
+	FailCount     string `orm:"" description:"(检查失败个数)"`
+	WarnCount     string `orm:"" description:"(检查警告个数)"`
+	PassCount     string `orm:"" description:"(检查通过个数)"`
+	InfoCount     string `orm:"" description:"(检查提示个数)"`
+	RawLog        string `orm:"" description:"(结果原始内容)"`
+	Type          string `orm:"" description:"(分类)"`
+	Result        string `orm:"" description:"(测试结果)"`
 }
 
 func init() {
@@ -43,13 +43,13 @@ type BenchMarkLogInterface interface {
 
 func (this *BenchMarkLog) Add() models.Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData models.Result
 	var err error
 
 	this.RawLog = ""
 	_, err = o.Insert(this)
-	if err != nil {
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddBenchMarkLogErr
 		logs.Error("Add BenchMarkLog failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -64,7 +64,7 @@ func (this *BenchMarkLog) Add() models.Result {
 func (this *BenchMarkLog) List(from, limit int) models.Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var BenchMarkLogList []*BenchMarkLog = nil
 	var ResultData models.Result
 	var err error

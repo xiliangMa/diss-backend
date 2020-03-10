@@ -10,9 +10,9 @@ import (
 )
 
 type NameSpace struct {
-	Id        string `orm:"pk;description(命名空间id)"`
-	Name      string `orm:"unique;description(命名空间)"`
-	ClusterId string `orm:"default(null);description(集群id)"`
+	Id        string `orm:"pk;" description:"(命名空间id)"`
+	Name      string `orm:"unique;" description:"(命名空间)"`
+	ClusterId string `orm:"default(null);" description:"(集群id)"`
 }
 
 type NameSpaceInterface interface {
@@ -29,7 +29,7 @@ func init() {
 
 func (this *NameSpace) Add() models.Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData models.Result
 	var nameSpaceList []*NameSpace
 	var err error
@@ -54,7 +54,7 @@ func (this *NameSpace) Add() models.Result {
 		return this.Update()
 	} else {
 		_, err = o.Insert(this)
-		if err != nil {
+		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 			ResultData.Message = err.Error()
 			ResultData.Code = utils.AddNameSpaceErr
 			logs.Error("Add NameSpace failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -70,7 +70,7 @@ func (this *NameSpace) Add() models.Result {
 func (this *NameSpace) List(from, limit int) models.Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var nameSpaceList []*NameSpace
 	var ResultData models.Result
 	var err error
@@ -114,7 +114,7 @@ func (this *NameSpace) List(from, limit int) models.Result {
 
 func (this *NameSpace) Update() models.Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData models.Result
 
 	_, err := o.Update(this)

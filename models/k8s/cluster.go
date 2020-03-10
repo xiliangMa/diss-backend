@@ -10,14 +10,14 @@ import (
 )
 
 type Cluster struct {
-	Id         string    `orm:"pk;description(集群id)"`
-	Name       string    `orm:"unique;description(集群名)"`
-	FileName   string    `orm:"description(k8s 文件)"`
-	Status     uint8     `orm:"default(0);description(集群状态)"`
-	IsSync     bool      `orm:"default(false);description(是否同步)"`
-	Synced     bool      `orm:"default(false);description(同步状态)"`
-	CreateTime time.Time `orm:"description(创建时间);auto_now_add;type(datetime)"`
-	UpdateTime time.Time `orm:"null;description(更新时间);auto_now;type(datetime)"`
+	Id         string    `orm:"pk;" description:"(集群id)"`
+	Name       string    `orm:"unique;" description:"(集群名)"`
+	FileName   string    `orm:"" description:"(k8s 文件)"`
+	Status     uint8     `orm:"default(0);" description:"(集群状态)"`
+	IsSync     bool      `orm:"default(false);" description:"(是否同步)"`
+	Synced     bool      `orm:"default(false);" description:"(同步状态)"`
+	CreateTime time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
+	UpdateTime time.Time `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
 }
 
 func init() {
@@ -34,11 +34,11 @@ type ClusterInterface interface {
 
 func (this *Cluster) Add() models.Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData models.Result
 
 	_, err := o.Insert(this)
-	if err != nil {
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddClusterErr
 		logs.Error("Add Cluster failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -52,7 +52,7 @@ func (this *Cluster) Add() models.Result {
 func (this *Cluster) List(from, limit int) models.Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ClusterList []*Cluster
 	var ResultData models.Result
 	var err error
@@ -91,7 +91,7 @@ func (this *Cluster) List(from, limit int) models.Result {
 
 func (this *Cluster) Update() models.Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData models.Result
 
 	_, err := o.Update(this)

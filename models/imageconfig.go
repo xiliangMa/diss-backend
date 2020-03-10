@@ -9,16 +9,16 @@ import (
 )
 
 type ImageConfig struct {
-	Id         string    `orm:"pk;description(镜像id   k8s拿不到镜像id, 用主机id+镜像名称填充)"`
-	ImageId    string    `orm:"description(镜像id)"`
-	HostId     string    `orm:"description(主机id)"`
-	HostName   string    `orm:"description(主机名称)"`
-	Name       string    `orm:"description(镜像名)"`
-	Size       string    `orm:"description(大小)"`
-	OS         string    `orm:"description(镜像名)"`
-	DissStatus int8      `orm:"description(安全状态)"`
-	Age        string    `orm:"default(null);description(运行时长)"`
-	CreateTime time.Time `orm:"null;description(创建时间);type(datetime)"`
+	Id         string    `orm:"pk;" description:"(镜像id   k8s拿不到镜像id, 用主机id+镜像名称填充)"`
+	ImageId    string    `orm:"" description:"(镜像id)"`
+	HostId     string    `orm:"" description:"(主机id)"`
+	HostName   string    `orm:"" description:"(主机名称)"`
+	Name       string    `orm:"" description:"(镜像名)"`
+	Size       string    `orm:"" description:"(大小)"`
+	OS         string    `orm:"" description:"(镜像名)"`
+	DissStatus int8      `orm:"" description:"(安全状态)"`
+	Age        string    `orm:"default(null);" description:"(运行时长)"`
+	CreateTime time.Time `orm:"null;type(datetime)" description:"(创建时间)"`
 }
 
 func init() {
@@ -35,7 +35,7 @@ type ImageConfigInterface interface {
 
 func (this *ImageConfig) Add() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 	var err error
 	var imageConfigList []*ImageConfig
@@ -51,7 +51,7 @@ func (this *ImageConfig) Add() Result {
 		cond = cond.And("name", this.Name)
 	}
 	_, err = o.QueryTable(utils.ImageConfig).SetCond(cond).All(&imageConfigList)
-	if err != nil {
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetContainerConfigErr
 		logs.Error("Get ContainerConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -79,7 +79,7 @@ func (this *ImageConfig) Add() Result {
 func (this *ImageConfig) List(from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var imageConfigList []*ImageConfig
 	var ResultData Result
 	var err error
@@ -122,7 +122,7 @@ func (this *ImageConfig) List(from, limit int) Result {
 
 func (this *ImageConfig) Update() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -139,7 +139,7 @@ func (this *ImageConfig) Update() Result {
 
 func (this *ImageConfig) Delete() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 	cond := orm.NewCondition()
 

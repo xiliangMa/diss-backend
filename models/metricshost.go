@@ -9,39 +9,39 @@ import (
 )
 
 type HostConfig struct {
-	Id         string `orm:"pk;description(主机id)"`
-	HostName   string `orm:"description(主机名)"`
-	OS         string `orm:"description(系统)"`
-	PG         string `orm:"description(安全策略组)"`
-	Status     int8   `orm:"description(主机状态)"`
-	Diss       int8   `orm:"description(安全容器)"`
-	DissStatus int8   `orm:"description(安全状态)"`
-	TenantId   string `orm:"description(租户id)"`
-	Group      string `orm:"description(分组)"`
-	Type       int8   `orm:"default(0);description(类型 服务器: 0 虚拟机: 1)"`
-	IsInK8s    bool   `orm:"default(false);description(是否在k8s集群)"`
-	ClusterId  string `orm:"default(null);description(集群id)"`
-	Label      string `orm:"default(null);description(标签)"`
+	Id         string `orm:"pk;" description:"(主机id)"`
+	HostName   string `orm:"" description:"(主机名)"`
+	OS         string `orm:"" description:"(系统)"`
+	PG         string `orm:"" description:"(安全策略组)"`
+	Status     int8   `orm:"" description:"(主机状态)"`
+	Diss       int8   `orm:"" description:"(安全容器)"`
+	DissStatus int8   `orm:"" description:"(安全状态)"`
+	TenantId   string `orm:"" description:"(租户id)"`
+	Group      string `orm:"" description:"(分组)"`
+	Type       int8   `orm:"default(0);" description:"(类型 服务器: 0 虚拟机: 1)"`
+	IsInK8s    bool   `orm:"default(false);" description:"(是否在k8s集群)"`
+	ClusterId  string `orm:"default(null);" description:"(集群id)"`
+	Label      string `orm:"default(null);" description:"(标签)"`
 }
 
 type HostInfo struct {
-	Id            string `orm:"pk;description(主机id)"`
-	HostName      string `orm:"description(主机名称)"`
-	InternalAddr  string `orm:"default(null);description(主机ip 内)"`
-	PublicAddr    string `orm:"default(null);description(主机ip 外)"`
-	CpuCore       int64  `orm:"description(cpu)"`
-	Mem           string `orm:"description(内存)"`
-	Disk          string `orm:"description(磁盘)"`
-	OS            string `orm:"description(系统)"`
-	OSVer         string `orm:"description(系统版本)"`
-	Kernel        string `orm:"description(内核)"`
-	Architecture  string `orm:"description(架构)"`
-	Mac           string `orm:"description(mac)"`
-	DockerRuntime string `orm:"description(容器运行时)"`
-	KubernetesVer string `orm:"description(kubernetes 版本)"`
-	KubeletVer    string `orm:"description(kubelet 版本)"`
-	Kubeproxy     string `orm:"description(kubeproxy 版本)"`
-	DockerStatus  string `orm:"default(false);description(容器状态)"`
+	Id            string `orm:"pk;" description:"(主机id)"`
+	HostName      string `orm:"" description:"(主机名称)"`
+	InternalAddr  string `orm:"default(null);" description:"(主机ip 内)"`
+	PublicAddr    string `orm:"default(null);" description:"(主机ip 外)"`
+	CpuCore       int64  `orm:"" description:"(cpu)"`
+	Mem           string `orm:"" description:"(内存)"`
+	Disk          string `orm:"" description:"(磁盘)"`
+	OS            string `orm:"" description:"(系统)"`
+	OSVer         string `orm:"" description:"(系统版本)"`
+	Kernel        string `orm:"" description:"(内核)"`
+	Architecture  string `orm:"" description:"(架构)"`
+	Mac           string `orm:"" description:"(mac)"`
+	DockerRuntime string `orm:"" description:"(容器运行时)"`
+	KubernetesVer string `orm:"" description:"(kubernetes 版本)"`
+	KubeletVer    string `orm:"" description:"(kubelet 版本)"`
+	Kubeproxy     string `orm:"" description:"(kubeproxy 版本)"`
+	DockerStatus  string `orm:"default(false);" description:"(容器状态)"`
 }
 
 func init() {
@@ -50,7 +50,7 @@ func init() {
 
 func (this *HostConfig) Inner_AddHostConfig() error {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var err error
 	var hostConfigList []*HostConfig
 	cond := orm.NewCondition()
@@ -82,7 +82,7 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 		this.PG = "sys-default"
 		// 插入数据
 		_, err = o.Insert(this)
-		if err != nil {
+		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 			logs.Error("DB Metrics data --- Add %s failed, err: %s", Tag_HostConfig, err.Error())
 			return err
 		}
@@ -93,7 +93,7 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 
 func (this *HostInfo) Inner_AddHostInfo() error {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var err error
 	var hostInfoList []*HostInfo
 	cond := orm.NewCondition()
@@ -114,7 +114,7 @@ func (this *HostInfo) Inner_AddHostInfo() error {
 	} else {
 		// 插入数据
 		_, err = o.Insert(this)
-		if err != nil {
+		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 			logs.Error("DB Metrics data --- Add %s failed, err: %s", Tag_HostInfo, err.Error())
 			return err
 		}

@@ -48,3 +48,12 @@ func UnitConvert(size int64) string {
 		return strconv.FormatInt((size/100), 10) + "." + strconv.FormatInt((size%100), 10) + "GB"
 	}
 }
+
+
+func IgnoreLastInsertIdErrForPostgres(err error) error {
+	msg := "LastInsertId is not supported by this driver"
+	if err.Error() == msg {
+		return nil
+	}
+	return err
+}

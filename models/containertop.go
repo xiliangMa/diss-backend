@@ -9,17 +9,17 @@ import (
 )
 
 type ContainerPs struct {
-	Id          string        `orm:"pk;description(id)"`
-	HostId      string        `orm:"description(主机id)"`
-	PID         string        `orm:"description(PID)"`
-	User        string        `orm:"description(用户)"`
-	ContainerId string        `orm:"description(容器id)"`
-	CPU         string        `orm:"description(CPU)"`
-	Mem         string        `orm:"description(内存)"`
-	Time        string        `orm:"description(时间)"`
-	Start       string        `orm:"description(运行时长 非mac)"`
-	Started     string        `orm:"description(运行时长 mac)"`
-	Command     orm.TextField `orm:"description(Command)"`
+	Id          string        `orm:"pk;" description:"(id)"`
+	HostId      string        `orm:"" description:"(主机id)"`
+	PID         string        `orm:"" description:"(PID)"`
+	User        string        `orm:"" description:"(用户)"`
+	ContainerId string        `orm:"" description:"(容器id)"`
+	CPU         string        `orm:"" description:"(CPU)"`
+	Mem         string        `orm:"" description:"(内存)"`
+	Time        string        `orm:"" description:"(时间)"`
+	Start       string        `orm:"" description:"(运行时长 非mac)"`
+	Started     string        `orm:"" description:"(运行时长 mac)"`
+	Command     orm.TextField `orm:"" description:"(Command)"`
 }
 
 func init() {
@@ -36,7 +36,7 @@ type ContainerPsInterface interface {
 
 func (this *ContainerPs) Add() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 	var err error
 	var containerTopList []*ContainerPs
@@ -61,7 +61,7 @@ func (this *ContainerPs) Add() Result {
 		}
 	}
 	_, err = o.Insert(this)
-	if err != nil {
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddContainerPsErr
 		logs.Error("Add ContainerPs failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -76,7 +76,7 @@ func (this *ContainerPs) Add() Result {
 func (this *ContainerPs) List(from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ContainerList []*ContainerPs = nil
 	var ResultData Result
 	var err error
@@ -112,7 +112,7 @@ func (this *ContainerPs) List(from, limit int) Result {
 
 func (this *ContainerPs) Update() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -129,7 +129,7 @@ func (this *ContainerPs) Update() Result {
 
 func (this *ContainerPs) Delete() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	cond := orm.NewCondition()

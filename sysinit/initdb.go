@@ -58,9 +58,12 @@ func InitDB() {
 	orm.RegisterDriver(driver, orm.DRPostgres)
 	err := orm.RegisterDataBase(DSAlias, driver, DS)
 	if err != nil {
-		logs.Error("DB Register fail, DSAlias: %s, Err: %s", DSAlias, err)
+		logs.Error("DB Register fail, >>> DSAlias: %s <<<, Err: %s", DSAlias, err)
 	}
 
 	//auto create db
-	orm.RunSyncdb(DSAlias, force, false)
+	err = orm.RunSyncdb(DSAlias, force, true)
+	if err != nil {
+		logs.Error("Auth Create table fail, >>> DSAlias: %s <<<, Err: %s", DSAlias, err)
+	}
 }

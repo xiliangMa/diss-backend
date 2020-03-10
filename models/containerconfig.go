@@ -9,18 +9,18 @@ import (
 )
 
 type ContainerConfig struct {
-	Id            string `orm:"pk;description(id)"`
-	Name          string `orm:"description(容器名)"`
-	NameSpaceName string `orm:"description(命名空间)"`
-	PodId         string `orm:"description(pod id)"`
-	PodName       string `orm:"description(pod 名)"`
-	HostName      string `orm:"description(主机名)"`
-	Status        string `orm:"default(null);size(1000);description(状态)"`
-	Command       string `orm:"default(null);size(1000);description(命令)"`
-	ImageName     string `orm:"default(null);description(镜像名)"`
-	Age           string `orm:"null;description(运行时长)"`
-	CreateTime    string `orm:"null;description(创建时间);"`
-	UpdateTime    string `orm:"null;description(更新时间);"`
+	Id            string `orm:"pk;" description:"(id)"`
+	Name          string `orm:"" description:"(容器名)"`
+	NameSpaceName string `orm:"" description:"(命名空间)"`
+	PodId         string `orm:"" description:"(pod id)"`
+	PodName       string `orm:"" description:"(pod 名)"`
+	HostName      string `orm:"" description:"(主机名)"`
+	Status        string `orm:"" default(null);size(1000);description:"(状态)"`
+	Command       string `orm:"" default(null);size(1000);description:"(命令)"`
+	ImageName     string `orm:"" default(null);description:"(镜像名)"`
+	Age           string `orm:"null;" description:"(运行时长)"`
+	CreateTime    string `orm:"null;" description:"(创建时间);"`
+	UpdateTime    string `orm:"null;" description:"(更新时间);"`
 }
 
 func init() {
@@ -37,7 +37,7 @@ type ContainerConfigInterface interface {
 
 func (this *ContainerConfig) Add() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 	var err error
 	var containerConfigList []*ContainerConfig
@@ -60,7 +60,7 @@ func (this *ContainerConfig) Add() Result {
 		return this.Update()
 	} else {
 		_, err = o.Insert(this)
-		if err != nil {
+		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 			ResultData.Message = err.Error()
 			ResultData.Code = utils.AddContainerConfigErr
 			logs.Error("Add ContainerConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -75,7 +75,7 @@ func (this *ContainerConfig) Add() Result {
 func (this *ContainerConfig) List(from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ContainerList []*ContainerConfig = nil
 	var ResultData Result
 	var err error
@@ -129,7 +129,7 @@ func (this *ContainerConfig) List(from, limit int) Result {
 
 func (this *ContainerConfig) Update() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Update(this)

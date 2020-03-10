@@ -9,16 +9,16 @@ import (
 )
 
 type HostPs struct {
-	Id      string        `orm:"pk;description(id)"`
-	HostId  string        `orm:"description(主机id)"`
-	PID     string        `orm:"description(PID)"`
-	User    string        `orm:"description(用户)"`
-	CPU     string        `orm:"description(CPU)"`
-	Mem     string        `orm:"description(内存)"`
-	Time    string        `orm:"description(时间)"`
-	Start   string        `orm:"description(运行时长 非mac)"`
-	Started string        `orm:"description(运行时长 mac)"`
-	Command orm.TextField `orm:"description(Command)"`
+	Id      string        `orm:"pk;" description:"(id)"`
+	HostId  string        `orm:"" description:"(主机id)"`
+	PID     string        `orm:"" description:"(PID)"`
+	User    string        `orm:"" description:"(用户)"`
+	CPU     string        `orm:"" description:"(CPU)"`
+	Mem     string        `orm:"" description:"(内存)"`
+	Time    string        `orm:"" description:"(时间)"`
+	Start   string        `orm:"" description:"(运行时长 非mac)"`
+	Started string        `orm:"" description:"(运行时长 mac)"`
+	Command orm.TextField `orm:"" description:"(Command)"`
 }
 
 func init() {
@@ -36,7 +36,7 @@ type HostPsInterface interface {
 func (this *HostPs) List(from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var hostPsList []*HostPs = nil
 	var ResultData Result
 	cond := orm.NewCondition()
@@ -68,11 +68,11 @@ func (this *HostPs) List(from, limit int) Result {
 
 func (this *HostPs) Add() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Insert(this)
-	if err != nil {
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddHostPsErr
 		logs.Error("Add HostPs failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -86,7 +86,7 @@ func (this *HostPs) Add() Result {
 
 func (this *HostPs) Update() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -103,7 +103,7 @@ func (this *HostPs) Update() Result {
 
 func (this *HostPs) Delete() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 	cond := orm.NewCondition()
 

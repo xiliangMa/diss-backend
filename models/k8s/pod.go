@@ -10,15 +10,15 @@ import (
 )
 
 type Pod struct {
-	Id            string `orm:"pk;description(pod id)"`
-	Name          string `orm:"unique;description(集群名)"`
-	PodIp         string `orm:"default(null);description(pod ip)"`
-	Status        string `orm:"description(pod状态)"`
-	GroupId       string `orm:"default(null);description(租户id)"`
-	GroupName     string `orm:"default(null);description(租户名)"`
-	HostIp        string `orm:"default(null);description(主机ip， 默认内网ip)"`
-	HostName      string `orm:"default(null);description(host name)"`
-	NameSpaceName string `orm:"default(null);description(命名空间)"`
+	Id            string `orm:"pk;" description:"(pod id)"`
+	Name          string `orm:"unique;" description:"(集群名)"`
+	PodIp         string `orm:"default(null);" description:"(pod ip)"`
+	Status        string `orm:"" description:"(pod状态)"`
+	GroupId       string `orm:"default(null);" description:"(租户id)"`
+	GroupName     string `orm:"default(null);" description:"(租户名)"`
+	HostIp        string `orm:"default(null);" description:"(主机ip， 默认内网ip)"`
+	HostName      string `orm:"default(null);" description:"(host name)"`
+	NameSpaceName string `orm:"default(null);" description:"(命名空间)"`
 }
 
 type PodInterface interface {
@@ -35,7 +35,7 @@ func init() {
 
 func (this *Pod) Add() models.Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData models.Result
 	var podList []*Pod
 	var err error
@@ -66,7 +66,7 @@ func (this *Pod) Add() models.Result {
 		return updatePod.Update()
 	} else {
 		_, err = o.Insert(this)
-		if err != nil {
+		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 			ResultData.Message = err.Error()
 			ResultData.Code = utils.AddPodErr
 			logs.Error("Add Pod failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -82,7 +82,7 @@ func (this *Pod) Add() models.Result {
 func (this *Pod) List(from, limit int) models.Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var PodList []*Pod = nil
 	var ResultData models.Result
 	var err error
@@ -120,7 +120,7 @@ func (this *Pod) List(from, limit int) models.Result {
 
 func (this *Pod) Update() models.Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData models.Result
 
 	_, err := o.Update(this)

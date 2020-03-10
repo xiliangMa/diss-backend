@@ -9,17 +9,17 @@ import (
 )
 
 type ImageInfo struct {
-	Id          string `orm:"pk;description(数据库主键)"`
-	ImageId     string `orm:"description(镜像id)"`
-	Name        string `orm:"description(镜像名)"`
-	HostId      string `orm:"description(主机id)"`
-	HostName    string `orm:"description(主机名称)"`
-	RepoTags    string `orm:"description(RepoTags)"`
-	RepoDigests string `orm:"description(RepoDigests)"`
-	Os          string `orm:"description(系统)"`
-	Created     string `orm:"description(创建时间)"`
-	Size        string `orm:"description(大小)"`
-	Layers      string `orm:"description(Layers)"`
+	Id          string `orm:"pk;" description:"(数据库主键)"`
+	ImageId     string `orm:"" description:"(镜像id)"`
+	Name        string `orm:"" description:"(镜像名)"`
+	HostId      string `orm:"" description:"(主机id)"`
+	HostName    string `orm:"" description:"(主机名称)"`
+	RepoTags    string `orm:"" description:"(RepoTags)"`
+	RepoDigests string `orm:"" description:"(RepoDigests)"`
+	Os          string `orm:"" description:"(系统)"`
+	Created     string `orm:"" description:"(创建时间)"`
+	Size        string `orm:"" description:"(大小)"`
+	Layers      string `orm:"" description:"(Layers)"`
 }
 
 func init() {
@@ -36,12 +36,12 @@ type ImageInfoInterface interface {
 
 func (this *ImageInfo) Add() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 	var err error
 
 	_, err = o.Insert(this)
-	if err != nil {
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddImageInfoErr
 		logs.Error("Add ImageInfo failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -56,7 +56,7 @@ func (this *ImageInfo) Add() Result {
 func (this *ImageInfo) List() Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var imageList []*ImageInfo
 	var ResultData Result
 	var err error
@@ -102,7 +102,7 @@ func (this *ImageInfo) List() Result {
 
 func (this *ImageInfo) Delete() Result {
 	o := orm.NewOrm()
-	o.Using("default")
+	o.Using(utils.DS_Default)
 	var ResultData Result
 	cond := orm.NewCondition()
 
