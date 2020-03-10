@@ -5,7 +5,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	_ "github.com/xiliangMa/diss-backend/models"
 	_ "github.com/xiliangMa/diss-backend/models/k8s"
 	_ "github.com/xiliangMa/diss-backend/models/securitylog"
@@ -15,7 +15,7 @@ import (
 )
 
 func InitDB() {
-
+	driver := utils.DS_Driver_Postgres
 	runMode := beego.AppConfig.String("RunMode")
 	envRunMode := os.Getenv("RunMode")
 	if envRunMode != "" {
@@ -40,22 +40,23 @@ func InitDB() {
 	// 生产环境
 	if runMode == utils.Run_Mode_Prod {
 		//数据库名称
-		dbName = os.Getenv("MYSQL_DATABASE")
+		dbName = os.Getenv(utils.DS_Default_POSTGRES_DB)
 		//数据库连接用户名
-		dbUser = os.Getenv("MYSQL_USER")
+		dbUser = os.Getenv(utils.DS_Default_POSTGRES_USER)
 		//数据库连接用户名
-		dbPwd = os.Getenv("MYSQL_PASSWORD")
+		dbPwd = os.Getenv(utils.DS_Default_POSTGRES_PASSWORD)
 		//数据库IP（域名）
-		dbHost = os.Getenv("MYSQL_HOST")
+		dbHost = os.Getenv(utils.DS_Default_POSTGRES_HOST)
 	}
 
-	// demo
+	// demo mysql
 	//orm.RegisterDataBase("default", "mysql", "root:abc123@tcp(127.0.0.1:3306)/uranus_local?charset=utf8")
+	//DS := fmt.Sprintf("%s%s%s%s%s%s%s%s", dbUser, ":", dbPwd, "@tcp(", dbHost, ":"+port+")/", dbName, "?charset=utf8")
 
-	DS := fmt.Sprintf("%s%s%s%s%s%s%s%s", dbUser, ":", dbPwd, "@tcp(", dbHost, ":"+port+")/", dbName, "?charset=utf8")
-
-	orm.RegisterDriver("mysql", orm.DRMySQL)
-	err := orm.RegisterDataBase(DSAlias, "mysql", DS)
+	// postgres
+	DS := fmt.Sprintf("%s%s%s%s%s%s", "host="+dbHost, " port="+port, " user="+dbUser, " password="+dbPwd, " dbname="+dbName, " sslmode=disable")
+	orm.RegisterDriver(driver, orm.DRPostgres)
+	err := orm.RegisterDataBase(DSAlias, driver, DS)
 	if err != nil {
 		logs.Error("DB Register fail, DSAlias: %s, Err: %s", DSAlias, err)
 	}

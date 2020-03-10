@@ -3,12 +3,22 @@ package utils
 import "strconv"
 
 var (
+
 	//启动模式
 	Run_Mode_Dev  = "dev"
 	Run_Mode_Prod = "prod"
-
-	//数据源
-	DS_Default = "default"
+	// 数据库 ---- 数据源(和app.config 文件中的必须对应)
+	DS_Default      = "default"
+	DS_Security_Log = "security_log"
+	// 数据库 ----数据库驱动
+	DS_Driver_Mysql    = "mysql"
+	DS_Driver_Postgres = "postgres"
+	// 数据库 ----数据库初始化变量（default postgres）
+	DS_Default_POSTGRES_ROOT_PASSWORD = "POSTGRES_ROOT_PASSWORD"
+	DS_Default_POSTGRES_USER          = "POSTGRES_USER"
+	DS_Default_POSTGRES_PASSWORD      = "POSTGRES_PASSWORD"
+	DS_Default_POSTGRES_DB            = "POSTGRES_DB"
+	DS_Default_POSTGRES_HOST          = "DEFAULT_HOST"
 )
 
 func UnitConvert(size int64) string {
