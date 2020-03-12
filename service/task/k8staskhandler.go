@@ -31,7 +31,7 @@ func (this *K8STaskHandler) SyncHostConfigAndInfo(clusterName, clusterId string)
 		for _, n := range nodes.Items {
 			name := n.ObjectMeta.Name
 			// 同步 hostconfig
-			nodeId := n.Status.NodeInfo.SystemUUID
+			nodeId := strings.ToLower(n.Status.NodeInfo.SystemUUID)
 			config := new(models.HostConfig)
 			config.HostName = name
 			config.Id = nodeId
