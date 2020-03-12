@@ -12,8 +12,8 @@ diss-backend
 logs/*
 swagger/*
 swagger.zip
-routers/commentsRouter_controllers.go
 routers/commentsRouter*
+conf/app.conf
 
 lastupdate.tmp
 mem*
