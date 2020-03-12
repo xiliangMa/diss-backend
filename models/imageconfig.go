@@ -63,7 +63,7 @@ func (this *ImageConfig) Add() Result {
 		return this.Update()
 	} else {
 		_, err = o.Insert(this)
-		if err != nil {
+		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 			ResultData.Message = err.Error()
 			ResultData.Code = utils.AddImageConfigErr
 			logs.Error("Add ImageConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
