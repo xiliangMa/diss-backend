@@ -148,6 +148,6 @@ func (this *ContainerConfig) Update() Result {
 func (this *ContainerConfig) Count() int64 {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	counts, _ := o.QueryTable(utils.ContainerConfig).Count()
-	return counts
+	count, _ := o.QueryTable(utils.ContainerConfig).Count()
+	return count
 }

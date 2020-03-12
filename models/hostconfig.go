@@ -15,6 +15,7 @@ type HostConfigInterface interface {
 	Get()
 	List()
 	Count()
+	BnechMarkProportion()
 }
 
 func (this *HostConfig) List(from, limit int) Result {
@@ -76,6 +77,20 @@ func (this *HostConfig) Update() Result {
 func (this *HostConfig) Count() int64 {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	counts, _ := o.QueryTable(utils.HostConfig).Count()
-	return counts
+	count, _ := o.QueryTable(utils.HostConfig).Count()
+	return count
+}
+
+// docker基线 / k8s 基线
+func (this *HostConfig) BnechMarkProportion() (int64, int64) {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var k8sBenchMarkCount int64
+	count, _ := o.QueryTable(utils.HostConfig).Count()
+	dockerBenchMarkCount, _ := o.QueryTable(utils.HostConfig).Filter("is_in_k8s", false).Count()
+	if count != 0 {
+		k8sBenchMarkCount = count - dockerBenchMarkCount
+		return dockerBenchMarkCount, k8sBenchMarkCount
+	}
+	return 0, 0
 }
