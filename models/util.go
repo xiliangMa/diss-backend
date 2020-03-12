@@ -17,8 +17,8 @@ var (
 	Container_Status_All   = "All"
 
 	// bnech mark
-	Bench_Mark_Type_Docker     = 0
-	Bench_Mark_Type_Kubernetes = 1
+	//Bench_Mark_Type_Docker     = 0
+	//Bench_Mark_Type_Kubernetes = 1
 
 	// 安全容器
 	Diss_All           = -1
@@ -29,4 +29,8 @@ var (
 	Diss_Status_All    = -1
 	Diss_status_Safe   = 0
 	Diss_Status_Unsafe = 1
+
+	//基线日志类型
+	BMLT_Docker = "docker"
+	BMLT_K8s    = "k8s"
 )

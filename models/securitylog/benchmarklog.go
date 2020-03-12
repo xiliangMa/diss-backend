@@ -20,10 +20,10 @@ type BenchMarkLog struct {
 	PublicAddr    string `orm:"" description:"(主机ip 外)"`
 	OS            string `orm:"" description:"(系统)"`
 	UpdateTime    string `orm:"" description:"(更新时间)"`
-	FailCount     string `orm:"" description:"(检查失败个数)"`
-	WarnCount     string `orm:"" description:"(检查警告个数)"`
-	PassCount     string `orm:"" description:"(检查通过个数)"`
-	InfoCount     string `orm:"" description:"(检查提示个数)"`
+	FailCount     int    `orm:"" description:"(检查失败个数)"`
+	WarnCount     int    `orm:"" description:"(检查警告个数)"`
+	PassCount     int    `orm:"" description:"(检查通过个数)"`
+	InfoCount     int    `orm:"" description:"(检查提示个数)"`
 	RawLog        string `orm:"" description:"(结果原始内容)"`
 	Type          string `orm:"" description:"(分类)"`
 	Result        string `orm:"" description:"(测试结果)"`
@@ -39,6 +39,7 @@ type BenchMarkLogInterface interface {
 	Edit()
 	Get()
 	List()
+	GetMarkSummary()
 }
 
 func (this *BenchMarkLog) Add() models.Result {
@@ -93,5 +94,32 @@ func (this *BenchMarkLog) List(from, limit int) models.Result {
 	if total == 0 {
 		ResultData.Data = nil
 	}
+	return ResultData
+}
+
+type MarkSummary struct {
+	FailCount int
+	WarnCount int
+	PassCount int
+	InfoCount int
+}
+
+func (this *BenchMarkLog) GetMarkSummary() models.Result {
+	var ResultData models.Result
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	// docker 基线统计
+	dockerMarkSummary := new(MarkSummary)
+	o.Raw(utils.GetMarkSummarySql(models.BMLT_Docker)).QueryRow(&dockerMarkSummary)
+
+	// k8s 基线统计
+	k8sMarkSummary := new(MarkSummary)
+	o.Raw(utils.GetMarkSummarySql(models.BMLT_K8s)).QueryRow(&k8sMarkSummary)
+
+	data := make(map[string]interface{})
+	data[models.BMLT_Docker] = dockerMarkSummary
+	data[models.BMLT_K8s] = k8sMarkSummary
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
 	return ResultData
 }

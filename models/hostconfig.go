@@ -15,7 +15,7 @@ type HostConfigInterface interface {
 	Get()
 	List()
 	Count()
-	BnechMarkProportion()
+	GetBnechMarkProportion()
 }
 
 func (this *HostConfig) List(from, limit int) Result {
@@ -82,7 +82,7 @@ func (this *HostConfig) Count() int64 {
 }
 
 // docker基线 / k8s 基线
-func (this *HostConfig) BnechMarkProportion() (int64, int64) {
+func (this *HostConfig) GetBnechMarkProportion() (int64, int64) {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var k8sBenchMarkCount int64

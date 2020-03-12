@@ -2,6 +2,7 @@ package statistics
 
 import (
 	"github.com/xiliangMa/diss-backend/models"
+	msecuritylog "github.com/xiliangMa/diss-backend/models/securitylog"
 	"net/http"
 )
 
@@ -34,8 +35,14 @@ func (this *StatisticsService) GetBnechMarkProportionStatistics() models.Result 
 	data := make(map[string]interface{})
 	//docker 基线 / k8s 基线
 	hostConfig := new(models.HostConfig)
-	data["DockerBenchmarkCount"], data["K8sBenchmarkCount"] = hostConfig.BnechMarkProportion()
+	data["DockerBenchmarkCount"], data["K8sBenchmarkCount"] = hostConfig.GetBnechMarkProportion()
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
 	return ResultData
+}
+
+
+func (this *StatisticsService) GetBnechMarkSummaryStatistics() models.Result {
+	bml := new(msecuritylog.BenchMarkLog)
+	return bml.GetMarkSummary()
 }
