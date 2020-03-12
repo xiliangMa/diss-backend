@@ -14,6 +14,7 @@ type HostConfigInterface interface {
 	Edit()
 	Get()
 	List()
+	Count()
 }
 
 func (this *HostConfig) List(from, limit int) Result {
@@ -70,4 +71,11 @@ func (this *HostConfig) Update() Result {
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
+}
+
+func (this *HostConfig) Count() int64 {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	counts, _ := o.QueryTable(utils.HostConfig).Count()
+	return counts
 }

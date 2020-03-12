@@ -33,6 +33,7 @@ type ContainerConfigInterface interface {
 	Edit()
 	Get()
 	List()
+	Count()
 }
 
 func (this *ContainerConfig) Add() Result {
@@ -142,4 +143,11 @@ func (this *ContainerConfig) Update() Result {
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
+}
+
+func (this *ContainerConfig) Count() int64 {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	counts, _ := o.QueryTable(utils.ContainerConfig).Count()
+	return counts
 }

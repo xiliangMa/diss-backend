@@ -12,6 +12,7 @@ import (
 	ca "github.com/xiliangMa/diss-backend/controllers/asset"
 	csl "github.com/xiliangMa/diss-backend/controllers/securitylog"
 	cs "github.com/xiliangMa/diss-backend/controllers/securitypolicy"
+	cstatistics "github.com/xiliangMa/diss-backend/controllers/statistics"
 	css "github.com/xiliangMa/diss-backend/controllers/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -19,6 +20,11 @@ import (
 
 func init() {
 	ns := beego.NewNamespace("/api",
+		beego.NSNamespace("/v1/statistics",
+			beego.NSInclude(
+				&cstatistics.StatisticsController{},
+			),
+		),
 		beego.NSNamespace("/v1/hosts",
 			beego.NSInclude(
 				&controllers.HostController{},
