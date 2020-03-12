@@ -24,15 +24,18 @@ func init() {
 				&controllers.HostController{},
 			),
 		),
+		beego.NSNamespace("/v1/asset/images",
+			beego.NSInclude(
+				&ca.ImageController{},
+			),
+		),
 		beego.NSNamespace("/v1/asset/hosts",
 			beego.NSInclude(
 				&ca.HostController{},
-				//&ca.K8SController{},
 			),
 		),
 		beego.NSNamespace("/v1/asset/k8s",
 			beego.NSInclude(
-				//&ca.HostController{},
 				&ca.K8SController{},
 			),
 		),
