@@ -52,7 +52,10 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
-		logs.Info("############################ Sync agent data, >>>  HostName: %s, Type: %s, Size: %d <<<", containerConfigList[0].HostName, models.Tag_ContainerConfig, len(containerConfigList))
+		size := len(containerConfigList)
+		if size != 0 {
+			logs.Info("############################ Sync agent data, >>>  HostName: %s, Type: %s, Size: %d <<<", containerConfigList[0].HostName, models.Tag_ContainerConfig, len(containerConfigList))
+		}
 		for _, containerConfig := range containerConfigList {
 			if result := containerConfig.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
@@ -65,7 +68,10 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
 			return err
 		}
-		logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerInfoList[0].HostId, models.Tag_ContainerInfo, len(containerInfoList))
+		size := len(containerInfoList)
+		if size != 0 {
+			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerInfoList[0].HostId, models.Tag_ContainerInfo, len(containerInfoList))
+		}
 		for _, containerInfo := range containerInfoList {
 			if result := containerInfo.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
