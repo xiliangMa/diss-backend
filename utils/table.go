@@ -1,6 +1,7 @@
 package utils
 
 var (
+	// default postgres
 	Host              = "host"
 	HostConfig        = "host_config"
 	HostInfo          = "host_info"
@@ -18,4 +19,7 @@ var (
 	BenchMarkLog      = "bench_mark_log"
 	HostPs            = "host_ps"
 	CmdHistory        = "cmd_history"
+
+	//security_log timescaledb
+	DcokerIds = "docker_ids"
 )

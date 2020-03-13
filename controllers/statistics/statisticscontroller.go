@@ -16,7 +16,7 @@ type StatisticsController struct {
 // @Success 200 {object} models.Result
 // @router /asset [post]
 func (this *StatisticsController) GetAssetStatistics() {
-	statisticsService := ss.StatisticsService{nil, nil}
+	statisticsService := ss.StatisticsService{nil, nil, nil}
 	this.Data["json"] = statisticsService.GetAssetStatistics()
 	this.ServeJSON(false)
 
@@ -28,7 +28,7 @@ func (this *StatisticsController) GetAssetStatistics() {
 // @Success 200 {object} models.Result
 // @router /bmp [post]
 func (this *StatisticsController) GetBnechMarkProportionStatistics() {
-	statisticsService := ss.StatisticsService{nil, nil}
+	statisticsService := ss.StatisticsService{nil, nil, nil}
 	this.Data["json"] = statisticsService.GetBnechMarkProportionStatistics()
 	this.ServeJSON(false)
 
@@ -40,7 +40,20 @@ func (this *StatisticsController) GetBnechMarkProportionStatistics() {
 // @Success 200 {object} models.Result
 // @router /bms [post]
 func (this *StatisticsController) GetBnechMarkSummaryStatistics() {
-	statisticsService := ss.StatisticsService{nil, nil}
+	statisticsService := ss.StatisticsService{nil, nil, nil}
 	this.Data["json"] = statisticsService.GetBnechMarkSummaryStatistics()
+	this.ServeJSON(false)
+}
+
+// @Title GetIntrudeDetectLogStatistics
+// @Description Get IntrudeDetect Log Statistics (入侵基线告警)
+// @Param timeCycle query int 24 false "timecycle 时间周期"
+// @Param token header string true "authToken"
+// @Success 200 {object} models.Result
+// @router /idl [post]
+func (this *StatisticsController) GetIntrudeDetectLogStatistics() {
+	timeCycle, _ := this.GetInt("timeCycle")
+	statisticsService := ss.StatisticsService{nil, nil, nil}
+	this.Data["json"] = statisticsService.GetIntrudeDetectLogStatistics(timeCycle)
 	this.ServeJSON(false)
 }

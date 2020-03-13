@@ -49,7 +49,6 @@ func UnitConvert(size int64) string {
 	}
 }
 
-
 func IgnoreLastInsertIdErrForPostgres(err error) error {
 	msg := "LastInsertId is not supported by this driver"
 	if err.Error() == msg {

@@ -6,20 +6,19 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/lib/pq"
-	_ "github.com/xiliangMa/diss-backend/models"
-	"time"
+	_ "github.com/xiliangMa/diss-backend/models/securitylog"
 	"github.com/xiliangMa/diss-backend/utils"
 	"os"
 )
 
-func InitDB() {
+func InitSecurityLogDB() {
 	driver := utils.DS_Driver_Postgres
 	runMode := beego.AppConfig.String("RunMode")
 	envRunMode := os.Getenv("RunMode")
 	if envRunMode != "" {
 		runMode = envRunMode
 	}
-	DSAlias := utils.DS_Default
+	DSAlias := utils.DS_Security_Log
 	// true: drop table 后再建表
 	force, _ := beego.AppConfig.Bool("Force")
 
@@ -59,11 +58,10 @@ func InitDB() {
 		logs.Error("DB Register fail, >>> DSAlias: %s <<<, Err: %s", DSAlias, err)
 	}
 
-	//auto create db
+	// auto create db
 	err = orm.RunSyncdb(DSAlias, force, true)
 	if err != nil {
 		logs.Error("Auth Create table fail, >>> DSAlias: %s <<<, Err: %s", DSAlias, err)
 	}
-	// 设置为 UTC 时间
-	orm.DefaultTimeLoc = time.UTC
+
 }

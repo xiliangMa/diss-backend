@@ -69,4 +69,7 @@ var (
 	//task
 	AddTaskErr = 130
 	GetTaskErr = 131
+
+	// timescaledb 安全日志
+	GetIntrudeDetectLogErr = 200
 )
