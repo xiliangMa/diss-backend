@@ -12,7 +12,7 @@ services:
       - "10443:10443"
       - "8889:8889"
     env_file:
-      - deploy/diss-backend.env
+      - conf/diss-backend.env
       - deploy/diss-backend-db.env
     links:
       - diss-db

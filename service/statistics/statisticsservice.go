@@ -30,7 +30,6 @@ func (this *StatisticsService) GetAssetStatistics() models.Result {
 	return ResultData
 }
 
-
 func (this *StatisticsService) GetBnechMarkProportionStatistics() models.Result {
 	var ResultData models.Result
 	data := make(map[string]interface{})
@@ -41,7 +40,6 @@ func (this *StatisticsService) GetBnechMarkProportionStatistics() models.Result 
 	ResultData.Data = data
 	return ResultData
 }
-
 
 func (this *StatisticsService) GetBnechMarkSummaryStatistics() models.Result {
 	bml := new(msecuritylog.BenchMarkLog)

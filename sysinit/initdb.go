@@ -7,9 +7,9 @@ import (
 	"github.com/astaxie/beego/orm"
 	_ "github.com/lib/pq"
 	_ "github.com/xiliangMa/diss-backend/models"
-	"time"
 	"github.com/xiliangMa/diss-backend/utils"
 	"os"
+	"time"
 )
 
 func InitDB() {
@@ -26,7 +26,7 @@ func InitDB() {
 	//连接名称
 	//dbAlias := beego.AppConfig.String(DS + "::Alias")
 	//数据库名称
-	dbName := beego.AppConfig.String(DSAlias + "::Name")
+	dbName := beego.AppConfig.String(DSAlias + "::DBName")
 	//数据库连接用户名
 	dbUser := beego.AppConfig.String(DSAlias + "::User")
 	//数据库连接用户名
