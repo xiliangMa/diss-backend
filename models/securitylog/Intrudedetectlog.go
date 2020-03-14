@@ -34,9 +34,18 @@ type DcokerIds struct {
 	CreatedAt    int       `description:"(日志保存时间)"`
 }
 
-func init() {
-	orm.RegisterModel(new(DcokerIds))
+type DcokerIdsInterface interface {
+	Add()
+	Delete()
+	Edit()
+	Get()
+	List()
+	GetIntrudeDetectLogStatistics()
 }
+
+//func init() {
+//	orm.RegisterModel(new(DcokerIds))
+//}
 
 func (this *DcokerIds) GetIntrudeDetectLogStatistics(timeCycle int) models.Result {
 	o := orm.NewOrm()
@@ -74,5 +83,55 @@ func (this *DcokerIds) GetIntrudeDetectLogStatistics(timeCycle int) models.Resul
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
+	return ResultData
+}
+
+func (this *IntrudeDetectLog) List(from, limit int) models.Result {
+	o := orm.NewOrm()
+	orm.DefaultTimeLoc = time.Local
+	o.Using(utils.DS_Security_Log)
+	var dcokerIdsList []*DcokerIds = nil
+	var ResultData models.Result
+	var err error
+	//cond := orm.NewCondition()
+	st, _ := time.ParseInLocation(time.RFC3339, this.StartTime, time.UTC)
+	tt, _ := time.ParseInLocation(time.RFC3339, this.ToTime, time.UTC)
+
+	//cond = cond.And("host_id", this.HostId)
+	//if this.HostId != "" {
+	//	cond = cond.And("host_id", this.HostId)
+	//}
+	//if this.ContainerId != "" {
+	//	cond = cond.And("container_id", this.ContainerId)
+	//}
+	//if this.StartTime != "" {
+	//	loc, _ := time.LoadLocation("Asia/Shanghai")
+	//	tt, _ := time.ParseInLocation("2006-01-02 15:04:05", this.StartTime, loc)
+	//	cond = cond.And("created_at__gte", tt.Unix())
+	//}
+	//if this.ToTime != "" {
+	//	loc, _ := time.LoadLocation("Asia/Shanghai")
+	//	tt, _ := time.ParseInLocation("2006-01-02 15:04:05", this.ToTime, loc)
+	//	cond = cond.And("created_at__lte", tt.Unix())
+	//}
+	total, err := o.Raw("select * from docker_ids where host_id = ? and container_id = ? and created_at > ? and created_at < ?", this.HostId, this.ContainerId, st.Unix(), tt.Unix()).QueryRows(&dcokerIdsList)
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetIntrudeDetectLogErr
+		logs.Error("Get IntrudeDetectLo List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	//total, _ := o.QueryTable(utils.DcokerIds).SetCond(cond).Count()
+	data := make(map[string]interface{})
+	data["total"] = total
+	data["items"] = dcokerIdsList
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
 	return ResultData
 }

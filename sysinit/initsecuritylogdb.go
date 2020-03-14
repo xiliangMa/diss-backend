@@ -20,7 +20,7 @@ func InitSecurityLogDB() {
 	}
 	DSAlias := utils.DS_Security_Log
 	// true: drop table 后再建表
-	force, _ := beego.AppConfig.Bool("Force")
+	//force, _ := beego.AppConfig.Bool("Force")
 
 	//连接名称
 	//dbAlias := beego.AppConfig.String(DS + "::Alias")
@@ -59,9 +59,9 @@ func InitSecurityLogDB() {
 	}
 
 	// auto create db
-	err = orm.RunSyncdb(DSAlias, force, true)
-	if err != nil {
-		logs.Error("Auth Create table fail, >>> DSAlias: %s <<<, Err: %s", DSAlias, err)
-	}
+	//err = orm.RunSyncdb(DSAlias, force, true)
+	//if err != nil {
+	//	logs.Error("Auth Create table fail, >>> DSAlias: %s <<<, Err: %s", DSAlias, err)
+	//}
 
 }

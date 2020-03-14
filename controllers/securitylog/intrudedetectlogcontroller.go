@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	msl "github.com/xiliangMa/diss-backend/models/securitylog"
-	ssl "github.com/xiliangMa/diss-backend/service/securitylog"
 )
 
 // Intrude Detect Log api list
@@ -24,9 +23,9 @@ func (this *IntrudeDetectLogController) GetIntrudeDetectLogInfo() {
 	intrudeDetectLog := new(msl.IntrudeDetectLog)
 	intrudeDetectLog.HostId = hostId
 	json.Unmarshal(this.Ctx.Input.RequestBody, &intrudeDetectLog)
-	var securityLogService = ssl.SecurityLogService{nil, intrudeDetectLog}
-
-	this.Data["json"] = securityLogService.GetIntrudeDetectLogInfo()
+	//var securityLogService = ssl.SecurityLogService{nil, intrudeDetectLog}
+	//
+	//this.Data["json"] = securityLogService.GetIntrudeDetectLogInfo()
+	this.Data["json"] = intrudeDetectLog.List(0, intrudeDetectLog.Limit)
 	this.ServeJSON(false)
-
 }
