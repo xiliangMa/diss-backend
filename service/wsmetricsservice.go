@@ -85,7 +85,7 @@ func (wsmh *WSMetricsService) Save() error {
 		if size != 0 {
 			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageConfigList[0].HostId, models.Tag_ImageConfig, len(imageConfigList))
 			//删除主机下的所有imageconfig
-			//imageConfigList[0].Delete()
+			imageConfigList[0].Delete()
 		}
 
 		for _, imageConfig := range imageConfigList {
