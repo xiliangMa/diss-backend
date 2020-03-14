@@ -75,7 +75,7 @@ func (this *ImageInfo) List() Result {
 		cond = cond.And("name", this.Name)
 	}
 	if this.HostName != "" {
-		cond = cond.And("host_name", this.HostName)
+		cond = cond.And("host_name__iexact", this.HostName)
 	}
 
 	_, err = o.QueryTable(utils.ImageInfo).SetCond(cond).All(&imageList)
