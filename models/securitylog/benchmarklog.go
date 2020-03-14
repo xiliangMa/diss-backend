@@ -48,7 +48,7 @@ func (this *BenchMarkLog) Add() models.Result {
 	var ResultData models.Result
 	var err error
 
-	this.RawLog = ""
+	//this.RawLog = ""
 	_, err = o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
