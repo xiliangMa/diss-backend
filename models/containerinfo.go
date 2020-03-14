@@ -153,7 +153,13 @@ func (this *ContainerInfo) Delete() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
-	_, err := o.Delete(&ContainerInfo{Id: this.Id})
+	cond := orm.NewCondition()
+
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	_, err := o.QueryTable(utils.ContainerInfo).SetCond(cond).Delete()
+
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteContainerInfoErr
