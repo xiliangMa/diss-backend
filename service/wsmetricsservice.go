@@ -54,10 +54,12 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Info("############################ Sync agent data, >>>  HostName: %s, Type: %s, Size: %d <<<", containerConfigList[0].HostName, models.Tag_ContainerConfig, len(containerConfigList))
 		}
 		for _, containerConfig := range containerConfigList {
-			if result := containerConfig.Add(); result.Code != http.StatusOK {
-				return errors.New(result.Message)
-			}
+			//if result := containerConfig.Add(); result.Code != http.StatusOK {
+			//	return errors.New(result.Message)
+			//}
+			containerConfig.Add()
 		}
+		return nil
 	case models.Tag_ContainerInfo:
 		containerInfoList := []models.ContainerInfo{}
 		s, _ := json.Marshal(ms.Metric)
@@ -70,10 +72,12 @@ func (wsmh *WSMetricsService) Save() error {
 			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerInfoList[0].HostId, models.Tag_ContainerInfo, len(containerInfoList))
 		}
 		for _, containerInfo := range containerInfoList {
-			if result := containerInfo.Add(); result.Code != http.StatusOK {
-				return errors.New(result.Message)
-			}
+			//if result := containerInfo.Add(); result.Code != http.StatusOK {
+			//	return errors.New(result.Message)
+			//}
+			containerInfo.Add()
 		}
+		return nil
 	case models.Tag_ImageConfig:
 		imageConfigList := []models.ImageConfig{}
 		s, _ := json.Marshal(ms.Metric)
@@ -89,10 +93,12 @@ func (wsmh *WSMetricsService) Save() error {
 		}
 
 		for _, imageConfig := range imageConfigList {
-			if result := imageConfig.Add(); result.Code != http.StatusOK {
-				return errors.New(result.Message)
-			}
+			//if result := imageConfig.Add(); result.Code != http.StatusOK {
+			//	return errors.New(result.Message)
+			//}
+			imageConfig.Add()
 		}
+		return nil
 	case models.Tag_ImageInfo:
 		imageInfoList := []models.ImageInfo{}
 		s, _ := json.Marshal(ms.Metric)
@@ -107,9 +113,10 @@ func (wsmh *WSMetricsService) Save() error {
 			imageInfoList[0].Delete()
 		}
 		for _, imageInfo := range imageInfoList {
-			if result := imageInfo.Add(); result.Code != http.StatusOK {
-				return errors.New(result.Message)
-			}
+			//if result := imageInfo.Add(); result.Code != http.StatusOK {
+			//	return errors.New(result.Message)
+			//}
+			imageInfo.Add()
 		}
 	case models.Tag_HostPs:
 		hostPsList := []models.HostPs{}
@@ -126,10 +133,12 @@ func (wsmh *WSMetricsService) Save() error {
 
 		}
 		for _, hostPs := range hostPsList {
-			if result := hostPs.Add(); result.Code != http.StatusOK {
-				return errors.New(result.Message)
-			}
+			//if result := hostPs.Add(); result.Code != http.StatusOK {
+			//	return errors.New(result.Message)
+			//}
+			hostPs.Add()
 		}
+		return nil
 	case models.Tag_ContainerPs:
 		containerPsList := []models.ContainerPs{}
 		s, _ := json.Marshal(ms.Metric)
@@ -145,10 +154,12 @@ func (wsmh *WSMetricsService) Save() error {
 		}
 
 		for _, containerTop := range containerPsList {
-			if result := containerTop.Add(); result.Code != http.StatusOK {
-				return errors.New(result.Message)
-			}
+			//if result := containerTop.Add(); result.Code != http.StatusOK {
+			//	return errors.New(result.Message)
+			//}
+			containerTop.Add()
 		}
+		return nil
 	case models.Tag_DockerBenchMarkLog:
 		//index := beego.AppConfig.String("security_log::BenchMarkIndex")
 		benchMarkLog := securitylog.BenchMarkLog{}
@@ -214,10 +225,12 @@ func (wsmh *WSMetricsService) Save() error {
 		}
 
 		for _, cmdHistory := range cmdHistoryList.List {
-			if result := cmdHistory.Add(); result.Code != http.StatusOK {
-				return errors.New(result.Message)
-			}
+			//if result := cmdHistory.Add(); result.Code != http.StatusOK {
+			//	return errors.New(result.Message)
+			//}
+			cmdHistory.Add()
 		}
+		return nil
 	case models.Tag_ContainerCmdHistory:
 		cmdHistoryList := models.CmdHistoryList{}
 		s, _ := json.Marshal(ms.Metric)
@@ -232,10 +245,12 @@ func (wsmh *WSMetricsService) Save() error {
 			cmdHistoryList.List[0].Delete()
 		}
 		for _, cmdHistory := range cmdHistoryList.List {
-			if result := cmdHistory.Add(); result.Code != http.StatusOK {
-				return errors.New(result.Message)
-			}
+			//if result := cmdHistory.Add(); result.Code != http.StatusOK {
+			//	return errors.New(result.Message)
+			//}
+			cmdHistory.Add()
 		}
+		return nil
 	}
 
 	return nil
