@@ -6,7 +6,6 @@ import (
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/k8s"
 	msl "github.com/xiliangMa/diss-backend/models/securitylog"
-	ssl "github.com/xiliangMa/diss-backend/service/securitylog"
 )
 
 // Asset host object api list
@@ -233,8 +232,9 @@ func (this *HostController) GetHostBenchMarkLogInfo() {
 	benchMarkLog := new(msl.BenchMarkLog)
 	benchMarkLog.HostId = hostId
 	benchMarkLog.Id = bmlId
-	var securityLogService = ssl.SecurityLogService{benchMarkLog, nil}
-	this.Data["json"] = securityLogService.GetHostBenchMarkLogInfo()
+	//var securityLogService = ssl.SecurityLogService{benchMarkLog, nil}
+	//this.Data["json"] = securityLogService.GetHostBenchMarkLogInfo()
+	this.Data["json"] = benchMarkLog.List(0, 0)
 	this.ServeJSON(false)
 
 }
