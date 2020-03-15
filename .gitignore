@@ -12,7 +12,6 @@ diss-backend
 logs/*
 swagger/*
 swagger.zip
-routers/commentsRouter*
 conf/app.conf
 
 lastupdate.tmp
