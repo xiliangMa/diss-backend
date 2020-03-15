@@ -53,7 +53,7 @@ func (this *K8STaskHandler) SyncHostConfigAndInfo(clusterName, clusterId string)
 			c, _ := capacity.Cpu().AsInt64()
 			info.CpuCore = c
 			m, _ := capacity.Memory().AsInt64()
-			info.Mem = fmt.Sprintf("%.2f", m/1024/1024/1024)
+			info.Mem = fmt.Sprintf("%.2f", float64(m)/1024/1024/1024)
 			d, _ := capacity.StorageEphemeral().AsInt64()
 			info.Disk = utils.UnitConvert(d)
 			nStatusNodeinfo := n.Status.NodeInfo
