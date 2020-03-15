@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	SyncK8sSpec = "0 */5 * * * ?"
+	SyncK8sSpec = "0 */10 * * * ?"
 )
 
 func InitTask() {
