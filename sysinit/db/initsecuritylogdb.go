@@ -1,4 +1,4 @@
-package sysinit
+package db
 
 import (
 	"fmt"

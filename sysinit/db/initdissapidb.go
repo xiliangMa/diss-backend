@@ -1,4 +1,4 @@
-package sysinit
+package db
 
 import (
 	"fmt"
@@ -9,19 +9,18 @@ import (
 	_ "github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"os"
-	"time"
 )
 
-func InitDB() {
+func InitDissApiDB() {
 	driver := utils.DS_Driver_Postgres
 	runMode := beego.AppConfig.String("RunMode")
 	envRunMode := os.Getenv("RunMode")
 	if envRunMode != "" {
 		runMode = envRunMode
 	}
-	DSAlias := utils.DS_Default
+	DSAlias := utils.DS_Diss_Api
 	// true: drop table 后再建表
-	force, _ := beego.AppConfig.Bool("Force")
+	//force, _ := beego.AppConfig.Bool("Force")
 
 	//连接名称
 	//dbAlias := beego.AppConfig.String(DS + "::Alias")
@@ -60,10 +59,10 @@ func InitDB() {
 	}
 
 	//auto create db
-	err = orm.RunSyncdb(DSAlias, force, true)
-	if err != nil {
-		logs.Error("Auth Create table fail, >>> DSAlias: %s <<<, Err: %s", DSAlias, err)
-	}
-	// 设置为 UTC 时间
-	orm.DefaultTimeLoc = time.UTC
+	//err = orm.RunSyncdb(DSAlias, force, true)
+	//if err != nil {
+	//	logs.Error("Auth Create table fail, >>> DSAlias: %s <<<, Err: %s", DSAlias, err)
+	//}
+	//// 设置为 UTC 时间
+	//orm.DefaultTimeLoc = time.UTC
 }

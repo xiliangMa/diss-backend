@@ -1,8 +1,10 @@
 package sysinit
 
+import "github.com/xiliangMa/diss-backend/sysinit/db"
+
 func init() {
-	InitDB()
-	InitSecurityLogDB()
+	db.InitDB()
+	db.InitSecurityLogDB()
 	InitLogger()
 	InitTask()
 }
