@@ -93,6 +93,7 @@ func (this *IntrudeDetectLog) List(from, limit int) models.Result {
 	var dcokerIdsList []*DcokerIds = nil
 	var ResultData models.Result
 	var err error
+	containerId := this.ContainerId
 	//cond := orm.NewCondition()
 	st, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.UTC)
 	tt, _ := time.ParseInLocation("2006-01-02T15:04:05", this.ToTime, time.UTC)
@@ -114,7 +115,11 @@ func (this *IntrudeDetectLog) List(from, limit int) models.Result {
 	//	tt, _ := time.ParseInLocation("2006-01-02 15:04:05", this.ToTime, loc)
 	//	cond = cond.And("created_at__lte", tt.Unix())
 	//}
-	total, err := o.Raw("select * from docker_ids where host_id = ? and container_id = ? and created_at > ? and created_at < ?", this.HostId, this.ContainerId, st.Unix(), tt.Unix()).QueryRows(&dcokerIdsList)
+	if this.TargeType == models.IDLT_Docker {
+		containerId = string([]byte(this.ContainerId)[:12])
+	}
+
+	total, err := o.Raw("select * from docker_ids where host_id = ? and container_id = ? and created_at > ? and created_at < ?", this.HostId, containerId, st.Unix(), tt.Unix()).QueryRows(&dcokerIdsList)
 
 	if err != nil {
 		ResultData.Message = err.Error()

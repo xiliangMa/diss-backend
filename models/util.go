@@ -33,4 +33,8 @@ var (
 	//基线日志类型
 	BMLT_Docker = "docker"
 	BMLT_K8s    = "k8s"
+
+	// 入侵检测类型
+	IDLT_Docker = "docker"
+	IDLT_Host   = "host"
 )
