@@ -72,4 +72,8 @@ var (
 
 	// timescaledb 安全日志
 	GetIntrudeDetectLogErr = 200
+
+
+	// diss_api
+	GetAccountsErr = 250
 )

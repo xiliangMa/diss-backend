@@ -22,4 +22,8 @@ var (
 
 	//security_log timescaledb
 	DcokerIds = "docker_ids"
+
+
+	//Diss_api
+	Accounts = "accounts"
 )

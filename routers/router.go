@@ -9,6 +9,7 @@ import (
 	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/plugins/cors"
 	"github.com/xiliangMa/diss-backend/controllers"
+	caccounts "github.com/xiliangMa/diss-backend/controllers/accounts"
 	ca "github.com/xiliangMa/diss-backend/controllers/asset"
 	csl "github.com/xiliangMa/diss-backend/controllers/securitylog"
 	cs "github.com/xiliangMa/diss-backend/controllers/securitypolicy"
@@ -63,6 +64,11 @@ func init() {
 		beego.NSNamespace("/auth",
 			beego.NSInclude(
 				&controllers.AuthController{},
+			),
+		),
+		beego.NSNamespace("/accounts",
+			beego.NSInclude(
+				&caccounts.AccountsController{},
 			),
 		),
 		beego.NSNamespace("/v1/system",
