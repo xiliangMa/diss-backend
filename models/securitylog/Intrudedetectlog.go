@@ -94,8 +94,8 @@ func (this *IntrudeDetectLog) List(from, limit int) models.Result {
 	var ResultData models.Result
 	var err error
 	//cond := orm.NewCondition()
-	st, _ := time.ParseInLocation(time.RFC3339, this.StartTime, time.UTC)
-	tt, _ := time.ParseInLocation(time.RFC3339, this.ToTime, time.UTC)
+	st, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.UTC)
+	tt, _ := time.ParseInLocation("2006-01-02T15:04:05", this.ToTime, time.UTC)
 
 	//cond = cond.And("host_id", this.HostId)
 	//if this.HostId != "" {
