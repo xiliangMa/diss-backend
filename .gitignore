@@ -13,9 +13,9 @@ logs/*
 swagger/*
 swagger.zip
 conf/app.conf
-
 lastupdate.tmp
 mem*
+build/*
 
 #kubeconfig
 conf/kubeconfig/*
