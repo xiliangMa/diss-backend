@@ -19,10 +19,10 @@ var (
 	BenchMarkLog      = "bench_mark_log"
 	HostPs            = "host_ps"
 	CmdHistory        = "cmd_history"
+	Groups            = "groups"
 
 	//security_log timescaledb
 	DcokerIds = "docker_ids"
-
 
 	//Diss_api
 	Accounts = "accounts"

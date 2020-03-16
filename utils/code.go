@@ -1,6 +1,7 @@
 package utils
 
 var (
+	//diss-backend code 0-200
 	Fail                    = 1
 	GetHostListErr          = 2
 	AddHostErr              = 3
@@ -48,32 +49,35 @@ var (
 	DeleteCmdHistoryErr     = 54
 	DeleteImageInfoErr      = 55
 	DeleteImageConfigErr    = 56
+	AddGroupErr             = 57
+	GetGroupErr             = 58
+	EditGroupErr            = 59
+	DeleteGroupErr          = 60
 
-	//system
-	CheckK8sFilePostErr         = 60
-	CheckK8sFileCreateClientErr = 61
-	CheckK8sFileIsExistErr      = 62
-	UploadK8sFileErr            = 63
-	CheckK8sFileTestErr         = 64
+	//k8s 1001-1100
+	AddNameSpaceErr  = 1001
+	AddPodErr        = 1002
+	AddClusterErr    = 1003
+	GetClusterErr    = 1004
+	GetPodErr        = 1005
+	EditNameSpaceErr = 1006
+	EditPodErr       = 1007
+	GetNameSpaceErr  = 1008
 
-	//k8s
-	AddNameSpaceErr  = 100
-	AddPodErr        = 101
-	AddClusterErr    = 102
-	GetClusterErr    = 103
-	GetPodErr        = 104
-	EditNameSpaceErr = 105
-	EditPodErr       = 106
-	GetNameSpaceErr  = 107
+	//task 1100-1200
+	AddTaskErr = 1100
+	GetTaskErr = 1101
 
-	//task
-	AddTaskErr = 130
-	GetTaskErr = 131
+	//system 1200-1300
+	CheckK8sFilePostErr         = 1200
+	CheckK8sFileCreateClientErr = 1201
+	CheckK8sFileIsExistErr      = 1202
+	UploadK8sFileErr            = 1203
+	CheckK8sFileTestErr         = 1204
 
-	// timescaledb 安全日志
-	GetIntrudeDetectLogErr = 200
+	// timescaledb 安全日志1300-1400
+	GetIntrudeDetectLogErr = 1300
 
-
-	// diss_api
-	GetAccountsErr = 250
+	// diss_api 1400-1500
+	GetAccountsErr = 1400
 )

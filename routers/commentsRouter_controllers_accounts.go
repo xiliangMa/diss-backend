@@ -16,4 +16,13 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/accounts:AccountsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/accounts:AccountsController"],
+        beego.ControllerComments{
+            Method: "GetGroupsList",
+            Router: `/:accountName/groups`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
 }
