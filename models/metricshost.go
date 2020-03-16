@@ -12,12 +12,12 @@ type HostConfig struct {
 	Id          string `orm:"pk;" description:"(主机id)"`
 	HostName    string `orm:"" description:"(主机名)"`
 	OS          string `orm:"" description:"(系统)"`
-	PG          string `orm:"" description:"(安全策略组)"`
-	Status      int8   `orm:"" description:"(主机状态)"`
-	Diss        int8   `orm:"" description:"(安全容器)"`
-	DissStatus  int8   `orm:"" description:"(安全状态)"`
+	PG          string `orm:"default(sys-default)" description:"(安全策略组)"`
+	Status      int8   `orm:"default(0)" description:"(主机状态)"`
+	Diss        int8   `orm:"default(0)" description:"(安全容器)"`
+	DissStatus  int8   `orm:"default(0)" description:"(安全状态)"`
 	AccountName string `orm:"default(admin)" description:"(租户)"`
-	Group       string `orm:"" description:"(分组)"`
+	Group       string `orm:"default(未分组)" description:"(分组)"`
 	Type        int8   `orm:"default(0);" description:"(类型 服务器: 0 虚拟机: 1)"`
 	IsInK8s     bool   `orm:"default(false);" description:"(是否在k8s集群)"`
 	ClusterId   string `orm:"default(null);" description:"(集群id)"`
@@ -74,12 +74,6 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 			return errors.New(resilt.Message)
 		}
 	} else {
-		// 填写默认数据
-		this.Group = "未分组"
-		this.DissStatus = 0 // running
-		this.Diss = 0       // 已安装
-		this.Status = 0     // running
-		this.PG = "sys-default"
 		// 插入数据
 		_, err = o.Insert(this)
 		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
