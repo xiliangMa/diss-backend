@@ -6,6 +6,7 @@ import (
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/k8s"
 	msl "github.com/xiliangMa/diss-backend/models/securitylog"
+	"github.com/xiliangMa/diss-backend/utils"
 )
 
 // Asset host object api list
@@ -16,15 +17,29 @@ type HostController struct {
 // @Title GetHostConfig
 // @Description Get HostConfig List
 // @Param token header string true "authToken"
+// @Param user header string "admin" true "diss api 系统的登入用户"
 // @Param body body models.HostConfig false "主机配置信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router / [post]
 func (this *HostController) GetHostConfigList() {
+	accountName := models.Account_Admin
+	user := this.Ctx.Input.Header("user")
+	if user != models.Account_Admin {
+		accountUsers := new(models.AccountUsers)
+		accountUsers.UserName = user
+		err,  account := accountUsers.GetAccountByUser()
+		accountName = account
+		if err != nil {
+			this.Data["json"] = models.Result{Code: utils.GetAccountUsersErr, Data: nil, Message: err.Error()}
+			this.ServeJSON(false)
+		}
+	}
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 	hostConfig := new(models.HostConfig)
+	hostConfig.AccountName = accountName
 	json.Unmarshal(this.Ctx.Input.RequestBody, &hostConfig)
 	this.Data["json"] = hostConfig.List(from, limit)
 	this.ServeJSON(false)

@@ -22,15 +22,15 @@ type AccountUsersInterface interface {
 	GetAccountByUser()
 }
 
-func (this *AccountUsers) GetAccountByUser() (error, *AccountUsers) {
+func (this *AccountUsers) GetAccountByUser() (error, string) {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Diss_Api)
-	var accountUsers AccountUsers
+	var accountName string
 
-	err := o.Raw("select * from "+utils.AccountUsers+" user_name = ?", this.UserName).QueryRow(&accountUsers)
+	err := o.Raw("select account_name from "+utils.AccountUsers+" where username = ?", this.UserName).QueryRow(&accountName)
 	if err != nil {
-		logs.Error("Get AccountUsers List failed, code: %d, err: %s", utils.GetAccountUsersErr, "GetAccountUsersErr")
+		logs.Error("Get AccountUsers List failed, code: %d, err: %s", utils.GetAccountUsersErr, err)
 	}
-	return err, &accountUsers
+	return err, accountName
 }

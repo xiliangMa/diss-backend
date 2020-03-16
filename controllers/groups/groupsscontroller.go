@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/service/dissapi"
 )
 
 // Groups（分组） object api list
@@ -26,7 +25,7 @@ func (this *GroupsController) GetGroupsList() {
 	if this.Ctx.Input.Header("user") != models.Account_Admin {
 		accountUsers := models.AccountUsers{}
 		accountUsers.UserName = this.Ctx.Input.Header("user")
-		_, accountName = dissapi.GetAccountByUser(&accountUsers)
+		_, accountName = accountUsers.GetAccountByUser()
 	}
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
