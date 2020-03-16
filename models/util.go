@@ -20,6 +20,10 @@ var (
 	//Bench_Mark_Type_Docker     = 0
 	//Bench_Mark_Type_Kubernetes = 1
 
+	// 分组类型
+	Group_Host      = 0
+	Group_Container = 1
+
 	// 安全容器
 	Diss_All           = -1
 	Diss_Installed     = 0

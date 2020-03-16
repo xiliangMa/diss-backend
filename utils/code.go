@@ -79,5 +79,6 @@ var (
 	GetIntrudeDetectLogErr = 1300
 
 	// diss_api 1400-1500
-	GetAccountsErr = 1400
+	GetAccountsErr     = 1400
+	GetAccountUsersErr = 1401
 )

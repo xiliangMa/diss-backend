@@ -25,5 +25,6 @@ var (
 	DcokerIds = "docker_ids"
 
 	//Diss_api
-	Accounts = "accounts"
+	Accounts     = "accounts"
+	AccountUsers = "account_users"
 )

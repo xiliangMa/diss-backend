@@ -21,7 +21,6 @@ type AuthController struct {
 func (this *AuthController) Login() {
 	name := this.GetString("name")
 	pwd := this.GetString("pwd")
-
 	var ResultData models.Result
 	result, code := utils.GreateToken(name, pwd)
 	ResultData.Code = code

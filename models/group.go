@@ -11,7 +11,7 @@ import (
 type Groups struct {
 	Id          string    `orm:"pk;" description:"(id)"`
 	Name        string    `orm:"" description:"(镜像id)"`
-	Type        string    `orm:"" description:"(分组类型 0 主机 1 容器)"`
+	Type        int       `orm:"default(0)" description:"(分组类型 0 主机 1 容器)"`
 	AccountName string    `orm:"" description:"(租户)"`
 	CreateTime  time.Time `orm:"null;type(datetime)" description:"(创建时间)"`
 }
@@ -54,7 +54,7 @@ func (this *Groups) List(from, limit int) Result {
 	var err error
 
 	cond := orm.NewCondition()
-	if this.AccountName != "" {
+	if this.AccountName != "" && this.AccountName != Account_Admin {
 		cond = cond.And("account_name", this.AccountName)
 	}
 	if this.Id != "" {
@@ -63,6 +63,7 @@ func (this *Groups) List(from, limit int) Result {
 	if this.Name != "" {
 		cond = cond.And("name__contains", this.Name)
 	}
+	cond = cond.And("type", this.Type)
 	_, err = o.QueryTable(utils.Groups).SetCond(cond).Limit(limit, from).All(&GroupList)
 
 	if err != nil {
