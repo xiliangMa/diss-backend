@@ -13,7 +13,7 @@ type Groups struct {
 	Name        string    `orm:"" description:"(镜像id)"`
 	Type        int       `orm:"default(0)" description:"(分组类型 0 主机 1 容器)"`
 	AccountName string    `orm:"" description:"(租户)"`
-	CreateTime  time.Time `orm:"null;type(datetime)" description:"(创建时间)"`
+	CreateTime  time.Time `orm:"null;auto_now;type(datetime)" description:"(创建时间)"`
 }
 
 func init() {
