@@ -39,6 +39,9 @@ func (this *HostConfig) List(from, limit int) Result {
 		cond = cond.And("host_name__contains", this.HostName)
 	}
 
+	if this.AccountName != "" {
+		cond = cond.And("account_name", this.AccountName)
+	}
 	_, err = o.QueryTable(utils.HostConfig).SetCond(cond).Limit(limit, from).All(&HostConfigList)
 	if err != nil {
 		ResultData.Message = err.Error()

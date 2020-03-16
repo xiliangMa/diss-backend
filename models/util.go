@@ -37,4 +37,7 @@ var (
 	// 入侵检测类型
 	IDLT_Docker = "docker"
 	IDLT_Host   = "host"
+
+	// 租户
+	Account_Admin = "admin"
 )
