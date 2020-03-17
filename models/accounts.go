@@ -37,7 +37,7 @@ func (this *Accounts) List(from, limit int) Result {
 	if this.Name == Account_Admin {
 		total, err = o.Raw("select * from " + utils.Accounts).QueryRows(&accountsList)
 	} else {
-		total, err = o.Raw("select * from " + utils.Accounts + " where name = ?", this.Name).QueryRows(&accountsList)
+		total, err = o.Raw("select * from "+utils.Accounts+" where name = ?", this.Name).QueryRows(&accountsList)
 	}
 
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/k8s"
+	"github.com/xiliangMa/diss-backend/utils"
 )
 
 // Asset K8S object api list
@@ -15,16 +16,30 @@ type K8SController struct {
 // @Title GetClusters
 // @Description Get Cluster List
 // @Param token header string true "authToken"
+// @Param user header string "admin" true "diss api 系统的登入用户"
 // @Param body body k8s.Cluster false "集群"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router /clusters [post]
 func (this *K8SController) GetClusters() {
+	accountName := models.Account_Admin
+	if this.Ctx.Input.Header("user") != models.Account_Admin {
+		accountUsers := models.AccountUsers{}
+		accountUsers.UserName = this.Ctx.Input.Header("user")
+		err, account := accountUsers.GetAccountByUser()
+		accountName = account
+		if err != nil {
+			this.Data["json"] = models.Result{Code: utils.NoAccountUsersErr, Data: nil, Message: err.Error()}
+			this.ServeJSON(false)
+		}
+	}
+
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 	cluster := new(k8s.Cluster)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &cluster)
+	cluster.AccountName = accountName
 	this.Data["json"] = cluster.List(from, limit)
 	this.ServeJSON(false)
 

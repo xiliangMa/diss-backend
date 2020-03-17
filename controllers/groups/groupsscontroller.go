@@ -26,7 +26,7 @@ func (this *GroupsController) GetGroupsList() {
 	if this.Ctx.Input.Header("user") != models.Account_Admin {
 		accountUsers := models.AccountUsers{}
 		accountUsers.UserName = this.Ctx.Input.Header("user")
-		err,  account := accountUsers.GetAccountByUser()
+		err, account := accountUsers.GetAccountByUser()
 		accountName = account
 		if err != nil {
 			this.Data["json"] = models.Result{Code: utils.NoAccountUsersErr, Data: nil, Message: err.Error()}

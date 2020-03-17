@@ -29,7 +29,7 @@ func (this *HostController) GetHostConfigList() {
 	if user != models.Account_Admin {
 		accountUsers := new(models.AccountUsers)
 		accountUsers.UserName = user
-		err,  account := accountUsers.GetAccountByUser()
+		err, account := accountUsers.GetAccountByUser()
 		accountName = account
 		if err != nil {
 			this.Data["json"] = models.Result{Code: utils.NoAccountUsersErr, Data: nil, Message: err.Error()}

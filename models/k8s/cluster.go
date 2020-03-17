@@ -15,7 +15,7 @@ type Cluster struct {
 	FileName    string    `orm:"" description:"(k8s 文件)"`
 	Status      uint8     `orm:"default(0);" description:"(集群状态)"`
 	IsSync      bool      `orm:"default(false);" description:"(是否同步)"`
-	AccountName string    `orm:"" description:"(租户)"`
+	AccountName string    `orm:"-" description:"(租户)"`
 	SyncStatus  int       `orm:"default(0);" description:"(同步状态 0 成功 1 同步中 2 失败)"`
 	CreateTime  time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
 	UpdateTime  time.Time `orm:"auto_now;type(datetime)" description:"(更新时间)"`
@@ -55,8 +55,11 @@ func (this *Cluster) List(from, limit int) models.Result {
 	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
 	var ClusterList []*Cluster
+	var cIds []*string
+	ac := new(models.AccountCluster)
 	var ResultData models.Result
 	var err error
+	var total int64
 	cond := orm.NewCondition()
 
 	if this.Name != "" {
@@ -67,7 +70,19 @@ func (this *Cluster) List(from, limit int) models.Result {
 		cond = cond.And("id", this.Id)
 	}
 
-	_, err = o.QueryTable(utils.Cluster).SetCond(cond).Limit(limit, from).All(&ClusterList)
+	if this.AccountName != "" && this.AccountName != models.Account_Admin {
+		// 查询绑定关系
+		ac.AccountName = this.AccountName
+		_, cIds = ac.List()
+		if cIds != nil {
+			cond = cond.And("id__in", cIds)
+			_, err = o.QueryTable(utils.Cluster).SetCond(cond).Limit(limit, from).All(&ClusterList)
+		}
+		total = 0
+	} else {
+		_, err = o.QueryTable(utils.Cluster).SetCond(cond).Limit(limit, from).All(&ClusterList)
+		total, _ = o.QueryTable(utils.Cluster).SetCond(cond).Count()
+	}
 
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -75,8 +90,6 @@ func (this *Cluster) List(from, limit int) models.Result {
 		logs.Error("Get Cluster List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
-
-	total, _ := o.QueryTable(utils.Cluster).SetCond(cond).Count()
 
 	data := make(map[string]interface{})
 	data["total"] = total
