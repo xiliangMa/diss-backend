@@ -48,18 +48,32 @@ func (this *K8SController) GetClusters() {
 // @Title GetNameSpaceList
 // @Description Get NameSpace List
 // @Param token header string true "authToken"
+// @Param user header string "admin" true "diss api 系统的登入用户"
 // @Param clusterId path string "" true "clusterId"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router /clusters/:clusterId/namespaces [post]
 func (this *K8SController) GetNameSpaces() {
+	accountName := models.Account_Admin
+	if this.Ctx.Input.Header("user") != models.Account_Admin {
+		accountUsers := models.AccountUsers{}
+		accountUsers.UserName = this.Ctx.Input.Header("user")
+		err, account := accountUsers.GetAccountByUser()
+		accountName = account
+		if err != nil {
+			this.Data["json"] = models.Result{Code: utils.NoAccountUsersErr, Data: nil, Message: err.Error()}
+			this.ServeJSON(false)
+		}
+	}
+
 	clusterId := this.GetString(":clusterId")
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 
 	ns := new(k8s.NameSpace)
 	ns.ClusterId = clusterId
+	ns.AccountName = accountName
 	this.Data["json"] = ns.List(from, limit)
 	this.ServeJSON(false)
 
