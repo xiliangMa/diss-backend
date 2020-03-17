@@ -30,7 +30,12 @@ func (this *AccountUsers) GetAccountByUser() (error, string) {
 
 	err := o.Raw("select account_name from "+utils.AccountUsers+" where username = ?", this.UserName).QueryRow(&accountName)
 	if err != nil {
-		logs.Error("Get AccountUsers List failed, code: %d, err: %s", utils.GetAccountUsersErr, err)
+		if err.Error() == "<QuerySeter> no row found" {
+			logs.Error("Get AccountUsers List failed, code: %d, err: %s", utils.NoAccountUsersErr, err)
+		} else {
+			logs.Error("Get AccountUsers List failed, code: %d, err: %s", utils.GetAccountUsersErr, err)
+		}
+
 	}
 	return err, accountName
 }

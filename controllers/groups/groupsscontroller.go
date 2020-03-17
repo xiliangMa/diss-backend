@@ -29,7 +29,7 @@ func (this *GroupsController) GetGroupsList() {
 		err,  account := accountUsers.GetAccountByUser()
 		accountName = account
 		if err != nil {
-			this.Data["json"] = models.Result{Code: utils.GetAccountUsersErr, Data: nil, Message: err.Error()}
+			this.Data["json"] = models.Result{Code: utils.NoAccountUsersErr, Data: nil, Message: err.Error()}
 			this.ServeJSON(false)
 		}
 	}
