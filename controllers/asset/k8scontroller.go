@@ -126,6 +126,21 @@ func (this *K8SController) GetContainerConfig() {
 
 }
 
+// @Title GetContainerInfo
+// @Description Get Container  Info
+// @Param token header string true "authToken"
+// @Param containerId path string "" true "containerId"
+// @Success 200 {object} models.Result
+// @router /containers/:containerId [post]
+func (this *K8SController) GetContainerInfo() {
+	containerId := this.GetString(":containerId")
+	containerInfo := new(models.ContainerInfo)
+	containerInfo.Id = containerId
+	this.Data["json"] = containerInfo.List()
+	this.ServeJSON(false)
+
+}
+
 // @Title GetContainerCmdHistorys
 // @Description Get Container CmdHistory  List
 // @Param token header string true "authToken"
