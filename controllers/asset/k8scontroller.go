@@ -24,9 +24,10 @@ type K8SController struct {
 // @router /clusters [post]
 func (this *K8SController) GetClusters() {
 	accountName := models.Account_Admin
-	if this.Ctx.Input.Header("user") != models.Account_Admin {
+	user := this.Ctx.Input.Header("user")
+	if user != models.Account_Admin && user != "" {
 		accountUsers := models.AccountUsers{}
-		accountUsers.UserName = this.Ctx.Input.Header("user")
+		accountUsers.UserName = user
 		err, account := accountUsers.GetAccountByUser()
 		accountName = account
 		if err != nil {
@@ -55,10 +56,11 @@ func (this *K8SController) GetClusters() {
 // @Success 200 {object} models.Result
 // @router /clusters/:clusterId/namespaces [post]
 func (this *K8SController) GetNameSpaces() {
+	user := this.Ctx.Input.Header("user")
 	accountName := models.Account_Admin
-	if this.Ctx.Input.Header("user") != models.Account_Admin {
+	if user != models.Account_Admin && user != "" {
 		accountUsers := models.AccountUsers{}
-		accountUsers.UserName = this.Ctx.Input.Header("user")
+		accountUsers.UserName = user
 		err, account := accountUsers.GetAccountByUser()
 		accountName = account
 		if err != nil {

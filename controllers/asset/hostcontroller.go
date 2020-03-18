@@ -26,7 +26,7 @@ type HostController struct {
 func (this *HostController) GetHostConfigList() {
 	accountName := models.Account_Admin
 	user := this.Ctx.Input.Header("user")
-	if user != models.Account_Admin {
+	if user != models.Account_Admin && user != "" {
 		accountUsers := new(models.AccountUsers)
 		accountUsers.UserName = user
 		err, account := accountUsers.GetAccountByUser()
