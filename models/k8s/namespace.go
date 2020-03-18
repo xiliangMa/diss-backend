@@ -14,6 +14,7 @@ type NameSpace struct {
 	Name        string `orm:"unique;" description:"(命名空间)"`
 	ClusterId   string `orm:"default(null);" description:"(集群id)"`
 	AccountName string `orm:"" description:"(租户)"`
+	Force       bool   `orm:"-" description:"(强制更新)"`
 }
 
 type NameSpaceInterface interface {
@@ -22,6 +23,7 @@ type NameSpaceInterface interface {
 	Edit()
 	Get()
 	List()
+	BindAccount()
 }
 
 func init() {
@@ -132,5 +134,49 @@ func (this *NameSpace) Update() models.Result {
 	}
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
+	return ResultData
+}
+
+func (this *NameSpace) BindAccount() models.Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData models.Result
+	cond := orm.NewCondition()
+	cond = cond.And("id", this.Id)
+	dbList := []*NameSpace{}
+
+	o.QueryTable(utils.NameSpace).SetCond(cond).All(&dbList)
+	if dbList == nil {
+		ResultData.Message = "NoNameSpacedErr"
+		ResultData.Code = utils.NoNameSpacedErr
+		logs.Error("NameSpace: %s not found, code: %d, err: %s", dbList[0].Name, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	if this.Force {
+		dbList[0].AccountName = this.AccountName
+	} else {
+		if dbList[0].AccountName == "" {
+			dbList[0].AccountName = this.AccountName
+		} else {
+			if this.Force != true {
+				ResultData.Message = "IsBindErr"
+				ResultData.Code = utils.IsBindErr
+				logs.Error("NameSpace: %s bind accout failed, code: %d, err: %s", dbList[0].Name, ResultData.Code, ResultData.Message)
+				return ResultData
+			}
+		}
+	}
+	dbList[0].Force = this.Force
+
+	_, err := o.Update(dbList[0])
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditNameSpaceErr
+		logs.Error("Update NameSpace: %s failed, code: %d, err: %s", dbList[0].Name, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = dbList[0]
 	return ResultData
 }

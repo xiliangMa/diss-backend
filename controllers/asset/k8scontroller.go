@@ -202,5 +202,20 @@ func (this *K8SController) GetContainerImageInfo() {
 
 	this.Data["json"] = imageInfo.List()
 	this.ServeJSON(false)
+}
 
+// @Title BindAccount
+// @Description BindAccount（绑定租户）
+// @Param token header string true "authToken"
+// @Param nsId path string "" true "nsId"
+// @Param body body k8s.NameSpace true "命名空间"
+// @Success 200 {object} models.Result
+// @router /namespaces/:nsId/bindaccount [put]
+func (this *K8SController) BindAccount() {
+	nsId := this.GetString(":nsId")
+	NS := new(k8s.NameSpace)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &NS)
+	NS.Id = nsId
+	this.Data["json"] = NS.BindAccount()
+	this.ServeJSON(false)
 }

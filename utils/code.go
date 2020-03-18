@@ -65,6 +65,8 @@ var (
 	EditNameSpaceErr = 1006
 	EditPodErr       = 1007
 	GetNameSpaceErr  = 1008
+	IsBindErr        = 1009
+	NoNameSpacedErr  = 1010
 
 	//task 1100-1200
 	AddTaskErr = 1100
