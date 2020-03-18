@@ -165,7 +165,7 @@ func (this *HostController) GetHostContainerConfigList() {
 	containerConfig := new(models.ContainerConfig)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &containerConfig)
 	containerConfig.HostName = hostName
-	this.Data["json"] = containerConfig.List(from, limit)
+	this.Data["json"] = containerConfig.List(from, limit, false)
 	this.ServeJSON(false)
 
 }

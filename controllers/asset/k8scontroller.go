@@ -121,7 +121,7 @@ func (this *K8SController) GetContainerConfig() {
 	json.Unmarshal(this.Ctx.Input.RequestBody, &containerConfig)
 	containerConfig.NameSpaceName = nsName
 	containerConfig.PodId = podId
-	this.Data["json"] = containerConfig.List(from, limit)
+	this.Data["json"] = containerConfig.List(from, limit, false)
 	this.ServeJSON(false)
 
 }

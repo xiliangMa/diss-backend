@@ -12,12 +12,13 @@ type ContainerConfig struct {
 	Id            string `orm:"pk;" description:"(id)"`
 	Name          string `orm:"" description:"(容器名)"`
 	NameSpaceName string `orm:"" description:"(命名空间)"`
-	PodId         string `orm:"" description:"(pod id)"`
-	PodName       string `orm:"" description:"(pod 名)"`
+	PodId         string `orm:"default(null)" description:"(pod id)"`
+	PodName       string `orm:"default(null)" description:"(pod 名)"`
 	HostName      string `orm:"" description:"(主机名)"`
-	Status        string `orm:"" default(null);size(1000);description:"(状态)"`
-	Command       string `orm:"" default(null);size(1000);description:"(命令)"`
-	ImageName     string `orm:"" default(null);description:"(镜像名)"`
+	AccountName   string `orm:"" description:"(租户)"`
+	Status        string `orm:"default(null);size(1000);" description:"(状态)"`
+	Command       string `orm:"default(null);size(1000);" description:"(命令)"`
+	ImageName     string `orm:"default(null);" description:"(镜像名)"`
 	Age           string `orm:"null;" description:"(运行时长)"`
 	CreateTime    string `orm:"null;" description:"(创建时间);"`
 	UpdateTime    string `orm:"null;" description:"(更新时间);"`
@@ -73,7 +74,7 @@ func (this *ContainerConfig) Add() Result {
 	return ResultData
 }
 
-func (this *ContainerConfig) List(from, limit int) Result {
+func (this *ContainerConfig) List(from, limit int, groupSearch bool) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
@@ -94,9 +95,6 @@ func (this *ContainerConfig) List(from, limit int) Result {
 	if this.NameSpaceName != "" {
 		cond = cond.And("name_space_name", this.NameSpaceName)
 	}
-	if this.PodId != "" {
-		cond = cond.And("pod_id", this.PodId)
-	}
 	if this.Status != "" && this.Status != Container_Status_All {
 		switch this.Status {
 		case Container_Status_Run:
@@ -104,6 +102,17 @@ func (this *ContainerConfig) List(from, limit int) Result {
 		case Container_Status_Pause:
 			cond = cond.AndNotCond(cond.And("status__contains", "Up").Or("status", Pod_Container_Statue_Running).Or("status", Pod_Container_Statue_Terminated))
 
+		}
+	}
+	if this.AccountName != "" && this.AccountName != Account_Admin {
+		cond = cond.And("account_name", this.AccountName)
+	}
+	// 分组条件 只能查询pod 为空的主机
+	if groupSearch == true {
+		cond = cond.And("pod_id", "")
+	} else {
+		if this.PodId != "" {
+			cond = cond.And("pod_id", this.PodId)
 		}
 	}
 	_, err = o.QueryTable(utils.ContainerConfig).SetCond(cond).Limit(limit, from).All(&ContainerList)

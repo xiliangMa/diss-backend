@@ -24,6 +24,6 @@ func (this *ImageController) GetContainersList() {
 	from, _ := this.GetInt("from")
 	containerConfig := new(models.ContainerConfig)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &containerConfig)
-	this.Data["json"] = containerConfig.List(from, limit)
+	this.Data["json"] = containerConfig.List(from, limit, false)
 	this.ServeJSON(false)
 }
