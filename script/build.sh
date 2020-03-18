@@ -24,7 +24,6 @@ cd "$PROJECT_DIR" || exit
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o "$BUILD_DIR/bin/diss-backend"
 
 
-#
 #### 准备 build 文件
 echo "=========== 3. cp files for docker build ==========="
 cd $PROJECT_DIR
@@ -54,6 +53,7 @@ fi
 
 # build 镜像
 echo "=========== 6. build diss-backend images ==========="
+cd $PROJECT_DIR
 docker-compose build --no-cache
 
 cd $BUILD_DIR
