@@ -15,6 +15,7 @@ type NameSpace struct {
 	ClusterId   string `orm:"default(null);" description:"(集群id)"`
 	AccountName string `orm:"" description:"(租户)"`
 	Force       bool   `orm:"-" description:"(强制更新)"`
+	SyncK8s     bool   `orm:"-;default(false)" description:"(强制更新)"`
 }
 
 type NameSpaceInterface interface {
@@ -53,8 +54,10 @@ func (this *NameSpace) Add() models.Result {
 	}
 
 	if len(nameSpaceList) != 0 {
-		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接更新）
-		return this.Update()
+		ResultData.Message = "NameSpaceExistErr"
+		ResultData.Code = utils.NameSpaceExistErr
+		logs.Error("Add NameSpace failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
 	} else {
 		_, err = o.Insert(this)
 		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
