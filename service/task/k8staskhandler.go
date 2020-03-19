@@ -155,7 +155,7 @@ func (this *K8STaskHandler) SyncNameSpace(clusetrName, clusterId string) {
 			ob.Id = nsId
 			ob.Name = nsName
 			ob.ClusterId = clusterId
-			ob.Add()
+			ob.Add(true)
 		}
 		logs.Info("########## Sync NameSpace, Cluster: %s >>> end <<< ##########, size: %d", clusetrName, len(nameSpaces.Items))
 	}

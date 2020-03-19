@@ -15,7 +15,6 @@ type NameSpace struct {
 	ClusterId   string `orm:"default(null);" description:"(集群id)"`
 	AccountName string `orm:"" description:"(租户)"`
 	Force       bool   `orm:"-" description:"(强制更新)"`
-	SyncK8s     bool   `orm:"-;default(false)" description:"(强制更新)"`
 }
 
 type NameSpaceInterface interface {
@@ -31,21 +30,17 @@ func init() {
 	orm.RegisterModel(new(NameSpace))
 }
 
-func (this *NameSpace) Add() models.Result {
+func (this *NameSpace) Add(syncK8s bool) models.Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData models.Result
-	var nameSpaceList []*NameSpace
+	var dbNS []*NameSpace
 	var err error
 	cond := orm.NewCondition()
-	cond = cond.And("id", this.Id)
-	if this.Name != "" {
-		cond = cond.And("name__contains", this.Name)
-	}
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
-	_, err = o.QueryTable(utils.NameSpace).SetCond(cond).All(&nameSpaceList)
+	count, err := o.QueryTable(utils.NameSpace).SetCond(cond).All(&dbNS)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetNameSpaceErr
@@ -53,11 +48,17 @@ func (this *NameSpace) Add() models.Result {
 		return ResultData
 	}
 
-	if len(nameSpaceList) != 0 {
-		ResultData.Message = "NameSpaceExistErr"
-		ResultData.Code = utils.NameSpaceExistErr
-		logs.Error("Add NameSpace failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
+	if count != 0 {
+		if syncK8s {
+			// 同步更新k8s数据
+			this.AccountName = dbNS[0].AccountName
+			this.Update()
+		} else {
+			ResultData.Message = "NameSpaceExistErr"
+			ResultData.Code = utils.NameSpaceExistErr
+			logs.Error("Add NameSpace failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+			return ResultData
+		}
 	} else {
 		_, err = o.Insert(this)
 		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
