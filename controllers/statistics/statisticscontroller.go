@@ -14,7 +14,7 @@ type StatisticsController struct {
 // @Description Get Asset Statistics (资产概况：主机数、容器数)
 // @Param token header string true "authToken"
 // @Success 200 {object} models.Result
-// @router /asset [post]
+// @router /asset [get]
 func (this *StatisticsController) GetAssetStatistics() {
 	statisticsService := ss.StatisticsService{nil, nil, nil}
 	this.Data["json"] = statisticsService.GetAssetStatistics()
@@ -26,7 +26,7 @@ func (this *StatisticsController) GetAssetStatistics() {
 // @Description Get BnechMark Proportion Statistics (安全基线占比：docker基线、kubernetes基线)
 // @Param token header string true "authToken"
 // @Success 200 {object} models.Result
-// @router /bmp [post]
+// @router /bmp [get]
 func (this *StatisticsController) GetBnechMarkProportionStatistics() {
 	statisticsService := ss.StatisticsService{nil, nil, nil}
 	this.Data["json"] = statisticsService.GetBnechMarkProportionStatistics()
@@ -38,7 +38,7 @@ func (this *StatisticsController) GetBnechMarkProportionStatistics() {
 // @Description Get BnechMark Summary Statistics (安全基线摘要统计)
 // @Param token header string true "authToken"
 // @Success 200 {object} models.Result
-// @router /bms [post]
+// @router /bms [get]
 func (this *StatisticsController) GetBnechMarkSummaryStatistics() {
 	statisticsService := ss.StatisticsService{nil, nil, nil}
 	this.Data["json"] = statisticsService.GetBnechMarkSummaryStatistics()
@@ -50,7 +50,7 @@ func (this *StatisticsController) GetBnechMarkSummaryStatistics() {
 // @Param timeCycle query int 24 false "timecycle 时间周期"
 // @Param token header string true "authToken"
 // @Success 200 {object} models.Result
-// @router /idl [post]
+// @router /idl [get]
 func (this *StatisticsController) GetIntrudeDetectLogStatistics() {
 	timeCycle, _ := this.GetInt("timeCycle")
 	statisticsService := ss.StatisticsService{nil, nil, nil}
