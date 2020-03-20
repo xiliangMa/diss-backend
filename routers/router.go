@@ -55,6 +55,7 @@ func init() {
 		beego.NSNamespace("/v1/securitylog",
 			beego.NSInclude(
 				&csl.IntrudeDetectLogController{},
+				&csl.BenchMarkLogController{},
 			),
 		),
 		beego.NSNamespace("/v1/merticinfo",

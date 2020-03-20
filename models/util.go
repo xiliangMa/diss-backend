@@ -35,8 +35,12 @@ var (
 	Diss_Status_Unsafe = 1
 
 	//基线日志类型
-	BMLT_Docker = "docker"
-	BMLT_K8s    = "k8s"
+	BMLT_Docker    = "docker"
+	BMLT_K8s       = "k8s"
+	BML_Level_Info = "INFO"
+	BML_Level_Warn = "WARN"
+	BML_Level_Pass = "PASS"
+	BML_Level_fail = "FAIL"
 
 	// 入侵检测类型
 	IDLT_Docker = "docker"

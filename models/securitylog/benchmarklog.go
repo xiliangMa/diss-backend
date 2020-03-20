@@ -12,7 +12,7 @@ import (
 type BenchMarkLog struct {
 	Id            string `orm:"pk;" description:"(基线id)"`
 	BenchMarkName string `orm:"" description:"(基线模版名称)"`
-	Level         string `orm:"" description:"(级别)"`
+	Level         string `orm:"" description:"(级别 info warn  fail pass)"`
 	ProjectName   string `orm:"" description:"(测试项目)"`
 	HostName      string `orm:"" description:"(主机名称)"`
 	HostId        string `orm:"" description:"(主机Id)"`
@@ -71,10 +71,20 @@ func (this *BenchMarkLog) List(from, limit int) models.Result {
 	var err error
 	cond := orm.NewCondition()
 
-	cond = cond.And("host_id", this.HostId)
+	if this.HostId != "" {
+		cond = cond.And("host_id", this.HostId)
+	}
+
+	if this.HostName != "" {
+		cond = cond.And("host_name", this.HostName)
+	}
 
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
+	}
+
+	if this.Level != "" {
+		cond = cond.And("level", this.Level)
 	}
 
 	if this.BenchMarkName != "" {
