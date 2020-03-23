@@ -69,12 +69,14 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 		updateHostConfig.IsInK8s = this.IsInK8s
 		updateHostConfig.OS = this.OS
 		updateHostConfig.Status = this.Status
+		updateHostConfig.AccountName = Account_Admin
 		resilt := updateHostConfig.Update()
 		if resilt.Code != http.StatusOK {
 			return errors.New(resilt.Message)
 		}
 	} else {
 		// 插入数据
+		this.AccountName = Account_Admin
 		_, err = o.Insert(this)
 		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 			logs.Error("DB Metrics data --- Add %s failed, err: %s", Tag_HostConfig, err.Error())
