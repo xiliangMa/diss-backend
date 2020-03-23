@@ -13,6 +13,33 @@ type K8SController struct {
 	beego.Controller
 }
 
+func (this *K8SController) GetClustersBak() {
+	accountName := models.Account_Admin
+	user := this.Ctx.Input.Header("user")
+	if user != models.Account_Admin && user != "" && user != "all" {
+		accountUsers := models.AccountUsers{}
+		accountUsers.UserName = user
+		err, account := accountUsers.GetAccountByUser()
+		accountName = account
+		if err != nil {
+			this.Data["json"] = models.Result{Code: utils.NoAccountUsersErr, Data: nil, Message: err.Error()}
+			this.ServeJSON(false)
+		}
+	}
+
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+	cluster := new(k8s.Cluster)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &cluster)
+	// 如果用户all，即查询所有租户集群信息， 直接根据租户查询
+	if user != "" && user != "all" {
+		cluster.AccountName = accountName
+	}
+	this.Data["json"] = cluster.List(from, limit)
+	this.ServeJSON(false)
+
+}
+
 // @Title GetClusters
 // @Description Get Cluster List
 // @Param token header string true "authToken"
@@ -44,7 +71,7 @@ func (this *K8SController) GetClusters() {
 	if user != "" && user != "all" {
 		cluster.AccountName = accountName
 	}
-	this.Data["json"] = cluster.List(from, limit)
+	this.Data["json"] = cluster.ListByAccount(from, limit)
 	this.ServeJSON(false)
 
 }
