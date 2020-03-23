@@ -9,7 +9,6 @@ import (
 	_ "github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"os"
-	"time"
 )
 
 func InitDB() {
@@ -64,6 +63,6 @@ func InitDB() {
 	if err != nil {
 		logs.Error("Auth Create table fail, >>> DSAlias: %s <<<, Err: %s", DSAlias, err)
 	}
-	// 设置为 UTC 时间
-	orm.DefaultTimeLoc = time.UTC
+	// 设置为 UTC 时间(默认为Local时间 需要可以更改)
+	//orm.DefaultTimeLoc = time.UTC
 }
