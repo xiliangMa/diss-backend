@@ -36,7 +36,6 @@ func (this *AccountCluster) List() (error, []string) {
 	return err, cIds
 }
 
-
 func (this *AccountCluster) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)

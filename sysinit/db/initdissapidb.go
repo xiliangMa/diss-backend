@@ -37,13 +37,13 @@ func InitDissApiDB() {
 	// 生产环境
 	if runMode == utils.Run_Mode_Prod {
 		//数据库名称
-		dbName = os.Getenv(utils.DS_Default_POSTGRES_DB)
+		dbName = os.Getenv(utils.DS_Diss_Api_DB_Name)
 		//数据库连接用户名
-		dbUser = os.Getenv(utils.DS_Default_POSTGRES_USER)
-		//数据库连接用户名
-		dbPwd = os.Getenv(utils.DS_Default_POSTGRES_PASSWORD)
+		dbUser = os.Getenv(utils.DS_Diss_Api_User)
+		//数据库连接密码
+		dbPwd = os.Getenv(utils.DS_Diss_Api_Pwd)
 		//数据库IP（域名）
-		dbHost = os.Getenv(utils.DS_Default_POSTGRES_HOST)
+		dbHost = os.Getenv(utils.DS_Diss_Api_Host)
 	}
 
 	// demo mysql

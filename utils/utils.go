@@ -25,6 +25,12 @@ var (
 	DS_Security_Log_User    = "DS_Security_Log_User"
 	DS_Security_Log_Pwd     = "DS_Security_Log_Pwd"
 	DS_Security_Log_Host    = "DS_Security_Log_Host"
+
+	// 数据库 ----数据库初始化变量（diss_api postgres）
+	DS_Diss_Api_DB_Name = "DS_Diss_Api_DB_Name"
+	DS_Diss_Api_User    = "DS_Diss_Api_User"
+	DS_Diss_Api_Pwd     = "DS_Diss_Api_Pwd"
+	DS_Diss_Api_Host    = "DS_Diss_Api_Host"
 )
 
 func UnitConvert(size int64) string {
