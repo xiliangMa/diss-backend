@@ -55,8 +55,6 @@ func (this *Cluster) List(from, limit int) models.Result {
 	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
 	var ClusterList []*Cluster
-	var cIds []string
-	ac := new(models.AccountCluster)
 	var ResultData models.Result
 	var err error
 	var total int64
@@ -65,23 +63,11 @@ func (this *Cluster) List(from, limit int) models.Result {
 	if this.Name != "" {
 		cond = cond.And("name__contains", this.Name)
 	}
-
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
-
-	if this.AccountName != "" && this.AccountName != models.Account_Admin {
-		// 查询绑定关系
-		ac.AccountName = this.AccountName
-		_, cIds = ac.List()
-		if cIds != nil {
-			cond = cond.And("id__in", cIds)
-			total, err = o.QueryTable(utils.Cluster).SetCond(cond).Limit(limit, from).All(&ClusterList)
-		}
-	} else {
-		_, err = o.QueryTable(utils.Cluster).SetCond(cond).Limit(limit, from).All(&ClusterList)
-		total, _ = o.QueryTable(utils.Cluster).SetCond(cond).Count()
-	}
+	_, err = o.QueryTable(utils.Cluster).SetCond(cond).Limit(limit, from).All(&ClusterList)
+	total, _ = o.QueryTable(utils.Cluster).SetCond(cond).Count()
 
 	if err != nil {
 		ResultData.Message = err.Error()
