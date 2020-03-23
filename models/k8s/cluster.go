@@ -55,7 +55,7 @@ func (this *Cluster) List(from, limit int) models.Result {
 	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
 	var ClusterList []*Cluster
-	var cIds []*string
+	var cIds []string
 	ac := new(models.AccountCluster)
 	var ResultData models.Result
 	var err error
@@ -76,9 +76,8 @@ func (this *Cluster) List(from, limit int) models.Result {
 		_, cIds = ac.List()
 		if cIds != nil {
 			cond = cond.And("id__in", cIds)
-			_, err = o.QueryTable(utils.Cluster).SetCond(cond).Limit(limit, from).All(&ClusterList)
+			total, err = o.QueryTable(utils.Cluster).SetCond(cond).Limit(limit, from).All(&ClusterList)
 		}
-		total = 0
 	} else {
 		_, err = o.QueryTable(utils.Cluster).SetCond(cond).Limit(limit, from).All(&ClusterList)
 		total, _ = o.QueryTable(utils.Cluster).SetCond(cond).Count()

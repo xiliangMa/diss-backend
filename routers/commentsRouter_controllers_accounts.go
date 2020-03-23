@@ -7,13 +7,13 @@ import (
 
 func init() {
 
-	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/accounts:AccountsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/accounts:AccountsController"],
-		beego.ControllerComments{
-			Method:           "GetHostConfigList",
-			Router:           `/`,
-			AllowHTTPMethods: []string{"post"},
-			MethodParams:     param.Make(),
-			Filters:          nil,
-			Params:           nil})
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/accounts:AccountsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/accounts:AccountsController"],
+        beego.ControllerComments{
+            Method: "GetAccountsList",
+            Router: `/`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
 
 }

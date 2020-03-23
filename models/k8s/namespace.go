@@ -3,6 +3,7 @@ package k8s
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
+	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -180,6 +181,14 @@ func (this *NameSpace) BindAccount() models.Result {
 		logs.Error("Update NameSpace: %s failed, code: %d, err: %s", dbList[0].Name, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
+	//  添加account 和 cluster 的绑定关系
+	ac := new(models.AccountCluster)
+	id, _ := uuid.NewV4()
+	ac.Id = id.String()
+	ac.AccountName = this.AccountName
+	ac.ClusterId = dbList[0].ClusterId
+	ac.Add()
+
 	ResultData.Code = http.StatusOK
 	ResultData.Data = dbList[0]
 	return ResultData
