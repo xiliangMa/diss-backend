@@ -20,7 +20,6 @@ var (
 	HostPs            = "host_ps"
 	CmdHistory        = "cmd_history"
 	Groups            = "groups"
-	AccoountCluster   = "account_cluster"
 
 	//security_log timescaledb
 	DcokerIds = "docker_ids"

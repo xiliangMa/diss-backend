@@ -180,7 +180,35 @@ func (this *NameSpace) BindAccount() models.Result {
 		logs.Error("Update NameSpace: %s failed, code: %d, err: %s", dbList[0].Name, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
+	//  添加account 和 cluster 的绑定关系
+	//ac := new(models.AccountCluster)
+	//id, _ := uuid.NewV4()
+	//ac.Id = id.String()
+	//ac.AccountName = this.AccountName
+	//ac.ClusterId = dbList[0].ClusterId
+	//ac.Add()
+
 	ResultData.Code = http.StatusOK
 	ResultData.Data = dbList[0]
 	return ResultData
+}
+
+func (this *NameSpace) ListByAccountGroupByClusterId() (error, []string) {
+	o := orm.NewOrm()
+	orm.DefaultTimeLoc = time.Local
+	o.Using(utils.DS_Default)
+	var cIds []string
+	cond := orm.NewCondition()
+
+	if this.AccountName != "" {
+		cond = cond.And("account_name", this.AccountName)
+	}
+	_, err := o.Raw("select cluster_id from "+utils.NameSpace+" where account_name = ? group by cluster_id", this.AccountName).QueryRows(&cIds)
+	//_, err = o.QueryTable(utils.NameSpace).SetCond(cond).GroupBy("cluster_id").All(&nameSpaceList)
+
+	if err != nil {
+		logs.Error("Get NameSpace List failed, code: %d, err: %s", err.Error(), utils.GetClusterErr)
+		return err, nil
+	}
+	return nil, cIds
 }

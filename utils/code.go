@@ -55,6 +55,7 @@ var (
 	DeleteGroupErr          = 60
 	GetAccountClusterErr    = 61
 	NoccountClusterErr      = 62
+	AddAccountClusterErr    = 63
 
 	//k8s 1001-1100
 	AddNameSpaceErr   = 1001

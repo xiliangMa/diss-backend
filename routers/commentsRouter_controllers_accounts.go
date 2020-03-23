@@ -9,7 +9,7 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/accounts:AccountsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/accounts:AccountsController"],
 		beego.ControllerComments{
-			Method:           "GetHostConfigList",
+			Method:           "GetAccountsList",
 			Router:           `/`,
 			AllowHTTPMethods: []string{"post"},
 			MethodParams:     param.Make(),

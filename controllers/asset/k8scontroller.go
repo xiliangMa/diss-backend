@@ -16,7 +16,7 @@ type K8SController struct {
 // @Title GetClusters
 // @Description Get Cluster List
 // @Param token header string true "authToken"
-// @Param user header string "admin" true "diss api 系统的登入用户"
+// @Param user header string "admin" true "diss api 系统的登入用户 如果用户all，即查询所有租户集群信息，直接根据租户查询"
 // @Param body body k8s.Cluster false "集群"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -25,7 +25,7 @@ type K8SController struct {
 func (this *K8SController) GetClusters() {
 	accountName := models.Account_Admin
 	user := this.Ctx.Input.Header("user")
-	if user != models.Account_Admin && user != "" {
+	if user != models.Account_Admin && user != "" && user != "all" {
 		accountUsers := models.AccountUsers{}
 		accountUsers.UserName = user
 		err, account := accountUsers.GetAccountByUser()
@@ -40,8 +40,11 @@ func (this *K8SController) GetClusters() {
 	from, _ := this.GetInt("from")
 	cluster := new(k8s.Cluster)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &cluster)
-	cluster.AccountName = accountName
-	this.Data["json"] = cluster.List(from, limit)
+	// 如果用户all，即查询所有租户集群信息， 直接根据租户查询
+	if user != "" && user != "all" {
+		cluster.AccountName = accountName
+	}
+	this.Data["json"] = cluster.ListByAccount(from, limit)
 	this.ServeJSON(false)
 
 }
