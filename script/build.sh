@@ -48,7 +48,7 @@ fi
 NONE_IMAGES_ID=`docker images -f "dangling=true" -q`
 if [[ -n "$NONE_IMAGES_ID"  ]]
 then
-  docker rmi -f NONE_IMAGES_ID
+  docker rmi $NONE_IMAGES_ID
 fi
 
 # build 镜像
@@ -58,4 +58,12 @@ docker-compose build --no-cache
 
 cd $BUILD_DIR
 tar -cvf diss-backend.tar.gz ./*
-echo "=========== 7. build success ==========="
+
+echo "=========== 7. remove none images ==========="
+NONE_IMAGES_ID=`docker images -f "dangling=true" -q`
+if [[ -n "$NONE_IMAGES_ID"  ]]
+then
+  docker rmi $NONE_IMAGES_ID
+fi
+
+echo "=========== 8. build success ==========="
