@@ -17,7 +17,7 @@ type HostController struct {
 // @Title GetHostConfig
 // @Description Get HostConfig List
 // @Param token header string true "authToken"
-// @Param user header string "admin" true "diss api 系统的登入用户"
+// @Param user query string "admin" true "diss api 系统的登入用户 如果用户all, 直接根据租户查询"
 // @Param body body models.HostConfig false "主机配置信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -25,7 +25,7 @@ type HostController struct {
 // @router / [post]
 func (this *HostController) GetHostConfigList() {
 	accountName := models.Account_Admin
-	user := this.Ctx.Input.Header("user")
+	user := this.GetString("user")
 	if user != models.Account_Admin && user != "" {
 		accountUsers := new(models.AccountUsers)
 		accountUsers.UserName = user

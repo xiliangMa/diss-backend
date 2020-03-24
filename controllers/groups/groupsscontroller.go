@@ -15,7 +15,7 @@ type GroupsController struct {
 // @Title GetGroups
 // @Description Get Groups List（获取租户下的分组 主机/容器分组）
 // @Param token header string true "authToken"
-// @Param user header string "admin" true "diss api 系统的登入用户"
+// @Param user query string "admin" true "diss api 系统的登入用户"
 // @Param body body models.Groups false "分组信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -23,7 +23,7 @@ type GroupsController struct {
 // @router / [post]
 func (this *GroupsController) GetGroupsList() {
 	accountName := models.Account_Admin
-	user := this.Ctx.Input.Header("user")
+	user := this.GetString("user")
 	if user != models.Account_Admin && user != "" {
 		accountUsers := models.AccountUsers{}
 		accountUsers.UserName = user
@@ -47,7 +47,7 @@ func (this *GroupsController) GetGroupsList() {
 // @Title GetContainers
 // @Description Get Groups List（获取分组下的容器）
 // @Param token header string true "authToken"
-// @Param user header string "admin" true "diss api 系统的登入用户"
+// @Param user query string "admin" true "diss api 系统的登入用户"
 // @Param body body models.ContainerConfig false "分组信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -55,7 +55,7 @@ func (this *GroupsController) GetGroupsList() {
 // @router /containers [post]
 func (this *GroupsController) GetContainersList() {
 	accountName := models.Account_Admin
-	user := this.Ctx.Input.Header("user")
+	user := this.GetString("user")
 	if user != models.Account_Admin && user != "" {
 		accountUsers := models.AccountUsers{}
 		accountUsers.UserName = user
