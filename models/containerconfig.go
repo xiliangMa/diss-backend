@@ -5,7 +5,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"time"
 )
 
 type ContainerConfig struct {
@@ -76,7 +75,6 @@ func (this *ContainerConfig) Add() Result {
 
 func (this *ContainerConfig) List(from, limit int, groupSearch bool) Result {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
 	var ContainerList []*ContainerConfig = nil
 	var ResultData Result

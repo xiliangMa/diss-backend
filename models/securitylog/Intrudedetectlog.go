@@ -49,7 +49,7 @@ type DcokerIdsInterface interface {
 
 func (this *DcokerIds) GetIntrudeDetectLogStatistics(timeCycle int) models.Result {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
+
 	o.Using(utils.DS_Security_Log)
 	dcokerIdsCountList := make(map[int]*int)
 	var ResultData models.Result
@@ -88,7 +88,6 @@ func (this *DcokerIds) GetIntrudeDetectLogStatistics(timeCycle int) models.Resul
 
 func (this *IntrudeDetectLog) List(from, limit int) models.Result {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Security_Log)
 	var dcokerIdsList []*DcokerIds = nil
 	var ResultData models.Result

@@ -5,7 +5,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"time"
 )
 
 type CmdHistory struct {
@@ -73,7 +72,6 @@ func (this *CmdHistoryList) MultiAdd() Result {
 
 func (this *CmdHistory) List(from, limit int) Result {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
 	var imageList []*CmdHistory
 	var ResultData Result

@@ -5,7 +5,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"time"
 )
 
 type ImageInfo struct {
@@ -55,7 +54,6 @@ func (this *ImageInfo) Add() Result {
 
 func (this *ImageInfo) List() Result {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
 	var imageList []*ImageInfo
 	var ResultData Result

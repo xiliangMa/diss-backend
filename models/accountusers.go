@@ -4,7 +4,6 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
-	"time"
 )
 
 // 用户-租户绑定关系 diss_api
@@ -24,7 +23,6 @@ type AccountUsersInterface interface {
 
 func (this *AccountUsers) GetAccountByUser() (error, string) {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Diss_Api)
 	var accountName string
 

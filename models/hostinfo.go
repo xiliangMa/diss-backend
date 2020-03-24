@@ -5,7 +5,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"time"
 )
 
 type HostInfoInterface interface {
@@ -18,7 +17,6 @@ type HostInfoInterface interface {
 
 func (this *HostInfo) List() Result {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
 	var HostInfoList []*HostInfo = nil
 	var ResultData Result

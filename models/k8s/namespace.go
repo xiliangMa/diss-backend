@@ -6,7 +6,6 @@ import (
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"time"
 )
 
 type NameSpace struct {
@@ -76,7 +75,6 @@ func (this *NameSpace) Add(syncK8s bool) models.Result {
 
 func (this *NameSpace) List(from, limit int) models.Result {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
 	var nameSpaceList []*NameSpace
 	var ResultData models.Result
@@ -195,7 +193,7 @@ func (this *NameSpace) BindAccount() models.Result {
 
 func (this *NameSpace) ListByAccountGroupByClusterId() (error, []string) {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
+
 	o.Using(utils.DS_Default)
 	var cIds []string
 	cond := orm.NewCondition()

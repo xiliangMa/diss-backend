@@ -5,7 +5,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"time"
 )
 
 type ContainerInfo struct {
@@ -88,7 +87,6 @@ func (this *ContainerInfo) Add() Result {
 
 func (this *ContainerInfo) List() Result {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
 	var ContainerList []*ContainerInfo = nil
 	var ResultData Result

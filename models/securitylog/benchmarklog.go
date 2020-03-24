@@ -6,7 +6,6 @@ import (
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"time"
 )
 
 type BenchMarkLog struct {
@@ -64,7 +63,6 @@ func (this *BenchMarkLog) Add() models.Result {
 
 func (this *BenchMarkLog) List(from, limit int) models.Result {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
 	var BenchMarkLogList []*BenchMarkLog = nil
 	var ResultData models.Result

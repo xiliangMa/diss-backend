@@ -5,7 +5,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"time"
 )
 
 // 租户
@@ -28,7 +27,6 @@ type AccounstInterface interface {
 
 func (this *Accounts) List(from, limit int) Result {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Diss_Api)
 	var accountsList []*Accounts
 	var ResultData Result
