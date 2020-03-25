@@ -180,6 +180,15 @@ func init() {
 
     beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/asset:K8SController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/asset:K8SController"],
         beego.ControllerComments{
+            Method: "UnBindAccount",
+            Router: `/namespaces/:nsId/unbindaccount`,
+            AllowHTTPMethods: []string{"delete"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/asset:K8SController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/asset:K8SController"],
+        beego.ControllerComments{
             Method: "GetPods",
             Router: `/namespaces/:nsName/pods`,
             AllowHTTPMethods: []string{"post"},

@@ -58,17 +58,19 @@ var (
 	AddAccountClusterErr    = 63
 
 	//k8s 1001-1100
-	AddNameSpaceErr   = 1001
-	AddPodErr         = 1002
-	AddClusterErr     = 1003
-	GetClusterErr     = 1004
-	GetPodErr         = 1005
-	EditNameSpaceErr  = 1006
-	EditPodErr        = 1007
-	GetNameSpaceErr   = 1008
-	IsBindErr         = 1009
-	NoNameSpacedErr   = 1010
-	NameSpaceExistErr = 1011
+	AddNameSpaceErr    = 1001
+	AddPodErr          = 1002
+	AddClusterErr      = 1003
+	GetClusterErr      = 1004
+	GetPodErr          = 1005
+	EditNameSpaceErr   = 1006
+	EditPodErr         = 1007
+	GetNameSpaceErr    = 1008
+	IsBindErr          = 1009
+	NoNameSpacedErr    = 1010
+	NameSpaceExistErr  = 1011
+	UnBindNameSpaceErr = 1012
+	BindNameSpaceErr   = 1013
 
 	//task 1100-1200
 	AddTaskErr = 1100

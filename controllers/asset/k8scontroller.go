@@ -227,3 +227,17 @@ func (this *K8SController) BindAccount() {
 	this.Data["json"] = NS.BindAccount()
 	this.ServeJSON(false)
 }
+
+// @Title UnBindAccount
+// @Description UnBindAccount（解除绑定）
+// @Param token header string true "authToken"
+// @Param nsId path string "" true "nsId"
+// @Success 200 {object} models.Result
+// @router /namespaces/:nsId/unbindaccount [delete]
+func (this *K8SController) UnBindAccount() {
+	nsId := this.GetString(":nsId")
+	NS := new(k8s.NameSpace)
+	NS.Id = nsId
+	this.Data["json"] = NS.UnBindAccount()
+	this.ServeJSON(false)
+}

@@ -139,6 +139,32 @@ func (this *NameSpace) Update() models.Result {
 	return ResultData
 }
 
+func (this *NameSpace) UnBindAccount() models.Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData models.Result
+	dbList := []*NameSpace{}
+
+	cond := orm.NewCondition()
+	cond = cond.And("id", this.Id)
+	count, err := o.QueryTable(utils.NameSpace).SetCond(cond).All(&dbList)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.UnBindNameSpaceErr
+		logs.Error("Get NameSpace: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	// 解除绑定 设置租户为空
+	if count != 0 {
+		dbList[0].AccountName = ""
+		dbList[0].Update()
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = nil
+	return ResultData
+}
+
 func (this *NameSpace) BindAccount() models.Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
@@ -175,7 +201,7 @@ func (this *NameSpace) BindAccount() models.Result {
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.EditNameSpaceErr
-		logs.Error("Update NameSpace: %s failed, code: %d, err: %s", dbList[0].Name, ResultData.Code, ResultData.Message)
+		logs.Error("Bind NameSpace: %s, AccountNamecode: %s, fail: %d, err: %s", dbList[0].Name, this.AccountName, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	//  添加account 和 cluster 的绑定关系
