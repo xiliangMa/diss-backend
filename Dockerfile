@@ -7,7 +7,6 @@ WORKDIR /build
 COPY entrypoint.sh .
 COPY bin/diss-backend .
 COPY conf ./conf
-COPY upload ./upload
 COPY swagger ./swagger
 
 FROM alpine:3.11
