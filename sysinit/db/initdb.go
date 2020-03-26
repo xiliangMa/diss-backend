@@ -28,7 +28,7 @@ func InitDB() {
 	dbName := beego.AppConfig.String(DSAlias + "::DBName")
 	//数据库连接用户名
 	dbUser := beego.AppConfig.String(DSAlias + "::User")
-	//数据库连接用户名
+	//数据库连接密码
 	dbPwd := beego.AppConfig.String(DSAlias + "::Pwd")
 	//数据库IP（域名）
 	dbHost := beego.AppConfig.String(DSAlias + "::Host")
@@ -40,10 +40,12 @@ func InitDB() {
 		dbName = os.Getenv(utils.DS_Default_POSTGRES_DB)
 		//数据库连接用户名
 		dbUser = os.Getenv(utils.DS_Default_POSTGRES_USER)
-		//数据库连接用户名
+		//数据库连接密码
 		dbPwd = os.Getenv(utils.DS_Default_POSTGRES_PASSWORD)
 		//数据库IP（域名）
 		dbHost = os.Getenv(utils.DS_Default_POSTGRES_HOST)
+		//端口
+		port = os.Getenv(utils.DS_Default_POSTGRES_PORT)
 	}
 
 	// demo mysql

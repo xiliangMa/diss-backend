@@ -28,7 +28,7 @@ func InitDissApiDB() {
 	dbName := beego.AppConfig.String(DSAlias + "::DBName")
 	//数据库连接用户名
 	dbUser := beego.AppConfig.String(DSAlias + "::User")
-	//数据库连接用户名
+	//数据库连接密码
 	dbPwd := beego.AppConfig.String(DSAlias + "::Pwd")
 	//数据库IP（域名）
 	dbHost := beego.AppConfig.String(DSAlias + "::Host")
@@ -44,6 +44,8 @@ func InitDissApiDB() {
 		dbPwd = os.Getenv(utils.DS_Diss_Api_Pwd)
 		//数据库IP（域名）
 		dbHost = os.Getenv(utils.DS_Diss_Api_Host)
+		//端口
+		port = os.Getenv(utils.DS_Diss_Api_Port)
 	}
 
 	// demo mysql

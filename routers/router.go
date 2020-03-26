@@ -68,12 +68,12 @@ func init() {
 				&controllers.AuthController{},
 			),
 		),
-		beego.NSNamespace("/accounts",
+		beego.NSNamespace("/v1/accounts",
 			beego.NSInclude(
 				&caccounts.AccountsController{},
 			),
 		),
-		beego.NSNamespace("/groups",
+		beego.NSNamespace("/v1/groups",
 			beego.NSInclude(
 				&cgroups.GroupsController{},
 			),

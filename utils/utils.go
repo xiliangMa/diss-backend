@@ -20,17 +20,20 @@ var (
 	DS_Default_POSTGRES_PASSWORD      = "POSTGRES_PASSWORD"
 	DS_Default_POSTGRES_DB            = "POSTGRES_DB"
 	DS_Default_POSTGRES_HOST          = "DEFAULT_HOST"
+	DS_Default_POSTGRES_PORT          = "DEFAULT_PORT"
 	// 数据库 ----数据库初始化变量（security_log postgres）
 	DS_Security_Log_DB_Name = "DS_Security_Log_DB_Name"
 	DS_Security_Log_User    = "DS_Security_Log_User"
 	DS_Security_Log_Pwd     = "DS_Security_Log_Pwd"
 	DS_Security_Log_Host    = "DS_Security_Log_Host"
+	DS_Security_Log_Port    = "DS_Security_Log_Port"
 
 	// 数据库 ----数据库初始化变量（diss_api postgres）
 	DS_Diss_Api_DB_Name = "DS_Diss_Api_DB_Name"
 	DS_Diss_Api_User    = "DS_Diss_Api_User"
 	DS_Diss_Api_Pwd     = "DS_Diss_Api_Pwd"
 	DS_Diss_Api_Host    = "DS_Diss_Api_Host"
+	DS_Diss_Api_Port    = "DS_Diss_Api_Port"
 )
 
 func UnitConvert(size int64) string {
