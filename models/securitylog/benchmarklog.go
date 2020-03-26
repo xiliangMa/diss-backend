@@ -39,6 +39,7 @@ type BenchMarkLogInterface interface {
 	Get()
 	List()
 	GetMarkSummary()
+	GetHostMarkSummary()
 }
 
 func (this *BenchMarkLog) Add() models.Result {
@@ -132,6 +133,20 @@ func (this *BenchMarkLog) GetMarkSummary() models.Result {
 	data := make(map[string]interface{})
 	data[models.BMLT_Docker] = dockerMarkSummary
 	data[models.BMLT_K8s] = k8sMarkSummary
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	return ResultData
+}
+
+func (this *BenchMarkLog) GetHostMarkSummary() models.Result {
+	var ResultData models.Result
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	// host 基线统计
+	hostMarkSummary := new(MarkSummary)
+	o.Raw(utils.GetHostMarkSummarySql()).QueryRow(&hostMarkSummary)
+	data := make(map[string]interface{})
+	data[models.BMLT_Host_All] = hostMarkSummary
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
 	return ResultData
