@@ -70,8 +70,6 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 		updateHostConfig.OS = this.OS
 		updateHostConfig.Status = this.Status
 		updateHostConfig.AccountName = Account_Admin
-		updateHostConfig.Group = this.Group
-		updateHostConfig.PG = this.PG
 		resilt := updateHostConfig.Update()
 		if resilt.Code != http.StatusOK {
 			return errors.New(resilt.Message)
