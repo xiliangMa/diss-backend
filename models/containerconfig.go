@@ -28,12 +28,12 @@ func init() {
 }
 
 type ContainerConfigInterface interface {
-	Add()
-	Delete()
-	Edit()
-	Get()
-	List()
-	Count()
+	Add() Result
+	Delete() Result
+	Edit() Result
+	Get() Result
+	List(from, limit int, groupSearch bool) Result
+	Count() int64
 }
 
 func (this *ContainerConfig) Add() Result {
@@ -157,4 +157,31 @@ func (this *ContainerConfig) Count() int64 {
 	o.Using(utils.DS_Default)
 	count, _ := o.QueryTable(utils.ContainerConfig).Count()
 	return count
+}
+
+func (this *ContainerConfig) Delete() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+	cond := orm.NewCondition()
+
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	if !o.QueryTable(utils.ContainerConfig).SetCond(cond).Exist() {
+		ResultData.Message = "ContainerConfigNotFoundErr"
+		ResultData.Code = utils.ContainerConfigNotFoundErr
+		logs.Error("Delete ContainerConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	_, err := o.QueryTable(utils.ContainerConfig).SetCond(cond).Delete()
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteContainerConfigErr
+		logs.Error("Delete ContainerConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	return ResultData
 }

@@ -27,3 +27,18 @@ func (this *ContainerController) GetContainersList() {
 	this.Data["json"] = containerConfig.List(from, limit, false)
 	this.ServeJSON(false)
 }
+
+// @Title DeleteContainer
+// @Description Delete Container
+// @Param token header string true "authToken"
+// @Param containerId path string "" true "containerId"
+// @Success 200 {object} models.Result
+// @router /:containerId [delete]
+func (this *ContainerController) DeleteContainer() {
+	containerId := this.GetString(":containerId")
+	containerConfig := new(models.ContainerConfig)
+	//json.Unmarshal(this.Ctx.Input.RequestBody, &containerConfig)
+	containerConfig.Id = containerId
+	this.Data["json"] = containerConfig.Delete()
+	this.ServeJSON(false)
+}

@@ -14,7 +14,7 @@ type HostController struct {
 // @Title GetHosts
 // @Description Get Hosts
 // @Param token header string true "authToken"
-// @Param body body models.HostConfig false "主机配置信息"
+// @Param body git  models.HostConfig false "主机配置信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
