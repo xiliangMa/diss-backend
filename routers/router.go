@@ -76,7 +76,7 @@ func init() {
 		),
 		beego.NSNamespace("/v1/hosts",
 			beego.NSInclude(
-				&ca.HostController{},
+				&cbase.HostController{},
 			),
 		),
 		beego.NSNamespace("/v1/containers",

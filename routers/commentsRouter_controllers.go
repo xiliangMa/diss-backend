@@ -25,60 +25,6 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
-	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"],
-		beego.ControllerComments{
-			Method:           "HostList",
-			Router:           `/`,
-			AllowHTTPMethods: []string{"post"},
-			MethodParams:     param.Make(),
-			Filters:          nil,
-			Params:           nil})
-
-	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"],
-		beego.ControllerComments{
-			Method:           "DeleteHost",
-			Router:           `/:id`,
-			AllowHTTPMethods: []string{"delete"},
-			MethodParams:     param.Make(),
-			Filters:          nil,
-			Params:           nil})
-
-	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"],
-		beego.ControllerComments{
-			Method:           "AddHost",
-			Router:           `/addhost`,
-			AllowHTTPMethods: []string{"post"},
-			MethodParams:     param.Make(),
-			Filters:          nil,
-			Params:           nil})
-
-	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"],
-		beego.ControllerComments{
-			Method:           "EditHost",
-			Router:           `/edithost`,
-			AllowHTTPMethods: []string{"post"},
-			MethodParams:     param.Make(),
-			Filters:          nil,
-			Params:           nil})
-
-	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"],
-		beego.ControllerComments{
-			Method:           "GetHostContainers",
-			Router:           `/gethost_containers`,
-			AllowHTTPMethods: []string{"post"},
-			MethodParams:     param.Make(),
-			Filters:          nil,
-			Params:           nil})
-
-	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:HostController"],
-		beego.ControllerComments{
-			Method:           "GetHostImages",
-			Router:           `/gethost_images`,
-			AllowHTTPMethods: []string{"post"},
-			MethodParams:     param.Make(),
-			Filters:          nil,
-			Params:           nil})
-
 	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:MetricController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers:MetricController"],
 		beego.ControllerComments{
 			Method:           "ContainerList",
