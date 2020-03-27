@@ -6,7 +6,6 @@ import (
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"time"
 )
 
 type Pod struct {
@@ -81,7 +80,6 @@ func (this *Pod) Add() models.Result {
 
 func (this *Pod) List(from, limit int) models.Result {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
 	var PodList []*Pod = nil
 	var ResultData models.Result

@@ -16,7 +16,7 @@ type K8SController struct {
 // @Title GetClusters
 // @Description Get Cluster List
 // @Param token header string true "authToken"
-// @Param user header string "admin" true "diss api 系统的登入用户 如果用户all，即查询所有租户集群信息，直接根据租户查询"
+// @Param user query string "admin" true "diss api 系统的登入用户 如果用户all，直接根据租户查询"
 // @Param body body k8s.Cluster false "集群"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -24,7 +24,7 @@ type K8SController struct {
 // @router /clusters [post]
 func (this *K8SController) GetClusters() {
 	accountName := models.Account_Admin
-	user := this.Ctx.Input.Header("user")
+	user := this.GetString("user")
 	if user != models.Account_Admin && user != "" && user != "all" {
 		accountUsers := models.AccountUsers{}
 		accountUsers.UserName = user
@@ -40,7 +40,7 @@ func (this *K8SController) GetClusters() {
 	from, _ := this.GetInt("from")
 	cluster := new(k8s.Cluster)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &cluster)
-	// 如果用户all，即查询所有租户集群信息， 直接根据租户查询
+	// 如果用户all， 直接根据租户查询
 	if user != "" && user != "all" {
 		cluster.AccountName = accountName
 	}
@@ -52,16 +52,17 @@ func (this *K8SController) GetClusters() {
 // @Title GetNameSpaceList
 // @Description Get NameSpace List
 // @Param token header string true "authToken"
-// @Param user header string "admin" true "diss api 系统的登入用户"
+// @Param user query string "admin" true "diss api 系统的登入用户"
 // @Param clusterId path string "" true "clusterId"
+// @Param body body k8s.NameSpace false "命名空间"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router /clusters/:clusterId/namespaces [post]
 func (this *K8SController) GetNameSpaces() {
-	user := this.Ctx.Input.Header("user")
+	user := this.GetString("user")
 	accountName := models.Account_Admin
-	if user != models.Account_Admin && user != "" {
+	if user != models.Account_Admin && user != "" && user != "all" {
 		accountUsers := models.AccountUsers{}
 		accountUsers.UserName = user
 		err, account := accountUsers.GetAccountByUser()
@@ -77,8 +78,12 @@ func (this *K8SController) GetNameSpaces() {
 	from, _ := this.GetInt("from")
 
 	ns := new(k8s.NameSpace)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &ns)
 	ns.ClusterId = clusterId
-	ns.AccountName = accountName
+	// 如果用户all， 直接根据租户查询
+	if user != "" && user != "all" {
+		ns.AccountName = accountName
+	}
 	this.Data["json"] = ns.List(from, limit)
 	this.ServeJSON(false)
 
@@ -220,5 +225,19 @@ func (this *K8SController) BindAccount() {
 	json.Unmarshal(this.Ctx.Input.RequestBody, &NS)
 	NS.Id = nsId
 	this.Data["json"] = NS.BindAccount()
+	this.ServeJSON(false)
+}
+
+// @Title UnBindAccount
+// @Description UnBindAccount（解除绑定）
+// @Param token header string true "authToken"
+// @Param nsId path string "" true "nsId"
+// @Success 200 {object} models.Result
+// @router /namespaces/:nsId/unbindaccount [delete]
+func (this *K8SController) UnBindAccount() {
+	nsId := this.GetString(":nsId")
+	NS := new(k8s.NameSpace)
+	NS.Id = nsId
+	this.Data["json"] = NS.UnBindAccount()
 	this.ServeJSON(false)
 }

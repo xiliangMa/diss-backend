@@ -19,8 +19,8 @@ services:
     depends_on:
       - diss-db
     volumes:
+      - /tmp/diss/diss-backend/upload:/opt/diss-backend/upload
       - /tmp/diss/diss-backend/log:/opt/diss-backend/logs
-      # to dev
       - ./conf:/opt/diss-backend/conf
       - ./swagger:/opt/diss-backend/swagger
       - ./bin/diss-backend:/opt/diss-backend/diss-backend

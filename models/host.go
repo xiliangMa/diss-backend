@@ -29,7 +29,6 @@ func init() {
 
 func GetHostList(name, ip string, from, limit int) Result {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
 	var HostList []*Host
 	var ResultData Result

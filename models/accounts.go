@@ -5,7 +5,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"time"
 )
 
 // 租户
@@ -28,14 +27,14 @@ type AccounstInterface interface {
 
 func (this *Accounts) List(from, limit int) Result {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Diss_Api)
 	var accountsList []*Accounts
 	var ResultData Result
 	var total int64
 	var err error
+	ignoreAccount := "anchore-system"
 	if this.Name == Account_Admin {
-		total, err = o.Raw("select * from " + utils.Accounts).QueryRows(&accountsList)
+		total, err = o.Raw("select * from "+utils.Accounts+" where name != ?", ignoreAccount).QueryRows(&accountsList)
 	} else {
 		total, err = o.Raw("select * from "+utils.Accounts+" where name = ?", this.Name).QueryRows(&accountsList)
 	}

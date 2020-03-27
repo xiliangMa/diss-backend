@@ -9,7 +9,6 @@ import (
 	_ "github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"os"
-	"time"
 )
 
 func InitDB() {
@@ -29,7 +28,7 @@ func InitDB() {
 	dbName := beego.AppConfig.String(DSAlias + "::DBName")
 	//数据库连接用户名
 	dbUser := beego.AppConfig.String(DSAlias + "::User")
-	//数据库连接用户名
+	//数据库连接密码
 	dbPwd := beego.AppConfig.String(DSAlias + "::Pwd")
 	//数据库IP（域名）
 	dbHost := beego.AppConfig.String(DSAlias + "::Host")
@@ -41,10 +40,12 @@ func InitDB() {
 		dbName = os.Getenv(utils.DS_Default_POSTGRES_DB)
 		//数据库连接用户名
 		dbUser = os.Getenv(utils.DS_Default_POSTGRES_USER)
-		//数据库连接用户名
+		//数据库连接密码
 		dbPwd = os.Getenv(utils.DS_Default_POSTGRES_PASSWORD)
 		//数据库IP（域名）
 		dbHost = os.Getenv(utils.DS_Default_POSTGRES_HOST)
+		//端口
+		port = os.Getenv(utils.DS_Default_POSTGRES_PORT)
 	}
 
 	// demo mysql
@@ -64,6 +65,6 @@ func InitDB() {
 	if err != nil {
 		logs.Error("Auth Create table fail, >>> DSAlias: %s <<<, Err: %s", DSAlias, err)
 	}
-	// 设置为 UTC 时间
-	orm.DefaultTimeLoc = time.UTC
+	// 设置为 UTC 时间(默认为Local时间 需要可以更改)
+	//orm.DefaultTimeLoc = time.UTC
 }

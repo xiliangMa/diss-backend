@@ -7,8 +7,8 @@ import (
 
 var (
 	kubeconfig          string
-	path                = "../conf/kubeconfig/config"
-	jobFile             = "../conf/kube-bench/kube-bench-job.yml"
+	path                = "../build/kubeconfig/default-config"
+	jobFile             = "../build/kubebench/default-kube-bench-job.yml"
 	namespaces          = "default"
 	jobName             = "kube-bench"
 	podName             = "kube-bench"

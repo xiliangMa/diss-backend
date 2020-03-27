@@ -5,7 +5,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"time"
 )
 
 type HostConfigInterface interface {
@@ -20,7 +19,6 @@ type HostConfigInterface interface {
 
 func (this *HostConfig) List(from, limit int) Result {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
 	var HostConfigList []*HostConfig = nil
 	var ResultData Result
@@ -88,12 +86,7 @@ func (this *HostConfig) Count() int64 {
 func (this *HostConfig) GetBnechMarkProportion() (int64, int64) {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var k8sBenchMarkCount int64
-	count, _ := o.QueryTable(utils.HostConfig).Count()
-	dockerBenchMarkCount, _ := o.QueryTable(utils.HostConfig).Filter("is_in_k8s", false).Count()
-	if count != 0 {
-		k8sBenchMarkCount = count - dockerBenchMarkCount
-		return dockerBenchMarkCount, k8sBenchMarkCount
-	}
-	return 0, 0
+	dockerBenchMarkCount, _ := o.QueryTable(utils.HostConfig).Count()
+	k8sBenchMarkCount, _ := o.QueryTable(utils.HostConfig).Filter("is_in_k8s", false).Count()
+	return dockerBenchMarkCount, k8sBenchMarkCount
 }

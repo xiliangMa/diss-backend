@@ -5,7 +5,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"time"
 )
 
 type BenchMarkTemplate struct {
@@ -49,7 +48,6 @@ func (this *BenchMarkTemplate) Add() Result {
 
 func (this *BenchMarkTemplate) List(from, limit int) Result {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
 	var BenchMarkTemplateList []*BenchMarkTemplate
 	var ResultData Result

@@ -107,7 +107,6 @@ func (this *Cluster) Update() models.Result {
 
 func (this *Cluster) ListByAccount(from, limit int) models.Result {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
 	var ClusterList []*Cluster
 	var cIds []string

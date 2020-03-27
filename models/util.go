@@ -35,6 +35,7 @@ var (
 	Diss_Status_Unsafe = 1
 
 	//基线日志类型
+	BMLT_Host_All  = "host"
 	BMLT_Docker    = "docker"
 	BMLT_K8s       = "k8s"
 	BML_Level_Info = "INFO"

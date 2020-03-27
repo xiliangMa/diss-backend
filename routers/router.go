@@ -11,6 +11,7 @@ import (
 	"github.com/xiliangMa/diss-backend/controllers"
 	caccounts "github.com/xiliangMa/diss-backend/controllers/accounts"
 	ca "github.com/xiliangMa/diss-backend/controllers/asset"
+	cbase "github.com/xiliangMa/diss-backend/controllers/base"
 	cgroups "github.com/xiliangMa/diss-backend/controllers/groups"
 	csl "github.com/xiliangMa/diss-backend/controllers/securitylog"
 	cs "github.com/xiliangMa/diss-backend/controllers/securitypolicy"
@@ -25,11 +26,6 @@ func init() {
 		beego.NSNamespace("/v1/statistics",
 			beego.NSInclude(
 				&cstatistics.StatisticsController{},
-			),
-		),
-		beego.NSNamespace("/v1/hosts",
-			beego.NSInclude(
-				&controllers.HostController{},
 			),
 		),
 		beego.NSNamespace("/v1/asset/images",
@@ -68,14 +64,24 @@ func init() {
 				&controllers.AuthController{},
 			),
 		),
-		beego.NSNamespace("/accounts",
+		beego.NSNamespace("/v1/accounts",
 			beego.NSInclude(
 				&caccounts.AccountsController{},
 			),
 		),
-		beego.NSNamespace("/groups",
+		beego.NSNamespace("/v1/groups",
 			beego.NSInclude(
 				&cgroups.GroupsController{},
+			),
+		),
+		beego.NSNamespace("/v1/hosts",
+			beego.NSInclude(
+				&cbase.HostController{},
+			),
+		),
+		beego.NSNamespace("/v1/containers",
+			beego.NSInclude(
+				&cbase.ContainerController{},
 			),
 		),
 		beego.NSNamespace("/v1/system",

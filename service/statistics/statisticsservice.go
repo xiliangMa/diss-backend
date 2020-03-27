@@ -50,3 +50,9 @@ func (this *StatisticsService) GetIntrudeDetectLogStatistics(timeCycle int) mode
 	dcokerIds := new(msecuritylog.DcokerIds)
 	return dcokerIds.GetIntrudeDetectLogStatistics(timeCycle)
 }
+
+func (this *StatisticsService) GetHostBnechMarkSummaryStatistics(hostId string) models.Result {
+	bml := new(msecuritylog.BenchMarkLog)
+	bml.HostId = hostId
+	return bml.GetHostMarkSummary()
+}

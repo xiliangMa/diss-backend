@@ -57,3 +57,15 @@ func (this *StatisticsController) GetIntrudeDetectLogStatistics() {
 	this.Data["json"] = statisticsService.GetIntrudeDetectLogStatistics(timeCycle)
 	this.ServeJSON(false)
 }
+
+// @Title GetHostBnechMarkSummaryStatistics
+// @Description Get Host BnechMark Summary Statistics (主机安全基线摘要统计)
+// @Param token header string true "authToken"
+// @Param hostId path string "" true "hostId"
+// @Success 200 {object} models.Result
+// @router /:hostId/bms/host [get]
+func (this *StatisticsController) GetHostBnechMarkSummaryStatistics() {
+	statisticsService := ss.StatisticsService{nil, nil, nil}
+	this.Data["json"] = statisticsService.GetHostBnechMarkSummaryStatistics(this.GetString(":hostId"))
+	this.ServeJSON(false)
+}

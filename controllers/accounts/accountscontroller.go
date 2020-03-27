@@ -14,14 +14,14 @@ type AccountsController struct {
 // @Title GetAccounts
 // @Description Get Accounts List
 // @Param token header string true "authToken"
-// @Param user header string "admin" true "diss api 系统的登入用户"
+// @Param user query string "admin" true "diss api 系统的登入用户"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router / [post]
 func (this *AccountsController) GetAccountsList() {
 	accountName := models.Account_Admin
-	user := this.Ctx.Input.Header("user")
+	user := this.GetString("user")
 	if user != models.Account_Admin && user != "" {
 		accountUsers := models.AccountUsers{}
 		accountUsers.UserName = user

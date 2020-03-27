@@ -47,7 +47,6 @@ func (this *Groups) Add() Result {
 
 func (this *Groups) List(from, limit int) Result {
 	o := orm.NewOrm()
-	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
 	var GroupList []*Groups
 	var ResultData Result

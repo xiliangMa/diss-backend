@@ -44,6 +44,8 @@ func InitSecurityLogDB() {
 		dbPwd = os.Getenv(utils.DS_Security_Log_Pwd)
 		//数据库IP（域名）
 		dbHost = os.Getenv(utils.DS_Security_Log_Host)
+		//端口
+		port = os.Getenv(utils.DS_Security_Log_Port)
 	}
 
 	// demo mysql

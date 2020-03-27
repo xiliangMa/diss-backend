@@ -268,8 +268,8 @@ func (this *K8STaskHandler) SyncPodContainerConfigAndInfo() {
 						ciob.ImageName = imageName
 						//ciob.HostId = ""
 						ciob.HostName = hostName
-						ciob.StartedAt = created.String()
-						ciob.CreatedAt = created.String()
+						ciob.StartedAt = createTime.String()
+						ciob.CreatedAt = createTime.String()
 						ciob.Status = status
 						ciob.Ip = podIp
 						ciob.Labels = labels

@@ -77,6 +77,9 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 	} else {
 		// 插入数据
 		this.AccountName = Account_Admin
+		//添加默认数据
+		this.Group = "Default"
+		this.PG = "Sys-Default"
 		_, err = o.Insert(this)
 		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 			logs.Error("DB Metrics data --- Add %s failed, err: %s", Tag_HostConfig, err.Error())
