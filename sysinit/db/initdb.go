@@ -6,7 +6,10 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/lib/pq"
-	_ "github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/models"
+	mk8s "github.com/xiliangMa/diss-backend/models/k8s"
+	msecuritylog "github.com/xiliangMa/diss-backend/models/securitylog"
+	mtask "github.com/xiliangMa/diss-backend/models/task"
 	"github.com/xiliangMa/diss-backend/utils"
 	"os"
 )
@@ -60,6 +63,7 @@ func InitDB() {
 		logs.Error("DB Register fail, >>> DSAlias: %s <<<, Err: %s", DSAlias, err)
 	}
 
+	registerDefaultModel()
 	//auto create db
 	err = orm.RunSyncdb(DSAlias, force, true)
 	if err != nil {
@@ -67,4 +71,18 @@ func InitDB() {
 	}
 	// 设置为 UTC 时间(默认为Local时间 需要可以更改)
 	//orm.DefaultTimeLoc = time.UTC
+}
+
+func registerDefaultModel() {
+	// k8s
+	orm.RegisterModel(new(mk8s.Cluster), new(mk8s.NameSpace), new(mk8s.Pod))
+	// securitylog
+	orm.RegisterModel(new(msecuritylog.BenchMarkLog))
+	// task
+	orm.RegisterModel(new(mtask.Task))
+	//base
+	orm.RegisterModel(new(models.BenchMarkTemplate), new(models.CmdHistory),
+		new(models.ContainerConfig), new(models.ContainerInfo), new(models.ContainerPs),
+		new(models.HostConfig), new(models.HostInfo), new(models.HostPs), new(models.ImageConfig),
+		new(models.ImageInfo))
 }

@@ -22,10 +22,6 @@ type Task struct {
 	UpdateTime      time.Time `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
 }
 
-func init() {
-	orm.RegisterModel(new(Task))
-}
-
 type TaskInterface interface {
 	Add()
 	Delete()

@@ -20,10 +20,6 @@ type HostPs struct {
 	Command orm.TextField `orm:"" description:"(Command)"`
 }
 
-func init() {
-	orm.RegisterModel(new(HostPs))
-}
-
 type HostPsInterface interface {
 	Add()
 	Delete()

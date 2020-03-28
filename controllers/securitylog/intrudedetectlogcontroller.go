@@ -30,7 +30,6 @@ func (this *IntrudeDetectLogController) GetIntrudeDetectLogInfo() {
 	this.ServeJSON(false)
 }
 
-
 // @Title GetIntrudeDetectLog
 // @Description Get IntrudeDetectLog List
 // @Param token header string true "authToken"

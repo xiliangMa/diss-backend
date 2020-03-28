@@ -21,10 +21,6 @@ type ContainerPs struct {
 	Command     orm.TextField `orm:"" description:"(Command)"`
 }
 
-func init() {
-	orm.RegisterModel(new(ContainerPs))
-}
-
 type ContainerPsInterface interface {
 	Add()
 	Delete()

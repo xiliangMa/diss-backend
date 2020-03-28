@@ -17,10 +17,6 @@ type BenchMarkTemplate struct {
 	Status      int8   `orm:"default(0);" description:"(类型 停用 0  启用 1)"`
 }
 
-func init() {
-	orm.RegisterModel(new(BenchMarkTemplate))
-}
-
 type BenchMarkInterface interface {
 	Add()
 	Delete()

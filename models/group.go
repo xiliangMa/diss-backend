@@ -16,10 +16,6 @@ type Groups struct {
 	CreateTime  time.Time `orm:"null;auto_now;type(datetime)" description:"(创建时间)"`
 }
 
-func init() {
-	orm.RegisterModel(new(Groups))
-}
-
 type GroupInterface interface {
 	Add()
 	Delete()

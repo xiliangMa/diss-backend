@@ -25,10 +25,6 @@ type NameSpaceInterface interface {
 	BindAccount()
 }
 
-func init() {
-	orm.RegisterModel(new(NameSpace))
-}
-
 func (this *NameSpace) Add(syncK8s bool) models.Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)

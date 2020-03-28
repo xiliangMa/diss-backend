@@ -44,10 +44,6 @@ type HostInfo struct {
 	DockerStatus  string `orm:"default(false);" description:"(容器状态)"`
 }
 
-func init() {
-	orm.RegisterModel(new(HostConfig), new(HostInfo))
-}
-
 func (this *HostConfig) Inner_AddHostConfig() error {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)

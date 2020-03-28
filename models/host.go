@@ -23,10 +23,6 @@ type Host struct {
 	Disk         float64   `orm:"null;" description:"(磁盘)"`
 }
 
-func init() {
-	orm.RegisterModel(new(Host))
-}
-
 func GetHostList(name, ip string, from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)

@@ -23,10 +23,6 @@ type ContainerConfig struct {
 	UpdateTime    string `orm:"null;" description:"(更新时间);"`
 }
 
-func init() {
-	orm.RegisterModel(new(ContainerConfig))
-}
-
 type ContainerConfigInterface interface {
 	Add() Result
 	Delete() Result

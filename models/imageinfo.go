@@ -21,10 +21,6 @@ type ImageInfo struct {
 	Layers      string `orm:"" description:"(Layers)"`
 }
 
-func init() {
-	orm.RegisterModel(new(ImageInfo))
-}
-
 type ImageInfoInterface interface {
 	Add()
 	Delete()

@@ -28,10 +28,6 @@ type BenchMarkLog struct {
 	Result        string `orm:"" description:"(测试结果)"`
 }
 
-func init() {
-	orm.RegisterModel(new(BenchMarkLog))
-}
-
 type BenchMarkLogInterface interface {
 	Add()
 	Delete()

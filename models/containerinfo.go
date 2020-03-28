@@ -28,10 +28,6 @@ type ContainerInfo struct {
 	Mounts        string `orm:"default(null);size(1000);" description:"(Mounts)"`
 }
 
-func init() {
-	orm.RegisterModel(new(ContainerInfo))
-}
-
 type ContainerInfoInterface interface {
 	Add()
 	Delete()

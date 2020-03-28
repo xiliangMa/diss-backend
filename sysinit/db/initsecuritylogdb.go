@@ -6,7 +6,6 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/lib/pq"
-	_ "github.com/xiliangMa/diss-backend/models/securitylog"
 	"github.com/xiliangMa/diss-backend/utils"
 	"os"
 )
@@ -60,6 +59,7 @@ func InitSecurityLogDB() {
 		logs.Error("DB Register fail, >>> DSAlias: %s <<<, Err: %s", DSAlias, err)
 	}
 
+	//registerSecurityLogModel()
 	// auto create db
 	//err = orm.RunSyncdb(DSAlias, force, true)
 	//if err != nil {

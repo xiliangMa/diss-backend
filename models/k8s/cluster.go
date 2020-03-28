@@ -21,10 +21,6 @@ type Cluster struct {
 	UpdateTime  time.Time `orm:"auto_now;type(datetime)" description:"(更新时间)"`
 }
 
-func init() {
-	orm.RegisterModel(new(Cluster))
-}
-
 type ClusterInterface interface {
 	Add()
 	Delete()

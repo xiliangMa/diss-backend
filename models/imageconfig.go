@@ -21,10 +21,6 @@ type ImageConfig struct {
 	CreateTime time.Time `orm:"null;type(datetime)" description:"(创建时间)"`
 }
 
-func init() {
-	orm.RegisterModel(new(ImageConfig))
-}
-
 type ImageConfigInterface interface {
 	Add()
 	Delete()

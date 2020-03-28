@@ -28,10 +28,6 @@ type PodInterface interface {
 	List()
 }
 
-func init() {
-	orm.RegisterModel(new(Pod))
-}
-
 func (this *Pod) Add() models.Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)

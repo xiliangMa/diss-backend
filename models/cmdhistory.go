@@ -21,10 +21,6 @@ type CmdHistoryList struct {
 	List []*CmdHistory
 }
 
-func init() {
-	orm.RegisterModel(new(CmdHistory))
-}
-
 type CmdHistoryInterface interface {
 	Add()
 	MultiAdd()
