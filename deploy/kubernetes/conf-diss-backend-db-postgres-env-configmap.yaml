@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  POSTGRES_DB: diss
+  POSTGRES_PASSWORD: diss
+  POSTGRES_ROOT_PASSWORD: diss
+  POSTGRES_USER: diss
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: diss-backend-conf-diss-backend-db-postgres-env
+  name: conf-diss-backend-db-postgres-env

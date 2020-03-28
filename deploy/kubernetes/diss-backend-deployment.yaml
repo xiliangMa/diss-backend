@@ -1,0 +1,179 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose-prod.yml
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: diss-backend
+  name: diss-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: diss-backend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose-prod.yml
+        kompose.version: 1.21.0 (992df58d8)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: diss-backend
+    spec:
+      containers:
+      - command:
+        - ./entrypoint.sh
+        env:
+        - name: Address
+          valueFrom:
+            configMapKeyRef:
+              key: Address
+              name: conf-diss-backend-env
+        - name: DEFAULT_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: DEFAULT_HOST
+              name: conf-diss-backend-env
+        - name: DEFAULT_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: DEFAULT_PORT
+              name: conf-diss-backend-env
+        - name: DS_Diss_Api_DB_Name
+          valueFrom:
+            configMapKeyRef:
+              key: DS_Diss_Api_DB_Name
+              name: conf-diss-backend-env
+        - name: DS_Diss_Api_Host
+          valueFrom:
+            configMapKeyRef:
+              key: DS_Diss_Api_Host
+              name: conf-diss-backend-env
+        - name: DS_Diss_Api_Port
+          valueFrom:
+            configMapKeyRef:
+              key: DS_Diss_Api_Port
+              name: conf-diss-backend-env
+        - name: DS_Diss_Api_Pwd
+          valueFrom:
+            configMapKeyRef:
+              key: DS_Diss_Api_Pwd
+              name: conf-diss-backend-env
+        - name: DS_Diss_Api_User
+          valueFrom:
+            configMapKeyRef:
+              key: DS_Diss_Api_User
+              name: conf-diss-backend-env
+        - name: DS_Security_Log_DB_Name
+          valueFrom:
+            configMapKeyRef:
+              key: DS_Security_Log_DB_Name
+              name: conf-diss-backend-env
+        - name: DS_Security_Log_Host
+          valueFrom:
+            configMapKeyRef:
+              key: DS_Security_Log_Host
+              name: conf-diss-backend-env
+        - name: DS_Security_Log_Port
+          valueFrom:
+            configMapKeyRef:
+              key: DS_Security_Log_Port
+              name: conf-diss-backend-env
+        - name: DS_Security_Log_Pwd
+          valueFrom:
+            configMapKeyRef:
+              key: DS_Security_Log_Pwd
+              name: conf-diss-backend-env
+        - name: DS_Security_Log_User
+          valueFrom:
+            configMapKeyRef:
+              key: DS_Security_Log_User
+              name: conf-diss-backend-env
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_DB
+              name: conf-diss-backend-db-postgres-env
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_PASSWORD
+              name: conf-diss-backend-db-postgres-env
+        - name: POSTGRES_ROOT_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_ROOT_PASSWORD
+              name: conf-diss-backend-db-postgres-env
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_USER
+              name: conf-diss-backend-db-postgres-env
+        - name: Password
+          valueFrom:
+            configMapKeyRef:
+              key: Password
+              name: conf-diss-backend-env
+        - name: RunMode
+          valueFrom:
+            configMapKeyRef:
+              key: RunMode
+              name: conf-diss-backend-env
+        - name: UserName
+          valueFrom:
+            configMapKeyRef:
+              key: UserName
+              name: conf-diss-backend-env
+        image: registry.cn-qingdao.aliyuncs.com/diss/diss-backend
+        imagePullPolicy: ""
+        name: diss-backend
+        ports:
+        - containerPort: 8080
+        - containerPort: 10443
+        - containerPort: 8889
+        resources: {}
+        volumeMounts:
+        - mountPath: /opt/diss-backend/upload
+          name: diss-backend-claim0
+        - mountPath: /opt/diss-backend/logs
+          name: diss-backend-claim1
+#        - mountPath: /opt/diss-backend/conf
+#          name: diss-backend-claim2
+#        - mountPath: /opt/diss-backend/swagger
+#          name: diss-backend-claim3
+#        - mountPath: /opt/diss-backend/diss-backend
+#          name: diss-backend-claim4
+#        - mountPath: /opt/diss-backend/entrypoint.sh
+#          name: diss-backend-claim5
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes:
+      - name: diss-backend-claim0
+        hostPath:
+          path: /tmp/diss/diss-backend/upload
+          type: DirectoryOrCreate
+      - name: diss-backend-claim1
+        hostPath:
+          path: /tmp/diss/diss-backend/log
+          type: DirectoryOrCreate
+#      - name: diss-backend-claim2
+#        hostPath:
+#          path: /opt/diss-backend/conf
+#          type: DirectoryOrCreate
+#      - name: diss-backend-claim3
+#        hostPath:
+#          path: /opt/diss-backend/swagger
+#          type: DirectoryOrCreate
+#      - name: diss-backend-claim4
+#        hostPath:
+#          path: /opt/diss-backend/diss-backend
+#          type: DirectoryOrCreate
+#      - name: diss-backend-claim5
+#        hostPath:
+#          path: /opt/diss-backend/entrypoint.sh
+#          type: DirectoryOrCreate
+status: {}
