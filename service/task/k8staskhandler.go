@@ -192,7 +192,7 @@ func (this *K8STaskHandler) SyncNamespacePod() {
 	}
 }
 
-func (this *K8STaskHandler) SyncPodContainerConfigAndInfo() {
+func (this *K8STaskHandler) SyncPodContainerConfigAndInfo(clusterName string) {
 	nameSpaces, err := this.Clientgo.GetNameSpaces()
 	if err != nil {
 		logs.Error("Sync namspace err: %s", err.Error())
@@ -252,6 +252,7 @@ func (this *K8STaskHandler) SyncPodContainerConfigAndInfo() {
 						ccob.ImageName = imageName
 						ccob.HostName = hostName
 						ccob.Status = status
+						ccob.ClusterName = clusterName
 						ccob.Age = "Up " + created.String()
 						ccob.CreateTime = startTime
 						ccob.UpdateTime = startTime
@@ -320,6 +321,7 @@ func SyncAll() {
 		data := result.Data.(map[string]interface{})
 		for _, c := range data["items"].([]*k8s.Cluster) {
 			if c.IsSync == models.Cluster_IsSync {
+				clusterName := c.Name
 				c.SyncStatus = models.Cluster_Sync_Status_IN_PROGRESS
 				c.Update()
 				logs.Info("########################################## cluster:  %s, Sync start.", c.Name)
@@ -342,7 +344,7 @@ func SyncAll() {
 				this.SyncNamespacePod()
 
 				// 同步 pod 内的 containerconfig && containerinfo
-				this.SyncPodContainerConfigAndInfo()
+				this.SyncPodContainerConfigAndInfo(clusterName)
 
 				logs.Info("Sync end...., cluster name: %s ", c.Name)
 				// 更新同步时间、状态

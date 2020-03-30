@@ -15,6 +15,7 @@ type ContainerConfig struct {
 	PodName       string `orm:"default(null)" description:"(pod 名)"`
 	HostName      string `orm:"" description:"(主机名)"`
 	AccountName   string `orm:"" description:"(租户)"`
+	ClusterName   string `orm:"" description:"(集群名)"`
 	Status        string `orm:"default(null);size(1000);" description:"(状态)"`
 	Command       string `orm:"default(null);size(1000);" description:"(命令)"`
 	ImageName     string `orm:"default(null);" description:"(镜像名)"`
@@ -88,6 +89,9 @@ func (this *ContainerConfig) List(from, limit int, groupSearch bool) Result {
 	}
 	if this.NameSpaceName != "" {
 		cond = cond.And("name_space_name", this.NameSpaceName)
+	}
+	if this.ClusterName != "" {
+		cond = cond.And("cluster_name", this.ClusterName)
 	}
 	if this.Status != "" && this.Status != Container_Status_All {
 		switch this.Status {
