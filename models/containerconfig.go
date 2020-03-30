@@ -121,8 +121,10 @@ func (this *ContainerConfig) List(from, limit int, groupSearch bool) Result {
 	total, _ := o.QueryTable(utils.ContainerConfig).SetCond(cond).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
+	for _, containerConfig := range ContainerList {
+		containerConfig.AccountName = this.AccountName
+	}
 	data["items"] = ContainerList
-
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
 	if total == 0 {
