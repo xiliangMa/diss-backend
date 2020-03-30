@@ -13,6 +13,7 @@ import (
 	ca "github.com/xiliangMa/diss-backend/controllers/asset"
 	cbase "github.com/xiliangMa/diss-backend/controllers/base"
 	cgroups "github.com/xiliangMa/diss-backend/controllers/groups"
+	ck8s "github.com/xiliangMa/diss-backend/controllers/k8s"
 	csl "github.com/xiliangMa/diss-backend/controllers/securitylog"
 	cs "github.com/xiliangMa/diss-backend/controllers/securitypolicy"
 	cstatistics "github.com/xiliangMa/diss-backend/controllers/statistics"
@@ -82,6 +83,11 @@ func init() {
 		beego.NSNamespace("/v1/containers",
 			beego.NSInclude(
 				&cbase.ContainerController{},
+			),
+		),
+		beego.NSNamespace("/v1/k8s/clusterss",
+			beego.NSInclude(
+				&ck8s.ClusterController{},
 			),
 		),
 		beego.NSNamespace("/v1/system",
