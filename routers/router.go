@@ -95,6 +95,11 @@ func init() {
 				&ck8s.NSController{},
 			),
 		),
+		beego.NSNamespace("/v1/k8s/pods",
+			beego.NSInclude(
+				&ck8s.PodController{},
+			),
+		),
 		beego.NSNamespace("/v1/system",
 			beego.NSInclude(
 				&css.K8sController{},
