@@ -194,6 +194,7 @@ func (this *K8STaskHandler) SyncNamespacePod() {
 
 func (this *K8STaskHandler) SyncPodContainerConfigAndInfo(clusterName string) {
 	nameSpaces, err := this.Clientgo.GetNameSpaces()
+	SyncCheckPoint := time.Now().Unix()
 	if err != nil {
 		logs.Error("Sync namspace err: %s", err.Error())
 	} else {
@@ -256,6 +257,7 @@ func (this *K8STaskHandler) SyncPodContainerConfigAndInfo(clusterName string) {
 						ccob.Age = "Up " + created.String()
 						ccob.CreateTime = startTime
 						ccob.UpdateTime = startTime
+						ccob.SyncCheckPoint = SyncCheckPoint
 
 						//同步 containerinfo
 						ciob := new(models.ContainerInfo)
@@ -275,6 +277,7 @@ func (this *K8STaskHandler) SyncPodContainerConfigAndInfo(clusterName string) {
 						ciob.Ip = podIp
 						ciob.Labels = labels
 						ciob.Volumes = volumes
+						ciob.SyncCheckPoint = SyncCheckPoint
 
 						// 通过 containers获取的数据
 						for _, cs := range pod.Spec.Containers {

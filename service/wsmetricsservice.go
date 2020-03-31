@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/securitylog"
+	"github.com/xiliangMa/diss-backend/service/synccheck"
 	"net/http"
 )
 
@@ -44,6 +45,7 @@ func (wsmh *WSMetricsService) Save() error {
 		}
 	case models.Tag_ContainerConfig:
 		containerConfigList := []models.ContainerConfig{}
+		CheckObject := new(models.ContainerConfig)
 		s, _ := json.Marshal(ms.Metric)
 		if err := json.Unmarshal(s, &containerConfigList); err != nil {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
@@ -51,7 +53,7 @@ func (wsmh *WSMetricsService) Save() error {
 		}
 		size := len(containerConfigList)
 		if size != 0 {
-			logs.Info("############################ Sync agent data, >>>  HostName: %s, Type: %s, Size: %d <<<", containerConfigList[0].HostName, models.Tag_ContainerConfig, len(containerConfigList))
+			logs.Info("############################ Sync agent data, >>>  HostName: %s, Type: %s, Size: %d <<<", containerConfigList[0].HostName, models.Tag_ContainerConfig, size)
 		}
 		for _, containerConfig := range containerConfigList {
 			//if result := containerConfig.Add(); result.Code != http.StatusOK {
@@ -59,9 +61,18 @@ func (wsmh *WSMetricsService) Save() error {
 			//}
 			containerConfig.Add()
 		}
+		// 清除脏数据
+		if size != 0 {
+			CheckObject.HostName = containerConfigList[0].HostName
+			CheckObject.SyncCheckPoint = containerConfigList[0].SyncCheckPoint
+			agentCheckHandler := synccheck.AgentCheckHadler{CheckObject, nil}
+			agentCheckHandler.Check(models.Tag_ContainerConfig)
+		}
+
 		return nil
 	case models.Tag_ContainerInfo:
 		containerInfoList := []models.ContainerInfo{}
+		CheckObject := new(models.ContainerInfo)
 		s, _ := json.Marshal(ms.Metric)
 		if err := json.Unmarshal(s, &containerInfoList); err != nil {
 			logs.Error("Paraces %s error %s", ms.ResTag, err)
@@ -69,13 +80,21 @@ func (wsmh *WSMetricsService) Save() error {
 		}
 		size := len(containerInfoList)
 		if size != 0 {
-			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerInfoList[0].HostId, models.Tag_ContainerInfo, len(containerInfoList))
+			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerInfoList[0].HostId, models.Tag_ContainerInfo, size)
 		}
 		for _, containerInfo := range containerInfoList {
 			//if result := containerInfo.Add(); result.Code != http.StatusOK {
 			//	return errors.New(result.Message)
 			//}
 			containerInfo.Add()
+		}
+
+		// 清除脏数据
+		if size != 0 {
+			CheckObject.HostName = containerInfoList[0].HostName
+			CheckObject.SyncCheckPoint = containerInfoList[0].SyncCheckPoint
+			agentCheckHandler := synccheck.AgentCheckHadler{nil, CheckObject}
+			agentCheckHandler.Check(models.Tag_ContainerInfo)
 		}
 		return nil
 	case models.Tag_ImageConfig:

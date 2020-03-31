@@ -12,7 +12,7 @@ type CmdHistory struct {
 	HostId      string `orm:"" description:"(主机id)"`
 	ContainerId string `orm:"" description:"(容器id)"`
 	User        string `orm:"" description:"(用户)"`
-	Command     string `orm:"size(2000);" description:"(命令)"`
+	Command     string `orm:"" description:"(命令)"`
 	CreateTime  string `orm:"null;" description:"(更新时间)"`
 	Type        int8   `orm:"default(0);" description:"(类型 0 host 1 container)"`
 }

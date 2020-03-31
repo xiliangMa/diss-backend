@@ -8,32 +8,35 @@ import (
 )
 
 type ContainerInfo struct {
-	Id            string `orm:"pk;" description:"(id)"`
-	Name          string `orm:"" description:"(名称)"`
-	NameSpaceName string `orm:"" description:"(命名空间)"`
-	PodId         string `orm:"" description:"(Pod Id)"`
-	PodName       string `orm:"" description:"(Pod 名称)"`
-	ImageId       string `orm:"" description:"(imageId)"`
-	ImageName     string `orm:"" description:"(image名称)"`
-	HostId        string `orm:"" description:"(主机id)"`
-	HostName      string `orm:"" description:"(主机名)"`
-	Command       string `orm:"default(null);size(1000);" description:"(命令)"`
-	StartedAt     string `orm:"default(null);" description:"(启动时间)"`
-	CreatedAt     string `orm:"default(null);" description:"(创建时间)"`
-	Status        string `orm:"default(null);size(1000);" description:"(状态)"`
-	Ports         string `orm:"default(null);" description:"(端口)"`
-	Ip            string `orm:"default(null);" description:"(ip)"`
-	Labels        string `orm:"default(null);size(1000);" description:"(标签)"`
-	Volumes       string `orm:"default(null);size(1000);" description:"(Volumes)"`
-	Mounts        string `orm:"default(null);size(1000);" description:"(Mounts)"`
+	Id             string `orm:"pk;" description:"(id)"`
+	Name           string `orm:"" description:"(名称)"`
+	NameSpaceName  string `orm:"" description:"(命名空间)"`
+	PodId          string `orm:"" description:"(Pod Id)"`
+	PodName        string `orm:"" description:"(Pod 名称)"`
+	ImageId        string `orm:"" description:"(imageId)"`
+	ImageName      string `orm:"" description:"(image名称)"`
+	HostId         string `orm:"" description:"(主机id)"`
+	HostName       string `orm:"" description:"(主机名)"`
+	ClusterName    string `orm:"" description:"(集群名)"`
+	SyncCheckPoint int64  `orm:"default(0);" description:"(同步检查点)"`
+	Command        string `orm:"default(null);" description:"(命令)"`
+	StartedAt      string `orm:"default(null);" description:"(启动时间)"`
+	CreatedAt      string `orm:"default(null);" description:"(创建时间)"`
+	Status         string `orm:"default(null);" description:"(状态)"`
+	Ports          string `orm:"default(null);" description:"(端口)"`
+	Ip             string `orm:"default(null);" description:"(ip)"`
+	Labels         string `orm:"default(null);" description:"(标签)"`
+	Volumes        string `orm:"default(null);" description:"(Volumes)"`
+	Mounts         string `orm:"default(null);" description:"(Mounts)"`
 }
 
 type ContainerInfoInterface interface {
-	Add()
-	Delete()
-	Edit()
-	Get()
-	List()
+	Add() Result
+	Delete() Result
+	Edit() Result
+	Get() Result
+	List() Result
+	EmptyDirtyDataForAgent() error
 }
 
 func (this *ContainerInfo) Add() Result {
@@ -162,4 +165,15 @@ func (this *ContainerInfo) Delete() Result {
 	}
 	ResultData.Code = http.StatusOK
 	return ResultData
+}
+
+func (this *ContainerInfo) EmptyDirtyDataForAgent() error {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	_, err := o.Raw("delete from "+utils.ContainerInfo+" where host_name = ? and sync_check_point != ? and pod_id = '' ", this.HostName, this.SyncCheckPoint).Exec()
+
+	if err != nil {
+		logs.Error("Empty Dirty Data failed,  model: %s, code: %d, err: %s", utils.ContainerInfo, utils.EmptyDirtyDataContinerConfigErr, err.Error())
+	}
+	return err
 }

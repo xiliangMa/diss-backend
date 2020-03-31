@@ -8,20 +8,21 @@ import (
 )
 
 type ContainerConfig struct {
-	Id            string `orm:"pk;" description:"(id)"`
-	Name          string `orm:"" description:"(容器名)"`
-	NameSpaceName string `orm:"" description:"(命名空间)"`
-	PodId         string `orm:"default(null)" description:"(pod id)"`
-	PodName       string `orm:"default(null)" description:"(pod 名)"`
-	HostName      string `orm:"" description:"(主机名)"`
-	AccountName   string `orm:"" description:"(租户)"`
-	ClusterName   string `orm:"" description:"(集群名)"`
-	Status        string `orm:"default(null);size(1000);" description:"(状态)"`
-	Command       string `orm:"default(null);size(1000);" description:"(命令)"`
-	ImageName     string `orm:"default(null);" description:"(镜像名)"`
-	Age           string `orm:"null;" description:"(运行时长)"`
-	CreateTime    string `orm:"null;" description:"(创建时间);"`
-	UpdateTime    string `orm:"null;" description:"(更新时间);"`
+	Id             string `orm:"pk;" description:"(id)"`
+	Name           string `orm:"" description:"(容器名)"`
+	NameSpaceName  string `orm:"" description:"(命名空间)"`
+	PodId          string `orm:"default(null)" description:"(pod id)"`
+	PodName        string `orm:"default(null)" description:"(pod 名)"`
+	HostName       string `orm:"" description:"(主机名)"`
+	AccountName    string `orm:"" description:"(租户)"`
+	ClusterName    string `orm:"" description:"(集群名)"`
+	SyncCheckPoint int64  `orm:"default(0);" description:"(同步检查点)"`
+	Status         string `orm:"default(null);" description:"(状态)"`
+	Command        string `orm:"default(null);" description:"(命令)"`
+	ImageName      string `orm:"default(null);" description:"(镜像名)"`
+	Age            string `orm:"null;" description:"(运行时长)"`
+	CreateTime     string `orm:"null;" description:"(创建时间);"`
+	UpdateTime     string `orm:"null;" description:"(更新时间);"`
 }
 
 type ContainerConfigInterface interface {
@@ -31,6 +32,7 @@ type ContainerConfigInterface interface {
 	Get() Result
 	List(from, limit int, groupSearch bool) Result
 	Count() int64
+	EmptyDirtyDataForAgent() error
 }
 
 func (this *ContainerConfig) Add() Result {
@@ -54,7 +56,8 @@ func (this *ContainerConfig) Add() Result {
 	}
 
 	if len(containerConfigList) != 0 {
-		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接更新）
+		// 更新前需要将绑定关系提取
+		this.AccountName = containerConfigList[0].AccountName
 		return this.Update()
 	} else {
 		_, err = o.Insert(this)
@@ -186,4 +189,14 @@ func (this *ContainerConfig) Delete() Result {
 	}
 	ResultData.Code = http.StatusOK
 	return ResultData
+}
+
+func (this *ContainerConfig) EmptyDirtyDataForAgent() error {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	_, err := o.Raw("delete from "+utils.ContainerConfig+" where host_name = ? and sync_check_point != ? and pod_id = '' ", this.HostName, this.SyncCheckPoint).Exec()
+	if err != nil {
+		logs.Error("Empty Dirty Data failed,  model: %s, code: %d, err: %s", utils.ContainerConfig, utils.EmptyDirtyDataContinerConfigErr, err.Error())
+	}
+	return err
 }
