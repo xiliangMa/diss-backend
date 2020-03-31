@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/k8s"
+	"github.com/xiliangMa/diss-backend/service/synccheck"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strings"
@@ -13,7 +14,8 @@ import (
 )
 
 type K8STaskHandler struct {
-	Clientgo utils.ClientGo
+	Clientgo       utils.ClientGo
+	SyncCheckPoint int64
 }
 
 func NewK8STaskHandler(path string) *K8STaskHandler {
@@ -146,6 +148,9 @@ func (this *K8STaskHandler) SyncNameSpace(clusetrName, clusterId string) {
 	if err != nil {
 		logs.Error("Sync namspace err: %s", err.Error())
 	} else {
+		CheckObject := new(k8s.NameSpace)
+		CheckObject.SyncCheckPoint = this.SyncCheckPoint
+		CheckObject.ClusterId = clusterId
 		logs.Info("########## Sync NameSpace, Cluster: %s >>> strat <<< ##########, size: %d", clusetrName, len(nameSpaces.Items))
 		for _, ns := range nameSpaces.Items {
 			nsName := ns.ObjectMeta.Name
@@ -155,17 +160,28 @@ func (this *K8STaskHandler) SyncNameSpace(clusetrName, clusterId string) {
 			ob.Id = nsId
 			ob.Name = nsName
 			ob.ClusterId = clusterId
+			ob.SyncCheckPoint = this.SyncCheckPoint
 			ob.Add(true)
+		}
+		// 清除脏数据
+		size := len(nameSpaces.Items)
+		if size != 0 {
+			k8sCheckHandler := synccheck.K8SCheckHadler{nil, nil, CheckObject, nil}
+			k8sCheckHandler.Check(models.Tag_NameSpace)
+			logs.Info("########## Empty Dirty Data, Model: %s ##########", models.Tag_NameSpace)
 		}
 		logs.Info("########## Sync NameSpace, Cluster: %s >>> end <<< ##########, size: %d", clusetrName, len(nameSpaces.Items))
 	}
 }
 
-func (this *K8STaskHandler) SyncNamespacePod() {
+func (this *K8STaskHandler) SyncNamespacePod(clusterName string) {
 	nameSpaces, err := this.Clientgo.GetNameSpaces()
 	if err != nil {
 		logs.Error("Sync namspace err: %s", err.Error())
 	} else {
+		CheckObject := new(k8s.Pod)
+		CheckObject.SyncCheckPoint = this.SyncCheckPoint
+		CheckObject.ClusterName = clusterName
 		for _, ns := range nameSpaces.Items {
 			nsName := ns.Name
 			pods, err := this.Clientgo.GetPodsByNameSpace(nsName)
@@ -183,21 +199,36 @@ func (this *K8STaskHandler) SyncNamespacePod() {
 					podob.HostName = pod.Spec.NodeName
 					podob.PodIp = pod.Status.PodIP
 					podob.Status = string(pod.Status.Phase)
+					podob.ClusterName = clusterName
+					podob.SyncCheckPoint = this.SyncCheckPoint
 					podob.Add()
 				}
 				logs.Info("########## Sync Pod, NameSpace: %s >>> end <<< ##########, size: %d, NSName %s", nsName, len(pods.Items), nsName)
 			}
 		}
-
+		// 清除脏数据
+		size := len(nameSpaces.Items)
+		if size != 0 {
+			k8sCheckHandler := synccheck.K8SCheckHadler{nil, nil, nil, CheckObject}
+			k8sCheckHandler.Check(models.Tag_Pod)
+			logs.Info("########## Empty Dirty Data, Model: %s ##########", models.Tag_Pod)
+		}
 	}
 }
 
 func (this *K8STaskHandler) SyncPodContainerConfigAndInfo(clusterName string) {
 	nameSpaces, err := this.Clientgo.GetNameSpaces()
-	SyncCheckPoint := time.Now().Unix()
 	if err != nil {
 		logs.Error("Sync namspace err: %s", err.Error())
 	} else {
+		CheckObject1 := new(models.ContainerConfig)
+		CheckObject1.SyncCheckPoint = this.SyncCheckPoint
+		CheckObject1.ClusterName = clusterName
+
+		CheckObject2 := new(models.ContainerInfo)
+		CheckObject2.SyncCheckPoint = this.SyncCheckPoint
+		CheckObject2.ClusterName = clusterName
+
 		for _, ns := range nameSpaces.Items {
 			nsName := ns.Name
 			pods, err := this.Clientgo.GetPodsByNameSpace(nsName)
@@ -257,7 +288,7 @@ func (this *K8STaskHandler) SyncPodContainerConfigAndInfo(clusterName string) {
 						ccob.Age = "Up " + created.String()
 						ccob.CreateTime = startTime
 						ccob.UpdateTime = startTime
-						ccob.SyncCheckPoint = SyncCheckPoint
+						ccob.SyncCheckPoint = this.SyncCheckPoint
 
 						//同步 containerinfo
 						ciob := new(models.ContainerInfo)
@@ -277,7 +308,8 @@ func (this *K8STaskHandler) SyncPodContainerConfigAndInfo(clusterName string) {
 						ciob.Ip = podIp
 						ciob.Labels = labels
 						ciob.Volumes = volumes
-						ciob.SyncCheckPoint = SyncCheckPoint
+						ciob.ClusterName = clusterName
+						ciob.SyncCheckPoint = this.SyncCheckPoint
 
 						// 通过 containers获取的数据
 						for _, cs := range pod.Spec.Containers {
@@ -307,6 +339,17 @@ func (this *K8STaskHandler) SyncPodContainerConfigAndInfo(clusterName string) {
 				}
 			}
 		}
+		// 清除脏数据
+		size := len(nameSpaces.Items)
+		if size != 0 {
+			k8sCheckHandler := synccheck.K8SCheckHadler{CheckObject1, CheckObject2, nil, nil}
+
+			k8sCheckHandler.Check(models.Tag_ContainerConfig)
+			logs.Info("########## Empty Dirty Data, Model: %s ##########", models.Tag_ContainerConfig)
+
+			k8sCheckHandler.Check(models.Tag_ContainerInfo)
+			logs.Info("########## Empty Dirty Data, Model: %s ##########", models.Tag_ContainerInfo)
+		}
 	}
 }
 
@@ -322,6 +365,7 @@ func SyncAll() {
 
 	if result.Code == http.StatusOK && result.Data != nil {
 		data := result.Data.(map[string]interface{})
+		SyncCheckPoint := time.Now().Unix()
 		for _, c := range data["items"].([]*k8s.Cluster) {
 			if c.IsSync == models.Cluster_IsSync {
 				clusterName := c.Name
@@ -330,12 +374,12 @@ func SyncAll() {
 				logs.Info("########################################## cluster:  %s, Sync start.", c.Name)
 				// 创建k8s客户端
 				this := NewK8STaskHandler(c.FileName)
-
+				this.SyncCheckPoint = SyncCheckPoint
 				// 同步 namespace
-				this.SyncNameSpace(c.Name, c.Id)
+				this.SyncNameSpace(clusterName, c.Id)
 
 				// 同步 集群内的 hostconfig && hostInfo
-				this.SyncHostConfigAndInfo(c.Name, c.Id)
+				this.SyncHostConfigAndInfo(clusterName, c.Id)
 
 				// 单独同步 hostinfo
 				//this.SyncHostInfo(c.Name)
@@ -344,16 +388,16 @@ func SyncAll() {
 				//this.SyncHostImageConfig()
 
 				// 同步 namespace 下的 pod
-				this.SyncNamespacePod()
+				this.SyncNamespacePod(clusterName)
 
 				// 同步 pod 内的 containerconfig && containerinfo
 				this.SyncPodContainerConfigAndInfo(clusterName)
 
-				logs.Info("Sync end...., cluster name: %s ", c.Name)
+				logs.Info("Sync end...., cluster name: %s ", clusterName)
 				// 更新同步时间、状态
 				c.SyncStatus = models.Cluster_Sync_Status_OK
 				c.Update()
-				logs.Info("########################################## cluster:  %s, Sync end.", c.Name)
+				logs.Info("########################################## cluster:  %s, Sync end.", clusterName)
 			}
 		}
 

@@ -9,23 +9,26 @@ import (
 )
 
 type Pod struct {
-	Id            string `orm:"pk;" description:"(pod id)"`
-	Name          string `orm:"unique;" description:"(集群名)"`
-	PodIp         string `orm:"default(null);" description:"(pod ip)"`
-	Status        string `orm:"" description:"(pod状态)"`
-	GroupId       string `orm:"default(null);" description:"(租户id)"`
-	GroupName     string `orm:"default(null);" description:"(租户名)"`
-	HostIp        string `orm:"default(null);" description:"(主机ip， 默认内网ip)"`
-	HostName      string `orm:"default(null);" description:"(host name)"`
-	NameSpaceName string `orm:"default(null);" description:"(命名空间)"`
+	Id             string `orm:"pk;" description:"(pod id)"`
+	Name           string `orm:"unique;" description:"(集群名)"`
+	PodIp          string `orm:"default(null);" description:"(pod ip)"`
+	Status         string `orm:"" description:"(pod状态)"`
+	GroupId        string `orm:"default(null);" description:"(租户id)"`
+	GroupName      string `orm:"default(null);" description:"(租户名)"`
+	SyncCheckPoint int64  `orm:"default(0);" description:"(同步检查点)"`
+	HostIp         string `orm:"default(null);" description:"(主机ip， 默认内网ip)"`
+	HostName       string `orm:"default(null);" description:"(host name)"`
+	NameSpaceName  string `orm:"default(null);" description:"(命名空间)"`
+	ClusterName    string `orm:"" description:"(集群名)"`
 }
 
 type PodInterface interface {
-	Add()
-	Delete()
-	Edit()
-	Get()
-	List()
+	Add() models.Result
+	Delete() models.Result
+	Update() models.Result
+	Get() models.Result
+	List(from, limit int) models.Result
+	EmptyDirtyData() error
 }
 
 func (this *Pod) Add() models.Result {
@@ -127,4 +130,14 @@ func (this *Pod) Update() models.Result {
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
+}
+
+func (this *Pod) EmptyDirtyData() error {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	_, err := o.Raw("delete from "+utils.Pod+" where cluster_name = ? and sync_check_point != ? ", this.ClusterName, this.SyncCheckPoint).Exec()
+	if err != nil {
+		logs.Error("Empty Dirty Data failed,  model: %s, code: %d, err: %s", utils.Pod, utils.EmptyDirtyDataPodErr, err.Error())
+	}
+	return err
 }

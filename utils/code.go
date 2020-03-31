@@ -60,6 +60,8 @@ var (
 	ContainerConfigNotFoundErr      = 65
 	EmptyDirtyDataContinerConfigErr = 66
 	EmptyDirtyDataContinerInfoErr   = 67
+	EmptyDirtyDataNameSpaceErr      = 68
+	EmptyDirtyDataPodErr            = 69
 
 	//k8s 1001-1100
 	AddNameSpaceErr    = 1001

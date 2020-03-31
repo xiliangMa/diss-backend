@@ -9,20 +9,23 @@ import (
 )
 
 type NameSpace struct {
-	Id          string `orm:"pk;" description:"(命名空间id)"`
-	Name        string `orm:"unique;" description:"(命名空间)"`
-	ClusterId   string `orm:"default(null);" description:"(集群id)"`
-	AccountName string `orm:"" description:"(租户)"`
-	Force       bool   `orm:"-" description:"(强制更新)"`
+	Id             string `orm:"pk;" description:"(命名空间id)"`
+	Name           string `orm:"unique;" description:"(命名空间)"`
+	ClusterId      string `orm:"default(null);" description:"(集群id)"`
+	AccountName    string `orm:"" description:"(租户)"`
+	SyncCheckPoint int64  `orm:"default(0);" description:"(同步检查点)"`
+	Force          bool   `orm:"-" description:"(强制更新)"`
 }
 
 type NameSpaceInterface interface {
-	Add()
-	Delete()
-	Edit()
-	Get()
-	List()
-	BindAccount()
+	Add() models.Result
+	Edit() models.Result
+	Get() models.Result
+	List() models.Result
+	BindAccount() models.Result
+	UnBindAccount() models.Result
+	ListByAccountGroupByClusterId() (error, []string)
+	EmptyDirtyData() error
 }
 
 func (this *NameSpace) Add(syncK8s bool) models.Result {
@@ -231,4 +234,16 @@ func (this *NameSpace) ListByAccountGroupByClusterId() (error, []string) {
 		return err, nil
 	}
 	return nil, cIds
+}
+
+func (this *NameSpace) EmptyDirtyData() error {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	_, err := o.Raw("delete from "+utils.NameSpace+" where cluster_id = ? and sync_check_point != ? ", this.ClusterId, this.SyncCheckPoint).Exec()
+	if err != nil {
+		logs.Error("Empty Dirty Data failed,  model: %s, code: %d, err: %s", utils.NameSpace, utils.EmptyDirtyDataNameSpaceErr, err.Error())
+	} else {
+		logs.Error("Empty Dirty Data success,  model: %s, ", utils.NameSpace)
+	}
+	return err
 }

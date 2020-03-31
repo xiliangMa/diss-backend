@@ -33,6 +33,7 @@ type ContainerConfigInterface interface {
 	List(from, limit int, groupSearch bool) Result
 	Count() int64
 	EmptyDirtyDataForAgent() error
+	EmptyDirtyDataForK8s() error
 }
 
 func (this *ContainerConfig) Add() Result {
@@ -195,6 +196,17 @@ func (this *ContainerConfig) EmptyDirtyDataForAgent() error {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	_, err := o.Raw("delete from "+utils.ContainerConfig+" where host_name = ? and sync_check_point != ? and pod_id = '' ", this.HostName, this.SyncCheckPoint).Exec()
+	if err != nil {
+		logs.Error("Empty Dirty Data failed,  model: %s, code: %d, err: %s", utils.ContainerConfig, utils.EmptyDirtyDataContinerConfigErr, err.Error())
+	}
+	return err
+}
+
+func (this *ContainerConfig) EmptyDirtyDataForK8s() error {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	_, err := o.Raw("delete from "+utils.ContainerConfig+" where cluster_name = ? and sync_check_point != ? and pod_id = '' ", this.ClusterName, this.SyncCheckPoint).Exec()
+
 	if err != nil {
 		logs.Error("Empty Dirty Data failed,  model: %s, code: %d, err: %s", utils.ContainerConfig, utils.EmptyDirtyDataContinerConfigErr, err.Error())
 	}

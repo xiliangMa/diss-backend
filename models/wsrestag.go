@@ -13,4 +13,6 @@ const (
 	Tag_KubernetesBenchMarkLog = "KubernetesBenchMarkLog"
 	Tag_HostCmdHistory         = "HostCmdHistory"
 	Tag_ContainerCmdHistory    = "ContainerCmdHistory"
+	Tag_NameSpace              = "NameSpace"
+	Tag_Pod                    = "Pod"
 )
