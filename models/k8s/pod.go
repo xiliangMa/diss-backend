@@ -11,6 +11,7 @@ import (
 type Pod struct {
 	Id             string `orm:"pk;" description:"(pod id)"`
 	Name           string `orm:"unique;" description:"(集群名)"`
+	AccountName    string `orm:"" description:"(租户)"`
 	PodIp          string `orm:"default(null);" description:"(pod ip)"`
 	Status         string `orm:"" description:"(pod状态)"`
 	GroupId        string `orm:"default(null);" description:"(租户id)"`

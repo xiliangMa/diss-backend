@@ -142,23 +142,37 @@ func (this *NameSpace) UnBindAccount() models.Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData models.Result
-	dbList := []*NameSpace{}
-
+	err := o.Begin()
+	params := orm.Params{"account_name": ""}
 	cond := orm.NewCondition()
 	cond = cond.And("id", this.Id)
-	count, err := o.QueryTable(utils.NameSpace).SetCond(cond).All(&dbList)
+
+	_, err = o.QueryTable(utils.NameSpace).SetCond(cond).Update(params)
 	if err != nil {
+		o.Rollback()
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.UnBindNameSpaceErr
-		logs.Error("Get NameSpace: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+		logs.Error("UnBind NameSpace: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
-
-	// 解除绑定 设置租户为空
-	if count != 0 {
-		dbList[0].AccountName = ""
-		dbList[0].Update()
+	// 解除 pod 和 pod 下容器的 租户绑定关系
+	_, err = o.QueryTable(utils.Pod).Filter("name_space_name", this.Name).Update(params)
+	if err != nil {
+		o.Rollback()
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.UnBindPodErr
+		logs.Error("UnBind Pod failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
 	}
+	_, err = o.QueryTable(utils.ContainerConfig).Filter("name_space_name", this.Name).Update(params)
+	if err != nil {
+		o.Rollback()
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.UnBindContainerErr
+		logs.Error("UnBind Container failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	o.Commit()
 	ResultData.Code = http.StatusOK
 	ResultData.Data = nil
 	return ResultData
@@ -187,6 +201,7 @@ func (this *NameSpace) BindAccount() models.Result {
 			dbList[0].AccountName = this.AccountName
 		} else {
 			if this.Force != true {
+				o.Rollback()
 				ResultData.Message = "IsBindErr"
 				ResultData.Code = utils.IsBindErr
 				logs.Error("NameSpace: %s bind accout failed, code: %d, err: %s", dbList[0].Name, ResultData.Code, ResultData.Message)
@@ -198,19 +213,32 @@ func (this *NameSpace) BindAccount() models.Result {
 
 	_, err := o.Update(dbList[0])
 	if err != nil {
+		o.Rollback()
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.EditNameSpaceErr
 		logs.Error("Bind NameSpace: %s, AccountNamecode: %s, fail: %d, err: %s", dbList[0].Name, this.AccountName, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
-	//  添加account 和 cluster 的绑定关系
-	//ac := new(models.AccountCluster)
-	//id, _ := uuid.NewV4()
-	//ac.Id = id.String()
-	//ac.AccountName = this.AccountName
-	//ac.ClusterId = dbList[0].ClusterId
-	//ac.Add()
+	// 更新 pod 和 pod 下容器的 租户绑定关系
+	params := orm.Params{"account_name": this.AccountName}
+	_, err = o.QueryTable(utils.Pod).Filter("name_space_name", this.Name).Update(params)
+	if err != nil {
+		o.Rollback()
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.UnBindPodErr
+		logs.Error("UnBind Pod failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
 
+	_, err = o.QueryTable(utils.ContainerConfig).Filter("name_space_name", this.Name).Update(params)
+	if err != nil {
+		o.Rollback()
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.UnBindContainerErr
+		logs.Error("UnBind Container failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	o.Commit()
 	ResultData.Code = http.StatusOK
 	ResultData.Data = dbList[0]
 	return ResultData

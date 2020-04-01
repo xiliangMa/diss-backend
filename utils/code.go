@@ -62,6 +62,8 @@ var (
 	EmptyDirtyDataContinerInfoErr   = 67
 	EmptyDirtyDataNameSpaceErr      = 68
 	EmptyDirtyDataPodErr            = 69
+	BindContainerErr                = 70
+	UnBindContainerErr              = 71
 
 	//k8s 1001-1100
 	AddNameSpaceErr    = 1001
@@ -75,8 +77,10 @@ var (
 	IsBindErr          = 1009
 	NoNameSpacedErr    = 1010
 	NameSpaceExistErr  = 1011
-	UnBindNameSpaceErr = 1012
-	BindNameSpaceErr   = 1013
+	BindNameSpaceErr   = 1012
+	UnBindNameSpaceErr = 1013
+	BindPodErr         = 1014
+	UnBindPodErr       = 1015
 
 	//task 1100-1200
 	AddTaskErr = 1100
