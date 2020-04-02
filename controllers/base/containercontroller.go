@@ -42,3 +42,19 @@ func (this *ContainerController) DeleteContainer() {
 	this.Data["json"] = containerConfig.Delete()
 	this.ServeJSON(false)
 }
+
+// @Title GetContainerInfo
+// @Description Get Container Info
+// @Param token header string true "authToken"
+// @Param containerId path string "" true "containerId"
+// @Param body body models.ContainerInfo false "容器详细信息"
+// @Success 200 {object} models.Result
+// @router /:containerId/info [post]
+func (this *ContainerController) GetContainerInfo() {
+	containerId := this.GetString(":containerId")
+	containerInfo := new(models.ContainerInfo)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &containerInfo)
+	containerInfo.Id = containerId
+	this.Data["json"] = containerInfo.List()
+	this.ServeJSON(false)
+}
