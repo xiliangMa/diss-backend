@@ -59,6 +59,9 @@ func (this *ImageInfo) List() Result {
 	if this.HostId != "" {
 		cond = cond.And("host_id", this.HostId)
 	}
+	if this.HostName != "" {
+		cond = cond.And("host_name", this.HostName)
+	}
 	if this.ImageId != "" {
 		cond = cond.And("image_id", this.ImageId)
 	}

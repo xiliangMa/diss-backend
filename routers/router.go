@@ -85,6 +85,11 @@ func init() {
 				&cbase.ContainerController{},
 			),
 		),
+		beego.NSNamespace("/v1/images",
+			beego.NSInclude(
+				&cbase.ImageController{},
+			),
+		),
 		beego.NSNamespace("/v1/k8s/clusters",
 			beego.NSInclude(
 				&ck8s.ClusterController{},
