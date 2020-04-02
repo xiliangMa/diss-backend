@@ -86,16 +86,16 @@ func (this *ContainerConfig) List(from, limit int, groupSearch bool) Result {
 		cond = cond.And("name__contains", this.Name)
 	}
 	if this.HostName != "" {
-		cond = cond.And("host_name", this.HostName)
+		cond = cond.And("host_name__contains", this.HostName)
 	}
 	if this.ImageName != "" {
-		cond = cond.And("image_name", this.ImageName)
+		cond = cond.And("image_name__contains", this.ImageName)
 	}
 	if this.NameSpaceName != "" {
-		cond = cond.And("name_space_name", this.NameSpaceName)
+		cond = cond.And("name_space_name__contains", this.NameSpaceName)
 	}
 	if this.ClusterName != "" {
-		cond = cond.And("cluster_name", this.ClusterName)
+		cond = cond.And("cluster_name__contains", this.ClusterName)
 	}
 	if this.Status != "" && this.Status != Container_Status_All {
 		switch this.Status {
