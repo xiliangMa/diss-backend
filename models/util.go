@@ -35,13 +35,17 @@ var (
 	Diss_Status_Unsafe = 1
 
 	//基线日志类型
-	BMLT_Host_All  = "host"
-	BMLT_Docker    = "docker"
-	BMLT_K8s       = "k8s"
-	BML_Level_Info = "INFO"
-	BML_Level_Warn = "WARN"
-	BML_Level_Pass = "PASS"
-	BML_Level_fail = "FAIL"
+	BMLT_Host_All    = "host"
+	BMLT_Docker      = "docker"
+	BMLT_K8s         = "k8s"
+	BML_Template_ALL = "All"
+	BML_Level_ALL    = "All"
+	BML_Level_High   = "High"
+	BML_Level_Medium = "Medium"
+	BML_Level_Low    = "Low"
+	BML_Result_ALL   = "All"
+	BML_Result_Pass  = "Pass"
+	BML_Result_Fail  = "Fail"
 
 	// 入侵检测类型
 	IDLT_Docker = "docker"

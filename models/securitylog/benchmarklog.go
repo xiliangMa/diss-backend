@@ -78,11 +78,15 @@ func (this *BenchMarkLog) List(from, limit int) models.Result {
 		cond = cond.And("id", this.Id)
 	}
 
-	if this.Level != "" {
+	if this.Level != "" && this.Level != models.BML_Level_ALL {
 		cond = cond.And("level", this.Level)
 	}
 
-	if this.BenchMarkName != "" {
+	if this.Result != "" && this.Result != models.BML_Result_ALL {
+		cond = cond.And("result", this.Result)
+	}
+
+	if this.BenchMarkName != "" && this.BenchMarkName != models.BML_Template_ALL {
 		cond = cond.And("bench_mark_name", this.BenchMarkName)
 	}
 	_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Limit(limit, from).OrderBy("-update_time").All(&BenchMarkLogList)
