@@ -21,11 +21,11 @@ type HostPs struct {
 }
 
 type HostPsInterface interface {
-	Add()
-	Delete()
-	Edit()
-	Get()
-	List()
+	Add() Result
+	Delete() Result
+	Edit() Result
+	Get() Result
+	List(from, limit int) Result
 }
 
 func (this *HostPs) List(from, limit int) Result {
