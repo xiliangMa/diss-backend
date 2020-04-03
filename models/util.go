@@ -48,7 +48,7 @@ var (
 	BML_Result_Fail  = "Fail"
 
 	// 入侵检测类型
-	IDLT_Docker = "docker"
+	IDLT_Docker = "container"
 	IDLT_Host   = "host"
 
 	// 租户
