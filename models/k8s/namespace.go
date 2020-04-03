@@ -99,6 +99,10 @@ func (this *NameSpace) List(from, limit int) models.Result {
 		cond = cond.And("account_name", this.AccountName)
 	}
 
+	if this.AccountName == models.Account_Admin {
+		cond = cond.And("account_name", "")
+	}
+
 	_, err = o.QueryTable(utils.NameSpace).SetCond(cond).Limit(limit, from).All(&nameSpaceList)
 
 	if err != nil {
