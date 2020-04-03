@@ -80,7 +80,7 @@ func init() {
 				&cbase.HostController{},
 			),
 		),
-		beego.NSNamespace("/v1/hostcmdhistory",
+		beego.NSNamespace("/v1/hostcmdhistorys",
 			beego.NSInclude(
 				&cbase.HostCmdHistoryController{},
 			),
@@ -88,6 +88,11 @@ func init() {
 		beego.NSNamespace("/v1/containers",
 			beego.NSInclude(
 				&cbase.ContainerController{},
+			),
+		),
+		beego.NSNamespace("/v1/containercmdhistorys",
+			beego.NSInclude(
+				&cbase.ContainerCmdHistoryController{},
 			),
 		),
 		beego.NSNamespace("/v1/images",

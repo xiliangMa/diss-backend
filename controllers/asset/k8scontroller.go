@@ -153,7 +153,7 @@ func (this *K8SController) GetContainerInfo() {
 // @Description Get Container CmdHistory  List
 // @Param token header string true "authToken"
 // @Param containerId path string "" true "containerId"
-// @Param body body models.CmdHistory false "主机命令历史"
+// @Param body body models.CmdHistory false "容器命令历史"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
