@@ -54,6 +54,15 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:GroupsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:GroupsController"],
 		beego.ControllerComments{
+			Method:           "AddGroup",
+			Router:           `/add`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:GroupsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:GroupsController"],
+		beego.ControllerComments{
 			Method:           "GetContainersList",
 			Router:           `/containers`,
 			AllowHTTPMethods: []string{"post"},

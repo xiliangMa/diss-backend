@@ -30,7 +30,19 @@ func (this *GroupsController) GetGroupsList() {
 	groups.AccountName = accountName
 	this.Data["json"] = groups.List(from, limit)
 	this.ServeJSON(false)
+}
 
+// @Title AddGroup
+// @Description Add Group
+// @Param token header string true "authToken"
+// @Param body body models.Groups false "分组信息"
+// @Success 200 {object} models.Result
+// @router /add [post]
+func (this *GroupsController) AddGroup() {
+	groups := new(models.Groups)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &groups)
+	this.Data["json"] = groups.Add()
+	this.ServeJSON(false)
 }
 
 // @Title GetContainers

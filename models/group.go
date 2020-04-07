@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
+	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"time"
@@ -10,12 +11,13 @@ import (
 
 type Groups struct {
 	Id          string    `orm:"pk;" description:"(id)"`
-	FirstLevel  string    `orm:"" description:"(一级分组)"`
-	SecondLevel string    `orm:"" description:"(二级分组)"`
-	ThirdLevel  string    `orm:"" description:"(三级分组)"`
+	FirstLevel  string    `orm:"unique" description:"(一级分组)"`
+	SecondLevel string    `orm:"null" description:"(二级分组)"`
+	ThirdLevel  string    `orm:"null" description:"(三级分组)"`
 	Type        int       `orm:"default(0)" description:"(All -1 分组类型 0 主机 1 容器)"`
-	AccountName string    `orm:"default(admin)" description:"(租户)"`
-	CreateTime  time.Time `orm:"null;auto_now;type(datetime)" description:"(创建时间)"`
+	AccountName string    `orm:"default(admin)" description:"(租户 默认 admin)"`
+	CreateTime  time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
+	UpdateTime  time.Time `orm:"auto_now;type(datetime)" description:"(更新时间)"`
 }
 
 type GroupInterface interface {
@@ -30,7 +32,8 @@ func (this *Groups) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
-
+	uuid, _ := uuid.NewV4()
+	this.Id = uuid.String()
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -38,9 +41,9 @@ func (this *Groups) Add() Result {
 		logs.Error("Add Group failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
-	ResultData.Code = http.StatusOK
-	ResultData.Data = this
-	return ResultData
+	cond := orm.NewCondition()
+	cond = cond.And("id", this.Id)
+	return this.List(0, 0)
 }
 
 func (this *Groups) List(from, limit int) Result {
