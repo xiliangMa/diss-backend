@@ -14,7 +14,7 @@ type HostController struct {
 // @Title GetHosts
 // @Description Get Hosts
 // @Param token header string true "authToken"
-// @Param body git  models.HostConfig false "主机配置信息"
+// @Param body body models.HostConfig false "主机配置信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
@@ -48,5 +48,20 @@ func (this *HostController) GetHostPsList() {
 	hostPs.HostId = hostId
 	this.Data["json"] = hostPs.List(from, limit)
 	this.ServeJSON(false)
+}
 
+// @Title UpdateHost
+// @Description Update Host
+// @Param token header string true "authToken"
+// @Param hostId path string "" true "hostId"
+// @Param body body models.HostConfig true "主机配置信息"
+// @Success 200 {object} models.Result
+// @router /:hostId [put]
+func (this *HostController) UpdateHost() {
+	hostId := this.GetString(":hostId")
+	hostConfig := new(models.HostConfig)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &hostConfig)
+	hostConfig.Id = hostId
+	this.Data["json"] = hostConfig.Update()
+	this.ServeJSON(false)
 }
