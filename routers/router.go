@@ -12,7 +12,6 @@ import (
 	caccounts "github.com/xiliangMa/diss-backend/controllers/accounts"
 	ca "github.com/xiliangMa/diss-backend/controllers/asset"
 	cbase "github.com/xiliangMa/diss-backend/controllers/base"
-	cgroups "github.com/xiliangMa/diss-backend/controllers/groups"
 	ck8s "github.com/xiliangMa/diss-backend/controllers/k8s"
 	csl "github.com/xiliangMa/diss-backend/controllers/securitylog"
 	cs "github.com/xiliangMa/diss-backend/controllers/securitypolicy"
@@ -72,7 +71,7 @@ func init() {
 		),
 		beego.NSNamespace("/v1/groups",
 			beego.NSInclude(
-				&cgroups.GroupsController{},
+				&cbase.GroupsController{},
 			),
 		),
 		beego.NSNamespace("/v1/hosts",

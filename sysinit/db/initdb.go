@@ -84,5 +84,5 @@ func registerDefaultModel() {
 	orm.RegisterModel(new(models.BenchMarkTemplate), new(models.CmdHistory),
 		new(models.ContainerConfig), new(models.ContainerInfo), new(models.ContainerPs),
 		new(models.HostConfig), new(models.HostInfo), new(models.HostPs), new(models.ImageConfig),
-		new(models.ImageInfo))
+		new(models.ImageInfo), new(models.Groups))
 }

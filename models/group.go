@@ -10,18 +10,20 @@ import (
 
 type Groups struct {
 	Id          string    `orm:"pk;" description:"(id)"`
-	Name        string    `orm:"" description:"(镜像id)"`
-	Type        int       `orm:"default(0)" description:"(分组类型 0 主机 1 容器)"`
-	AccountName string    `orm:"" description:"(租户)"`
+	FirstLevel  string    `orm:"" description:"(一级分组)"`
+	SecondLevel string    `orm:"" description:"(二级分组)"`
+	ThirdLevel  string    `orm:"" description:"(三级分组)"`
+	Type        int       `orm:"default(0)" description:"(All -1 分组类型 0 主机 1 容器)"`
+	AccountName string    `orm:"default(admin)" description:"(租户)"`
 	CreateTime  time.Time `orm:"null;auto_now;type(datetime)" description:"(创建时间)"`
 }
 
 type GroupInterface interface {
-	Add()
-	Delete()
-	Edit()
-	Get()
-	List()
+	Add() Result
+	Delete() Result
+	Update() Result
+	Get() Result
+	List(from, limit int) Result
 }
 
 func (this *Groups) Add() Result {
@@ -49,16 +51,25 @@ func (this *Groups) List(from, limit int) Result {
 	var err error
 
 	cond := orm.NewCondition()
-	if this.AccountName != "" && this.AccountName != Account_Admin {
+	if this.AccountName != "" {
 		cond = cond.And("account_name", this.AccountName)
 	}
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
-	if this.Name != "" {
-		cond = cond.And("name__contains", this.Name)
+	if this.FirstLevel != "" {
+		cond = cond.And("first_level__contains", this.FirstLevel)
 	}
-	cond = cond.And("type", this.Type)
+	if this.SecondLevel != "" {
+		cond = cond.And("second_level__contains", this.SecondLevel)
+	}
+	if this.ThirdLevel != "" {
+		cond = cond.And("third_level__contains", this.ThirdLevel)
+	}
+	if this.Type != Group_All {
+		cond = cond.And("type", this.Type)
+	}
+
 	_, err = o.QueryTable(utils.Groups).SetCond(cond).Limit(limit, from).All(&GroupList)
 
 	if err != nil {
@@ -90,7 +101,7 @@ func (this *Groups) Update() Result {
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.EditGroupErr
-		logs.Error("Update Group: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+		logs.Error("Update Group: %s failed, code: %d, err: %s", this.FirstLevel, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK
