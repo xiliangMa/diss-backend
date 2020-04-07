@@ -45,6 +45,20 @@ func (this *GroupsController) AddGroup() {
 	this.ServeJSON(false)
 }
 
+// @Title DeleteGroup
+// @Description Delete Group
+// @Param token header string true "authToken"
+// @Param grouprId path string "" true "grouprId"
+// @Success 200 {object} models.Result
+// @router /:grouprId [delete]
+func (this *GroupsController) DeleteGroup() {
+	grouprId := this.GetString(":grouprId")
+	group := new(models.Groups)
+	group.Id = grouprId
+	this.Data["json"] = group.Delete()
+	this.ServeJSON(false)
+}
+
 // @Title GetContainers
 // @Description Get Groups List（获取分组下的容器）
 // @Param token header string true "authToken"
