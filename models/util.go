@@ -1,6 +1,8 @@
 package models
 
 var (
+	All = "All"
+
 	// k8s
 	Cluster_Sync_Status_OK          = 0
 	Cluster_Sync_Status_IN_PROGRESS = 1

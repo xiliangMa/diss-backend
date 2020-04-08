@@ -31,7 +31,7 @@ func (this *IntrudeDetectLogController) GetIntrudeDetectLogInfo() {
 }
 
 // @Title GetIntrudeDetectLog
-// @Description Get IntrudeDetectLog List
+// @Description Get IntrudeDetectLog List (1. 根据 TargeType = host 和 HostId = All 判断是否是查询所有主机日志 如果不是则匹配其它所传入的条件 2. 根据 TargeType = container 和 ContainerId = All 判断是否是查询所有容器日志 如果不是则匹配其它所传入的条件)
 // @Param token header string true "authToken"
 // @Param body body securitylog.IntrudeDetectLog false "入侵检测日志信息"
 // @Success 200 {object} models.Result
@@ -39,6 +39,6 @@ func (this *IntrudeDetectLogController) GetIntrudeDetectLogInfo() {
 func (this *IntrudeDetectLogController) GetIntrudeDetectLogList() {
 	intrudeDetectLog := new(msl.IntrudeDetectLog)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &intrudeDetectLog)
-	this.Data["json"] = intrudeDetectLog.List(0, intrudeDetectLog.Limit)
+	this.Data["json"] = intrudeDetectLog.List1(0, intrudeDetectLog.Limit)
 	this.ServeJSON(false)
 }
