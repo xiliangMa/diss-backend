@@ -8,13 +8,12 @@ import (
 )
 
 type HostConfigInterface interface {
-	Add()
-	Delete()
-	Edit()
-	Get()
-	List()
-	Count()
-	GetBnechMarkProportion()
+	Inner_AddHostConfig() error
+	Inner_AddHostInfo() error
+	List(from, limit int) Result
+	Update() Result
+	Count() int64
+	GetBnechMarkProportion() (int64, int64)
 }
 
 func (this *HostConfig) List(from, limit int) Result {
@@ -31,12 +30,14 @@ func (this *HostConfig) List(from, limit int) Result {
 		cond = cond.And("diss_status", this.DissStatus)
 	}
 	if this.Label != "" {
-		cond = cond.And("Label__contains", this.Label)
+		cond = cond.And("label__contains", this.Label)
+	}
+	if this.Group != "" {
+		cond = cond.And("group__contains", this.Group)
 	}
 	if this.HostName != "" {
 		cond = cond.And("host_name__contains", this.HostName)
 	}
-
 	if this.AccountName != "" && this.AccountName != Account_Admin {
 		cond = cond.And("account_name", this.AccountName)
 	}
