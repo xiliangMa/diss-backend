@@ -13,7 +13,7 @@ type GroupsController struct {
 }
 
 // @Title GetGroups
-// @Description Get Groups List（获取租户下的分组 主机/容器分组）
+// @Description Get Groups List（获取租户下的分组 主机/容器分组, 暂不支持主机、容器对象参数传入查询）
 // @Param token header string true "authToken"
 // @Param accountName query string "admin" true "diss api 系统登入用户的所属租户"
 // @Param body body models.Groups false "分组信息"

@@ -50,7 +50,7 @@ func (this *Groups) Add() Result {
 func (this *Groups) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var GroupList []*Groups
+	var groupList []*Groups
 	var ResultData Result
 	var err error
 
@@ -74,8 +74,10 @@ func (this *Groups) List(from, limit int) Result {
 		cond = cond.And("type", this.Type)
 	}
 
-	_, err = o.QueryTable(utils.Groups).SetCond(cond).Limit(limit, from).All(&GroupList)
-
+	_, err = o.QueryTable(utils.Groups).SetCond(cond).Limit(limit, from).All(&groupList)
+	for _, group := range groupList {
+		o.LoadRelated(group, "HostConfig")
+	}
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetGroupErr
@@ -86,7 +88,7 @@ func (this *Groups) List(from, limit int) Result {
 	total, _ := o.QueryTable(utils.Groups).SetCond(cond).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
-	data["items"] = GroupList
+	data["items"] = groupList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
