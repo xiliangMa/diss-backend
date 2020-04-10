@@ -10,14 +10,15 @@ import (
 )
 
 type Groups struct {
-	Id          string    `orm:"pk;" description:"(id)"`
-	FirstLevel  string    `orm:"unique" description:"(一级分组)"`
-	SecondLevel string    `orm:"null" description:"(二级分组)"`
-	ThirdLevel  string    `orm:"null" description:"(三级分组)"`
-	Type        int       `orm:"default(0)" description:"(All -1 分组类型 0 主机 1 容器)"`
-	AccountName string    `orm:"default(admin)" description:"(租户 默认 admin)"`
-	CreateTime  time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
-	UpdateTime  time.Time `orm:"auto_now;type(datetime)" description:"(更新时间)"`
+	Id          string        `orm:"pk;" description:"(id)"`
+	FirstLevel  string        `orm:"unique" description:"(一级分组)"`
+	SecondLevel string        `orm:"null" description:"(二级分组)"`
+	ThirdLevel  string        `orm:"null" description:"(三级分组)"`
+	Type        int           `orm:"default(0)" description:"(All -1 分组类型 0 主机 1 容器)"`
+	AccountName string        `orm:"default(admin)" description:"(租户 默认 admin)"`
+	CreateTime  time.Time     `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
+	UpdateTime  time.Time     `orm:"auto_now;type(datetime)" description:"(更新时间)"`
+	HostConfig  []*HostConfig `orm:"reverse(many);null" description:"(主机列表)"`
 }
 
 type GroupInterface interface {

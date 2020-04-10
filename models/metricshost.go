@@ -9,19 +9,20 @@ import (
 )
 
 type HostConfig struct {
-	Id          string `orm:"pk;" description:"(主机id)"`
-	HostName    string `orm:"" description:"(主机名)"`
-	OS          string `orm:"" description:"(系统)"`
-	PG          string `orm:"default(sys-default)" description:"(安全策略组)"`
-	Status      int8   `orm:"default(0)" description:"(主机状态)"`
-	Diss        int8   `orm:"default(0)" description:"(安全容器)"`
-	DissStatus  int8   `orm:"default(0)" description:"(安全状态)"`
-	AccountName string `orm:"default(admin)" description:"(租户)"`
-	Group       string `orm:"default(未分组)" description:"(分组)"`
-	Type        int8   `orm:"default(0);" description:"(类型 服务器: 0 虚拟机: 1)"`
-	IsInK8s     bool   `orm:"default(false);" description:"(是否在k8s集群)"`
-	ClusterId   string `orm:"default(null);" description:"(集群id)"`
-	Label       string `orm:"default(null);" description:"(标签)"`
+	Id          string  `orm:"pk;" description:"(主机id)"`
+	HostName    string  `orm:"" description:"(主机名)"`
+	OS          string  `orm:"" description:"(系统)"`
+	PG          string  `orm:"default(sys-default)" description:"(安全策略组)"`
+	Status      int8    `orm:"default(0)" description:"(主机状态)"`
+	Diss        int8    `orm:"default(0)" description:"(安全容器)"`
+	DissStatus  int8    `orm:"default(0)" description:"(安全状态)"`
+	AccountName string  `orm:"default(admin)" description:"(租户)"`
+	GroupId     string  `orm:"-" description:"(查询参数：分组Id， 仅仅是查询使用, 返回数据看 Group)"`
+	Group       *Groups `orm:"rel(fk);null" description:"(分组)"`
+	Type        int8    `orm:"default(0);" description:"(类型 服务器: 0 虚拟机: 1)"`
+	IsInK8s     bool    `orm:"default(false);" description:"(是否在k8s集群)"`
+	ClusterId   string  `orm:"default(null);" description:"(集群id)"`
+	Label       string  `orm:"default(null);" description:"(标签)"`
 }
 
 type HostInfo struct {
@@ -74,7 +75,6 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 		// 插入数据
 		this.AccountName = Account_Admin
 		//添加默认数据
-		this.Group = "Default"
 		this.PG = "Sys-Default"
 		_, err = o.Insert(this)
 		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {

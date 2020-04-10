@@ -32,8 +32,8 @@ func (this *HostConfig) List(from, limit int) Result {
 	if this.Label != "" {
 		cond = cond.And("label__contains", this.Label)
 	}
-	if this.Group != "" {
-		cond = cond.And("group__contains", this.Group)
+	if this.GroupId != "" {
+		cond = cond.And("Group", this.GroupId)
 	}
 	if this.HostName != "" {
 		cond = cond.And("host_name__contains", this.HostName)
@@ -41,7 +41,7 @@ func (this *HostConfig) List(from, limit int) Result {
 	if this.AccountName != "" && this.AccountName != Account_Admin {
 		cond = cond.And("account_name", this.AccountName)
 	}
-	_, err = o.QueryTable(utils.HostConfig).SetCond(cond).Limit(limit, from).All(&HostConfigList)
+	_, err = o.QueryTable(utils.HostConfig).SetCond(cond).Limit(limit, from).RelatedSel().All(&HostConfigList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetHostConfigErr
