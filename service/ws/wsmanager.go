@@ -1,13 +1,10 @@
-package utils
+package ws
 
 import (
 	"github.com/astaxie/beego/context"
 	"github.com/gorilla/websocket"
 	"net/http"
-)
-
-var (
-	WS *WSManager
+	"strings"
 )
 
 type WSManager struct {
@@ -22,7 +19,13 @@ func (this *WSManager) NewWSManager(response *context.Response, request *http.Re
 		},
 	}
 	this.Conn, this.Err = upgrader.Upgrade(response, request, nil)
-	WS = this
+
+	if this.Err == nil {
+		ip := strings.Split(this.Conn.RemoteAddr().String(), ":")
+		client := &Client{hub: WSHub, conn: this.Conn, send: make(chan []byte, 256), clientIp: ip[0]}
+		client.hub.register <- client
+		WS = this
+	}
 }
 
 func (this *WSManager) GetWSManager() *WSManager {

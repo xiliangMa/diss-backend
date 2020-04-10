@@ -17,6 +17,7 @@ import (
 	cs "github.com/xiliangMa/diss-backend/controllers/securitypolicy"
 	cstatistics "github.com/xiliangMa/diss-backend/controllers/statistics"
 	css "github.com/xiliangMa/diss-backend/controllers/system/system"
+	"github.com/xiliangMa/diss-backend/service/ws"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -122,6 +123,8 @@ func init() {
 	)
 
 	// add route for ws
+	ws.WSHub = ws.NewHub()
+	go ws.WSHub.Run()
 	beego.Router("/metrics", &controllers.WSMetricController{}, "*:Metrics")
 
 	var isLogin = func(ctx *context.Context) {
