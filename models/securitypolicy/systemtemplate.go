@@ -13,9 +13,9 @@ type SystemTemplate struct {
 	Name        string `orm:"" description:"(名称)"`
 	Description string `orm:"" description:"(描述)"`
 	Type        int    `orm:"" description:"(类型 基线-docker 0  基线-kubernetes 1)"`
-	Version     int    `orm:"null" description:"(版本)"`
+	Version     string `orm:"null" description:"(版本)"`
 	Commands    string `orm:"null;" description:"(操作命令)"`
-	Status      int    `orm:"default(0);" description:"(类型 停用 0  启用 1)"`
+	Status      int    `orm:"default(1);" description:"(类型 停用 0  启用 1)"`
 }
 
 type SystemTemplateInterface interface {
@@ -59,7 +59,7 @@ func (this *SystemTemplate) List(from, limit int) models.Result {
 	if this.Type != models.SYSTMP__All {
 		cond = cond.And("type", this.Type)
 	}
-	if this.Version != models.SYSTMP_Version_All {
+	if this.Version != models.All {
 		cond = cond.And("name__contains", this.Name)
 	}
 	if this.Commands != "" {
