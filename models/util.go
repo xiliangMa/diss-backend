@@ -33,10 +33,10 @@ var (
 	Diss_Status_Unsafe = 1
 
 	//系统魔板
-	SYSTMP__All        = -1
-	SYSTMP__Docker     = 0
-	SYSTMP_K8s         = 1
-	SYSTMP_Status_All  = -1
+	SYSTMP__All       = -1
+	SYSTMP__Docker    = 0
+	SYSTMP_K8s        = 1
+	SYSTMP_Status_All = -1
 
 	//基线日志类型
 	BMLT_Host_All    = "host"

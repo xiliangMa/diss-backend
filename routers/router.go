@@ -14,6 +14,7 @@ import (
 	cbase "github.com/xiliangMa/diss-backend/controllers/base"
 	cjob "github.com/xiliangMa/diss-backend/controllers/job"
 	ck8s "github.com/xiliangMa/diss-backend/controllers/k8s"
+	csecuritycheck "github.com/xiliangMa/diss-backend/controllers/securitycheck"
 	csl "github.com/xiliangMa/diss-backend/controllers/securitylog"
 	cs "github.com/xiliangMa/diss-backend/controllers/securitypolicy"
 	cstatistics "github.com/xiliangMa/diss-backend/controllers/statistics"
@@ -124,6 +125,11 @@ func init() {
 		beego.NSNamespace("/v1/task",
 			beego.NSInclude(
 				&cjob.TaskController{},
+			),
+		),
+		beego.NSNamespace("/v1/securitycheck",
+			beego.NSInclude(
+				&csecuritycheck.SecurityCheckController{},
 			),
 		),
 	)
