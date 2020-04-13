@@ -64,6 +64,7 @@ var (
 	EmptyDirtyDataPodErr            = 69
 	BindContainerErr                = 70
 	UnBindContainerErr              = 71
+	DeleteSYSTemplateErr            = 72
 
 	//k8s 1001-1100
 	AddNameSpaceErr    = 1001

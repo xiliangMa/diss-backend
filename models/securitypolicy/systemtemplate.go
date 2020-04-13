@@ -21,6 +21,7 @@ type SystemTemplate struct {
 type SystemTemplateInterface interface {
 	Add() models.Result
 	List() models.Result
+	Delete() models.Result
 }
 
 func (this *SystemTemplate) Add() models.Result {
@@ -84,5 +85,26 @@ func (this *SystemTemplate) List(from, limit int) models.Result {
 	if total == 0 {
 		ResultData.Data = nil
 	}
+	return ResultData
+}
+
+func (this *SystemTemplate) Delete() models.Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData models.Result
+	cond := orm.NewCondition()
+
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	_, err := o.QueryTable(utils.SYSTemplate).SetCond(cond).Delete()
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteSYSTemplateErr
+		logs.Error("Delete SYSTemplateErr failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
 	return ResultData
 }
