@@ -65,6 +65,7 @@ var (
 	BindContainerErr                = 70
 	UnBindContainerErr              = 71
 	DeleteSYSTemplateErr            = 72
+	EditSYSTemplateErr              = 73
 
 	//k8s 1001-1100
 	AddNameSpaceErr    = 1001

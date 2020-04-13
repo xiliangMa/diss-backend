@@ -22,6 +22,7 @@ type SystemTemplateInterface interface {
 	Add() models.Result
 	List() models.Result
 	Delete() models.Result
+	Update() models.Result
 }
 
 func (this *SystemTemplate) Add() models.Result {
@@ -106,5 +107,22 @@ func (this *SystemTemplate) Delete() models.Result {
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK
+	return ResultData
+}
+
+func (this *SystemTemplate) Update() models.Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData models.Result
+
+	_, err := o.Update(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditSYSTemplateErr
+		logs.Error("Update SYSTemplateErr: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
 	return ResultData
 }
