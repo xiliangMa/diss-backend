@@ -1,4 +1,4 @@
-package securitypolicy
+package job
 
 import (
 	"github.com/astaxie/beego/logs"
@@ -68,7 +68,7 @@ func (this *SystemTemplate) List(from, limit int) models.Result {
 	if this.Status != models.SYSTMP_Status_All {
 		cond = cond.And("status", this.Status)
 	}
-	_, err = o.QueryTable(utils.SYSTemplate).SetCond(cond).Limit(limit, from).All(&systemTemplateList)
+	_, err = o.QueryTable(utils.SYSTemplate).SetCond(cond).RelatedSel().Limit(limit, from).All(&systemTemplateList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetSYSTemplateErr

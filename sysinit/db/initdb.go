@@ -7,6 +7,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	_ "github.com/lib/pq"
 	"github.com/xiliangMa/diss-backend/models"
+	mjob "github.com/xiliangMa/diss-backend/models/job"
 	mk8s "github.com/xiliangMa/diss-backend/models/k8s"
 	msecuritylog "github.com/xiliangMa/diss-backend/models/securitylog"
 	msecuritypolicy "github.com/xiliangMa/diss-backend/models/securitypolicy"
@@ -79,7 +80,7 @@ func registerDefaultModel() {
 	// securitylog
 	orm.RegisterModel(new(msecuritylog.BenchMarkLog))
 	// task
-	//orm.RegisterModel(new(mtask.Task))
+	orm.RegisterModel(new(mjob.Task))
 	//base
 	orm.RegisterModel(new(msecuritypolicy.SystemTemplate), new(models.CmdHistory),
 		new(models.ContainerConfig), new(models.ContainerInfo), new(models.ContainerPs),
