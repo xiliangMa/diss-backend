@@ -60,7 +60,7 @@ func (this *Task) List(from, limit int) models.Result {
 	if this.Name != "" {
 		cond = cond.And("name__contains", this.Name)
 	}
-	_, err = o.QueryTable(utils.Task).SetCond(cond).Limit(limit, from).All(&TaskList)
+	_, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().Limit(limit, from).All(&TaskList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetTaskErr
