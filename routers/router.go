@@ -44,9 +44,9 @@ func init() {
 				&ca.K8SController{},
 			),
 		),
-		beego.NSNamespace("/v1/securitypolicy/bmts",
+		beego.NSNamespace("/v1/securitypolicy/systmps",
 			beego.NSInclude(
-				&cs.BMTController{},
+				&cs.SystemTemplateController{},
 			),
 		),
 		beego.NSNamespace("/v1/securitylog",

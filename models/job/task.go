@@ -1,4 +1,4 @@
-package task
+package job
 
 import (
 	"github.com/astaxie/beego/logs"

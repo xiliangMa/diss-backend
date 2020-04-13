@@ -1,0 +1,88 @@
+package securitypolicy
+
+import (
+	"github.com/astaxie/beego/logs"
+	"github.com/astaxie/beego/orm"
+	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/utils"
+	"net/http"
+)
+
+type SystemTemplate struct {
+	Id          string `orm:"pk;" description:"(基线id)"`
+	Name        string `orm:"" description:"(名称)"`
+	Description string `orm:"" description:"(描述)"`
+	Type        int    `orm:"" description:"(类型 基线-docker 0  基线-kubernetes 1)"`
+	Version     int    `orm:"null" description:"(版本)"`
+	Commands    string `orm:"null;" description:"(操作命令)"`
+	Status      int    `orm:"default(0);" description:"(类型 停用 0  启用 1)"`
+}
+
+type SystemTemplateInterface interface {
+	Add() models.Result
+	List() models.Result
+}
+
+func (this *SystemTemplate) Add() models.Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData models.Result
+
+	_, err := o.Insert(this)
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.AddSYSTemplateErr
+		logs.Error("Add SystemTemplate failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+func (this *SystemTemplate) List(from, limit int) models.Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var systemTemplateList []*SystemTemplate
+	var ResultData models.Result
+	var err error
+	cond := orm.NewCondition()
+
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	if this.Name != "" {
+		cond = cond.And("name__contains", this.Name)
+	}
+	if this.Type != models.SYSTMP__All {
+		cond = cond.And("type", this.Type)
+	}
+	if this.Version != models.SYSTMP_Version_All {
+		cond = cond.And("name__contains", this.Name)
+	}
+	if this.Commands != "" {
+		cond = cond.And("commands__contains", this.Commands)
+	}
+	if this.Status != models.SYSTMP_Status_All {
+		cond = cond.And("status", this.Status)
+	}
+	_, err = o.QueryTable(utils.SYSTemplate).SetCond(cond).Limit(limit, from).All(&systemTemplateList)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetSYSTemplateErr
+		logs.Error("Get SystemTemplate List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	total, _ := o.QueryTable(utils.SYSTemplate).Count()
+	data := make(map[string]interface{})
+	data["total"] = total
+	data["items"] = systemTemplateList
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
+	return ResultData
+}

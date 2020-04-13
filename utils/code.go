@@ -15,8 +15,8 @@ var (
 	GetUserInfoErr                  = 19
 	ElasticConnErr                  = 21
 	ElasticSearchErr                = 22
-	AddBenchMarkTemplateErr         = 23
-	GetBenchMarkTemplateErr         = 24
+	AddSYSTemplateErr               = 23
+	GetSYSTemplateErr               = 24
 	AddBenchMarkLogErr              = 25
 	GetBenchMarkLogErr              = 26
 	GetHostPsErr                    = 27
