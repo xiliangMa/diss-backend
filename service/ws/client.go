@@ -3,13 +3,15 @@ package ws
 import "github.com/gorilla/websocket"
 
 type Client struct {
-	hub *Hub
+	Hub *Hub
 
 	// The websocket connection.
-	conn *websocket.Conn
+	Conn *websocket.Conn
 
 	// Buffered channel of outbound messages.
-	send chan []byte
+	Send chan []byte
 
-	clientIp string
+	ClientIp string
+
+	SystemId string
 }

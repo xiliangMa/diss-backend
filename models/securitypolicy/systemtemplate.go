@@ -1,4 +1,4 @@
-package job
+package securitypolicy
 
 import (
 	"github.com/astaxie/beego/logs"
@@ -12,7 +12,7 @@ type SystemTemplate struct {
 	Id          string `orm:"pk;" description:"(基线id)"`
 	Name        string `orm:"" description:"(名称)"`
 	Description string `orm:"" description:"(描述)"`
-	Type        int    `orm:"" description:"(类型 基线-docker 0  基线-kubernetes 1)"`
+	Type        string `orm:"" description:"(类型)"`
 	Version     string `orm:"null" description:"(版本)"`
 	Commands    string `orm:"null;" description:"(操作命令)"`
 	Status      int    `orm:"default(1);" description:"(类型 停用 0  启用 1)"`
@@ -24,6 +24,7 @@ type SystemTemplateInterface interface {
 	List() models.Result
 	Delete() models.Result
 	Update() models.Result
+	GetDefaultTemplate() map[string]*SystemTemplate
 }
 
 func (this *SystemTemplate) Add() models.Result {
@@ -57,7 +58,7 @@ func (this *SystemTemplate) List(from, limit int) models.Result {
 	if this.Name != "" {
 		cond = cond.And("name__contains", this.Name)
 	}
-	if this.Type != models.SYSTMP__All {
+	if this.Type != "" {
 		cond = cond.And("type", this.Type)
 	}
 	if this.Version != models.All {
@@ -66,7 +67,7 @@ func (this *SystemTemplate) List(from, limit int) models.Result {
 	if this.Commands != "" {
 		cond = cond.And("commands__contains", this.Commands)
 	}
-	if this.Status != models.SYSTMP_Status_All {
+	if this.Status != models.TMP_Status_ALl {
 		cond = cond.And("status", this.Status)
 	}
 	_, err = o.QueryTable(utils.SYSTemplate).SetCond(cond).RelatedSel().Limit(limit, from).All(&systemTemplateList)
@@ -126,4 +127,24 @@ func (this *SystemTemplate) Update() models.Result {
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
+}
+
+func (this *SystemTemplate) GetDefaultTemplate() map[string]*SystemTemplate {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var systemTemplateList []*SystemTemplate
+	defaultTemplateList := make(map[string]*SystemTemplate)
+	var err error
+	cond := orm.NewCondition()
+	cond = cond.And("is_default", true)
+	_, err = o.QueryTable(utils.SYSTemplate).SetCond(cond).RelatedSel().All(&systemTemplateList)
+	if err != nil {
+		logs.Error("Get SystemTemplate List failed, code: %d, err: %s", utils.GetSYSTemplateErr, err.Error())
+		return nil
+	}
+
+	for _, systemTemplate := range systemTemplateList {
+		defaultTemplateList[systemTemplate.Type] = systemTemplate
+	}
+	return defaultTemplateList
 }

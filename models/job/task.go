@@ -15,18 +15,22 @@ type Task struct {
 	Name           string                          `orm:"" description:"(名称)"`
 	Description    string                          `orm:"" description:"(描述)"`
 	Spec           string                          `orm:"" description:"(定时器)"`
-	Type           string                          `orm:"" description:"(类型 重复执行 单词执行 )"`
+	Type           string                          `orm:"" description:"(类型 重复执行 单次执行 )"`
 	Status         string                          `orm:"null;" description:"(状态: 未开始、执行中、完成、暂停)"`
-	SystemTemplate *msecuritypolicy.SystemTemplate `orm:"rel(fk);null;;" description:"(模板类型)"`
+	Batch          int64                           `orm:"default(0);" description:"(任务批次)"`
+	SystemTemplate *msecuritypolicy.SystemTemplate `orm:"rel(fk);null;;" description:"(系统模板)"`
+	Host           *models.HostConfig              `orm:"rel(fk);null;;" description:"(主机)"`
+	Container      *models.ContainerConfig         `orm:"rel(fk);null;;" description:"(容器)"`
 	CreateTime     time.Time                       `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
 	UpdateTime     time.Time                       `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
 }
 
 type TaskInterface interface {
 	Add() models.Result
-	List() models.Result
+	List(from, limit int) models.Result
 	Delete() models.Result
 	Update() models.Result
+	GetCurrentBatchTaskList() (error, []*Task)
 }
 
 func (this *Task) Add() models.Result {
@@ -117,4 +121,19 @@ func (this *Task) Update() models.Result {
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
+}
+
+func (this *Task) GetCurrentBatchTaskList() (error, []*Task) {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var TaskList []*Task
+	var err error
+	cond := orm.NewCondition()
+	cond = cond.And("batch", this.Batch)
+	_, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().All(&TaskList)
+	if err != nil {
+		logs.Error("Get Task List failed, code: %d, err: %s", utils.GetTaskErr, err.Error())
+		return err, nil
+	}
+	return nil, TaskList
 }

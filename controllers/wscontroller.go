@@ -1,13 +1,13 @@
 package controllers
 
 import (
+	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/gorilla/websocket"
-	"github.com/xiliangMa/diss-backend/service"
+	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/ws"
 	"net/http"
-	"strconv"
 )
 
 type WSMetricController struct {
@@ -22,8 +22,10 @@ var upgrader = websocket.Upgrader{
 
 func (this *WSMetricController) Metrics() {
 	wsm := new(ws.WSManager)
+	wsm.Request = this.Ctx.Request
+	wsm.Response = this.Ctx.ResponseWriter
 	// 创建全局ws控制对象
-	wsm.NewWSManager(this.Ctx.ResponseWriter, this.Ctx.Request)
+	wsm.NewWSManager()
 	err, wsconn := wsm.GetWSManager().Err, wsm.GetWSManager().Conn
 	if err != nil {
 		logs.Info("upgrade:", err)
@@ -38,13 +40,13 @@ func (this *WSMetricController) Metrics() {
 			break
 		}
 
-		wsmh := &service.WSMetricsService{message}
+		wsmh := &ws.WSMetricsService{message, wsconn}
 		wsmh.Save()
 
 		//err = wsconn.WriteMessage(mt, message)
-		respmsg := "received ok: " + strconv.Itoa(len(message)) + " bytes "
-
-		err = wsconn.WriteMessage(websocket.TextMessage, []byte(respmsg))
+		result := models.MetricsResult{ResType: models.Type_ReceiveState, ResTag: models.Tag_Received, Metric: nil, Config: ""}
+		data, _ := json.Marshal(result)
+		err = wsconn.WriteMessage(websocket.TextMessage, data)
 		if err != nil {
 			logs.Info("############################ Received data from agent fail ############################", err)
 			break

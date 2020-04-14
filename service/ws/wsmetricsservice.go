@@ -1,17 +1,21 @@
-package service
+package ws
 
 import (
 	"encoding/json"
 	"errors"
 	"github.com/astaxie/beego/logs"
+	"github.com/gorilla/websocket"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/models/bean"
 	"github.com/xiliangMa/diss-backend/models/securitylog"
 	"github.com/xiliangMa/diss-backend/service/synccheck"
 	"net/http"
+	"strings"
 )
 
 type WSMetricsService struct {
 	Message []byte
+	Conn    *websocket.Conn
 }
 
 func (wsmh *WSMetricsService) Save() error {
@@ -21,6 +25,17 @@ func (wsmh *WSMetricsService) Save() error {
 		return err
 	}
 	switch ms.ResTag {
+	case models.Tag_HeartBeat:
+		heartBeat := bean.HeartBeat{}
+		s, _ := json.Marshal(ms.Metric)
+		if err := json.Unmarshal(s, &heartBeat); err != nil {
+			logs.Error("Paraces %s error %s", ms.ResTag, err)
+			return err
+		}
+		ip := strings.Split(wsmh.Conn.RemoteAddr().String(), ":")
+		client := &Client{Hub: WSHub, Conn: wsmh.Conn, Send: make(chan []byte, 256), ClientIp: ip[0], SystemId: heartBeat.SystemId}
+		client.Hub.Register <- client
+		logs.Info("############################ Agent Heater Beat data, >>> HostId: %s, Type: %s <<<", heartBeat.SystemId, models.Tag_HeartBeat)
 	case models.Tag_HostConfig:
 		hostConfig := models.HostConfig{}
 		s, _ := json.Marshal(ms.Metric)

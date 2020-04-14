@@ -1,5 +1,6 @@
 package models
 
+// ws 通信 Tag
 const (
 	Tag_HostConfig             = "HostConfig"
 	Tag_HostInfo               = "HostInfo"
@@ -15,4 +16,10 @@ const (
 	Tag_ContainerCmdHistory    = "ContainerCmdHistory"
 	Tag_NameSpace              = "NameSpace"
 	Tag_Pod                    = "Pod"
+	Tag_HeartBeat              = "HeartBeat"
+	Tag_Received               = "Received"
+
+	// diss-backend 下发的数据
+	Tag_DockerBenchMark     = "DockerBenchMark"
+	Tag_KubernetesBenchMark = "KubernetesBenchMark"
 )

@@ -32,11 +32,21 @@ var (
 	Diss_status_Safe   = 0
 	Diss_Status_Unsafe = 1
 
-	//系统魔板
-	SYSTMP__All       = -1
-	SYSTMP__Docker    = 0
-	SYSTMP_K8s        = 1
-	SYSTMP_Status_All = -1
+	//系统魔板类型
+	TMP_Type_BM_Docker = "DockerBenchMark"
+	TMP_Type_BM_K8S    = "KubernetesBenchMark"
+	TMP_Type_VS        = "SC_VirusScan"
+	TMP_Type_LS        = "SC_LeakScan"
+	TMP_Status_ALl     = -1
+	SC_Type_Host       = "host"
+	Sc_Type_Container  = "container"
+
+	// 任务状态
+	Task_Status_Pending = "Pending"
+	Task_Status_Running = "Running"
+	Task_Status_Pause   = "Pause"
+	Task_Status_Finshed = "Finshed"
+	Task_Status_Failed  = "Failed"
 
 	//基线日志类型
 	BMLT_Host_All    = "host"

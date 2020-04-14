@@ -6,21 +6,21 @@ type Hub struct {
 	DissClient map[string]*Client
 
 	// Register requests from the clients.
-	register chan *Client
+	Register chan *Client
 }
 
 func NewHub() *Hub {
 	return &Hub{
 		DissClient: make(map[string]*Client),
-		register:   make(chan *Client),
+		Register:   make(chan *Client),
 	}
 }
 
 func (h *Hub) Run() {
 	for {
 		select {
-		case client := <-h.register:
-			h.DissClient[client.clientIp] = client
+		case client := <-h.Register:
+			h.DissClient[client.SystemId] = client
 		}
 	}
 }
