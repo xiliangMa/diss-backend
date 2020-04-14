@@ -16,6 +16,7 @@ type SystemTemplate struct {
 	Version     string `orm:"null" description:"(版本)"`
 	Commands    string `orm:"null;" description:"(操作命令)"`
 	Status      int    `orm:"default(1);" description:"(类型 停用 0  启用 1)"`
+	IsDefault   bool   `orm:"default(false);" description:"(默认系统策略)"`
 }
 
 type SystemTemplateInterface interface {
