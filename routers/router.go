@@ -58,11 +58,6 @@ func init() {
 				&csl.BenchMarkLogController{},
 			),
 		),
-		beego.NSNamespace("/v1/merticinfo",
-			beego.NSInclude(
-				&controllers.MetricController{},
-			),
-		),
 		beego.NSNamespace("/auth",
 			beego.NSInclude(
 				&controllers.AuthController{},
