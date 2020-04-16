@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego/logs"
 	"github.com/gorilla/websocket"
-	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/job"
+	"github.com/xiliangMa/diss-backend/models/ws"
 )
 
 type WSDeliverService struct {
@@ -19,7 +19,7 @@ func (this *WSDeliverService) DeliverTask() {
 	for _, task := range this.CurrentBatchTaskList {
 		if _, ok := this.Hub.DissClient[task.Host.Id]; ok {
 			client := this.Hub.DissClient[task.Host.Id]
-			result := models.MetricsResult{ResType: "Task", ResTag: task.Type, Metric: task, Config: ""}
+			result := ws.MetricsResult{ResType: "Task", ResTag: task.Type, Metric: task, Config: ""}
 			data, err := json.Marshal(result)
 			err = client.Conn.WriteMessage(websocket.TextMessage, data)
 			if err == nil {

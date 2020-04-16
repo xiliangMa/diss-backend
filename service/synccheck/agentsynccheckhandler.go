@@ -2,6 +2,7 @@ package synccheck
 
 import (
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/models/ws"
 )
 
 type AgentCheckHadler struct {
@@ -11,9 +12,9 @@ type AgentCheckHadler struct {
 
 func (this *AgentCheckHadler) Check(model string) {
 	switch model {
-	case models.Tag_ContainerConfig:
+	case ws.Tag_ContainerConfig:
 		this.ContainerConfingCheck()
-	case models.Tag_ContainerInfo:
+	case ws.Tag_ContainerInfo:
 		this.ContainerInfoCheck()
 	}
 

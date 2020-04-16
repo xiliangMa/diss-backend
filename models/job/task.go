@@ -31,6 +31,7 @@ type TaskInterface interface {
 	Delete() models.Result
 	Update() models.Result
 	GetCurrentBatchTaskList() (error, []*Task)
+	GetUnFinishedTaskList() models.Result
 }
 
 func (this *Task) Add() models.Result {
@@ -67,11 +68,10 @@ func (this *Task) List(from, limit int) models.Result {
 	if this.Name != "" {
 		cond = cond.And("name__contains", this.Name)
 	}
+	if this.Status != "" && this.Status != models.All {
+		cond = cond.And("status", this.Status)
+	}
 	_, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().Limit(limit, from).All(&TaskList)
-	//for _, task := range TaskList {
-	//	o.LoadRelated(task, "Host")
-	//	logs.Error("==============", task.Host)
-	//}
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetTaskErr
@@ -143,4 +143,38 @@ func (this *Task) GetCurrentBatchTaskList() (error, []*Task) {
 		return err, nil
 	}
 	return nil, TaskList
+}
+
+func (this *Task) GetUnFinishedTaskList() models.Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var TaskList []*Task
+	var ResultData models.Result
+	var err error
+	var total int64
+	cond := orm.NewCondition()
+
+	if this.Host != nil && this.Host.Id != "" {
+		cond = cond.And("host_id", this.Host.Id)
+	}
+	cond = cond.AndCond(cond.And("status", models.Task_Status_Pending).Or("status", models.Task_Status_Running))
+
+	total, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().All(&TaskList)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetTaskErr
+		logs.Error("Get Task List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	data := make(map[string]interface{})
+	data["total"] = total
+	data["items"] = TaskList
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
+	return ResultData
 }

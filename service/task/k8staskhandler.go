@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/k8s"
+	"github.com/xiliangMa/diss-backend/models/ws"
 	"github.com/xiliangMa/diss-backend/service/synccheck"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -167,8 +168,8 @@ func (this *K8STaskHandler) SyncNameSpace(clusetrName, clusterId string) {
 		size := len(nameSpaces.Items)
 		if size != 0 {
 			k8sCheckHandler := synccheck.K8SCheckHadler{nil, nil, CheckObject, nil}
-			k8sCheckHandler.Check(models.Tag_NameSpace)
-			logs.Info("########## Empty Dirty Data, Model: %s ##########", models.Tag_NameSpace)
+			k8sCheckHandler.Check(ws.Tag_NameSpace)
+			logs.Info("########## Empty Dirty Data, Model: %s ##########", ws.Tag_NameSpace)
 		}
 		logs.Info("########## Sync NameSpace, Cluster: %s >>> end <<< ##########, size: %d", clusetrName, len(nameSpaces.Items))
 	}
@@ -210,8 +211,8 @@ func (this *K8STaskHandler) SyncNamespacePod(clusterName string) {
 		size := len(nameSpaces.Items)
 		if size != 0 {
 			k8sCheckHandler := synccheck.K8SCheckHadler{nil, nil, nil, CheckObject}
-			k8sCheckHandler.Check(models.Tag_Pod)
-			logs.Info("########## Empty Dirty Data, Model: %s ##########", models.Tag_Pod)
+			k8sCheckHandler.Check(ws.Tag_Pod)
+			logs.Info("########## Empty Dirty Data, Model: %s ##########", ws.Tag_Pod)
 		}
 	}
 }
@@ -344,11 +345,11 @@ func (this *K8STaskHandler) SyncPodContainerConfigAndInfo(clusterName string) {
 		if size != 0 {
 			k8sCheckHandler := synccheck.K8SCheckHadler{CheckObject1, CheckObject2, nil, nil}
 
-			k8sCheckHandler.Check(models.Tag_ContainerConfig)
-			logs.Info("########## Empty Dirty Data, Model: %s ##########", models.Tag_ContainerConfig)
+			k8sCheckHandler.Check(ws.Tag_ContainerConfig)
+			logs.Info("########## Empty Dirty Data, Model: %s ##########", ws.Tag_ContainerConfig)
 
-			k8sCheckHandler.Check(models.Tag_ContainerInfo)
-			logs.Info("########## Empty Dirty Data, Model: %s ##########", models.Tag_ContainerInfo)
+			k8sCheckHandler.Check(ws.Tag_ContainerInfo)
+			logs.Info("########## Empty Dirty Data, Model: %s ##########", ws.Tag_ContainerInfo)
 		}
 	}
 }

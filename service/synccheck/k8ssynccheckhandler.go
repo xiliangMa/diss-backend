@@ -3,6 +3,7 @@ package synccheck
 import (
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/k8s"
+	"github.com/xiliangMa/diss-backend/models/ws"
 )
 
 type K8SCheckHadler struct {
@@ -14,13 +15,13 @@ type K8SCheckHadler struct {
 
 func (this *K8SCheckHadler) Check(model string) {
 	switch model {
-	case models.Tag_ContainerConfig:
+	case ws.Tag_ContainerConfig:
 		this.ContainerConfingCheck()
-	case models.Tag_ContainerInfo:
+	case ws.Tag_ContainerInfo:
 		this.ContainerInfoCheck()
-	case models.Tag_NameSpace:
+	case ws.Tag_NameSpace:
 		this.NSCheck()
-	case models.Tag_Pod:
+	case ws.Tag_Pod:
 		this.PodCheck()
 	}
 

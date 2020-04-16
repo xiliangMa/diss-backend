@@ -1,11 +1,9 @@
 package ws
 
 import (
-	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/gorilla/websocket"
-	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/ws"
 	"net/http"
 )
@@ -39,18 +37,8 @@ func (this *WSMetricController) Metrics() {
 			logs.Info("############################ Sync agent data fail ############################, err: ", err)
 			break
 		}
-
 		wsmh := &ws.WSMetricsService{message, wsconn}
 		wsmh.Save()
-
-		//err = wsconn.WriteMessage(mt, message)
-		result := models.MetricsResult{ResType: models.Type_ReceiveState, ResTag: models.Tag_Received, Metric: nil, Config: ""}
-		data, _ := json.Marshal(result)
-		err = wsconn.WriteMessage(websocket.TextMessage, data)
-		if err != nil {
-			logs.Info("############################ Received data from agent fail ############################", err)
-			break
-		}
 	}
 	this.Data["json"] = nil
 	this.ServeJSON(false)
