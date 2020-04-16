@@ -18,6 +18,7 @@ const (
 	Tag_Pod                    = "Pod"
 	Tag_HeartBeat              = "HeartBeat"
 	Tag_Received               = "Received"
+	Tag_Task                   = "Task"
 
 	// diss-backend 下发的数据
 	Tag_DockerBenchMark     = "DockerBenchMark"

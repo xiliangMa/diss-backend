@@ -19,6 +19,7 @@ import (
 	cs "github.com/xiliangMa/diss-backend/controllers/securitypolicy"
 	cstatistics "github.com/xiliangMa/diss-backend/controllers/statistics"
 	css "github.com/xiliangMa/diss-backend/controllers/system/system"
+	ws2 "github.com/xiliangMa/diss-backend/controllers/ws"
 	"github.com/xiliangMa/diss-backend/service/ws"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -122,7 +123,7 @@ func init() {
 				&css.K8sController{},
 			),
 		),
-		beego.NSNamespace("/v1/task",
+		beego.NSNamespace("/v1/tasks",
 			beego.NSInclude(
 				&cjob.TaskController{},
 			),
@@ -137,7 +138,7 @@ func init() {
 	// add route for ws
 	ws.WSHub = ws.NewHub()
 	go ws.WSHub.Run()
-	beego.Router("/metrics", &controllers.WSMetricController{}, "*:Metrics")
+	beego.Router("/metrics", &ws2.WSMetricController{}, "*:Metrics")
 
 	var isLogin = func(ctx *context.Context) {
 		if ctx.Request.Method != "OPTIONS" {

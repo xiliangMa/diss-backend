@@ -18,9 +18,9 @@ type Task struct {
 	Type           string                          `orm:"" description:"(类型 重复执行 单次执行 )"`
 	Status         string                          `orm:"null;" description:"(状态: 未开始、执行中、完成、暂停)"`
 	Batch          int64                           `orm:"default(0);" description:"(任务批次)"`
-	SystemTemplate *msecuritypolicy.SystemTemplate `orm:"rel(fk);null;;" description:"(系统模板)"`
-	Host           *models.HostConfig              `orm:"rel(fk);null;;" description:"(主机)"`
-	Container      *models.ContainerConfig         `orm:"rel(fk);null;;" description:"(容器)"`
+	SystemTemplate *msecuritypolicy.SystemTemplate `orm:"rel(fk);null;" description:"(系统模板)"`
+	Host           *models.HostConfig              `orm:"rel(fk);null;" description:"(主机)"`
+	Container      *models.ContainerConfig         `orm:"rel(fk);null;" description:"(容器)"`
 	CreateTime     time.Time                       `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
 	UpdateTime     time.Time                       `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
 }
@@ -58,6 +58,9 @@ func (this *Task) List(from, limit int) models.Result {
 	var err error
 	cond := orm.NewCondition()
 
+	if this.Host != nil && this.Host.Id != "" {
+		cond = cond.And("host_id", this.Host.Id)
+	}
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
@@ -65,6 +68,10 @@ func (this *Task) List(from, limit int) models.Result {
 		cond = cond.And("name__contains", this.Name)
 	}
 	_, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().Limit(limit, from).All(&TaskList)
+	//for _, task := range TaskList {
+	//	o.LoadRelated(task, "Host")
+	//	logs.Error("==============", task.Host)
+	//}
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetTaskErr

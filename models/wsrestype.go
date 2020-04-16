@@ -4,4 +4,5 @@ package models
 const (
 	Type_ReceiveState = "ReceiveState"
 	Type_Task         = "Task"
+	Type_SyncData     = "Sync"
 )
