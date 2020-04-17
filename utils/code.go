@@ -96,6 +96,9 @@ var (
 	CheckK8sFileIsExistErr      = 1202
 	UploadK8sFileErr            = 1203
 	CheckK8sFileTestErr         = 1204
+	UploadLogoErr               = 1205
+	ChecLogoPostErr             = 1206
+	CheckLogoIsExistErr         = 1207
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300

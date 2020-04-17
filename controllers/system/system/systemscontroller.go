@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-type K8sController struct {
+type SystemController struct {
 	beego.Controller
 }
 
@@ -21,12 +21,12 @@ type K8sController struct {
 // @Param isForce formData bool true true "force"
 // @Success 200 {object} models.Result
 // @router /system/k8s/upload [post]
-func (this *K8sController) UploadK8sFile() {
+func (this *SystemController) UploadK8sFile() {
 	key := "k8sFile"
 	isForce, _ := this.GetBool("isForce", true)
 	clusterName := this.GetString("clusterName")
 	f, h, _ := this.GetFile(key)
-	result, fpath := css.Check(f, h)
+	result, fpath := css.Check(h)
 	defer f.Close()
 	if result.Code == http.StatusOK {
 		err := this.SaveToFile(key, fpath)
@@ -74,6 +74,34 @@ func (this *K8sController) UploadK8sFile() {
 					// to do 强制更新后文件名相同、内容不一样
 				}
 			}
+		}
+	}
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
+// @Title UpLoadLogo
+// @Description UpLoad Logo
+// @Param token header string true "authToken"
+// @Param logo formData file true "logo"
+// @Success 200 {object} models.Result
+// @router /system/logo [post]
+func (this *SystemController) UploadLogo() {
+	key := "logo"
+	f, h, _ := this.GetFile(key)
+	defer f.Close()
+	logoService := new(css.LogoService)
+	result, fpath := logoService.Check(h)
+	if result.Code != http.StatusOK {
+		logs.Error("Upload logo  fail, err: %s", result.Message)
+	} else {
+		err := this.SaveToFile(key, fpath)
+		if err != nil {
+			result.Code = utils.UploadLogoErr
+			result.Message = "UploadLogoErr"
+			logs.Error("Upload logo  fail, err: %s", err.Error())
+		} else {
+			result.Code = http.StatusOK
 		}
 	}
 	this.Data["json"] = result

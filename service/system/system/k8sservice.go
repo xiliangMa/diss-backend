@@ -31,14 +31,14 @@ func CheckK8sFileIsExist(fpath, fName string) int {
 	return http.StatusOK
 }
 
-func Check(f multipart.File, h *multipart.FileHeader) (models.Result, string) {
+func Check(h *multipart.FileHeader) (models.Result, string) {
 	var fpath = getK8sFilePath()
 	var result models.Result
 	fName := h.Filename
 	ext := path.Ext(fName)
 
 	//创建目录
-	CreateKubeConfigDirExist(fpath)
+	CreateKubeConfigDir(fpath)
 
 	// 后缀名不符合上传要求
 	if code := CheckK8sFilePost(ext, fName); code != http.StatusOK {
@@ -86,7 +86,7 @@ func getK8sFilePath() string {
 	return beego.AppConfig.String("k8s::KubeCongigPath")
 }
 
-func CreateKubeConfigDirExist(fpath string) {
+func CreateKubeConfigDir(fpath string) {
 	_, err := os.Stat(fpath)
 	if os.IsNotExist(err) {
 		logs.Info("Create KubeConfig Dir success, path: %s", fpath)

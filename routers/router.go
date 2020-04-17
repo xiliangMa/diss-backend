@@ -115,7 +115,7 @@ func init() {
 		),
 		beego.NSNamespace("/v1/system",
 			beego.NSInclude(
-				&css.K8sController{},
+				&css.SystemController{},
 			),
 		),
 		beego.NSNamespace("/v1/tasks",
