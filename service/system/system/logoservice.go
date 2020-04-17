@@ -60,11 +60,14 @@ func (this *LogoService) Check(h *multipart.FileHeader) (models.Result, string) 
 func (this *LogoService) CheckLogoIsExist() models.Result {
 	newLogoPath := this.getLogoPath() + beego.AppConfig.String("system::NewLogoName")
 	var result models.Result
-	if _, err := os.Stat(newLogoPath); err == nil {
-		result.Code = utils.CheckLogoIsExistErr
-		result.Message = "CheckLogoIsExistErr"
+	if _, err := os.Stat(newLogoPath); err != nil {
+		result.Code = utils.CheckLogoIsNotExistErr
+		result.Message = "CheckLogoIsNotExistErr"
 		return result
 	}
+	data := make(map[string]string)
+	data["url"] = beego.AppConfig.String("system::LogoUrl")
+	result.Data = data
 	result.Code = http.StatusOK
 	return result
 }

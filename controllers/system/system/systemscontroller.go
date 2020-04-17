@@ -107,3 +107,15 @@ func (this *SystemController) UploadLogo() {
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }
+
+// @Title Check Logo isexist
+// @Description Chec kLogo IsExist
+// @Param token header string true "authToken"
+// @Success 200 {object} models.Result
+// @router /system/isexist [get]
+func (this *SystemController) CheckLogoIsExist() {
+	logoService := new(css.LogoService)
+	result := logoService.CheckLogoIsExist()
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
