@@ -109,10 +109,10 @@ func (this *SystemController) UploadLogo() {
 }
 
 // @Title Check Logo isexist
-// @Description Chec kLogo IsExist
+// @Description Check kLogo IsExist
 // @Param token header string true "authToken"
 // @Success 200 {object} models.Result
-// @router /system/isexist [get]
+// @router /system/logo/isexist [get]
 func (this *SystemController) CheckLogoIsExist() {
 	logoService := new(css.LogoService)
 	result := logoService.CheckLogoIsExist()

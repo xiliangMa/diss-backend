@@ -27,8 +27,8 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:SystemController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:SystemController"],
 		beego.ControllerComments{
-			Method:           "GetLogo",
-			Router:           `/system/logo`,
+			Method:           "CheckLogoIsExist",
+			Router:           `/system/logo/isexist`,
 			AllowHTTPMethods: []string{"get"},
 			MethodParams:     param.Make(),
 			Filters:          nil,

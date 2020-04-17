@@ -66,7 +66,7 @@ func (this *LogoService) CheckLogoIsExist() models.Result {
 		return result
 	}
 	data := make(map[string]string)
-	data["url"] = beego.AppConfig.String("system::LogoUrl")
+	data["url"] = "http://ip:port/" + beego.AppConfig.String("system::LogoUrl")
 	result.Data = data
 	result.Code = http.StatusOK
 	return result
