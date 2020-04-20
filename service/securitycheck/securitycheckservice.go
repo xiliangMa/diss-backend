@@ -62,13 +62,13 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *bean.SecurityCheck)
 		k8sTask.Id = uid2.String()
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_BM_K8S, uid2)
 		//基线-K8S
-		dockerTask.Type = models.TMP_Type_BM_K8S
+		k8sTask.Type = models.TMP_Type_BM_K8S
 		k8sTask.SystemTemplate = TMP_Type_BM_K8S_DT
 		k8sTask.Name = "System-Task-" + k8sTask.Id
 		k8sTask.Description = "System-Task-" + models.TMP_Type_BM_K8S
 		k8sTask.Host = securityCheck.Host
 		k8sTask.Batch = this.Bath
-		dockerTask.Status = models.Task_Status_Pending
+		k8sTask.Status = models.Task_Status_Pending
 
 		//添加task记录
 		dockerTask.Add()
