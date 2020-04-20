@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	mjob "github.com/xiliangMa/diss-backend/models/job"
+	"github.com/xiliangMa/diss-backend/service/ws"
+	"github.com/xiliangMa/diss-backend/utils"
+	"net/http"
 )
 
 // Task 接口
@@ -39,7 +42,22 @@ func (this *TaskController) DeleteTask() {
 	id := this.GetString(":id")
 	task := new(mjob.Task)
 	task.Id = id
-	this.Data["json"] = task.Delete()
+	result := task.List(0, 0)
+	data := result.Data.(map[string]interface{})
+	if result.Code == http.StatusOK && data["total"] != 0 {
+		//向agent下发删除任务指令
+		deleteTaskList := data["items"]
+		WSDeliverService := ws.WSDeliverService{Hub: ws.WSHub, DelTask: deleteTaskList.([]*mjob.Task)[0]}
+		err := WSDeliverService.DeleteTask()
+		if err == nil {
+			// agent 删除任务成功后 删除数据库
+			result = task.Delete()
+		} else {
+			result.Code = utils.DeleteTaskErr
+			result.Message = "DeleteTaskErr"
+			result.Data = nil
+		}
+	}
+	this.Data["json"] = result
 	this.ServeJSON(false)
-
 }

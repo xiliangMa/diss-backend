@@ -48,6 +48,8 @@ var (
 	Task_Status_Finshed        = "Finshed"
 	Task_Status_Failed         = "Failed"
 	Task_Status_Deliver_Failed = "DeliverFailed"
+	Task_Status_Received       = "Received"
+	Task_Status_Receive_Failed = "ReceiveFailed"
 
 	//基线日志类型
 	BMLT_Host_All    = "host"
