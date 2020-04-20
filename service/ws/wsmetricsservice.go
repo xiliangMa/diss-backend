@@ -314,24 +314,46 @@ func (this *WSMetricsService) Save() error {
 			this.ReceiveData(metricsResult)
 			return nil
 		}
-	case ws.Type_Control: // 数据下发
+	case ws.Type_Control:
 		switch ms.Tag {
 		case ws.Resource_Task:
-			task := job.Task{}
-			s, _ := json.Marshal(ms.Data)
-			if err := json.Unmarshal(s, &task); err != nil {
-				logs.Error("Paraces %s error %s", ms.Tag, err)
-				return err
+			// 获取任务列表接口
+			switch ms.RCType {
+			case ws.Resource_Control_Type_Get:
+				task := job.Task{}
+				s, _ := json.Marshal(ms.Data)
+				if err := json.Unmarshal(s, &task); err != nil {
+					logs.Error("Paraces %s error %s", ms.Tag, err)
+					return err
+				}
+				if result := task.GetUnFinishedTaskList(); result.Code != http.StatusOK {
+					logs.Error("############################ Get un finished task list  fail, >>> HostId: %s, error: <<<", task.Host.Id, result.Message)
+					return errors.New(result.Message)
+				} else {
+					metricsResult := ws.WsData{Code: result.Code, Msg: result.Message, Type: ws.Type_RequestState, Tag: ws.Resource_Task, Data: result.Data, Config: ""}
+					this.ReceiveData(metricsResult)
+					jsonStr, _ := json.Marshal(result.Data)
+					logs.Info("############################  Get un finished task list, >>> HostId: %s, Type: %s, task data:  %v <<<", task.Host.Id, ws.Resource_Task, string(jsonStr))
+				}
+			case ws.Resource_Control_Type_Put:
+				//更新任务状态
+				task := job.Task{}
+				s, _ := json.Marshal(ms.Data)
+				if err := json.Unmarshal(s, &task); err != nil {
+					logs.Error("Paraces %s error %s", ms.Tag, err)
+					return err
+				}
+				if result := task.Update(); result.Code != http.StatusOK {
+					logs.Error("############################ Update task status  fail, >>> HostId: %s, error: <<<", task.Host.Id, result.Message)
+					return errors.New(result.Message)
+				} else {
+					metricsResult := ws.WsData{Code: result.Code, Msg: result.Message, Type: ws.Type_RequestState, Tag: ws.Resource_Task, Data: result.Data}
+					this.ReceiveData(metricsResult)
+					jsonStr, _ := json.Marshal(result.Data)
+					logs.Info("############################ Update task status, >>> HostId: %s, Type: %s, task data:  %v <<<", task.Host.Id, ws.Resource_Task, string(jsonStr))
+				}
 			}
-			if result := task.GetUnFinishedTaskList(); result.Code != http.StatusOK {
-				logs.Info("############################ Get un finished task list  fail, >>> HostId: %s, error: <<<", task.Host.Id, result.Message)
-				return errors.New(result.Message)
-			} else {
-				metricsResult := ws.WsData{Type: ws.Type_RequestState, Tag: ws.Resource_Task, Data: result.Data, Config: ""}
-				this.ReceiveData(metricsResult)
-				jsonStr, _ := json.Marshal(result.Data)
-				logs.Info("############################  Get un finished task list, >>> HostId: %s, Type: %s, task data:  %v <<<", task.Host.Id, ws.Resource_Task, string(jsonStr))
-			}
+
 		}
 	}
 
