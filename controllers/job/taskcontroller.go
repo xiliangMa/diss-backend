@@ -28,3 +28,18 @@ func (this *TaskController) GetTaskList() {
 	this.ServeJSON(false)
 
 }
+
+// @Title DeleteTask
+// @Description Delete Task
+// @Param token header string true "authToken"
+// @Param id path string "" true "id"
+// @Success 200 {object} models.Result
+// @router /:id [delete]
+func (this *TaskController) DeleteTask() {
+	id := this.GetString(":id")
+	task := new(mjob.Task)
+	task.Id = id
+	this.Data["json"] = task.Delete()
+	this.ServeJSON(false)
+
+}
