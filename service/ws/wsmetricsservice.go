@@ -332,8 +332,9 @@ func (this *WSMetricsService) Save() error {
 				} else {
 					metricsResult := ws.WsData{Code: result.Code, Msg: result.Message, Type: ws.Type_RequestState, Tag: ws.Resource_Task, Data: result.Data, Config: ""}
 					this.ReceiveData(metricsResult)
-					jsonStr, _ := json.Marshal(result.Data)
-					logs.Info("############################  Get un finished task list, >>> HostId: %s, Type: %s, task data:  %v <<<", task.Host.Id, ws.Resource_Task, string(jsonStr))
+					data := result.Data.(map[string]interface{})
+					tatal := data["total"]
+					logs.Info("############################  Get un finished task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, ws.Resource_Task, tatal)
 				}
 			case ws.Resource_Control_Type_Put:
 				//更新任务状态
@@ -347,10 +348,9 @@ func (this *WSMetricsService) Save() error {
 					logs.Error("############################ Update task status  fail, >>> HostId: %s, error: <<<", task.Host.Id, result.Message)
 					return errors.New(result.Message)
 				} else {
-					metricsResult := ws.WsData{Code: result.Code, Msg: result.Message, Type: ws.Type_RequestState, Tag: ws.Resource_Task, Data: result.Data}
+					metricsResult := ws.WsData{Code: result.Code, Msg: result.Message, Type: ws.Type_RequestState, Tag: ws.Resource_Task}
 					this.ReceiveData(metricsResult)
-					jsonStr, _ := json.Marshal(result.Data)
-					logs.Info("############################ Update task status, >>> HostId: %s, Type: %s, task data:  %v <<<", task.Host.Id, ws.Resource_Task, string(jsonStr))
+					logs.Info("############################ Update task status, >>> HostId: %s, Type: %s, task id:  %v <<<", task.Host.Id, ws.Resource_Task, task.Id)
 				}
 			}
 
