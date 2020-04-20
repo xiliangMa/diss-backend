@@ -12,9 +12,9 @@ type AgentCheckHadler struct {
 
 func (this *AgentCheckHadler) Check(model string) {
 	switch model {
-	case ws.Tag_ContainerConfig:
+	case ws.Resource_ContainerConfig:
 		this.ContainerConfingCheck()
-	case ws.Tag_ContainerInfo:
+	case ws.Resource_ContainerInfo:
 		this.ContainerInfoCheck()
 	}
 

@@ -19,7 +19,7 @@ func (this *WSDeliverService) DeliverTask() {
 	for _, task := range this.CurrentBatchTaskList {
 		if _, ok := this.Hub.DissClient[task.Host.Id]; ok {
 			client := this.Hub.DissClient[task.Host.Id]
-			result := ws.MetricsResult{ResType: "Task", ResTag: task.Type, Metric: task, Config: ""}
+			result := ws.WsData{Type: "Task", Tag: task.Type, Data: task, Config: ""}
 			data, err := json.Marshal(result)
 			err = client.Conn.WriteMessage(websocket.TextMessage, data)
 			if err == nil {

@@ -181,7 +181,7 @@ func AddHost_Processing(h Host, isEdit int) interface{} {
 
 	if len(pureMetric) == 0 {
 		ResultData.Code = utils.GetHostMetricError
-		ResultData.Message = "Host Metric cant acquire"
+		ResultData.Message = "Host Data cant acquire"
 		logs.Error("AddHost failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}

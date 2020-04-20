@@ -15,13 +15,13 @@ type K8SCheckHadler struct {
 
 func (this *K8SCheckHadler) Check(model string) {
 	switch model {
-	case ws.Tag_ContainerConfig:
+	case ws.Resource_ContainerConfig:
 		this.ContainerConfingCheck()
-	case ws.Tag_ContainerInfo:
+	case ws.Resource_ContainerInfo:
 		this.ContainerInfoCheck()
-	case ws.Tag_NameSpace:
+	case ws.Resource_NameSpace:
 		this.NSCheck()
-	case ws.Tag_Pod:
+	case ws.Resource_Pod:
 		this.PodCheck()
 	}
 

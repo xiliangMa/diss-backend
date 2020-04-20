@@ -21,64 +21,64 @@ type WSMetricsService struct {
 }
 
 func (this *WSMetricsService) Save() error {
-	ms := ws.MetricsResult{}
+	ms := ws.WsData{}
 	if err := json.Unmarshal(this.Message, &ms); err != nil {
-		logs.Error("Paraces MetricsResult error %s", err)
+		logs.Error("Paraces WsData error %s", err)
 		return err
 	}
-	switch ms.ResType {
+	switch ms.Type {
 	case ws.Type_Metric: // 数据上报
-		switch ms.ResTag {
-		case ws.Tag_HeartBeat:
+		switch ms.Tag {
+		case ws.Resource_HeartBeat:
 			heartBeat := bean.HeartBeat{}
-			s, _ := json.Marshal(ms.Metric)
+			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &heartBeat); err != nil {
-				logs.Error("Paraces %s error %s", ms.ResTag, err)
+				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
 			ip := strings.Split(this.Conn.RemoteAddr().String(), ":")
 			client := &Client{Hub: WSHub, Conn: this.Conn, Send: make(chan []byte, 256), ClientIp: ip[0], SystemId: heartBeat.SystemId}
 			client.Hub.Register <- client
-			logs.Info("############################ Agent Heater Beat data, >>> HostId: %s, Type: %s <<<", heartBeat.SystemId, ws.Tag_HeartBeat)
-			metricsResult := ws.MetricsResult{ResType: ws.Type_ReceiveState, ResTag: ws.Tag_Received, Metric: nil, Config: ""}
+			logs.Info("############################ Agent Heater Beat data, >>> HostId: %s, Type: %s <<<", heartBeat.SystemId, ws.Resource_HeartBeat)
+			metricsResult := ws.WsData{Type: ws.Type_ReceiveState, Tag: ws.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
-		case ws.Tag_HostConfig:
+		case ws.Resource_HostConfig:
 			hostConfig := models.HostConfig{}
-			s, _ := json.Marshal(ms.Metric)
+			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &hostConfig); err != nil {
-				logs.Error("Paraces %s error %s", ms.ResTag, err)
+				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
-			logs.Info("############################ Sync agent data, >>> HostId: %s, Type: %s <<<", hostConfig.Id, ws.Tag_HostConfig)
+			logs.Info("############################ Sync agent data, >>> HostId: %s, Type: %s <<<", hostConfig.Id, ws.Resource_HostConfig)
 			if err := hostConfig.Inner_AddHostConfig(); err != nil {
 				return err
 			}
-			metricsResult := ws.MetricsResult{ResType: ws.Type_ReceiveState, ResTag: ws.Tag_Received, Metric: nil, Config: ""}
+			metricsResult := ws.WsData{Type: ws.Type_ReceiveState, Tag: ws.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
-		case ws.Tag_HostInfo:
+		case ws.Resource_HostInfo:
 			hostInfo := models.HostInfo{}
-			s, _ := json.Marshal(ms.Metric)
+			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &hostInfo); err != nil {
-				logs.Error("Paraces %s error %s", ms.ResTag, err)
+				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
-			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", hostInfo.Id, ws.Tag_HostInfo)
+			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", hostInfo.Id, ws.Resource_HostInfo)
 			if err := hostInfo.Inner_AddHostInfo(); err != nil {
 				return err
 			}
-			metricsResult := ws.MetricsResult{ResType: ws.Type_ReceiveState, ResTag: ws.Tag_Received, Metric: nil, Config: ""}
+			metricsResult := ws.WsData{Type: ws.Type_ReceiveState, Tag: ws.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
-		case ws.Tag_ContainerConfig:
+		case ws.Resource_ContainerConfig:
 			containerConfigList := []models.ContainerConfig{}
 			CheckObject := new(models.ContainerConfig)
-			s, _ := json.Marshal(ms.Metric)
+			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &containerConfigList); err != nil {
-				logs.Error("Paraces %s error %s", ms.ResTag, err)
+				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
 			size := len(containerConfigList)
 			if size != 0 {
-				logs.Info("############################ Sync agent data, >>>  HostName: %s, Type: %s, Size: %d <<<", containerConfigList[0].HostName, ws.Tag_ContainerConfig, size)
+				logs.Info("############################ Sync agent data, >>>  HostName: %s, Type: %s, Size: %d <<<", containerConfigList[0].HostName, ws.Resource_ContainerConfig, size)
 			}
 			for _, containerConfig := range containerConfigList {
 				//if result := containerConfig.Add(); result.Code != http.StatusOK {
@@ -91,22 +91,22 @@ func (this *WSMetricsService) Save() error {
 				CheckObject.HostName = containerConfigList[0].HostName
 				CheckObject.SyncCheckPoint = containerConfigList[0].SyncCheckPoint
 				agentCheckHandler := synccheck.AgentCheckHadler{CheckObject, nil}
-				agentCheckHandler.Check(ws.Tag_ContainerConfig)
+				agentCheckHandler.Check(ws.Resource_ContainerConfig)
 			}
-			metricsResult := ws.MetricsResult{ResType: ws.Type_ReceiveState, ResTag: ws.Tag_Received, Metric: nil, Config: ""}
+			metricsResult := ws.WsData{Type: ws.Type_ReceiveState, Tag: ws.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
-		case ws.Tag_ContainerInfo:
+		case ws.Resource_ContainerInfo:
 			containerInfoList := []models.ContainerInfo{}
 			CheckObject := new(models.ContainerInfo)
-			s, _ := json.Marshal(ms.Metric)
+			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &containerInfoList); err != nil {
-				logs.Error("Paraces %s error %s", ms.ResTag, err)
+				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
 			size := len(containerInfoList)
 			if size != 0 {
-				logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerInfoList[0].HostId, ws.Tag_ContainerInfo, size)
+				logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerInfoList[0].HostId, ws.Resource_ContainerInfo, size)
 			}
 			for _, containerInfo := range containerInfoList {
 				//if result := containerInfo.Add(); result.Code != http.StatusOK {
@@ -120,21 +120,21 @@ func (this *WSMetricsService) Save() error {
 				CheckObject.HostName = containerInfoList[0].HostName
 				CheckObject.SyncCheckPoint = containerInfoList[0].SyncCheckPoint
 				agentCheckHandler := synccheck.AgentCheckHadler{nil, CheckObject}
-				agentCheckHandler.Check(ws.Tag_ContainerInfo)
+				agentCheckHandler.Check(ws.Resource_ContainerInfo)
 			}
-			metricsResult := ws.MetricsResult{ResType: ws.Type_ReceiveState, ResTag: ws.Tag_Received, Metric: nil, Config: ""}
+			metricsResult := ws.WsData{Type: ws.Type_ReceiveState, Tag: ws.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
-		case ws.Tag_ImageConfig:
+		case ws.Resource_ImageConfig:
 			imageConfigList := []models.ImageConfig{}
-			s, _ := json.Marshal(ms.Metric)
+			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &imageConfigList); err != nil {
-				logs.Error("Paraces %s error %s", ms.ResTag, err)
+				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
 			size := len(imageConfigList)
 			if size != 0 {
-				logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageConfigList[0].HostId, ws.Tag_ImageConfig, len(imageConfigList))
+				logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageConfigList[0].HostId, ws.Resource_ImageConfig, len(imageConfigList))
 				//删除主机下的所有imageconfig
 				imageConfigList[0].Delete()
 			}
@@ -145,19 +145,19 @@ func (this *WSMetricsService) Save() error {
 				//}
 				imageConfig.Add()
 			}
-			metricsResult := ws.MetricsResult{ResType: ws.Type_ReceiveState, ResTag: ws.Tag_Received, Metric: nil, Config: ""}
+			metricsResult := ws.WsData{Type: ws.Type_ReceiveState, Tag: ws.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
-		case ws.Tag_ImageInfo:
+		case ws.Resource_ImageInfo:
 			imageInfoList := []models.ImageInfo{}
-			s, _ := json.Marshal(ms.Metric)
+			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &imageInfoList); err != nil {
-				logs.Error("Paraces %s error %s", ms.ResTag, err)
+				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
 			size := len(imageInfoList)
 			if size != 0 {
-				logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageInfoList[0].HostId, ws.Tag_ImageInfo, len(imageInfoList))
+				logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageInfoList[0].HostId, ws.Resource_ImageInfo, len(imageInfoList))
 				//删除主机下的所有imageginfo
 				imageInfoList[0].Delete()
 			}
@@ -167,18 +167,18 @@ func (this *WSMetricsService) Save() error {
 				//}
 				imageInfo.Add()
 			}
-			metricsResult := ws.MetricsResult{ResType: ws.Type_ReceiveState, ResTag: ws.Tag_Received, Metric: nil, Config: ""}
+			metricsResult := ws.WsData{Type: ws.Type_ReceiveState, Tag: ws.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
-		case ws.Tag_HostPs:
+		case ws.Resource_HostPs:
 			hostPsList := []models.HostPs{}
-			s, _ := json.Marshal(ms.Metric)
+			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &hostPsList); err != nil {
-				logs.Error("Paraces %s error %s", ms.ResTag, err)
+				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
 			size := len(hostPsList)
 			if size != 0 {
-				logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", hostPsList[0].HostId, ws.Tag_HostPs, size)
+				logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", hostPsList[0].HostId, ws.Resource_HostPs, size)
 				// 删除该主机下所有的进程
 				hostPsList[0].Delete()
 
@@ -189,20 +189,20 @@ func (this *WSMetricsService) Save() error {
 				//}
 				hostPs.Add()
 			}
-			metricsResult := ws.MetricsResult{ResType: ws.Type_ReceiveState, ResTag: ws.Tag_Received, Metric: nil, Config: ""}
+			metricsResult := ws.WsData{Type: ws.Type_ReceiveState, Tag: ws.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
-		case ws.Tag_ContainerPs:
+		case ws.Resource_ContainerPs:
 			containerPsList := []models.ContainerPs{}
-			s, _ := json.Marshal(ms.Metric)
+			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &containerPsList); err != nil {
-				logs.Error("Paraces %s error %s", ms.ResTag, err)
+				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
 			size := len(containerPsList)
 
 			if size != 0 {
-				logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerPsList[0].HostId, ws.Tag_ContainerPs, len(containerPsList))
+				logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerPsList[0].HostId, ws.Resource_ContainerPs, len(containerPsList))
 				containerPsList[0].Delete()
 			}
 
@@ -212,22 +212,22 @@ func (this *WSMetricsService) Save() error {
 				//}
 				containerTop.Add()
 			}
-			metricsResult := ws.MetricsResult{ResType: ws.Type_ReceiveState, ResTag: ws.Tag_Received, Metric: nil, Config: ""}
+			metricsResult := ws.WsData{Type: ws.Type_ReceiveState, Tag: ws.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
-		case ws.Tag_DockerBenchMarkLog:
+		case ws.Resource_DockerBenchMarkLog:
 			//index := beego.AppConfig.String("security_log::BenchMarkIndex")
 			benchMarkLog := securitylog.BenchMarkLog{}
-			s, _ := json.Marshal(ms.Metric)
+			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &benchMarkLog); err != nil {
-				logs.Error("Paraces %s error %s", ms.ResTag, err)
+				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
-			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", benchMarkLog.HostId, ws.Tag_DockerBenchMarkLog)
+			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", benchMarkLog.HostId, ws.Resource_DockerBenchMarkLog)
 			if result := benchMarkLog.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
 			}
-			metricsResult := ws.MetricsResult{ResType: ws.Type_ReceiveState, ResTag: ws.Tag_Received, Metric: nil, Config: ""}
+			metricsResult := ws.WsData{Type: ws.Type_ReceiveState, Tag: ws.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			// 上报es
 			//esClient, err := utils.GetESClient()
@@ -242,19 +242,19 @@ func (this *WSMetricsService) Save() error {
 			//	logs.Info("Add security_log to es success, benchMarkLog.Id: %s", benchMarkLog.Id)
 			//}
 			//defer respones.Body.Close()
-		case ws.Tag_KubernetesBenchMarkLog:
+		case ws.Resource_KubernetesBenchMarkLog:
 			//index := beego.AppConfig.String("security_log::BenchMarkIndex")
 			benchMarkLog := securitylog.BenchMarkLog{}
-			s, _ := json.Marshal(ms.Metric)
+			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &benchMarkLog); err != nil {
-				logs.Error("Paraces %s error %s", ms.ResTag, err)
+				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
-			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", benchMarkLog.HostId, ws.Tag_KubernetesBenchMarkLog)
+			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", benchMarkLog.HostId, ws.Resource_KubernetesBenchMarkLog)
 			if result := benchMarkLog.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
 			}
-			metricsResult := ws.MetricsResult{ResType: ws.Type_ReceiveState, ResTag: ws.Tag_Received, Metric: nil, Config: ""}
+			metricsResult := ws.WsData{Type: ws.Type_ReceiveState, Tag: ws.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			// 上报es
 			//esClient, err := utils.GetESClient()
@@ -268,16 +268,16 @@ func (this *WSMetricsService) Save() error {
 			//	logs.Info("Add security_log to es success, benchMarkLog.Id: %s", benchMarkLog.Id)
 			//}
 			//defer respones.Body.Close()
-		case ws.Tag_HostCmdHistory:
+		case ws.Resource_HostCmdHistory:
 			cmdHistoryList := models.CmdHistoryList{}
-			s, _ := json.Marshal(ms.Metric)
+			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &cmdHistoryList.List); err != nil {
-				logs.Error("Paraces %s error %s", ms.ResTag, err)
+				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
 			size := len(cmdHistoryList.List)
 			if size != 0 {
-				logs.Info("############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, ws.Tag_HostCmdHistory, size)
+				logs.Info("############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, ws.Resource_HostCmdHistory, size)
 				// 删除该主机下所有的记录 type = 0
 				cmdHistoryList.List[0].Delete()
 			}
@@ -288,19 +288,19 @@ func (this *WSMetricsService) Save() error {
 				//}
 				cmdHistory.Add()
 			}
-			metricsResult := ws.MetricsResult{ResType: ws.Type_ReceiveState, ResTag: ws.Tag_Received, Metric: nil, Config: ""}
+			metricsResult := ws.WsData{Type: ws.Type_ReceiveState, Tag: ws.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
-		case ws.Tag_ContainerCmdHistory:
+		case ws.Resource_ContainerCmdHistory:
 			cmdHistoryList := models.CmdHistoryList{}
-			s, _ := json.Marshal(ms.Metric)
+			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &cmdHistoryList.List); err != nil {
-				logs.Error("Paraces %s error %s", ms.ResTag, err)
+				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
 			size := len(cmdHistoryList.List)
 			if size != 0 {
-				logs.Info("############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, ws.Tag_ContainerCmdHistory, size)
+				logs.Info("############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, ws.Resource_ContainerCmdHistory, size)
 				// 删除该主机下所有的记录 type = 1
 				cmdHistoryList.List[0].Delete()
 			}
@@ -310,27 +310,27 @@ func (this *WSMetricsService) Save() error {
 				//}
 				cmdHistory.Add()
 			}
-			metricsResult := ws.MetricsResult{ResType: ws.Type_ReceiveState, ResTag: ws.Tag_Received, Metric: nil, Config: ""}
+			metricsResult := ws.WsData{Type: ws.Type_ReceiveState, Tag: ws.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
 		}
-	case ws.Type_SyncData: // 数据下发
-		switch ms.ResTag {
-		case ws.Tag_Task:
+	case ws.Type_Control: // 数据下发
+		switch ms.Tag {
+		case ws.Resource_Task:
 			task := job.Task{}
-			s, _ := json.Marshal(ms.Metric)
+			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &task); err != nil {
-				logs.Error("Paraces %s error %s", ms.ResTag, err)
+				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
 			if result := task.GetUnFinishedTaskList(); result.Code != http.StatusOK {
 				logs.Info("############################ Get un finished task list  fail, >>> HostId: %s, error: <<<", task.Host.Id, result.Message)
 				return errors.New(result.Message)
 			} else {
-				metricsResult := ws.MetricsResult{ResType: ws.Type_Response, ResTag: ws.Tag_Task, Metric: result.Data, Config: ""}
+				metricsResult := ws.WsData{Type: ws.Type_RequestState, Tag: ws.Resource_Task, Data: result.Data, Config: ""}
 				this.ReceiveData(metricsResult)
 				jsonStr, _ := json.Marshal(result.Data)
-				logs.Info("############################  Get un finished task list, >>> HostId: %s, Type: %s, task data:  %v <<<", task.Host.Id, ws.Tag_Task, string(jsonStr))
+				logs.Info("############################  Get un finished task list, >>> HostId: %s, Type: %s, task data:  %v <<<", task.Host.Id, ws.Resource_Task, string(jsonStr))
 			}
 		}
 	}
@@ -338,7 +338,7 @@ func (this *WSMetricsService) Save() error {
 	return nil
 }
 
-func (this *WSMetricsService) ReceiveData(result ws.MetricsResult) {
+func (this *WSMetricsService) ReceiveData(result ws.WsData) {
 	data, _ := json.Marshal(result)
 	err := this.Conn.WriteMessage(websocket.TextMessage, data)
 	if err != nil {

@@ -79,7 +79,7 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 		this.PG = "Sys-Default"
 		_, err = o.Insert(this)
 		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
-			logs.Error("DB Metrics data --- Add %s failed, err: %s", ws.Tag_HostConfig, err.Error())
+			logs.Error("DB Metrics data --- Add %s failed, err: %s", ws.Resource_HostConfig, err.Error())
 			return err
 		}
 	}
@@ -111,7 +111,7 @@ func (this *HostInfo) Inner_AddHostInfo() error {
 		// 插入数据
 		_, err = o.Insert(this)
 		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
-			logs.Error("DB Metrics data --- Add %s failed, err: %s", ws.Tag_HostInfo, err.Error())
+			logs.Error("DB Metrics data --- Add %s failed, err: %s", ws.Resource_HostInfo, err.Error())
 			return err
 		}
 	}
