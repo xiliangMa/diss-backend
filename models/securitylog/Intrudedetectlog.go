@@ -142,11 +142,11 @@ func (this *IntrudeDetectLog) List1(from, limit int) models.Result {
 		sql = sql + "container_id != '" + models.IDLT_Host + "' and "
 	}
 
-	if this.ContainerId != "" && this.HostId != "" && this.ContainerId != models.All && this.HostId != models.All {
-		if this.ContainerId != models.IDLT_Host {
+	if (this.ContainerId != "" && this.ContainerId != models.All) || (this.HostId != "" && this.HostId != models.All) {
+		if this.ContainerId != models.IDLT_Host && this.TargeType == models.IDLT_Docker {
 			containerId := this.ContainerId
 			containerId = string([]byte(this.ContainerId)[:12])
-			sql = sql + "container_id != " + containerId + " and "
+			sql = sql + "container_id = '" + containerId + "' and "
 		}
 
 		if this.TargeType == models.IDLT_Host {
@@ -157,23 +157,41 @@ func (this *IntrudeDetectLog) List1(from, limit int) models.Result {
 		}
 		if this.StartTime != "" {
 			st, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.UTC)
-			sql = sql + "created_at > '" + st.String() + "' and "
+			sql = sql + "created_at > '" + strconv.FormatInt(st.Unix(), 10) + "' and "
 		}
 		if this.ToTime != "" {
 			tt, _ := time.ParseInLocation("2006-01-02T15:04:05", this.ToTime, time.UTC)
-			sql = sql + "created_at < '" + tt.String() + "' and "
+			sql = sql + "created_at < '" + strconv.FormatInt(tt.Unix(), 10) + "' and "
 		}
 		if this.Priority != "" {
 			sql = sql + "priority = '" + this.Priority + "' and "
 		}
 	}
+	//if this.HostId != "" && this.HostId != models.All && this.TargeType == models.IDLT_Host {
+	//	if this.TargeType == models.IDLT_Host {
+	//		sql = sql + "host_id = '" + this.HostId + "' and "
+	//	}
+	//	if this.HostName != "" {
+	//		sql = sql + "host_name = '" + this.HostName + "' and "
+	//	}
+	//	if this.StartTime != "" {
+	//		st, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.UTC)
+	//		sql = sql + "created_at > '" + strconv.FormatInt(st.Unix(), 10) + "' and "
+	//	}
+	//	if this.ToTime != "" {
+	//		tt, _ := time.ParseInLocation("2006-01-02T15:04:05", this.ToTime, time.UTC)
+	//		sql = sql + "created_at < '" + strconv.FormatInt(tt.Unix(), 10) + "' and "
+	//	}
+	//	if this.Priority != "" {
+	//		sql = sql + "priority = '" + this.Priority + "' and "
+	//	}
+	//}
 	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
 	resultSql := sql
 	if from >= 0 && limit > 0 {
 		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
 		resultSql = resultSql + limitSql
 	}
-
 	_, err = o.Raw(resultSql).QueryRows(&dcokerIdsList)
 	if err != nil {
 		ResultData.Message = err.Error()
