@@ -157,7 +157,7 @@ func (this *Task) GetUnFinishedTaskList() models.Result {
 	if this.Host != nil && this.Host.Id != "" {
 		cond = cond.And("host_id", this.Host.Id)
 	}
-	cond = cond.AndCond(cond.And("status", models.Task_Status_Pending).Or("status", models.Task_Status_Running))
+	cond = cond.AndCond(cond.And("status", models.Task_Status_Pending).Or("status", models.Task_Status_Running).Or("status", models.Task_Status_Deliver_Failed))
 
 	total, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().All(&TaskList)
 	if err != nil {
