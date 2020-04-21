@@ -338,19 +338,21 @@ func (this *WSMetricsService) Save() error {
 				}
 			case ws.Resource_Control_Type_Put:
 				//更新任务状态
-				task := job.Task{}
+				taskList := []job.Task{}
 				s, _ := json.Marshal(ms.Data)
-				if err := json.Unmarshal(s, &task); err != nil {
+				if err := json.Unmarshal(s, &taskList); err != nil {
 					logs.Error("Paraces %s error %s", ms.Tag, err)
 					return err
 				}
-				if result := task.Update(); result.Code != http.StatusOK {
-					logs.Error("############################ Update task status  fail, >>> HostId: %s, error: <<<", task.Host.Id, result.Message)
-					return errors.New(result.Message)
-				} else {
-					metricsResult := ws.WsData{Code: result.Code, Msg: result.Message, Type: ws.Type_RequestState, Tag: ws.Resource_Task}
-					this.ReceiveData(metricsResult)
-					logs.Info("############################ Update task status, >>> HostId: %s, Type: %s, task id:  %v <<<", task.Host.Id, ws.Resource_Task, task.Id)
+				for _, task := range taskList {
+					if result := task.Update(); result.Code != http.StatusOK {
+						logs.Error("############################ Update task status  fail, >>> HostId: %s, error: <<<", task.Host.Id, result.Message)
+						return errors.New(result.Message)
+					} else {
+						metricsResult := ws.WsData{Code: result.Code, Msg: result.Message, Type: ws.Type_RequestState, Tag: ws.Resource_Task}
+						this.ReceiveData(metricsResult)
+						logs.Info("############################ Update task status, >>> HostId: %s, Type: %s, task id:  %v <<<", task.Host.Id, ws.Resource_Task, task.Id)
+					}
 				}
 			}
 
