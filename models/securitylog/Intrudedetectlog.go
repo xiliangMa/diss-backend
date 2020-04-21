@@ -19,7 +19,6 @@ type IntrudeDetectLog struct {
 	ContainerId string `description:"(容日Id 如果是主机该字段为：host， 如果是容器为：容器的实际ID)"`
 	StartTime   string `description:"(开始时间)"`
 	ToTime      string `description:"(结束时间)"`
-	Limit       int    `description:"(条数)"`
 	AccountName string `description:"(租户)"`
 	Priority    string `description:"(安全等级)"`
 }
@@ -94,29 +93,12 @@ func (this *IntrudeDetectLog) List(from, limit int) models.Result {
 	st, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.UTC)
 	tt, _ := time.ParseInLocation("2006-01-02T15:04:05", this.ToTime, time.UTC)
 
-	//cond = cond.And("host_id", this.HostId)
-	//if this.HostId != "" {
-	//	cond = cond.And("host_id", this.HostId)
-	//}
-	//if this.ContainerId != "" {
-	//	cond = cond.And("container_id", this.ContainerId)
-	//}
-	//if this.StartTime != "" {
-	//	loc, _ := time.LoadLocation("Asia/Shanghai")
-	//	tt, _ := time.ParseInLocation("2006-01-02 15:04:05", this.StartTime, loc)
-	//	cond = cond.And("created_at__gte", tt.Unix())
-	//}
-	//if this.ToTime != "" {
-	//	loc, _ := time.LoadLocation("Asia/Shanghai")
-	//	tt, _ := time.ParseInLocation("2006-01-02 15:04:05", this.ToTime, loc)
-	//	cond = cond.And("created_at__lte", tt.Unix())
-	//}
 	var total int64
 	if this.TargeType == models.IDLT_Docker {
 		containerId = string([]byte(this.ContainerId)[:12])
-		total, err = o.Raw("select * from docker_ids where container_id = ? and created_at > ? and created_at < ?", containerId, st.Unix(), tt.Unix()).QueryRows(&dcokerIdsList)
+		total, err = o.Raw("select * from docker_ids where container_id = ? and created_at > ? and created_at < ? limit ? OFFSET ?", containerId, st.Unix(), tt.Unix(), limit, from).QueryRows(&dcokerIdsList)
 	} else {
-		total, err = o.Raw("select * from docker_ids where host_id = ? and container_id = ? and created_at > ? and created_at < ?", this.HostId, containerId, st.Unix(), tt.Unix()).QueryRows(&dcokerIdsList)
+		total, err = o.Raw("select * from docker_ids where host_id = ? and container_id = ? and created_at > ? and created_at < ? limit ? OFFSET ?", this.HostId, containerId, st.Unix(), tt.Unix(), limit, from).QueryRows(&dcokerIdsList)
 	}
 
 	if err != nil {
@@ -187,12 +169,12 @@ func (this *IntrudeDetectLog) List1(from, limit int) models.Result {
 	}
 	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
 	resultSql := sql
-	if from > 0 && limit > 0 {
-		limitSql := " limit " + strconv.Itoa(from) + " OFFSET " + strconv.Itoa(limit-1)
+	if from >= 0 && limit > 0 {
+		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
 		resultSql = resultSql + limitSql
 	}
 
-	total, err = o.Raw(resultSql).QueryRows(&dcokerIdsList)
+	_, err = o.Raw(resultSql).QueryRows(&dcokerIdsList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetIntrudeDetectLogErr
