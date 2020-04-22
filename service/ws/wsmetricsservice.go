@@ -320,36 +320,45 @@ func (this *WSMetricsService) Save() error {
 			// 获取任务列表接口
 			switch ms.RCType {
 			case ws.Resource_Control_Type_Get:
+				metricsResult := ws.WsData{Code: http.StatusOK, Type: ws.Type_RequestState, Tag: ws.Resource_Task}
 				task := job.Task{}
 				s, _ := json.Marshal(ms.Data)
 				if err := json.Unmarshal(s, &task); err != nil {
-					logs.Error("Paraces %s error %s", ms.Tag, err)
+					logs.Error("Paraces: %s type: %s error: %s  ", ms.Tag, ms.RCType, err)
 					return err
 				}
 				if result := task.GetUnFinishedTaskList(); result.Code != http.StatusOK {
+					metricsResult.Code = result.Code
+					metricsResult.Msg = result.Message
 					logs.Error("############################ Get un finished task list  fail, >>> HostId: %s, error: <<<", task.Host.Id, result.Message)
 					return errors.New(result.Message)
 				} else {
-					metricsResult := ws.WsData{Code: result.Code, Msg: result.Message, Type: ws.Type_RequestState, Tag: ws.Resource_Task, Data: result.Data, Config: ""}
-					this.ReceiveData(metricsResult)
-					data := result.Data.(map[string]interface{})
-					tatal := data["total"]
-					logs.Info("############################  Get un finished task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, ws.Resource_Task, tatal)
+					metricsResult.Code = result.Code
+					metricsResult.Msg = result.Message
+					metricsResult.Data = result.Data
+					if result.Data != nil {
+						data := result.Data.(map[string]interface{})
+						tatal := data["total"]
+						logs.Info("############################  Get un finished task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, ws.Resource_Task, tatal)
+					}
 				}
+				this.ReceiveData(metricsResult)
 			case ws.Resource_Control_Type_Put:
 				//更新任务状态
+				metricsResult := ws.WsData{Code: http.StatusOK, Type: ws.Type_RequestState, Tag: ws.Resource_Task}
 				taskList := []job.Task{}
 				s, _ := json.Marshal(ms.Data)
 				if err := json.Unmarshal(s, &taskList); err != nil {
-					logs.Error("Paraces %s error %s", ms.Tag, err)
+					logs.Error("Paraces: %s type: %s error: %s  ", ms.Tag, ms.RCType, err)
 					return err
 				}
 				for _, task := range taskList {
 					if result := task.Update(); result.Code != http.StatusOK {
+						metricsResult.Code = result.Code
+						metricsResult.Msg = result.Message
 						logs.Error("############################ Update task status  fail, >>> HostId: %s, error: <<<", task.Host.Id, result.Message)
 						return errors.New(result.Message)
 					} else {
-						metricsResult := ws.WsData{Code: result.Code, Msg: result.Message, Type: ws.Type_RequestState, Tag: ws.Resource_Task}
 						this.ReceiveData(metricsResult)
 						logs.Info("############################ Update task status, >>> HostId: %s, Type: %s, task id:  %v <<<", task.Host.Id, ws.Resource_Task, task.Id)
 					}
