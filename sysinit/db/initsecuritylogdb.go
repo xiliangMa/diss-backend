@@ -10,7 +10,10 @@ import (
 	"os"
 )
 
-func InitSecurityLogDB() {
+type SecurityLogDb struct {
+}
+
+func (this *SecurityLogDb) InitDB() {
 	driver := utils.DS_Driver_Postgres
 	runMode := beego.AppConfig.String("RunMode")
 	envRunMode := os.Getenv("RunMode")

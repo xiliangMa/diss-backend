@@ -3,9 +3,19 @@ package sysinit
 import "github.com/xiliangMa/diss-backend/sysinit/db"
 
 func init() {
-	db.InitDB()
-	db.InitSecurityLogDB()
-	db.InitDissApiDB()
+	// initDB
+	defaultDB := db.DefaultDB{}
+	defaultDB.InitDB()
+
+	securityLogDb := db.SecurityLogDb{}
+	securityLogDb.InitDB()
+
+	dissApiDB := db.DissApiDB{}
+	dissApiDB.InitDB()
+
+	//init logger
 	InitLogger()
+
+	// init task
 	InitTask()
 }

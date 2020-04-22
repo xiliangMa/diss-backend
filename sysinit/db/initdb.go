@@ -15,7 +15,10 @@ import (
 	"os"
 )
 
-func InitDB() {
+type DefaultDB struct {
+}
+
+func (this *DefaultDB) InitDB() {
 	driver := utils.DS_Driver_Postgres
 	runMode := beego.AppConfig.String("RunMode")
 	envRunMode := os.Getenv("RunMode")
@@ -64,7 +67,7 @@ func InitDB() {
 		logs.Error("DB Register fail, >>> DSAlias: %s <<<, Err: %s", DSAlias, err)
 	}
 
-	registerDefaultModel()
+	this.registerModel()
 	//auto create db
 	err = orm.RunSyncdb(DSAlias, force, true)
 	if err != nil {
@@ -74,7 +77,7 @@ func InitDB() {
 	//orm.DefaultTimeLoc = time.UTC
 }
 
-func registerDefaultModel() {
+func (this *DefaultDB) registerModel() {
 	// k8s
 	orm.RegisterModel(new(mk8s.Cluster), new(mk8s.NameSpace), new(mk8s.Pod))
 	// securitylog

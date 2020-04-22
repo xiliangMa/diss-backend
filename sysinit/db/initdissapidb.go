@@ -11,7 +11,10 @@ import (
 	"os"
 )
 
-func InitDissApiDB() {
+type DissApiDB struct {
+}
+
+func (this *DissApiDB) InitDB() {
 	driver := utils.DS_Driver_Postgres
 	runMode := beego.AppConfig.String("RunMode")
 	envRunMode := os.Getenv("RunMode")
