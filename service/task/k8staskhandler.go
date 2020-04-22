@@ -373,6 +373,12 @@ func SyncAll() {
 				c.SyncStatus = models.Cluster_Sync_Status_IN_PROGRESS
 				c.Update()
 				logs.Info("########################################## cluster:  %s, Sync start.", c.Name)
+				defer func() {
+					if err := recover(); err != nil {
+						logs.Error("########################################## cluster:  %s id: %s , Sync fail. err: %s", c.Name, c.Id, err)
+					}
+				}()
+
 				// 创建k8s客户端
 				this := NewK8STaskHandler(c.FileName)
 				this.SyncCheckPoint = SyncCheckPoint
