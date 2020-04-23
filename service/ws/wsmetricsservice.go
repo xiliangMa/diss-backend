@@ -338,8 +338,10 @@ func (this *WSMetricsService) Save() error {
 					metricsResult.Data = result.Data
 					if result.Data != nil {
 						data := result.Data.(map[string]interface{})
-						tatal := data["total"]
-						logs.Info("############################  Get un finished task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, ws.Resource_Task, tatal)
+						total := data["total"]
+						logs.Info("############################  Get un finished task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, ws.Resource_Task, total)
+					} else {
+						logs.Info("############################  Get un finished task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, ws.Resource_Task, 0)
 					}
 				}
 				this.ReceiveData(metricsResult)
