@@ -320,7 +320,7 @@ func (this *WSMetricsService) Save() error {
 			// 获取任务列表接口
 			switch ms.RCType {
 			case ws.Resource_Control_Type_Get:
-				metricsResult := ws.WsData{Code: http.StatusOK, Type: ws.Type_RequestState, Tag: ws.Resource_Task}
+				metricsResult := ws.WsData{Code: http.StatusOK, Type: ws.Type_RequestState, Tag: ws.Resource_Task, RCType: ws.Resource_Control_Type_Get}
 				task := job.Task{}
 				s, _ := json.Marshal(ms.Data)
 				if err := json.Unmarshal(s, &task); err != nil {
@@ -345,7 +345,7 @@ func (this *WSMetricsService) Save() error {
 				this.ReceiveData(metricsResult)
 			case ws.Resource_Control_Type_Put:
 				//更新任务状态
-				metricsResult := ws.WsData{Code: http.StatusOK, Type: ws.Type_RequestState, Tag: ws.Resource_Task}
+				metricsResult := ws.WsData{Code: http.StatusOK, Type: ws.Type_RequestState, Tag: ws.Resource_Task, RCType: ws.Resource_Control_Type_Put}
 				taskList := []job.Task{}
 				s, _ := json.Marshal(ms.Data)
 				if err := json.Unmarshal(s, &taskList); err != nil {
