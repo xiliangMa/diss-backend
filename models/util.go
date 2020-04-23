@@ -51,6 +51,10 @@ var (
 	Task_Status_Received       = "Received"
 	Task_Status_Receive_Failed = "ReceiveFailed"
 
+	//任务类型
+	Job_Type_Once     = "Once"
+	Job_Type_Periodic = "Periodical"
+
 	//基线日志类型
 	BMLT_Host_All    = "host"
 	BMLT_Docker      = "docker"
