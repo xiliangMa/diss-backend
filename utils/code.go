@@ -107,4 +107,6 @@ var (
 	GetAccountsErr     = 1400
 	GetAccountUsersErr = 1401
 	NoAccountUsersErr  = 1402
+	GetImageVirusErr   = 1403
+	GetDockerVirusErr  = 1404
 )

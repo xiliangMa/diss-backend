@@ -34,4 +34,22 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/securitylog:VirusLogController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/securitylog:VirusLogController"],
+		beego.ControllerComments{
+			Method:           "GetHostOrContainerVirusLogList",
+			Router:           `/virus/hostorcontainer`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/securitylog:VirusLogController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/securitylog:VirusLogController"],
+		beego.ControllerComments{
+			Method:           "GetVirusLogList",
+			Router:           `/virus/image`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
 }

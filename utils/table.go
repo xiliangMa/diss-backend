@@ -27,4 +27,6 @@ var (
 	//Diss_api
 	Accounts     = "accounts"
 	AccountUsers = "account_users"
+	ImageVirus   = "image_virus"
+	DockerVirus  = "docker_virus"
 )

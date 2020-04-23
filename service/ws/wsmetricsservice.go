@@ -320,7 +320,7 @@ func (this *WSMetricsService) Save() error {
 			// 获取任务列表接口
 			switch ms.RCType {
 			case ws.Resource_Control_Type_Get:
-				metricsResult := ws.WsData{Code: http.StatusOK, Type: ws.Type_RequestState, Tag: ws.Resource_Task, RCType: ws.Resource_Control_Type_Get}
+				metricsResult := ws.WsData{Code: http.StatusOK, Type: ws.Type_Control, Tag: ws.Resource_Task, RCType: ws.Resource_Control_Type_Get}
 				task := job.Task{}
 				s, _ := json.Marshal(ms.Data)
 				if err := json.Unmarshal(s, &task); err != nil {
@@ -347,7 +347,7 @@ func (this *WSMetricsService) Save() error {
 				this.ReceiveData(metricsResult)
 			case ws.Resource_Control_Type_Put:
 				//更新任务状态
-				metricsResult := ws.WsData{Code: http.StatusOK, Type: ws.Type_RequestState, Tag: ws.Resource_Task, RCType: ws.Resource_Control_Type_Put}
+				metricsResult := ws.WsData{Code: http.StatusOK, Type: ws.Type_Control, Tag: ws.Resource_Task, RCType: ws.Resource_Control_Type_Put}
 				taskList := []job.Task{}
 				s, _ := json.Marshal(ms.Data)
 				if err := json.Unmarshal(s, &taskList); err != nil {
@@ -378,6 +378,6 @@ func (this *WSMetricsService) ReceiveData(result ws.WsData) {
 	data, _ := json.Marshal(result)
 	err := this.Conn.WriteMessage(websocket.TextMessage, data)
 	if err != nil {
-		logs.Info("############################ Received data from agent fail ############################", err)
+		logs.Error("############################ Received data from agent fail ############################", err)
 	}
 }
