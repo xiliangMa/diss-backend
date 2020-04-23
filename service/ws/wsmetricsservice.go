@@ -215,7 +215,7 @@ func (this *WSMetricsService) Save() error {
 			metricsResult := ws.WsData{Type: ws.Type_ReceiveState, Tag: ws.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
-		case ws.Resource_DockerBenchMarkLog:
+		case ws.Resource_DockerBenchMark:
 			//index := beego.AppConfig.String("security_log::BenchMarkIndex")
 			benchMarkLog := securitylog.BenchMarkLog{}
 			s, _ := json.Marshal(ms.Data)
@@ -223,7 +223,7 @@ func (this *WSMetricsService) Save() error {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
-			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", benchMarkLog.HostId, ws.Resource_DockerBenchMarkLog)
+			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", benchMarkLog.HostId, ws.Resource_DockerBenchMark)
 			if result := benchMarkLog.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
 			}
@@ -242,7 +242,7 @@ func (this *WSMetricsService) Save() error {
 			//	logs.Info("Add security_log to es success, benchMarkLog.Id: %s", benchMarkLog.Id)
 			//}
 			//defer respones.Body.Close()
-		case ws.Resource_KubernetesBenchMarkLog:
+		case ws.Resource_KubernetesBenchMark:
 			//index := beego.AppConfig.String("security_log::BenchMarkIndex")
 			benchMarkLog := securitylog.BenchMarkLog{}
 			s, _ := json.Marshal(ms.Data)
@@ -250,7 +250,7 @@ func (this *WSMetricsService) Save() error {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
-			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", benchMarkLog.HostId, ws.Resource_KubernetesBenchMarkLog)
+			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", benchMarkLog.HostId, ws.Resource_KubernetesBenchMark)
 			if result := benchMarkLog.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
 			}

@@ -2,27 +2,23 @@ package ws
 
 const (
 	// #################### ws 通信资源
-	Resource_HostConfig             = "HostConfig"
-	Resource_HostInfo               = "HostInfo"
-	Resource_ImageConfig            = "ImageConfig"
-	Resource_ImageInfo              = "ImageInfo"
-	Resource_ContainerConfig        = "ContainerConfig"
-	Resource_ContainerInfo          = "ContainerInfo"
-	Resource_ContainerPs            = "ContainerPs"
-	Resource_HostPs                 = "HostPs"
-	Resource_DockerBenchMarkLog     = "DockerBenchMarkLog"
-	Resource_KubernetesBenchMarkLog = "KubernetesBenchMarkLog"
-	Resource_HostCmdHistory         = "HostCmdHistory"
-	Resource_ContainerCmdHistory    = "ContainerCmdHistory"
-	Resource_NameSpace              = "NameSpace"
-	Resource_Pod                    = "Pod"
-	Resource_HeartBeat              = "HeartBeat"
-	Resource_Received               = "Received"
-	Resource_Task                   = "Task"
-
-	// diss-backend 下发的数据
+	Resource_HostConfig          = "HostConfig"
+	Resource_HostInfo            = "HostInfo"
+	Resource_ImageConfig         = "ImageConfig"
+	Resource_ImageInfo           = "ImageInfo"
+	Resource_ContainerConfig     = "ContainerConfig"
+	Resource_ContainerInfo       = "ContainerInfo"
+	Resource_ContainerPs         = "ContainerPs"
+	Resource_HostPs              = "HostPs"
 	Resource_DockerBenchMark     = "DockerBenchMark"
 	Resource_KubernetesBenchMark = "KubernetesBenchMark"
+	Resource_HostCmdHistory      = "HostCmdHistory"
+	Resource_ContainerCmdHistory = "ContainerCmdHistory"
+	Resource_NameSpace           = "NameSpace"
+	Resource_Pod                 = "Pod"
+	Resource_HeartBeat           = "HeartBeat"
+	Resource_Received            = "Received"
+	Resource_Task                = "Task"
 
 	// #################### ws 通信类型
 	Type_Metric       = "Metric"       //指标类型

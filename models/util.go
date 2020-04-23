@@ -32,7 +32,7 @@ var (
 	Diss_status_Safe   = 0
 	Diss_Status_Unsafe = 1
 
-	//系统魔板类型
+	//系统魔板类型(此处和ws resource tag 保持一致)
 	TMP_Type_BM_Docker = "DockerBenchMark"
 	TMP_Type_BM_K8S    = "KubernetesBenchMark"
 	TMP_Type_VS        = "SC_VirusScan"
