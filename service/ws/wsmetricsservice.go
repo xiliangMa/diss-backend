@@ -355,15 +355,16 @@ func (this *WSMetricsService) Save() error {
 					return err
 				}
 				for _, task := range taskList {
+					metricsResult.Data = task
 					if result := task.Update(); result.Code != http.StatusOK {
 						metricsResult.Code = result.Code
 						metricsResult.Msg = result.Message
 						logs.Error("############################ Update task status  fail, >>> HostId: %s, error: <<<", task.Host.Id, result.Message)
 						return errors.New(result.Message)
 					} else {
-						this.ReceiveData(metricsResult)
 						logs.Info("############################ Update task status, >>> HostId: %s, Type: %s, task id:  %v <<<", task.Host.Id, ws.Resource_Task, task.Id)
 					}
+					this.ReceiveData(metricsResult)
 				}
 			}
 
