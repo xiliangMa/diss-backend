@@ -11,6 +11,7 @@ import (
 	mk8s "github.com/xiliangMa/diss-backend/models/k8s"
 	msecuritylog "github.com/xiliangMa/diss-backend/models/securitylog"
 	msecuritypolicy "github.com/xiliangMa/diss-backend/models/securitypolicy"
+	"github.com/xiliangMa/diss-backend/sysinit/dbscript"
 	"github.com/xiliangMa/diss-backend/utils"
 	"os"
 )
@@ -75,6 +76,9 @@ func (this *DefaultDB) InitDB() {
 	}
 	// 设置为 UTC 时间(默认为Local时间 需要可以更改)
 	//orm.DefaultTimeLoc = time.UTC
+
+	//初始化系统数据
+	this.InitSystemData()
 }
 
 func (this *DefaultDB) registerModel() {
@@ -89,4 +93,20 @@ func (this *DefaultDB) registerModel() {
 		new(models.ContainerConfig), new(models.ContainerInfo), new(models.ContainerPs),
 		new(models.HostConfig), new(models.HostInfo), new(models.HostPs), new(models.ImageConfig),
 		new(models.ImageInfo), new(models.Groups))
+}
+
+func (this *DefaultDB) InitSystemData() {
+	// 初始化
+	o := orm.NewOrm()
+	// 系统魔板
+	logs.Info("Init default data.")
+	_, err := o.Raw(dbscript.DefaultDockerBenchSql).Exec()
+	if err != nil {
+		logs.Error("Init DefaultDockerBenchSql fail, err: %s", err)
+	}
+
+	_, err = o.Raw(dbscript.DefaultK8sBenchSql).Exec()
+	if err != nil {
+		logs.Error("Init DefaultK8sBenchSql fail, err: %s", err)
+	}
 }
