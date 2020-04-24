@@ -79,4 +79,8 @@ var (
 
 	// 租户
 	Account_Admin = "admin"
+
+	// nats topic
+	Topic_Task    = "Task"
+	Topic_Metrics = "Metrics"
 )

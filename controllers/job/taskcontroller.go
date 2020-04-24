@@ -3,6 +3,7 @@ package job
 import (
 	"encoding/json"
 	"github.com/astaxie/beego"
+	"github.com/xiliangMa/diss-backend/models/global"
 	mjob "github.com/xiliangMa/diss-backend/models/job"
 	"github.com/xiliangMa/diss-backend/service/ws"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -47,7 +48,7 @@ func (this *TaskController) DeleteTask() {
 	if result.Code == http.StatusOK && data["total"] != 0 {
 		//向agent下发删除任务指令
 		deleteTaskList := data["items"]
-		WSDeliverService := ws.WSDeliverService{Hub: ws.WSHub, DelTask: deleteTaskList.([]*mjob.Task)[0]}
+		WSDeliverService := ws.WSDeliverService{Hub: global.WSHub, DelTask: deleteTaskList.([]*mjob.Task)[0]}
 		err := WSDeliverService.DeleteTask()
 		if err == nil {
 			// agent 删除任务成功后 删除数据库

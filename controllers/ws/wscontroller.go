@@ -19,12 +19,13 @@ var upgrader = websocket.Upgrader{
 }
 
 func (this *WSMetricController) Metrics() {
-	wsm := new(ws.WSManager)
-	wsm.Request = this.Ctx.Request
-	wsm.Response = this.Ctx.ResponseWriter
+	wsm := &ws.WSManager{
+		Request:  this.Ctx.Request,
+		Response: this.Ctx.ResponseWriter,
+	}
 	// 创建全局ws控制对象
 	wsm.NewWSManager()
-	err, wsconn := wsm.GetWSManager().Err, wsm.GetWSManager().Conn
+	err, wsconn := wsm.Err, wsm.Conn
 	if err != nil {
 		logs.Info("upgrade:", err)
 		return

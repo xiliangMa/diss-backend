@@ -2,6 +2,7 @@ package ws
 
 import (
 	"github.com/astaxie/beego/context"
+	"github.com/astaxie/beego/logs"
 	"github.com/gorilla/websocket"
 	"net/http"
 )
@@ -13,19 +14,15 @@ type WSManager struct {
 	Request  *http.Request
 }
 
-func (this *WSManager) NewWSManager() {
+func (this *WSManager) NewWSManager() *WSManager {
 	var upgrader = websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
 			return true
 		},
 	}
 	this.Conn, this.Err = upgrader.Upgrade(this.Response, this.Request, nil)
-
-	if this.Err == nil {
-		WS = this
+	if this.Err != nil {
+		logs.Error("Create WSManager fail, err: %s", this.Err)
 	}
-}
-
-func (this *WSManager) GetWSManager() *WSManager {
-	return WS
+	return this
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/bean"
+	"github.com/xiliangMa/diss-backend/models/global"
 	"github.com/xiliangMa/diss-backend/models/job"
 	"github.com/xiliangMa/diss-backend/models/securitylog"
 	"github.com/xiliangMa/diss-backend/models/ws"
@@ -37,7 +38,7 @@ func (this *WSMetricsService) Save() error {
 				return err
 			}
 			ip := strings.Split(this.Conn.RemoteAddr().String(), ":")
-			client := &Client{Hub: WSHub, Conn: this.Conn, Send: make(chan []byte, 256), ClientIp: ip[0], SystemId: heartBeat.SystemId}
+			client := &ws.Client{Hub: global.WSHub, Conn: this.Conn, Send: make(chan []byte, 256), ClientIp: ip[0], SystemId: heartBeat.SystemId}
 			client.Hub.Register <- client
 			logs.Info("############################ Agent Heater Beat data, >>> HostId: %s, Type: %s <<<", heartBeat.SystemId, ws.Resource_HeartBeat)
 			metricsResult := ws.WsData{Type: ws.Type_ReceiveState, Tag: ws.Resource_Received, Data: nil, Config: ""}

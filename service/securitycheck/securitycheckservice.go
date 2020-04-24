@@ -5,6 +5,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/bean"
+	"github.com/xiliangMa/diss-backend/models/global"
 	"github.com/xiliangMa/diss-backend/models/job"
 	msecuritypolicy "github.com/xiliangMa/diss-backend/models/securitypolicy"
 	"github.com/xiliangMa/diss-backend/service/ws"
@@ -129,11 +130,11 @@ func (this *SecurityCheckService) DeliverTask() models.Result {
 	var ResultData models.Result
 	this.PrePare()
 	wsDelive := ws.WSDeliverService{
-		Hub:                  ws.WSHub,
+		Hub:                  global.WSHub,
 		Bath:                 this.Bath,
 		CurrentBatchTaskList: this.CurrentBatchTaskList,
 	}
-	wsDelive.DeliverTask()
+	wsDelive.DeliverTaskToNats()
 
 	ResultData.Code = http.StatusOK
 	data := make(map[string]interface{})

@@ -1,6 +1,10 @@
 package utils
 
-import "strconv"
+import (
+	"github.com/astaxie/beego"
+	"os"
+	"strconv"
+)
 
 var (
 
@@ -34,6 +38,9 @@ var (
 	DS_Diss_Api_Pwd     = "DS_Diss_Api_Pwd"
 	DS_Diss_Api_Host    = "DS_Diss_Api_Host"
 	DS_Diss_Api_Port    = "DS_Diss_Api_Port"
+
+	// Nats
+	Nats_Server_Url = "Nats_Server_Url"
 )
 
 func UnitConvert(size int64) string {
@@ -91,4 +98,17 @@ func GetHostMarkSummarySql() string {
 		"sum(pass_count) as pass_count " +
 		"from bench_mark_log"
 	return sql
+}
+
+func GetNatsServerUrl() string {
+	runMode := beego.AppConfig.String("RunMode")
+	envRunMode := os.Getenv("RunMode")
+	if envRunMode != "" {
+		runMode = envRunMode
+	}
+	serverUrl := beego.AppConfig.String("nats::ServerUrl")
+	if runMode == Run_Mode_Prod {
+		serverUrl = os.Getenv(Nats_Server_Url)
+	}
+	return serverUrl
 }

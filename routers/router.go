@@ -10,17 +10,16 @@ import (
 	"github.com/astaxie/beego/plugins/cors"
 	"github.com/xiliangMa/diss-backend/controllers"
 	caccounts "github.com/xiliangMa/diss-backend/controllers/accounts"
-	ca "github.com/xiliangMa/diss-backend/controllers/asset"
+	casset "github.com/xiliangMa/diss-backend/controllers/asset"
 	cbase "github.com/xiliangMa/diss-backend/controllers/base"
 	cjob "github.com/xiliangMa/diss-backend/controllers/job"
 	ck8s "github.com/xiliangMa/diss-backend/controllers/k8s"
 	csecuritycheck "github.com/xiliangMa/diss-backend/controllers/securitycheck"
-	csl "github.com/xiliangMa/diss-backend/controllers/securitylog"
-	cs "github.com/xiliangMa/diss-backend/controllers/securitypolicy"
+	csecuritylog "github.com/xiliangMa/diss-backend/controllers/securitylog"
+	csecuritypolicy "github.com/xiliangMa/diss-backend/controllers/securitypolicy"
 	cstatistics "github.com/xiliangMa/diss-backend/controllers/statistics"
-	css "github.com/xiliangMa/diss-backend/controllers/system/system"
-	ws2 "github.com/xiliangMa/diss-backend/controllers/ws"
-	"github.com/xiliangMa/diss-backend/service/ws"
+	csystem "github.com/xiliangMa/diss-backend/controllers/system/system"
+	ws "github.com/xiliangMa/diss-backend/controllers/ws"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -34,29 +33,29 @@ func init() {
 		),
 		beego.NSNamespace("/v1/asset/images",
 			beego.NSInclude(
-				&ca.ImageController{},
+				&casset.ImageController{},
 			),
 		),
 		beego.NSNamespace("/v1/asset/hosts",
 			beego.NSInclude(
-				&ca.HostController{},
+				&casset.HostController{},
 			),
 		),
 		beego.NSNamespace("/v1/asset/k8s",
 			beego.NSInclude(
-				&ca.K8SController{},
+				&casset.K8SController{},
 			),
 		),
 		beego.NSNamespace("/v1/securitypolicy/systmps",
 			beego.NSInclude(
-				&cs.SystemTemplateController{},
+				&csecuritypolicy.SystemTemplateController{},
 			),
 		),
 		beego.NSNamespace("/v1/securitylog",
 			beego.NSInclude(
-				&csl.IntrudeDetectLogController{},
-				&csl.BenchMarkLogController{},
-				&csl.VirusLogController{},
+				&csecuritylog.IntrudeDetectLogController{},
+				&csecuritylog.BenchMarkLogController{},
+				&csecuritylog.VirusLogController{},
 			),
 		),
 		beego.NSNamespace("/auth",
@@ -116,7 +115,7 @@ func init() {
 		),
 		beego.NSNamespace("/v1/system",
 			beego.NSInclude(
-				&css.SystemController{},
+				&csystem.SystemController{},
 			),
 		),
 		beego.NSNamespace("/v1/tasks",
@@ -132,9 +131,7 @@ func init() {
 	)
 
 	// add route for ws
-	ws.WSHub = ws.NewHub()
-	go ws.WSHub.Run()
-	beego.Router("/metrics", &ws2.WSMetricController{}, "*:Metrics")
+	beego.Router("/metrics", &ws.WSMetricController{}, "*:Metrics")
 
 	var isLogin = func(ctx *context.Context) {
 		if ctx.Request.Method != "OPTIONS" {
