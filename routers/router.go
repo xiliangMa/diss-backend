@@ -56,6 +56,7 @@ func init() {
 				&csecuritylog.IntrudeDetectLogController{},
 				&csecuritylog.BenchMarkLogController{},
 				&csecuritylog.VirusLogController{},
+				&csecuritylog.VulnerabilitiesLogController{},
 			),
 		),
 		beego.NSNamespace("/auth",

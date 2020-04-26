@@ -104,9 +104,10 @@ var (
 	GetIntrudeDetectLogErr = 1300
 
 	// diss_api 1400-1500
-	GetAccountsErr     = 1400
-	GetAccountUsersErr = 1401
-	NoAccountUsersErr  = 1402
-	GetImageVirusErr   = 1403
-	GetDockerVirusErr  = 1404
+	GetAccountsErr                        = 1400
+	GetAccountUsersErr                    = 1401
+	NoAccountUsersErr                     = 1402
+	GetImageVirusErr                      = 1403
+	GetDockerVirusErr                     = 1404
+	GetImagePackageVulnerabilitiesListErr = 1405
 )

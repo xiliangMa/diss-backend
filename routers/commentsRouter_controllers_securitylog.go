@@ -52,4 +52,13 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/securitylog:VulnerabilitiesLogController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/securitylog:VulnerabilitiesLogController"],
+		beego.ControllerComments{
+			Method:           "GetImageVulnerabilitiesLogList",
+			Router:           `/vulnerabilities/image`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
 }

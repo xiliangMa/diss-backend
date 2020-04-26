@@ -25,8 +25,10 @@ var (
 	DcokerIds = "docker_ids"
 
 	//Diss_api
-	Accounts     = "accounts"
-	AccountUsers = "account_users"
-	ImageVirus   = "image_virus"
-	DockerVirus  = "docker_virus"
+	Accounts                    = "accounts"
+	AccountUsers                = "account_users"
+	ImageVirus                  = "image_virus"
+	DockerVirus                 = "docker_virus"
+	ImagePackageVulnerabilities = "image_package_vulnerabilities"
+	FeedDataVulnerabilities     = "feed_data_vulnerabilities"
 )
