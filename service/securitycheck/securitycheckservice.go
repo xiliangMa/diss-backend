@@ -134,7 +134,7 @@ func (this *SecurityCheckService) DeliverTask() models.Result {
 		Bath:                 this.Bath,
 		CurrentBatchTaskList: this.CurrentBatchTaskList,
 	}
-	wsDelive.DeliverTaskToNats()
+	wsDelive.DeliverTask()
 
 	ResultData.Code = http.StatusOK
 	data := make(map[string]interface{})
