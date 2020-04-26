@@ -132,24 +132,13 @@ func (this *IntrudeDetectLog) List1(from, limit int) models.Result {
 
 	sql := "select * from " + utils.DcokerIds + " where "
 
-	// 根据 TargeType = host 和 HostId = All 判断是否是查询所有主机日志 如果不是则匹配其它所传入的条件
-	// 根据 TargeType = container 和 ContainerId = All 判断是否是查询所有容器日志 如果不是则匹配其它所传入的条件
+	// 根据 TargeType = host 如果快速查询所有主机日志可以设置 HostId=All
+	// 根据 TargeType = container 如果快速查询所有容器日志可以设置 ContianerId =All
 
-	if this.TargeType == models.IDLT_Host && this.HostId == models.All {
+	if this.TargeType == models.IDLT_Host {
 		sql = sql + "container_id = '" + models.IDLT_Host + "' and "
-	}
-	if this.TargeType == models.IDLT_Docker && this.ContainerId == models.All {
-		sql = sql + "container_id != '" + models.IDLT_Host + "' and "
-	}
 
-	if (this.ContainerId != "" && this.ContainerId != models.All) || (this.HostId != "" && this.HostId != models.All) {
-		if this.ContainerId != models.IDLT_Host && this.TargeType == models.IDLT_Docker {
-			containerId := this.ContainerId
-			containerId = string([]byte(this.ContainerId)[:12])
-			sql = sql + "container_id = '" + containerId + "' and "
-		}
-
-		if this.TargeType == models.IDLT_Host {
+		if this.HostId != "" && this.HostId != models.All {
 			sql = sql + "host_id = '" + this.HostId + "' and "
 		}
 		if this.HostName != "" {
@@ -167,8 +156,47 @@ func (this *IntrudeDetectLog) List1(from, limit int) models.Result {
 			sql = sql + "priority = '" + this.Priority + "' and "
 		}
 	}
-	//if this.HostId != "" && this.HostId != models.All && this.TargeType == models.IDLT_Host {
+
+	if this.TargeType == models.IDLT_Docker {
+		if this.ContainerId == models.All {
+			sql = sql + "container_id != '" + models.IDLT_Host + "' and "
+		} else {
+			containerId := this.ContainerId
+			// 如果是安全日志入口查询 不需要截取12位
+			//containerId = string([]byte(this.ContainerId)[:12])
+			sql = sql + "container_id = '" + containerId + "' and "
+		}
+		if this.HostId != "" {
+			sql = sql + "host_id = '" + this.HostId + "' and "
+		}
+		if this.HostName != "" {
+			sql = sql + "host_name = '" + this.HostName + "' and "
+		}
+		if this.StartTime != "" {
+			st, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.UTC)
+			sql = sql + "created_at > '" + strconv.FormatInt(st.Unix(), 10) + "' and "
+		}
+		if this.ToTime != "" {
+			tt, _ := time.ParseInLocation("2006-01-02T15:04:05", this.ToTime, time.UTC)
+			sql = sql + "created_at < '" + strconv.FormatInt(tt.Unix(), 10) + "' and "
+		}
+		if this.Priority != "" {
+			sql = sql + "priority = '" + this.Priority + "' and "
+		}
+	}
+
+	//if (this.ContainerId != "" && this.ContainerId != models.All) || (this.HostId != "" && this.HostId != models.All) {
+	//	if this.ContainerId != models.IDLT_Host && this.TargeType == models.IDLT_Docker {
+	//		containerId := this.ContainerId
+	//		// 如果是安全日志入口查询 不需要截取12位
+	//		//containerId = string([]byte(this.ContainerId)[:12])
+	//		sql = sql + "container_id = '" + containerId + "' and "
+	//	}
+	//
 	//	if this.TargeType == models.IDLT_Host {
+	//		sql = sql + "container_id = '" + models.IDLT_Host + "' and "
+	//	}
+	//	if this.HostId != "" {
 	//		sql = sql + "host_id = '" + this.HostId + "' and "
 	//	}
 	//	if this.HostName != "" {

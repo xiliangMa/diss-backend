@@ -35,7 +35,7 @@ func (this *IntrudeDetectLogController) GetIntrudeDetectLogInfo() {
 }
 
 // @Title GetIntrudeDetectLog
-// @Description Get IntrudeDetectLog List (1. 根据 TargeType = host 和 HostId = All 判断是否是查询所有主机日志 如果不是则匹配其它所传入的条件 2. 根据 TargeType = container 和 ContainerId = All 判断是否是查询所有容器日志 如果不是则匹配其它所传入的条件)
+// @Description Get IntrudeDetectLog List (1. 根据 TargeType = host 查询主机基线日志 2. 根据 TargeType = container 如果快速查询所有容器日志可以设置 ContianerId =All)
 // @Param token header string true "authToken"
 // @Param body body securitylog.IntrudeDetectLog false "入侵检测日志信息"
 // @Param from query int 0 false "from"

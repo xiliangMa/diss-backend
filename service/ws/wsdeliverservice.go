@@ -24,7 +24,7 @@ func (this *WSDeliverService) DeliverTaskToNats() {
 		result := ws.WsData{Type: ws.Type_Control, Tag: ws.Resource_Task, Data: task, RCType: ws.Resource_Control_Type_Post}
 		data, _ := json.Marshal(result)
 		//err := client.Conn.WriteMessage(websocket.TextMessage, data)
-		err :=  global.NatsManager.Conn.Publish(models.Topic_Task, data)
+		err := global.NatsManager.Conn.Publish(models.Topic_Task, data)
 		//defer c.Close()
 		if err == nil {
 			logs.Info("Deliver Task to Nats Success, Id: %s, data: %v", task.Id, result)
