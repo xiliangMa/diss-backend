@@ -17,6 +17,7 @@ type IntrudeDetectLog struct {
 	HostName    string `description:"(主机名)"`
 	TargeType   string `description:"(类型)"`
 	ContainerId string `description:"(容日Id 如果是主机该字段为：host， 如果是容器为：容器的实际ID)"`
+	Output      string `description:"(事件信息)"`
 	StartTime   string `description:"(开始时间)"`
 	ToTime      string `description:"(结束时间)"`
 	AccountName string `description:"(租户)"`
@@ -155,6 +156,9 @@ func (this *IntrudeDetectLog) List1(from, limit int) models.Result {
 		if this.Priority != "" {
 			sql = sql + "priority = '" + this.Priority + "' and "
 		}
+		if this.Output != "" {
+			sql = sql + "output like '%" + this.Output + "%' and "
+		}
 	}
 
 	if this.TargeType == models.IDLT_Docker {
@@ -182,6 +186,9 @@ func (this *IntrudeDetectLog) List1(from, limit int) models.Result {
 		}
 		if this.Priority != "" {
 			sql = sql + "priority = '" + this.Priority + "' and "
+		}
+		if this.Output != "" {
+			sql = sql + "output like '%" + this.Output + "%' and "
 		}
 	}
 
@@ -220,6 +227,7 @@ func (this *IntrudeDetectLog) List1(from, limit int) models.Result {
 		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
 		resultSql = resultSql + limitSql
 	}
+
 	_, err = o.Raw(resultSql).QueryRows(&dcokerIdsList)
 	if err != nil {
 		ResultData.Message = err.Error()
