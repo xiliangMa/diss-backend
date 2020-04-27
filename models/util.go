@@ -83,4 +83,5 @@ var (
 	// nats topic
 	Topic_Task    = "Task"
 	Topic_Metrics = "Metrics"
+	Topic_Common  = "Common"
 )

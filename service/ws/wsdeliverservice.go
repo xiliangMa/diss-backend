@@ -23,16 +23,22 @@ func (this *WSDeliverService) DeliverTaskToNats() {
 	for _, task := range this.CurrentBatchTaskList {
 		result := ws.WsData{Type: ws.Type_Control, Tag: ws.Resource_Task, Data: task, RCType: ws.Resource_Control_Type_Post}
 		data, _ := json.Marshal(result)
-		//err := client.Conn.WriteMessage(websocket.TextMessage, data)
-		err := global.NatsManager.Conn.Publish(models.Topic_Task, data)
-		//defer c.Close()
+		hostName := ""
+		if task.Host != nil {
+			hostName = task.Host.HostName
+		}
+		if task.Container != nil {
+			hostName = task.Container.HostName
+		}
+		subject := hostName + `_` + models.Topic_Task
+		err := global.NatsManager.Conn.Publish(subject, data)
 		if err == nil {
-			logs.Info("Deliver Task to Nats Success, Id: %s, data: %v", task.Id, result)
+			logs.Info("Deliver Task to Nats Success, Subject: %s Id: %s, data: %v", subject, task.Id, result)
 		} else {
 			//更新 task 状态
 			task.Status = models.Task_Status_Deliver_Failed
 			task.Update()
-			logs.Error("Deliver Task to Nats Fail, Id: %s, err: %s", task.Id, err.Error())
+			logs.Error("Deliver Task to Nats Fail,  Subject: %s Id: %s, err: %s", subject, task.Id, err.Error())
 		}
 
 	}

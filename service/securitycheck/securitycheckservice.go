@@ -126,7 +126,7 @@ func (this *SecurityCheckService) GetCurrentBatchTask() []*job.Task {
 	return this.CurrentBatchTaskList
 }
 
-func (this *SecurityCheckService) DeliverTask() models.Result {
+func (this *SecurityCheckService) DeliverTask(isNats bool) models.Result {
 	var ResultData models.Result
 	this.PrePare()
 	wsDelive := ws.WSDeliverService{
@@ -134,7 +134,12 @@ func (this *SecurityCheckService) DeliverTask() models.Result {
 		Bath:                 this.Bath,
 		CurrentBatchTaskList: this.CurrentBatchTaskList,
 	}
-	wsDelive.DeliverTask()
+	if isNats {
+		go wsDelive.DeliverTaskToNats()
+	} else {
+		go wsDelive.DeliverTask()
+
+	}
 
 	ResultData.Code = http.StatusOK
 	data := make(map[string]interface{})

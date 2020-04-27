@@ -41,6 +41,8 @@ var (
 
 	// Nats
 	Nats_Server_Url = "Nats_Server_Url"
+	Nats_Cluster_Id = "Nats_Cluster_Id"
+	Nats_Client_Id  = "Nats_Client_Id"
 )
 
 func UnitConvert(size int64) string {
@@ -111,4 +113,30 @@ func GetNatsServerUrl() string {
 		serverUrl = os.Getenv(Nats_Server_Url)
 	}
 	return serverUrl
+}
+
+func GetNatsClientId() string {
+	runMode := beego.AppConfig.String("RunMode")
+	envRunMode := os.Getenv("RunMode")
+	if envRunMode != "" {
+		runMode = envRunMode
+	}
+	clientId := beego.AppConfig.String("nats::ClientId")
+	if runMode == Run_Mode_Prod {
+		clientId = os.Getenv(Nats_Client_Id)
+	}
+	return clientId
+}
+
+func GetNatsClusterId() string {
+	runMode := beego.AppConfig.String("RunMode")
+	envRunMode := os.Getenv("RunMode")
+	if envRunMode != "" {
+		runMode = envRunMode
+	}
+	clusterId := beego.AppConfig.String("nats::ClusterId")
+	if runMode == Run_Mode_Prod {
+		clusterId = os.Getenv(Nats_Cluster_Id)
+	}
+	return clusterId
 }

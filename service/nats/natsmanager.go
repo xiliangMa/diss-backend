@@ -7,18 +7,24 @@ import (
 )
 
 type NatsManager struct {
-	Conn stan.Conn
-	Err  error
+	Conn      stan.Conn
+	ClusterId string
+	ClientId  string
+	Err       error
 }
 
 func NewNatsManager() *NatsManager {
 	serverUrl := utils.GetNatsServerUrl()
-	nc, err := stan.Connect("test-cluster", "diss-server", stan.NatsURL(serverUrl))
+	clusterId := utils.GetNatsClusterId()
+	clientId := utils.GetNatsClientId()
+	nc, err := stan.Connect(clusterId, clientId, stan.NatsURL(serverUrl))
 	if err != nil {
-		logs.Error("Create NatsManager fail, ServerUrl: %s, err: %s", serverUrl, err)
+		logs.Error("Create NatsManager fail, ServerUrl: %s ClusterId: %s ClientId: %s, err: %s", serverUrl, clusterId, clientId, err)
 	}
 	return &NatsManager{
-		Conn: nc,
-		Err:  err,
+		Conn:      nc,
+		Err:       err,
+		ClientId:  clientId,
+		ClusterId: clusterId,
 	}
 }
