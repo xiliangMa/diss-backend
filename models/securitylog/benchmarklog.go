@@ -58,7 +58,7 @@ func (this *BenchMarkLog) Add() models.Result {
 	return ResultData
 }
 
-func (this *BenchMarkLog) List(from, limit int) models.Result {
+func (this *BenchMarkLog) List(from, limit int, isInfo bool) models.Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var BenchMarkLogList []*BenchMarkLog = nil
@@ -89,7 +89,14 @@ func (this *BenchMarkLog) List(from, limit int) models.Result {
 	if this.BenchMarkName != "" && this.BenchMarkName != models.BML_Template_ALL {
 		cond = cond.And("bench_mark_name", this.BenchMarkName)
 	}
-	_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Limit(limit, from).OrderBy("-update_time").All(&BenchMarkLogList)
+
+	if isInfo {
+		_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Limit(limit, from).OrderBy("-update_time").All(&BenchMarkLogList)
+	} else {
+		_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Limit(limit, from).OrderBy("-update_time").
+			All(&BenchMarkLogList, "id", "bench_mark_name", "level", "project_name", "host_name", "host_id", "internal_addr", "public_addr",
+				"o_s", "update_time", "fail_count", "warn_count", "pass_count", "info_count", "type", "result")
+	}
 
 	if err != nil {
 		ResultData.Message = err.Error()

@@ -25,7 +25,7 @@ func (this *BenchMarkLogController) GetBenchMarkLogList() {
 
 	benchMarkLog := new(msl.BenchMarkLog)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &benchMarkLog)
-	this.Data["json"] = benchMarkLog.List(from, limit)
+	this.Data["json"] = benchMarkLog.List(from, limit, false)
 	this.ServeJSON(false)
 
 }

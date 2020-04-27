@@ -68,7 +68,6 @@ func (this *ImagePackageVulnerabilities) List(from, limit int) models.Result {
 		countSql = countSql + " where " + filter
 	}
 
-
 	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
 	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
 	resultSql := sql
