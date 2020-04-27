@@ -131,6 +131,7 @@ func (this *IntrudeDetectLog) List1(from, limit int) models.Result {
 	var err error
 	var total int64 = 0
 
+	countSql := "select " + `"count"(host_id)` + " from " + utils.DcokerIds
 	sql := "select * from " + utils.DcokerIds + " where "
 
 	// 根据 TargeType = host 如果快速查询所有主机日志可以设置 HostId=All
@@ -221,6 +222,8 @@ func (this *IntrudeDetectLog) List1(from, limit int) models.Result {
 	//		sql = sql + "priority = '" + this.Priority + "' and "
 	//	}
 	//}
+
+	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
 	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
 	resultSql := sql
 	if from >= 0 && limit > 0 {
@@ -235,8 +238,7 @@ func (this *IntrudeDetectLog) List1(from, limit int) models.Result {
 		logs.Error("Get IntrudeDetectLo List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
-
-	total, _ = o.Raw(sql).QueryRows(&tempIdsList)
+	total, _ = o.Raw(countSql).QueryRows(&tempIdsList)
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = dcokerIdsList
