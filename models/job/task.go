@@ -12,6 +12,7 @@ import (
 
 type Task struct {
 	Id             string                          `orm:"pk;" description:"(任务id)"`
+	Account        string                          `orm:"" description:"(租户)"`
 	Name           string                          `orm:"" description:"(名称)"`
 	Description    string                          `orm:"" description:"(描述)"`
 	Spec           string                          `orm:"" description:"(定时器)"`

@@ -7,22 +7,22 @@ import (
 
 func init() {
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/job:TaskController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/job:TaskController"],
-        beego.ControllerComments{
-            Method: "GetTaskList",
-            Router: `/`,
-            AllowHTTPMethods: []string{"post"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/job:TaskController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/job:TaskController"],
+		beego.ControllerComments{
+			Method:           "GetTaskList",
+			Router:           `/`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/job:TaskController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/job:TaskController"],
-        beego.ControllerComments{
-            Method: "DeleteTask",
-            Router: `/:id`,
-            AllowHTTPMethods: []string{"delete"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/job:TaskController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/job:TaskController"],
+		beego.ControllerComments{
+			Method:           "DeleteTask",
+			Router:           `/:id`,
+			AllowHTTPMethods: []string{"delete"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
 
 }

@@ -17,6 +17,7 @@ type SecurityCheckService struct {
 	DefaultTMP           map[string]*msecuritypolicy.SystemTemplate
 	Bath                 int64
 	CurrentBatchTaskList []*job.Task
+	Account              string
 }
 
 func (this *SecurityCheckService) PrePare() {
@@ -57,6 +58,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *bean.SecurityCheck)
 		dockerTask.Host = securityCheck.Host
 		dockerTask.Batch = this.Bath
 		dockerTask.Status = models.Task_Status_Pending
+		dockerTask.Account = this.Account
 
 		k8sTask := new(job.Task)
 		uid2, _ := uuid.NewV4()
@@ -70,6 +72,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *bean.SecurityCheck)
 		k8sTask.Host = securityCheck.Host
 		k8sTask.Batch = this.Bath
 		k8sTask.Status = models.Task_Status_Pending
+		k8sTask.Account = this.Account
 
 		//添加task记录
 		dockerTask.Add()

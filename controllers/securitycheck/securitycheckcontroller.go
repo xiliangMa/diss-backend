@@ -16,16 +16,18 @@ type SecurityCheckController struct {
 // @Title SecurityCheck
 // @Description Security heck
 // @Param token header string true "authToken"
+// @Param account query string "admin" false "租户"
 // @Param body body bean.SecurityCheckList true "检查列表"
-// @Param nats query bool "false" false "是否下发给nats"
+// @Param nats query bool false false "是否下发给nats"
 // @Success 200 {object} models.Result
 // @router / [post]
 func (this *SecurityCheckController) SecurityCheck() {
 	checkList := new(bean.SecurityCheckList)
 	isNats, _ := this.GetBool("nats")
+	account := this.GetString("account")
 	json.Unmarshal(this.Ctx.Input.RequestBody, &checkList)
 	bath := time.Now().Unix()
-	securityCheckService := securitycheck.SecurityCheckService{checkList, nil, bath, nil}
+	securityCheckService := securitycheck.SecurityCheckService{SecurityCheckList: checkList, Bath: bath, Account: account}
 	this.Data["json"] = securityCheckService.DeliverTask(isNats)
 	this.ServeJSON(false)
 }
