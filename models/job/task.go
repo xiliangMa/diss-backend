@@ -12,7 +12,7 @@ import (
 
 type Task struct {
 	Id             string                          `orm:"pk;" description:"(任务id)"`
-	Account        string                          `orm:"" description:"(租户)"`
+	Account        string                          `orm:"default(admin)" description:"(租户)"`
 	Name           string                          `orm:"" description:"(名称)"`
 	Description    string                          `orm:"" description:"(描述)"`
 	Spec           string                          `orm:"" description:"(定时器)"`
@@ -63,6 +63,9 @@ func (this *Task) List(from, limit int) models.Result {
 	if this.Host != nil && this.Host.Id != "" {
 		cond = cond.And("host_id", this.Host.Id)
 	}
+	if this.Account != "" {
+		cond = cond.And("account", this.Account)
+	}
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
@@ -80,7 +83,7 @@ func (this *Task) List(from, limit int) models.Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.SYSTemplate).Count()
+	total, _ := o.QueryTable(utils.Task).SetCond(cond).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = TaskList
