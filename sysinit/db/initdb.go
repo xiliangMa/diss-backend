@@ -69,6 +69,7 @@ func (this *DefaultDB) InitDB() {
 	}
 
 	this.registerModel()
+	orm.Debug = true
 	//auto create db
 	err = orm.RunSyncdb(DSAlias, force, true)
 	if err != nil {
