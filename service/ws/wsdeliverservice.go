@@ -75,6 +75,9 @@ func (this *WSDeliverService) DeliverTask() {
 func (this *WSDeliverService) DeleteTask() error {
 	logs.Info("################ Delete Task <<<start>>> ################")
 	task := this.DelTask
+	if task.Host == nil {
+		return nil
+	}
 	hostId := task.Host.Id
 	if _, ok := this.Hub.DissClient[hostId]; !ok {
 		errMsg := "Agent not connect"
