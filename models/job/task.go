@@ -71,7 +71,7 @@ func (this *Task) List(from, limit int) models.Result {
 	if this.Status != "" && this.Status != models.All {
 		cond = cond.And("status", this.Status)
 	}
-	_, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().Limit(limit, from).All(&TaskList)
+	_, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().Limit(limit, from).OrderBy("-update_time").All(&TaskList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetTaskErr
