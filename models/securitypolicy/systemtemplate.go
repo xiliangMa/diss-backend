@@ -10,6 +10,7 @@ import (
 
 type SystemTemplate struct {
 	Id          string `orm:"pk;" description:"(基线id)"`
+	Account     string `orm:"default(admin)" description:"(租户)"`
 	Name        string `orm:"" description:"(名称)"`
 	Description string `orm:"" description:"(描述)"`
 	Type        string `orm:"" description:"(类型)"`
@@ -55,6 +56,9 @@ func (this *SystemTemplate) List(from, limit int) models.Result {
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
+	if this.Account != "" {
+		cond = cond.And("account", this.Account)
+	}
 	if this.Name != "" {
 		cond = cond.And("name__contains", this.Name)
 	}
@@ -78,7 +82,7 @@ func (this *SystemTemplate) List(from, limit int) models.Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.SYSTemplate).Count()
+	total, _ := o.QueryTable(utils.SYSTemplate).SetCond(cond).Count()
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = systemTemplateList
