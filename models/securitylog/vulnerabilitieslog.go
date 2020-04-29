@@ -19,8 +19,10 @@ type ImagePackageVulnerabilities struct {
 	PkgType                    string    `description:"(类型)"`
 	PkgArch                    string    `description:"(架构)"`
 	VulnerabilityId            string    `description:"(漏铜Id)"`
-	VulnerabilityNamespaceName string    `description:"(漏洞命名空间名)"`
+	VulnerabilityNamespaceName string    `description:"(操作系统)"`
 	CreatedAt                  time.Time `description:"(创建时间)"`
+	Severity                   string    `description:"(安全等级)"`
+	Link                       string    `description:"(漏洞详情)"`
 }
 
 type FeedDataVulnerabilities struct {
@@ -28,7 +30,7 @@ type FeedDataVulnerabilities struct {
 	NamespaceName string    `description:"(命名空间名称)"`
 	Severity      string    `description:"(安全等级)"`
 	Description   string    `description:"(描述)"`
-	Link          string    `description:"(链接)"`
+	Link          string    `description:"(漏洞详情)"`
 	MetadataJson  string    `description:"(元数据)"`
 	Cvss2Vectors  string    `description:"(向量)"`
 	Cvss2Score    string    `description:"(分数)"`
@@ -44,14 +46,20 @@ func (this *ImagePackageVulnerabilities) List(from, limit int) models.Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Diss_Api)
 	var ImagePackageVulnerabilitiesList []*ImagePackageVulnerabilities = nil
-	var tempList []*ImagePackageVulnerabilities = nil
 	var ResultData models.Result
 	var err error
 	var total int64 = 0
 	filter := ""
 
-	countSql := "select " + `"count"(pkg_image_id)` + " from " + utils.ImagePackageVulnerabilities
-	sql := "select * from " + utils.ImagePackageVulnerabilities
+	countSql := "select " + `"count"(a.pkg_image_id)` + " from " + utils.ImagePackageVulnerabilities + ` as a join ` + utils.FeedDataVulnerabilities +
+		` as b on a.vulnerability_id = b."id" `
+	sql := "select * from " + utils.ImagePackageVulnerabilities + ` as a join ` + utils.FeedDataVulnerabilities +
+		` as b on a.vulnerability_id = b."id" `
+
+	if this.Severity != "" {
+		sql = sql + `and b."severity" = '` + this.Severity + `'`
+		countSql = countSql + `and b."severity" = '` + this.Severity + `'`
+	}
 
 	if this.PkgUserId != "" {
 		filter = filter + `pkg_user_id = '` + this.PkgUserId + "' and "
@@ -59,7 +67,7 @@ func (this *ImagePackageVulnerabilities) List(from, limit int) models.Result {
 	if this.PkgImageId != "" {
 		filter = filter + `pkg_image_id = '` + this.PkgImageId + "' and "
 	}
-	if this.PkgUserId != "" {
+	if this.VulnerabilityId != "" {
 		filter = filter + `vulnerability_id = '` + this.VulnerabilityId + "' and "
 	}
 
@@ -82,7 +90,7 @@ func (this *ImagePackageVulnerabilities) List(from, limit int) models.Result {
 		logs.Error("Get ImagePackageVulnerabilities List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
-	total, _ = o.Raw(countSql).QueryRows(&tempList)
+	o.Raw(countSql).QueryRow(&total)
 
 	data := make(map[string]interface{})
 	data["total"] = total

@@ -84,4 +84,11 @@ var (
 	Topic_Task    = "Task"
 	Topic_Metrics = "Metrics"
 	Topic_Common  = "Common"
+
+	// diss-api
+	//漏洞安全等级
+	Vulnerabilities_Severity_Medium     = "Medium"
+	Vulnerabilities_Severity_Negligible = "Negligible"
+	Vulnerabilities_Severity_Low        = "Low"
+	Vulnerabilities_Severity_Critical   = "Critical"
 )
