@@ -3,6 +3,7 @@ package securitycheck
 import (
 	"encoding/json"
 	"github.com/astaxie/beego"
+	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/models/bean"
 	securitycheck "github.com/xiliangMa/diss-backend/service/securitycheck"
 	"time"
@@ -25,6 +26,9 @@ func (this *SecurityCheckController) SecurityCheck() {
 	checkList := new(bean.SecurityCheckList)
 	isNats, _ := this.GetBool("nats")
 	account := this.GetString("account")
+	if account == "" {
+		account = models.Account_Admin
+	}
 	json.Unmarshal(this.Ctx.Input.RequestBody, &checkList)
 	bath := time.Now().Unix()
 	securityCheckService := securitycheck.SecurityCheckService{SecurityCheckList: checkList, Bath: bath, Account: account}
