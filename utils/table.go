@@ -23,6 +23,7 @@ var (
 
 	//security_log timescaledb
 	DcokerIds = "docker_ids"
+	TaskLog   = "task_log"
 
 	//Diss_api
 	Accounts                    = "accounts"

@@ -102,6 +102,8 @@ var (
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300
+	AddTaskLogErr          = 1301
+	GetTaskLogErr          = 1302
 
 	// diss_api 1400-1500
 	GetAccountsErr                        = 1400
