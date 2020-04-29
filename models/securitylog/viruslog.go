@@ -95,38 +95,44 @@ func (this *DockerVirus) List(from, limit int) models.Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Diss_Api)
 	var imageVirusList []*ImageVirus = nil
-	var tempList []*ImageVirus = nil
 	var ResultData models.Result
 	var err error
 	var total int64 = 0
 
-	sql := "select * from " + utils.DockerVirus + " where "
+	filterSql := ""
+	countSql := `select "count"(host_id) from ` + utils.DockerVirus
+	sql := "select * from " + utils.DockerVirus
 
 	// 根据 TargeType = host 和 HostId = All 判断是否是查询所有主机日志 如果不是则匹配其它所传入的条件
 	// 根据 TargeType = container 和 ContainerId = All 判断是否是查询所有容器日志 如果不是则匹配其它所传入的条件
 
 	if this.TargeType == models.IDLT_Host && this.HostId == models.All {
-		sql = sql + "container_id = '" + models.IDLT_Host + "' and "
+		filterSql = filterSql + "container_id = '" + models.IDLT_Host + "' and "
 	}
 	if this.TargeType == models.IDLT_Docker && this.ContainerId == models.All {
-		sql = sql + "container_id != '" + models.IDLT_Host + "' and "
+		filterSql = filterSql + "container_id != '" + models.IDLT_Host + "' and "
 	}
 
 	if (this.ContainerId != "" && this.ContainerId != models.All) || (this.HostId != "" && this.HostId != models.All) {
 		if this.ContainerId != models.IDLT_Host && this.TargeType == models.IDLT_Docker {
 			containerId := this.ContainerId
 			containerId = string([]byte(this.ContainerId)[:12])
-			sql = sql + "container_id = '" + containerId + "' and "
+			filterSql = filterSql + "container_id = '" + containerId + "' and "
 		}
 
 		if this.TargeType == models.IDLT_Host {
-			sql = sql + "host_id = '" + this.HostId + "' and "
+			filterSql = filterSql + "host_id = '" + this.HostId + "' and "
 		}
 		if this.Virus != "" {
-			sql = sql + utils.DockerVirus + `."virus" like '%` + this.Virus + "%' and "
+			filterSql = filterSql + utils.DockerVirus + `."virus" like '%` + this.Virus + "%' and "
 		}
 	}
+	if filterSql != "" {
+		sql = sql + ` where ` + filterSql
+		countSql = countSql + ` where ` + filterSql
+	}
 	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
+	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
 	resultSql := sql
 	if from >= 0 && limit > 0 {
 		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
@@ -140,7 +146,7 @@ func (this *DockerVirus) List(from, limit int) models.Result {
 		return ResultData
 	}
 
-	total, _ = o.Raw(sql).QueryRows(&tempList)
+	o.Raw(countSql).QueryRow(&total)
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = imageVirusList
