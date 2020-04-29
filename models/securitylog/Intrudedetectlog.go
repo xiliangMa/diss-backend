@@ -126,70 +126,70 @@ func (this *IntrudeDetectLog) List1(from, limit int) models.Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var dcokerIdsList []*DcokerIds = nil
-	var tempIdsList []*DcokerIds = nil
 	var ResultData models.Result
 	var err error
 	var total int64 = 0
 
+	filterSql := ""
 	countSql := "select " + `"count"(host_id)` + " from " + utils.DcokerIds
-	sql := "select * from " + utils.DcokerIds + " where "
+	sql := "select * from " + utils.DcokerIds
 
 	// 根据 TargeType = host 如果快速查询所有主机日志可以设置 HostId=All
 	// 根据 TargeType = container 如果快速查询所有容器日志可以设置 ContianerId =All
 
 	if this.TargeType == models.IDLT_Host {
-		sql = sql + "container_id = '" + models.IDLT_Host + "' and "
+		filterSql = filterSql + "container_id = '" + models.IDLT_Host + "' and "
 
 		if this.HostId != "" && this.HostId != models.All {
-			sql = sql + "host_id = '" + this.HostId + "' and "
+			filterSql = filterSql + "host_id = '" + this.HostId + "' and "
 		}
 		if this.HostName != "" {
-			sql = sql + "host_name = '" + this.HostName + "' and "
+			filterSql = filterSql + "host_name = '" + this.HostName + "' and "
 		}
 		if this.StartTime != "" {
 			st, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.UTC)
-			sql = sql + "created_at > '" + strconv.FormatInt(st.Unix(), 10) + "' and "
+			filterSql = filterSql + "created_at > '" + strconv.FormatInt(st.Unix(), 10) + "' and "
 		}
 		if this.ToTime != "" {
 			tt, _ := time.ParseInLocation("2006-01-02T15:04:05", this.ToTime, time.UTC)
-			sql = sql + "created_at < '" + strconv.FormatInt(tt.Unix(), 10) + "' and "
+			filterSql = filterSql + "created_at < '" + strconv.FormatInt(tt.Unix(), 10) + "' and "
 		}
 		if this.Priority != "" {
-			sql = sql + "priority = '" + this.Priority + "' and "
+			filterSql = filterSql + "priority = '" + this.Priority + "' and "
 		}
 		if this.Output != "" {
-			sql = sql + "output like '%" + this.Output + "%' and "
+			filterSql = filterSql + "output like '%" + this.Output + "%' and "
 		}
 	}
 
 	if this.TargeType == models.IDLT_Docker {
 		if this.ContainerId == models.All {
-			sql = sql + "container_id != '" + models.IDLT_Host + "' and "
+			filterSql = filterSql + "container_id != '" + models.IDLT_Host + "' and "
 		} else {
 			containerId := this.ContainerId
 			// 如果是安全日志入口查询 不需要截取12位
 			//containerId = string([]byte(this.ContainerId)[:12])
-			sql = sql + "container_id = '" + containerId + "' and "
+			filterSql = filterSql + "container_id = '" + containerId + "' and "
 		}
 		if this.HostId != "" {
-			sql = sql + "host_id = '" + this.HostId + "' and "
+			filterSql = filterSql + "host_id = '" + this.HostId + "' and "
 		}
 		if this.HostName != "" {
-			sql = sql + "host_name = '" + this.HostName + "' and "
+			filterSql = filterSql + "host_name = '" + this.HostName + "' and "
 		}
 		if this.StartTime != "" {
 			st, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.UTC)
-			sql = sql + "created_at > '" + strconv.FormatInt(st.Unix(), 10) + "' and "
+			filterSql = filterSql + "created_at > '" + strconv.FormatInt(st.Unix(), 10) + "' and "
 		}
 		if this.ToTime != "" {
 			tt, _ := time.ParseInLocation("2006-01-02T15:04:05", this.ToTime, time.UTC)
-			sql = sql + "created_at < '" + strconv.FormatInt(tt.Unix(), 10) + "' and "
+			filterSql = filterSql + "created_at < '" + strconv.FormatInt(tt.Unix(), 10) + "' and "
 		}
 		if this.Priority != "" {
-			sql = sql + "priority = '" + this.Priority + "' and "
+			filterSql = filterSql + "priority = '" + this.Priority + "' and "
 		}
 		if this.Output != "" {
-			sql = sql + "output like '%" + this.Output + "%' and "
+			filterSql = filterSql + "output like '%" + this.Output + "%' and "
 		}
 	}
 
@@ -223,6 +223,10 @@ func (this *IntrudeDetectLog) List1(from, limit int) models.Result {
 	//	}
 	//}
 
+	if filterSql != "" {
+		sql = sql + ` where ` + filterSql
+		countSql = countSql + ` where ` + filterSql
+	}
 	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
 	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
 	resultSql := sql
@@ -238,7 +242,7 @@ func (this *IntrudeDetectLog) List1(from, limit int) models.Result {
 		logs.Error("Get IntrudeDetectLo List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
-	total, _ = o.Raw(countSql).QueryRows(&tempIdsList)
+	o.Raw(countSql).QueryRow(&total)
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = dcokerIdsList
