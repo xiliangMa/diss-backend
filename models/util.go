@@ -45,7 +45,7 @@ var (
 	Task_Status_Pending        = "Pending"
 	Task_Status_Running        = "Running"
 	Task_Status_Pause          = "Pause"
-	Task_Status_Finshed        = "Finshed"
+	Task_Status_Finished       = "Finished"
 	Task_Status_Failed         = "Failed"
 	Task_Status_Deliver_Failed = "DeliverFailed"
 	Task_Status_Received       = "Received"
