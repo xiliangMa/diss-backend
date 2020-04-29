@@ -2,6 +2,7 @@ package job
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models/global"
 	mjob "github.com/xiliangMa/diss-backend/models/job"
@@ -53,10 +54,16 @@ func (this *TaskController) DeleteTask() {
 		if err == nil {
 			// agent 删除任务成功后 删除数据库
 			result = task.Delete()
+			msg := fmt.Sprintf("Delet Task success, Id: %s", task.Id)
+			taskLog := mjob.TaskLog{Rawlog: msg, TaskId: task.Id}
+			taskLog.Add()
 		} else {
 			result.Code = utils.DeleteTaskErr
 			result.Message = "DeleteTaskErr"
 			result.Data = nil
+			msg := fmt.Sprintf("Delet Task fail, Id: %s, err: %s", task.Id, result.Message)
+			taskLog := mjob.TaskLog{Rawlog: msg, TaskId: task.Id}
+			taskLog.Add()
 		}
 	}
 	this.Data["json"] = result

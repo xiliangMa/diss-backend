@@ -3,6 +3,7 @@ package ws
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/gorilla/websocket"
 	"github.com/xiliangMa/diss-backend/models"
@@ -360,10 +361,16 @@ func (this *WSMetricsService) Save() error {
 					if result := task.Update(); result.Code != http.StatusOK {
 						metricsResult.Code = result.Code
 						metricsResult.Msg = result.Message
-						logs.Error("############################ Update task Status: %s, fail, >>> HostId: %s, error: <<<", task.Status, task.Host.Id, result.Message)
+						msg := fmt.Sprintf("############################ Update task Status: %s, fail, >>> HostId: %s, error: <<<", task.Status, task.Host.Id, result.Message)
+						logs.Error(msg)
+						taskLog := job.TaskLog{Rawlog: msg, TaskId: task.Id}
+						taskLog.Add()
 						return errors.New(result.Message)
 					} else {
-						logs.Info("############################ Update task Status: %s, >>> HostId: %s, Type: %s, task id:  %v <<<",task.Status, task.Host.Id, ws.Resource_Task, task.Id)
+						msg := fmt.Sprintf("############################ Update task Status: %s, >>> HostId: %s, Type: %s, task id:  %v <<<", task.Status, task.Host.Id, ws.Resource_Task, task.Id)
+						logs.Info(msg)
+						taskLog := job.TaskLog{Rawlog: msg, TaskId: task.Id}
+						taskLog.Add()
 					}
 					this.ReceiveData(metricsResult)
 				}

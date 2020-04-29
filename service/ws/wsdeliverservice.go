@@ -3,6 +3,7 @@ package ws
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/gorilla/websocket"
 	"github.com/xiliangMa/diss-backend/models"
@@ -54,12 +55,18 @@ func (this *WSDeliverService) DeliverTask() {
 			data, _ := json.Marshal(result)
 			err := client.Conn.WriteMessage(websocket.TextMessage, data)
 			if err == nil {
-				logs.Info("Deliver Task Success, Id: %s, data: %v", task.Id, result)
+				msg := fmt.Sprintf("Deliver Task Success, Id: %s, data: %v", task.Id, result)
+				logs.Info(msg)
+				taskLog := job.TaskLog{Rawlog: msg, TaskId: task.Id}
+				taskLog.Add()
 			} else {
 				//更新 task 状态
 				task.Status = models.Task_Status_Deliver_Failed
 				task.Update()
-				logs.Error("Deliver Task Fail, Id: %s, err: %s", task.Id, err.Error())
+				msg := fmt.Sprintf("Deliver Task Fail, Id: %s, err: %s", task.Id, err.Error())
+				logs.Error(msg)
+				taskLog := job.TaskLog{Rawlog: msg, TaskId: task.Id}
+				taskLog.Add()
 			}
 		} else {
 			//更新 task 状态
@@ -67,6 +74,9 @@ func (this *WSDeliverService) DeliverTask() {
 			task.Update()
 			errMsg := "Agent not connect"
 			logs.Error("Deliver Task Fail, Id: %s, err: %s", task.Id, errMsg)
+			msg := fmt.Sprintf("Deliver Task Fail, Id: %s, err: %s", task.Id, errMsg)
+			taskLog := job.TaskLog{Rawlog: msg, TaskId: task.Id}
+			taskLog.Add()
 		}
 	}
 	logs.Info("################ Deliver Task <<<end>>> ################")
