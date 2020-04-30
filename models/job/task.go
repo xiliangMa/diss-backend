@@ -193,6 +193,9 @@ func (this *Task) List(from, limit int) models.Result {
 	var err error
 	cond := orm.NewCondition()
 
+	if this.Batch != 0 {
+		cond = cond.And("batch", this.Batch)
+	}
 	if this.Host != nil && this.Host.Id != "" {
 		cond = cond.And("host_id", this.Host.Id)
 	}
