@@ -11,8 +11,8 @@ import (
 )
 
 type ImageVirus struct {
-	ImageDigest string `description:"(镜像digest)"`
-	UserId      string `description:"(用户id)"`
+	ImageDigest string `orm:"column(imageDigest)" description:"(镜像digest)"`
+	UserId      string `orm:"column(userId)" description:"(用户id)"`
 	FileName    string `description:"(文件名)"`
 	Virus       string `description:"(病毒)"`
 	FileHash    string `description:"(文件hash)"`
