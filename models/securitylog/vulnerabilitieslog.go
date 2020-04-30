@@ -52,9 +52,9 @@ func (this *ImagePackageVulnerabilities) List(from, limit int) models.Result {
 	filter := ""
 
 	countSql := "select " + `"count"(a.pkg_image_id)` + " from " + utils.ImagePackageVulnerabilities + ` as a join ` + utils.FeedDataVulnerabilities +
-		` as b on a.vulnerability_id = b."id" `
+		` as b on a.vulnerability_id = b."id" and a.vulnerability_namespace_name = b."namespace_name" `
 	sql := "select * from " + utils.ImagePackageVulnerabilities + ` as a join ` + utils.FeedDataVulnerabilities +
-		` as b on a.vulnerability_id = b."id" `
+		` as b on a.vulnerability_id = b."id" and a.vulnerability_namespace_name = b."namespace_name" `
 
 	if this.Severity != "" {
 		sql = sql + `and b."severity" = '` + this.Severity + `'`
