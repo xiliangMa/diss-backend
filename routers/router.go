@@ -119,6 +119,11 @@ func init() {
 				&csystem.SystemController{},
 			),
 		),
+		beego.NSNamespace("/v1/jobs",
+			beego.NSInclude(
+				&cjob.JobController{},
+			),
+		),
 		beego.NSNamespace("/v1/tasks",
 			beego.NSInclude(
 				&cjob.TaskController{},

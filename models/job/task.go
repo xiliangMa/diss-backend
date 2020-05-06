@@ -27,6 +27,7 @@ type Task struct {
 	Container      *models.ContainerConfig         `orm:"rel(fk);null;" description:"(容器)"`
 	CreateTime     time.Time                       `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
 	UpdateTime     time.Time                       `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
+	Job            *Job                            `orm:"rel(fk);null;" description:"(job)"`
 }
 
 type TaskLog struct {

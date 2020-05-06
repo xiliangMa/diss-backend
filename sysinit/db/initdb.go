@@ -87,7 +87,7 @@ func (this *DefaultDB) registerModel() {
 	// securitylog
 	orm.RegisterModel(new(msecuritylog.BenchMarkLog))
 	// task
-	orm.RegisterModel(new(mjob.Task), new(mjob.TaskLog))
+	orm.RegisterModel(new(mjob.Task), new(mjob.TaskLog), new(mjob.Job))
 	//base
 	orm.RegisterModel(new(msecuritypolicy.SystemTemplate), new(models.CmdHistory),
 		new(models.ContainerConfig), new(models.ContainerInfo), new(models.ContainerPs),

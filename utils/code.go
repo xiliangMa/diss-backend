@@ -66,6 +66,9 @@ var (
 	UnBindContainerErr              = 71
 	DeleteSYSTemplateErr            = 72
 	EditSYSTemplateErr              = 73
+	GetJobErr                       = 74
+	AddJobErr                       = 75
+	DeleteJobErr                    = 76
 
 	//k8s 1001-1100
 	AddNameSpaceErr    = 1001
