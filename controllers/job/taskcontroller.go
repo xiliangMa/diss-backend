@@ -55,17 +55,35 @@ func (this *TaskController) DeleteTask() {
 			// agent 删除任务成功后 删除数据库
 			result = task.Delete()
 			msg := fmt.Sprintf("Delet Task success, Id: %s", task.Id)
-			taskLog := mjob.TaskLog{Rawlog: msg, TaskId: task.Id}
+			taskLog := mjob.TaskLog{RawLog: msg, Task: task}
 			taskLog.Add()
 		} else {
 			result.Code = utils.DeleteTaskErr
 			result.Message = "DeleteTaskErr"
 			result.Data = nil
 			msg := fmt.Sprintf("Delet Task fail, Id: %s, err: %s", task.Id, result.Message)
-			taskLog := mjob.TaskLog{Rawlog: msg, TaskId: task.Id}
+			taskLog := mjob.TaskLog{RawLog: msg, Task: task}
 			taskLog.Add()
 		}
 	}
 	this.Data["json"] = result
 	this.ServeJSON(false)
+}
+
+// @Title GetTaskLogList
+// @Description Get TaskLog List
+// @Param token header string true "authToken"
+// @Param body body job.TaskLog false "任务调度"
+// @Param from query int 0 false "from"
+// @Param limit query int 20 false "limit"
+// @Success 200 {object} models.Result
+// @router /logs [post]
+func (this *TaskController) GetTaskLogList() {
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+	taskLog := new(mjob.TaskLog)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &taskLog)
+	this.Data["json"] = taskLog.List(from, limit)
+	this.ServeJSON(false)
+
 }

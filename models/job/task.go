@@ -31,8 +31,9 @@ type Task struct {
 
 type TaskLog struct {
 	Id         string    `orm:"pk;" description:"(任务id)"`
-	TaskId     string    `orm:"" description:"(任务Id)"`
-	Rawlog     string    `orm:"" description:"(日志)"`
+	Account    string    `orm:"default(admin)" description:"(租户)"`
+	Task       *Task     `orm:"rel(fk);null;" description:"(任务Id)"`
+	RawLog     string    `orm:"" description:"(日志)"`
 	CreateTime time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
 }
 
@@ -57,7 +58,7 @@ func (this *TaskLog) AddForRaw() models.Result {
 
 	uid, _ := uuid.NewV4()
 	insetSql := `INSERT INTO ` + utils.TaskLog + ` ( id, task_id, raw_log) VALUES (?,?,?)`
-	_, err := o.Raw(insetSql, uid, this.TaskId, this.Rawlog).Exec()
+	_, err := o.Raw(insetSql, uid, this.Task, this.RawLog).Exec()
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddTaskLogErr
@@ -81,9 +82,9 @@ func (this *TaskLog) ListForRaw(from, limit int) models.Result {
 	countSql := `select "count"(id) from ` + utils.TaskLog
 	sql := "select * from " + utils.TaskLog
 
-	if this.TaskId != "" {
-		filterSql = filterSql + "task_id = '" + this.TaskId + "' and "
-	}
+	//if this.Task != "" {
+	//	filterSql = filterSql + "task_id = '" + this.Task + "' and "
+	//}
 	if filterSql != "" {
 		sql = sql + ` where ` + filterSql
 		countSql = countSql + ` where ` + filterSql
@@ -144,8 +145,17 @@ func (this *TaskLog) List(from, limit int) models.Result {
 	var err error
 	cond := orm.NewCondition()
 
-	if this.TaskId != "" {
-		cond = cond.And("task_id", this.TaskId)
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	if this.Task != nil && this.Task.Id != "" {
+		cond = cond.And("task_id", this.Task.Id)
+	}
+	if this.RawLog != "" {
+		cond = cond.And("raw_log__icontains", this.RawLog)
+	}
+	if this.Account != "" {
+		cond = cond.And("account", this.Account)
 	}
 	_, err = o.QueryTable(utils.TaskLog).SetCond(cond).RelatedSel().Limit(limit, from).OrderBy("-create_time").All(&TaskLogList)
 	if err != nil {

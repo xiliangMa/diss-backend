@@ -57,7 +57,7 @@ func (this *WSDeliverService) DeliverTask() {
 			if err == nil {
 				msg := fmt.Sprintf("Deliver Task Success, Id: %s, data: %v", task.Id, result)
 				logs.Info(msg)
-				taskLog := job.TaskLog{Rawlog: msg, TaskId: task.Id}
+				taskLog := job.TaskLog{RawLog: msg, Task: task, Account: task.Account}
 				taskLog.Add()
 			} else {
 				//更新 task 状态
@@ -65,7 +65,7 @@ func (this *WSDeliverService) DeliverTask() {
 				task.Update()
 				msg := fmt.Sprintf("Deliver Task Fail, Id: %s, err: %s", task.Id, err.Error())
 				logs.Error(msg)
-				taskLog := job.TaskLog{Rawlog: msg, TaskId: task.Id}
+				taskLog := job.TaskLog{RawLog: msg, Task: task, Account: task.Account}
 				taskLog.Add()
 			}
 		} else {
@@ -73,9 +73,9 @@ func (this *WSDeliverService) DeliverTask() {
 			task.Status = models.Task_Status_Deliver_Failed
 			task.Update()
 			errMsg := "Agent not connect"
-			logs.Error("Deliver Task Fail, Id: %s, err: %s", task.Id, errMsg)
 			msg := fmt.Sprintf("Deliver Task Fail, Id: %s, err: %s", task.Id, errMsg)
-			taskLog := job.TaskLog{Rawlog: msg, TaskId: task.Id}
+			logs.Error(msg)
+			taskLog := job.TaskLog{RawLog: msg, Task: task, Account: task.Account}
 			taskLog.Add()
 		}
 	}
@@ -91,19 +91,28 @@ func (this *WSDeliverService) DeleteTask() error {
 	hostId := task.Host.Id
 	if _, ok := this.Hub.DissClient[hostId]; !ok {
 		errMsg := "Agent not connect"
-		logs.Error("Delete Task Fail, Id: %s, err: %s", task.Id, errMsg)
+		msg := fmt.Sprintf("Deliver Task Fail, Id: %s, err: %s", task.Id, errMsg)
+		logs.Error(msg)
+		taskLog := job.TaskLog{RawLog: msg, Task: task, Account: task.Account}
+		taskLog.Add()
 		return errors.New(errMsg)
 	}
 	client := this.Hub.DissClient[hostId]
 	result := ws.WsData{Type: ws.Type_Control, Tag: ws.Resource_Task, RCType: ws.Resource_Control_Type_Delete, Data: task}
 	data, err := json.Marshal(result)
 	if err != nil {
-		logs.Error("Delete Task Fail, Id: %s, err: %s", task.Id, err.Error())
+		msg := fmt.Sprintf("Delete Task Fail, Id: %s, err: %s", task.Id, err.Error())
+		logs.Error(msg)
+		taskLog := job.TaskLog{RawLog: msg, Task: task, Account: task.Account}
+		taskLog.Add()
 		return err
 	}
 	err = client.Conn.WriteMessage(websocket.TextMessage, data)
 	if err != nil {
-		logs.Error("Delete Task Fail, Id: %s, err: %s", task.Id, err.Error())
+		msg := fmt.Sprintf("Delete Task Fail, Id: %s, err: %s", task.Id, err.Error())
+		logs.Error(msg)
+		taskLog := job.TaskLog{RawLog: msg, Task: task, Account: task.Account}
+		taskLog.Add()
 		return err
 	}
 	logs.Info("Delete Task Success, Id: %s, data: %v", task.Id, result)

@@ -81,12 +81,14 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *bean.SecurityCheck)
 
 		//添加任务日志
 		dockerTaskLog := job.TaskLog{}
-		dockerTaskLog.TaskId = dockerTask.Id
-		dockerTaskLog.Rawlog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Btach: %v, Status: %s",
+		dockerTaskLog.Task = dockerTask
+		dockerTaskLog.Account = this.Account
+		dockerTaskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Btach: %v, Status: %s",
 			dockerTask.Id, dockerTask.Type, dockerTask.Batch, dockerTask.Status)
 		k8sTaskLog := job.TaskLog{}
-		k8sTaskLog.TaskId = dockerTask.Id
-		k8sTaskLog.Rawlog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Btach: %v, Status: %s",
+		k8sTaskLog.Task = dockerTask
+		k8sTaskLog.Account = this.Account
+		k8sTaskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Btach: %v, Status: %s",
 			k8sTask.Id, k8sTask.Type, k8sTask.Batch, k8sTask.Status)
 		dockerTaskLog.Add()
 		k8sTaskLog.Add()

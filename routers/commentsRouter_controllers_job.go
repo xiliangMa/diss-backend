@@ -25,4 +25,13 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/job:TaskController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/job:TaskController"],
+		beego.ControllerComments{
+			Method:           "GetTaskLogList",
+			Router:           `/logs`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
 }
