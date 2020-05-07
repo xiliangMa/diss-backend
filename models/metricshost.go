@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"github.com/xiliangMa/diss-backend/models/ws"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -24,6 +23,7 @@ type HostConfig struct {
 	IsInK8s     bool    `orm:"default(false);" description:"(是否在k8s集群)"`
 	ClusterId   string  `orm:"default(null);" description:"(集群id)"`
 	Label       string  `orm:"default(null);" description:"(标签)"`
+	Job         *Job    `orm:"rel(fk);null;" description:"(job)"`
 }
 
 type HostInfo struct {
@@ -79,7 +79,7 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 		this.PG = "Sys-Default"
 		_, err = o.Insert(this)
 		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
-			logs.Error("DB Metrics data --- Add %s failed, err: %s", ws.Resource_HostConfig, err.Error())
+			logs.Error("DB Metrics data --- Add %s failed, err: %s", Resource_HostConfig, err.Error())
 			return err
 		}
 	}
@@ -111,7 +111,7 @@ func (this *HostInfo) Inner_AddHostInfo() error {
 		// 插入数据
 		_, err = o.Insert(this)
 		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
-			logs.Error("DB Metrics data --- Add %s failed, err: %s", ws.Resource_HostInfo, err.Error())
+			logs.Error("DB Metrics data --- Add %s failed, err: %s", Resource_HostInfo, err.Error())
 			return err
 		}
 	}

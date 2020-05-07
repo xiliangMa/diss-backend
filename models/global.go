@@ -1,11 +1,10 @@
-package global
+package models
 
 import (
-	modelws "github.com/xiliangMa/diss-backend/models/ws"
 	"github.com/xiliangMa/diss-backend/service/nats"
 )
 
 var (
-	WSHub       *modelws.Hub
+	WSHub       *Hub
 	NatsManager *nats.NatsManager
 )

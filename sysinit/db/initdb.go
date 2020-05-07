@@ -7,10 +7,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	_ "github.com/lib/pq"
 	"github.com/xiliangMa/diss-backend/models"
-	mjob "github.com/xiliangMa/diss-backend/models/job"
-	mk8s "github.com/xiliangMa/diss-backend/models/k8s"
-	msecuritylog "github.com/xiliangMa/diss-backend/models/securitylog"
-	msecuritypolicy "github.com/xiliangMa/diss-backend/models/securitypolicy"
 	"github.com/xiliangMa/diss-backend/sysinit/dbscript"
 	"github.com/xiliangMa/diss-backend/utils"
 	"os"
@@ -83,13 +79,13 @@ func (this *DefaultDB) InitDB() {
 
 func (this *DefaultDB) registerModel() {
 	// k8s
-	orm.RegisterModel(new(mk8s.Cluster), new(mk8s.NameSpace), new(mk8s.Pod))
+	orm.RegisterModel(new(models.Cluster), new(models.NameSpace), new(models.Pod))
 	// securitylog
-	orm.RegisterModel(new(msecuritylog.BenchMarkLog))
+	orm.RegisterModel(new(models.BenchMarkLog))
 	// task
-	orm.RegisterModel(new(mjob.Task), new(mjob.TaskLog), new(mjob.Job))
+	orm.RegisterModel(new(models.Task), new(models.TaskLog), new(models.Job))
 	//base
-	orm.RegisterModel(new(msecuritypolicy.SystemTemplate), new(models.CmdHistory),
+	orm.RegisterModel(new(models.SystemTemplate), new(models.CmdHistory),
 		new(models.ContainerConfig), new(models.ContainerInfo), new(models.ContainerPs),
 		new(models.HostConfig), new(models.HostInfo), new(models.HostPs), new(models.ImageConfig),
 		new(models.ImageInfo), new(models.Groups))

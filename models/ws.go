@@ -1,4 +1,4 @@
-package ws
+package models
 
 const (
 	// #################### ws 通信资源

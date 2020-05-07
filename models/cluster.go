@@ -1,9 +1,8 @@
-package k8s
+package models
 
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"time"
@@ -29,10 +28,10 @@ type ClusterInterface interface {
 	List()
 }
 
-func (this *Cluster) Add() models.Result {
+func (this *Cluster) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
@@ -46,12 +45,12 @@ func (this *Cluster) Add() models.Result {
 	return ResultData
 }
 
-func (this *Cluster) List(from, limit int) models.Result {
+func (this *Cluster) List(from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
 	var ClusterList []*Cluster
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 	var total int64
 	cond := orm.NewCondition()
@@ -84,10 +83,10 @@ func (this *Cluster) List(from, limit int) models.Result {
 	return ResultData
 }
 
-func (this *Cluster) Update() models.Result {
+func (this *Cluster) Update() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 
 	_, err := o.Update(this)
 	if err != nil {
@@ -101,13 +100,13 @@ func (this *Cluster) Update() models.Result {
 	return ResultData
 }
 
-func (this *Cluster) ListByAccount(from, limit int) models.Result {
+func (this *Cluster) ListByAccount(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ClusterList []*Cluster
 	var cIds []string
 	ns := new(NameSpace)
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 	var total int64
 	cond := orm.NewCondition()
@@ -120,7 +119,7 @@ func (this *Cluster) ListByAccount(from, limit int) models.Result {
 		cond = cond.And("id", this.Id)
 	}
 
-	if this.AccountName != "" && this.AccountName != models.Account_Admin {
+	if this.AccountName != "" && this.AccountName != Account_Admin {
 		//根据命名空间查询绑定关系
 		ns.AccountName = this.AccountName
 		_, cIds = ns.ListByAccountGroupByClusterId()

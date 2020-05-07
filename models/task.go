@@ -1,11 +1,9 @@
-package job
+package models
 
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	uuid "github.com/satori/go.uuid"
-	"github.com/xiliangMa/diss-backend/models"
-	msecuritypolicy "github.com/xiliangMa/diss-backend/models/securitypolicy"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
@@ -14,20 +12,20 @@ import (
 )
 
 type Task struct {
-	Id             string                          `orm:"pk;" description:"(任务id)"`
-	Account        string                          `orm:"default(admin)" description:"(租户)"`
-	Name           string                          `orm:"" description:"(名称)"`
-	Description    string                          `orm:"" description:"(描述)"`
-	Spec           string                          `orm:"" description:"(定时器)"`
-	Type           string                          `orm:"" description:"(类型 重复执行 单次执行 )"`
-	Status         string                          `orm:"null;" description:"(状态: 未开始、执行中、完成、暂停)"`
-	Batch          int64                           `orm:"default(0);" description:"(任务批次)"`
-	SystemTemplate *msecuritypolicy.SystemTemplate `orm:"rel(fk);null;" description:"(系统模板)"`
-	Host           *models.HostConfig              `orm:"rel(fk);null;" description:"(主机)"`
-	Container      *models.ContainerConfig         `orm:"rel(fk);null;" description:"(容器)"`
-	CreateTime     time.Time                       `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
-	UpdateTime     time.Time                       `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
-	Job            *Job                            `orm:"rel(fk);null;" description:"(job)"`
+	Id             string           `orm:"pk;" description:"(任务id)"`
+	Account        string           `orm:"default(admin)" description:"(租户)"`
+	Name           string           `orm:"" description:"(名称)"`
+	Description    string           `orm:"" description:"(描述)"`
+	Spec           string           `orm:"" description:"(定时器)"`
+	Type           string           `orm:"" description:"(类型 重复执行 单次执行 )"`
+	Status         string           `orm:"null;" description:"(状态: 未开始、执行中、完成、暂停)"`
+	Batch          int64            `orm:"default(0);" description:"(任务批次)"`
+	SystemTemplate *SystemTemplate  `orm:"rel(fk);null;" description:"(系统模板)"`
+	Host           *HostConfig      `orm:"rel(fk);null;" description:"(主机)"`
+	Container      *ContainerConfig `orm:"rel(fk);null;" description:"(容器)"`
+	CreateTime     time.Time        `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
+	UpdateTime     time.Time        `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
+	Job            *Job             `orm:"rel(fk);null;" description:"(job)"`
 }
 
 type TaskLog struct {
@@ -39,23 +37,23 @@ type TaskLog struct {
 }
 
 type TaskLogInterface interface {
-	Add() models.Result
-	List(from, limit int) models.Result
+	Add() Result
+	List(from, limit int) Result
 }
 
 type TaskInterface interface {
-	Add() models.Result
-	List(from, limit int) models.Result
-	Delete() models.Result
-	Update() models.Result
+	Add() Result
+	List(from, limit int) Result
+	Delete() Result
+	Update() Result
 	GetCurrentBatchTaskList() (error, []*Task)
-	GetUnFinishedTaskList() models.Result
+	GetUnFinishedTaskList() Result
 }
 
-func (this *TaskLog) AddForRaw() models.Result {
+func (this *TaskLog) AddForRaw() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
-	var ResultData models.Result
+	var ResultData Result
 
 	uid, _ := uuid.NewV4()
 	insetSql := `INSERT INTO ` + utils.TaskLog + ` ( id, task_id, raw_log) VALUES (?,?,?)`
@@ -71,11 +69,11 @@ func (this *TaskLog) AddForRaw() models.Result {
 	return ResultData
 }
 
-func (this *TaskLog) ListForRaw(from, limit int) models.Result {
+func (this *TaskLog) ListForRaw(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var TaskList []*Task
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 	var total int64 = 0
 
@@ -119,10 +117,10 @@ func (this *TaskLog) ListForRaw(from, limit int) models.Result {
 	return ResultData
 }
 
-func (this *TaskLog) Add() models.Result {
+func (this *TaskLog) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 
 	uuid, _ := uuid.NewV4()
 	this.Id = uuid.String()
@@ -138,11 +136,11 @@ func (this *TaskLog) Add() models.Result {
 	return ResultData
 }
 
-func (this *TaskLog) List(from, limit int) models.Result {
+func (this *TaskLog) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var TaskLogList []*TaskLog
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 	cond := orm.NewCondition()
 
@@ -179,10 +177,10 @@ func (this *TaskLog) List(from, limit int) models.Result {
 	return ResultData
 }
 
-func (this *Task) Add() models.Result {
+func (this *Task) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
@@ -196,11 +194,11 @@ func (this *Task) Add() models.Result {
 	return ResultData
 }
 
-func (this *Task) List(from, limit int) models.Result {
+func (this *Task) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var TaskList []*Task
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 	cond := orm.NewCondition()
 
@@ -219,7 +217,7 @@ func (this *Task) List(from, limit int) models.Result {
 	if this.Name != "" {
 		cond = cond.And("name__contains", this.Name)
 	}
-	if this.Status != "" && this.Status != models.All {
+	if this.Status != "" && this.Status != All {
 		cond = cond.And("status", this.Status)
 	}
 	_, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().Limit(limit, from).OrderBy("-update_time").All(&TaskList)
@@ -243,10 +241,10 @@ func (this *Task) List(from, limit int) models.Result {
 	return ResultData
 }
 
-func (this *Task) Delete() models.Result {
+func (this *Task) Delete() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 	cond := orm.NewCondition()
 
 	if this.Id != "" {
@@ -264,10 +262,10 @@ func (this *Task) Delete() models.Result {
 	return ResultData
 }
 
-func (this *Task) Update() models.Result {
+func (this *Task) Update() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 
 	_, err := o.Update(this)
 	if err != nil {
@@ -296,11 +294,11 @@ func (this *Task) GetCurrentBatchTaskList() (error, []*Task) {
 	return nil, TaskList
 }
 
-func (this *Task) GetUnFinishedTaskList() models.Result {
+func (this *Task) GetUnFinishedTaskList() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var TaskList []*Task
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 	var total int64
 	cond := orm.NewCondition()
@@ -308,7 +306,7 @@ func (this *Task) GetUnFinishedTaskList() models.Result {
 	if this.Host != nil && this.Host.Id != "" {
 		cond = cond.And("host_id", this.Host.Id)
 	}
-	cond = cond.AndCond(cond.And("status", models.Task_Status_Pending).Or("status", models.Task_Status_Running).Or("status", models.Task_Status_Deliver_Failed))
+	cond = cond.AndCond(cond.And("status", Task_Status_Pending).Or("status", Task_Status_Running).Or("status", Task_Status_Deliver_Failed))
 
 	total, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().All(&TaskList)
 	if err != nil {

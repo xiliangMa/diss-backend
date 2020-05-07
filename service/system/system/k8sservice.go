@@ -5,7 +5,6 @@ import (
 	"github.com/astaxie/beego/logs"
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/models/k8s"
 	"github.com/xiliangMa/diss-backend/utils"
 	"mime/multipart"
 	"net/http"
@@ -95,7 +94,7 @@ func CreateKubeConfigDir(fpath string) {
 }
 
 func AddCluster(clusterName, path string) {
-	var cluster k8s.Cluster
+	var cluster models.Cluster
 	uid, _ := uuid.NewV4()
 	cluster.Id = uid.String()
 	cluster.Name = clusterName

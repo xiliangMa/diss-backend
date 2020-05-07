@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/models/k8s"
-	msl "github.com/xiliangMa/diss-backend/models/securitylog"
 	"github.com/xiliangMa/diss-backend/utils"
 )
 
@@ -65,7 +63,7 @@ func (this *HostController) GetHostInfoList() {
 // @Description Get HostPod List
 // @Param token header string true "authToken"
 // @Param hostName path string "" true "主机名"
-// @Param body body k8s.Pod false "Pod 信息"
+// @Param body body models.Pod false "Pod 信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
@@ -75,7 +73,7 @@ func (this *HostController) GetHostPodList() {
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 
-	pod := new(k8s.Pod)
+	pod := new(models.Pod)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &pod)
 	pod.HostName = hostName
 	this.Data["json"] = pod.List(from, limit)
@@ -215,7 +213,7 @@ func (this *HostController) GetHostContainerInfoList() {
 // @Description Get HostBenchMarkLog List
 // @Param token header string true "authToken"
 // @Param hostId path string "" true "hostId"
-// @Param body body securitylog.BenchMarkLog false "基线日志信息"
+// @Param body body models.BenchMarkLog false "基线日志信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
@@ -225,7 +223,7 @@ func (this *HostController) GetHostBenchMarkLogList() {
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 
-	benchMarkLog := new(msl.BenchMarkLog)
+	benchMarkLog := new(models.BenchMarkLog)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &benchMarkLog)
 	benchMarkLog.HostId = hostId
 	this.Data["json"] = benchMarkLog.List(from, limit, false)
@@ -244,7 +242,7 @@ func (this *HostController) GetHostBenchMarkLogInfo() {
 	hostId := this.GetString(":hostId")
 	bmlId := this.GetString(":bmlId")
 
-	benchMarkLog := new(msl.BenchMarkLog)
+	benchMarkLog := new(models.BenchMarkLog)
 	benchMarkLog.HostId = hostId
 	benchMarkLog.Id = bmlId
 	//var securityLogService = ssl.SecurityLogService{benchMarkLog, nil}

@@ -2,26 +2,24 @@ package synccheck
 
 import (
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/models/k8s"
-	"github.com/xiliangMa/diss-backend/models/ws"
 )
 
 type K8SCheckHadler struct {
 	ContinerConfig *models.ContainerConfig
 	ContainerInfo  *models.ContainerInfo
-	NS             *k8s.NameSpace
-	Pod            *k8s.Pod
+	NS             *models.NameSpace
+	Pod            *models.Pod
 }
 
 func (this *K8SCheckHadler) Check(model string) {
 	switch model {
-	case ws.Resource_ContainerConfig:
+	case models.Resource_ContainerConfig:
 		this.ContainerConfingCheck()
-	case ws.Resource_ContainerInfo:
+	case models.Resource_ContainerInfo:
 		this.ContainerInfoCheck()
-	case ws.Resource_NameSpace:
+	case models.Resource_NameSpace:
 		this.NSCheck()
-	case ws.Resource_Pod:
+	case models.Resource_Pod:
 		this.PodCheck()
 	}
 

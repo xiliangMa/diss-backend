@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/models/bean"
 	securitycheck "github.com/xiliangMa/diss-backend/service/securitycheck"
 	"time"
 )
@@ -18,12 +17,12 @@ type SecurityCheckController struct {
 // @Description Security heck
 // @Param token header string true "authToken"
 // @Param account query string "admin" false "租户"
-// @Param body body bean.SecurityCheckList true "检查列表"
+// @Param body body models.SecurityCheckList true "检查列表"
 // @Param nats query bool false false "是否下发给nats"
 // @Success 200 {object} models.Result
 // @router / [post]
 func (this *SecurityCheckController) SecurityCheck() {
-	checkList := new(bean.SecurityCheckList)
+	checkList := new(models.SecurityCheckList)
 	isNats, _ := this.GetBool("nats")
 	account := this.GetString("account")
 	if account == "" {

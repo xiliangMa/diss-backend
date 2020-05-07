@@ -1,9 +1,8 @@
-package k8s
+package models
 
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -18,20 +17,20 @@ type NameSpace struct {
 }
 
 type NameSpaceInterface interface {
-	Add() models.Result
-	Edit() models.Result
-	Get() models.Result
-	List() models.Result
-	BindAccount() models.Result
-	UnBindAccount() models.Result
+	Add() Result
+	Edit() Result
+	Get() Result
+	List() Result
+	BindAccount() Result
+	UnBindAccount() Result
 	ListByAccountGroupByClusterId() (error, []string)
 	EmptyDirtyData() error
 }
 
-func (this *NameSpace) Add(syncK8s bool) models.Result {
+func (this *NameSpace) Add(syncK8s bool) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 	var dbNS []*NameSpace
 	var err error
 	cond := orm.NewCondition()
@@ -72,11 +71,11 @@ func (this *NameSpace) Add(syncK8s bool) models.Result {
 	return ResultData
 }
 
-func (this *NameSpace) List(from, limit int) models.Result {
+func (this *NameSpace) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var nameSpaceList []*NameSpace
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 	cond := orm.NewCondition()
 
@@ -95,11 +94,11 @@ func (this *NameSpace) List(from, limit int) models.Result {
 		cond = cond.And("id", this.Id)
 	}
 
-	if this.AccountName != "" && this.AccountName != models.Account_Admin {
+	if this.AccountName != "" && this.AccountName != Account_Admin {
 		cond = cond.And("account_name", this.AccountName)
 	}
 
-	if this.AccountName == models.Account_Admin {
+	if this.AccountName == Account_Admin {
 		cond = cond.And("account_name", "")
 	}
 
@@ -125,10 +124,10 @@ func (this *NameSpace) List(from, limit int) models.Result {
 	return ResultData
 }
 
-func (this *NameSpace) Update() models.Result {
+func (this *NameSpace) Update() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 
 	_, err := o.Update(this)
 	if err != nil {
@@ -142,10 +141,10 @@ func (this *NameSpace) Update() models.Result {
 	return ResultData
 }
 
-func (this *NameSpace) UnBindAccount() models.Result {
+func (this *NameSpace) UnBindAccount() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 	err := o.Begin()
 	params := orm.Params{"account_name": ""}
 	cond := orm.NewCondition()
@@ -182,10 +181,10 @@ func (this *NameSpace) UnBindAccount() models.Result {
 	return ResultData
 }
 
-func (this *NameSpace) BindAccount() models.Result {
+func (this *NameSpace) BindAccount() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 	cond := orm.NewCondition()
 	cond = cond.And("id", this.Id)
 	dbList := []*NameSpace{}

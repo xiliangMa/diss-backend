@@ -1,9 +1,8 @@
-package k8s
+package models
 
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -24,18 +23,18 @@ type Pod struct {
 }
 
 type PodInterface interface {
-	Add() models.Result
-	Delete() models.Result
-	Update() models.Result
-	Get() models.Result
-	List(from, limit int) models.Result
+	Add() Result
+	Delete() Result
+	Update() Result
+	Get() Result
+	List(from, limit int) Result
 	EmptyDirtyData() error
 }
 
-func (this *Pod) Add() models.Result {
+func (this *Pod) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 	var podList []*Pod
 	var err error
 	cond := orm.NewCondition()
@@ -78,11 +77,11 @@ func (this *Pod) Add() models.Result {
 	return ResultData
 }
 
-func (this *Pod) List(from, limit int) models.Result {
+func (this *Pod) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var PodList []*Pod = nil
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 	cond := orm.NewCondition()
 	if this.Name != "" {
@@ -116,10 +115,10 @@ func (this *Pod) List(from, limit int) models.Result {
 	return ResultData
 }
 
-func (this *Pod) Update() models.Result {
+func (this *Pod) Update() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 
 	_, err := o.Update(this)
 	if err != nil {

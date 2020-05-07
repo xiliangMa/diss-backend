@@ -1,9 +1,8 @@
-package securitylog
+package models
 
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
@@ -34,19 +33,19 @@ type DockerVirus struct {
 }
 
 type ImageVirusInterface interface {
-	List(from, limit int) models.Result
+	List(from, limit int) Result
 }
 
 type DockerVirusInterface interface {
-	List(from, limit int) models.Result
+	List(from, limit int) Result
 }
 
-func (this *ImageVirus) List(from, limit int) models.Result {
+func (this *ImageVirus) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Diss_Api)
 	var imageVirusList []*ImageVirus = nil
 	var tempList []*ImageVirus = nil
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 	var total int64 = 0
 
@@ -91,11 +90,11 @@ func (this *ImageVirus) List(from, limit int) models.Result {
 	return ResultData
 }
 
-func (this *DockerVirus) List(from, limit int) models.Result {
+func (this *DockerVirus) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Diss_Api)
 	var imageVirusList []*ImageVirus = nil
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 	var total int64 = 0
 
@@ -106,21 +105,21 @@ func (this *DockerVirus) List(from, limit int) models.Result {
 	// 根据 TargeType = host 和 HostId = All 判断是否是查询所有主机日志 如果不是则匹配其它所传入的条件
 	// 根据 TargeType = container 和 ContainerId = All 判断是否是查询所有容器日志 如果不是则匹配其它所传入的条件
 
-	if this.TargeType == models.IDLT_Host && this.HostId == models.All {
-		filterSql = filterSql + "container_id = '" + models.IDLT_Host + "' and "
+	if this.TargeType == IDLT_Host && this.HostId == All {
+		filterSql = filterSql + "container_id = '" + IDLT_Host + "' and "
 	}
-	if this.TargeType == models.IDLT_Docker && this.ContainerId == models.All {
-		filterSql = filterSql + "container_id != '" + models.IDLT_Host + "' and "
+	if this.TargeType == IDLT_Docker && this.ContainerId == All {
+		filterSql = filterSql + "container_id != '" + IDLT_Host + "' and "
 	}
 
-	if (this.ContainerId != "" && this.ContainerId != models.All) || (this.HostId != "" && this.HostId != models.All) {
-		if this.ContainerId != models.IDLT_Host && this.TargeType == models.IDLT_Docker {
+	if (this.ContainerId != "" && this.ContainerId != All) || (this.HostId != "" && this.HostId != All) {
+		if this.ContainerId != IDLT_Host && this.TargeType == IDLT_Docker {
 			containerId := this.ContainerId
 			containerId = string([]byte(this.ContainerId)[:12])
 			filterSql = filterSql + "container_id = '" + containerId + "' and "
 		}
 
-		if this.TargeType == models.IDLT_Host {
+		if this.TargeType == IDLT_Host {
 			filterSql = filterSql + "host_id = '" + this.HostId + "' and "
 		}
 		if this.Virus != "" {

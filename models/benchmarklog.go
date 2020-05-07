@@ -1,9 +1,8 @@
-package securitylog
+package models
 
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -38,10 +37,10 @@ type BenchMarkLogInterface interface {
 	GetHostMarkSummary()
 }
 
-func (this *BenchMarkLog) Add() models.Result {
+func (this *BenchMarkLog) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 
 	//this.RawLog = ""
@@ -58,11 +57,11 @@ func (this *BenchMarkLog) Add() models.Result {
 	return ResultData
 }
 
-func (this *BenchMarkLog) List(from, limit int, isInfo bool) models.Result {
+func (this *BenchMarkLog) List(from, limit int, isInfo bool) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var BenchMarkLogList []*BenchMarkLog = nil
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 	cond := orm.NewCondition()
 
@@ -78,15 +77,15 @@ func (this *BenchMarkLog) List(from, limit int, isInfo bool) models.Result {
 		cond = cond.And("id", this.Id)
 	}
 
-	if this.Level != "" && this.Level != models.BML_Level_ALL {
+	if this.Level != "" && this.Level != BML_Level_ALL {
 		cond = cond.And("level", this.Level)
 	}
 
-	if this.Result != "" && this.Result != models.BML_Result_ALL {
+	if this.Result != "" && this.Result != BML_Result_ALL {
 		cond = cond.And("result", this.Result)
 	}
 
-	if this.BenchMarkName != "" && this.BenchMarkName != models.BML_Template_ALL {
+	if this.BenchMarkName != "" && this.BenchMarkName != BML_Template_ALL {
 		cond = cond.And("bench_mark_name", this.BenchMarkName)
 	}
 
@@ -125,35 +124,35 @@ type MarkSummary struct {
 	InfoCount int
 }
 
-func (this *BenchMarkLog) GetMarkSummary() models.Result {
-	var ResultData models.Result
+func (this *BenchMarkLog) GetMarkSummary() Result {
+	var ResultData Result
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	// docker 基线统计
 	dockerMarkSummary := new(MarkSummary)
-	o.Raw(utils.GetMarkSummarySql(models.BMLT_Docker)).QueryRow(&dockerMarkSummary)
+	o.Raw(utils.GetMarkSummarySql(BMLT_Docker)).QueryRow(&dockerMarkSummary)
 
 	// k8s 基线统计
 	k8sMarkSummary := new(MarkSummary)
-	o.Raw(utils.GetMarkSummarySql(models.BMLT_K8s)).QueryRow(&k8sMarkSummary)
+	o.Raw(utils.GetMarkSummarySql(BMLT_K8s)).QueryRow(&k8sMarkSummary)
 
 	data := make(map[string]interface{})
-	data[models.BMLT_Docker] = dockerMarkSummary
-	data[models.BMLT_K8s] = k8sMarkSummary
+	data[BMLT_Docker] = dockerMarkSummary
+	data[BMLT_K8s] = k8sMarkSummary
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
 	return ResultData
 }
 
-func (this *BenchMarkLog) GetHostMarkSummary() models.Result {
-	var ResultData models.Result
+func (this *BenchMarkLog) GetHostMarkSummary() Result {
+	var ResultData Result
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	// host 基线统计
 	hostMarkSummary := new(MarkSummary)
 	o.Raw(utils.GetHostMarkSummarySql()).QueryRow(&hostMarkSummary)
 	data := make(map[string]interface{})
-	data[models.BMLT_Host_All] = hostMarkSummary
+	data[BMLT_Host_All] = hostMarkSummary
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
 	return ResultData

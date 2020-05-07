@@ -4,8 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
-	"github.com/xiliangMa/diss-backend/models/global"
-	mjob "github.com/xiliangMa/diss-backend/models/job"
+	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/ws"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -19,7 +18,7 @@ type TaskController struct {
 // @Title GetTaskList
 // @Description Get Task List
 // @Param token header string true "authToken"
-// @Param body body job.Task false "任务"
+// @Param body body models.Task false "任务"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
@@ -27,7 +26,7 @@ type TaskController struct {
 func (this *TaskController) GetTaskList() {
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
-	task := new(mjob.Task)
+	task := new(models.Task)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &task)
 	this.Data["json"] = task.List(from, limit)
 	this.ServeJSON(false)
@@ -42,27 +41,27 @@ func (this *TaskController) GetTaskList() {
 // @router /:id [delete]
 func (this *TaskController) DeleteTask() {
 	id := this.GetString(":id")
-	task := new(mjob.Task)
+	task := new(models.Task)
 	task.Id = id
 	result := task.List(0, 0)
 	data := result.Data.(map[string]interface{})
 	if result.Code == http.StatusOK && data["total"] != 0 {
 		//向agent下发删除任务指令
 		deleteTaskList := data["items"]
-		WSDeliverService := ws.WSDeliverService{Hub: global.WSHub, DelTask: deleteTaskList.([]*mjob.Task)[0]}
+		WSDeliverService := ws.WSDeliverService{Hub: models.WSHub, DelTask: deleteTaskList.([]*models.Task)[0]}
 		err := WSDeliverService.DeleteTask()
 		if err == nil {
 			// agent 删除任务成功后 删除数据库
 			result = task.Delete()
 			msg := fmt.Sprintf("Delet Task success, Id: %s", task.Id)
-			taskLog := mjob.TaskLog{RawLog: msg, Task: task}
+			taskLog := models.TaskLog{RawLog: msg, Task: task}
 			taskLog.Add()
 		} else {
 			result.Code = utils.DeleteTaskErr
 			result.Message = "DeleteTaskErr"
 			result.Data = nil
 			msg := fmt.Sprintf("Delet Task fail, Id: %s, err: %s", task.Id, result.Message)
-			taskLog := mjob.TaskLog{RawLog: msg, Task: task}
+			taskLog := models.TaskLog{RawLog: msg, Task: task}
 			taskLog.Add()
 		}
 	}
@@ -73,7 +72,7 @@ func (this *TaskController) DeleteTask() {
 // @Title GetTaskLogList
 // @Description Get TaskLog List
 // @Param token header string true "authToken"
-// @Param body body job.TaskLog false "任务调度"
+// @Param body body models.TaskLog false "任务调度"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
@@ -81,7 +80,7 @@ func (this *TaskController) DeleteTask() {
 func (this *TaskController) GetTaskLogList() {
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
-	taskLog := new(mjob.TaskLog)
+	taskLog := new(models.TaskLog)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &taskLog)
 	this.Data["json"] = taskLog.List(from, limit)
 	this.ServeJSON(false)

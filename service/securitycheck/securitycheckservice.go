@@ -5,19 +5,15 @@ import (
 	"github.com/astaxie/beego/logs"
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/models/bean"
-	"github.com/xiliangMa/diss-backend/models/global"
-	"github.com/xiliangMa/diss-backend/models/job"
-	msecuritypolicy "github.com/xiliangMa/diss-backend/models/securitypolicy"
 	"github.com/xiliangMa/diss-backend/service/ws"
 	"net/http"
 )
 
 type SecurityCheckService struct {
-	*bean.SecurityCheckList
-	DefaultTMP           map[string]*msecuritypolicy.SystemTemplate
+	*models.SecurityCheckList
+	DefaultTMP           map[string]*models.SystemTemplate
 	Bath                 int64
-	CurrentBatchTaskList []*job.Task
+	CurrentBatchTaskList []*models.Task
 	Account              string
 }
 
@@ -40,13 +36,13 @@ func (this *SecurityCheckService) PrePare() {
 	logs.Info("################ PrePare work <<<end>>> ################")
 }
 
-func (this *SecurityCheckService) PrePareTask(securityCheck *bean.SecurityCheck) {
+func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityCheck) {
 	TMP_Type_BM_Docker_DT := this.DefaultTMP[models.TMP_Type_BM_Docker]
 	TMP_Type_BM_K8S_DT := this.DefaultTMP[models.TMP_Type_BM_K8S]
 	//TMP_Type_VS_DT := defaultTMP[models.TMP_Type_VS]
 	//TMP_Type_LS_DT := defaultTMP[models.TMP_Type_LS]
 	if securityCheck.BenchMarkCheck {
-		dockerTask := new(job.Task)
+		dockerTask := new(models.Task)
 		uid1, _ := uuid.NewV4()
 		dockerTask.Id = uid1.String()
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_BM_Docker, uid1)
@@ -61,7 +57,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *bean.SecurityCheck)
 		dockerTask.Status = models.Task_Status_Pending
 		dockerTask.Account = this.Account
 
-		k8sTask := new(job.Task)
+		k8sTask := new(models.Task)
 		uid2, _ := uuid.NewV4()
 		k8sTask.Id = uid2.String()
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_BM_K8S, uid2)
@@ -80,12 +76,12 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *bean.SecurityCheck)
 		k8sTask.Add()
 
 		//添加任务日志
-		dockerTaskLog := job.TaskLog{}
+		dockerTaskLog := models.TaskLog{}
 		dockerTaskLog.Task = dockerTask
 		dockerTaskLog.Account = this.Account
 		dockerTaskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Btach: %v, Status: %s",
 			dockerTask.Id, dockerTask.Type, dockerTask.Batch, dockerTask.Status)
-		k8sTaskLog := job.TaskLog{}
+		k8sTaskLog := models.TaskLog{}
 		k8sTaskLog.Task = dockerTask
 		k8sTaskLog.Account = this.Account
 		k8sTaskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Btach: %v, Status: %s",
@@ -95,7 +91,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *bean.SecurityCheck)
 	}
 	if securityCheck.VirusScan {
 		//病毒
-		task := new(job.Task)
+		task := new(models.Task)
 		uid, _ := uuid.NewV4()
 		task.Id = uid.String()
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_VS, uid)
@@ -109,7 +105,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *bean.SecurityCheck)
 	}
 	if securityCheck.LeakScan {
 		//漏洞
-		task := new(job.Task)
+		task := new(models.Task)
 		uid, _ := uuid.NewV4()
 		task.Id = uid.String()
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_LS, uid)
@@ -123,18 +119,18 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *bean.SecurityCheck)
 	}
 }
 
-func (this *SecurityCheckService) PrePareDefaultTMP() map[string]*msecuritypolicy.SystemTemplate {
+func (this *SecurityCheckService) PrePareDefaultTMP() map[string]*models.SystemTemplate {
 	if this.DefaultTMP == nil {
-		st := new(msecuritypolicy.SystemTemplate)
+		st := new(models.SystemTemplate)
 		this.DefaultTMP = st.GetDefaultTemplate()
 	}
 	logs.Info("PrePare Default Template: %v", this.DefaultTMP)
 	return this.DefaultTMP
 }
 
-func (this *SecurityCheckService) GetCurrentBatchTask() []*job.Task {
+func (this *SecurityCheckService) GetCurrentBatchTask() []*models.Task {
 	if this.CurrentBatchTaskList == nil {
-		task := new(job.Task)
+		task := new(models.Task)
 		task.Batch = this.Bath
 		if err, taskList := task.GetCurrentBatchTaskList(); err == nil {
 			this.CurrentBatchTaskList = taskList
@@ -148,7 +144,7 @@ func (this *SecurityCheckService) DeliverTask(isNats bool) models.Result {
 	var ResultData models.Result
 	this.PrePare()
 	wsDelive := ws.WSDeliverService{
-		Hub:                  global.WSHub,
+		Hub:                  models.WSHub,
 		Bath:                 this.Bath,
 		CurrentBatchTaskList: this.CurrentBatchTaskList,
 	}

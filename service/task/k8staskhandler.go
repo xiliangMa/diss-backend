@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/models/k8s"
-	"github.com/xiliangMa/diss-backend/models/ws"
 	"github.com/xiliangMa/diss-backend/service/synccheck"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -149,13 +147,13 @@ func (this *K8STaskHandler) SyncNameSpace(clusetrName, clusterId string) {
 	if err != nil {
 		logs.Error("Sync namspace err: %s", err.Error())
 	} else {
-		CheckObject := new(k8s.NameSpace)
+		CheckObject := new(models.NameSpace)
 		CheckObject.SyncCheckPoint = this.SyncCheckPoint
 		CheckObject.ClusterId = clusterId
 		logs.Info("########## Sync NameSpace, Cluster: %s >>> strat <<< ##########, size: %d", clusetrName, len(nameSpaces.Items))
 		for _, ns := range nameSpaces.Items {
 			nsName := ns.ObjectMeta.Name
-			ob := new(k8s.NameSpace)
+			ob := new(models.NameSpace)
 			nId := string(ns.UID)
 			nsId := nId
 			ob.Id = nsId
@@ -168,8 +166,8 @@ func (this *K8STaskHandler) SyncNameSpace(clusetrName, clusterId string) {
 		size := len(nameSpaces.Items)
 		if size != 0 {
 			k8sCheckHandler := synccheck.K8SCheckHadler{nil, nil, CheckObject, nil}
-			k8sCheckHandler.Check(ws.Resource_NameSpace)
-			logs.Info("########## Empty Dirty Data, Model: %s ##########", ws.Resource_NameSpace)
+			k8sCheckHandler.Check(models.Resource_NameSpace)
+			logs.Info("########## Empty Dirty Data, Model: %s ##########", models.Resource_NameSpace)
 		}
 		logs.Info("########## Sync NameSpace, Cluster: %s >>> end <<< ##########, size: %d", clusetrName, len(nameSpaces.Items))
 	}
@@ -180,7 +178,7 @@ func (this *K8STaskHandler) SyncNamespacePod(clusterName string) {
 	if err != nil {
 		logs.Error("Sync namspace err: %s", err.Error())
 	} else {
-		CheckObject := new(k8s.Pod)
+		CheckObject := new(models.Pod)
 		CheckObject.SyncCheckPoint = this.SyncCheckPoint
 		CheckObject.ClusterName = clusterName
 		for _, ns := range nameSpaces.Items {
@@ -192,7 +190,7 @@ func (this *K8STaskHandler) SyncNamespacePod(clusterName string) {
 				logs.Info("########## Sync Pod, NameSpace: %s >>> strat <<< ##########, size: %d, NSName %s", nsName, len(pods.Items), nsName)
 				for _, pod := range pods.Items {
 					// 同步 pod
-					podob := new(k8s.Pod)
+					podob := new(models.Pod)
 					podob.Id = string(pod.UID)
 					podob.Name = pod.ObjectMeta.Name
 					podob.NameSpaceName = nsName
@@ -211,8 +209,8 @@ func (this *K8STaskHandler) SyncNamespacePod(clusterName string) {
 		size := len(nameSpaces.Items)
 		if size != 0 {
 			k8sCheckHandler := synccheck.K8SCheckHadler{nil, nil, nil, CheckObject}
-			k8sCheckHandler.Check(ws.Resource_Pod)
-			logs.Info("########## Empty Dirty Data, Model: %s ##########", ws.Resource_Pod)
+			k8sCheckHandler.Check(models.Resource_Pod)
+			logs.Info("########## Empty Dirty Data, Model: %s ##########", models.Resource_Pod)
 		}
 	}
 }
@@ -345,29 +343,29 @@ func (this *K8STaskHandler) SyncPodContainerConfigAndInfo(clusterName string) {
 		if size != 0 {
 			k8sCheckHandler := synccheck.K8SCheckHadler{CheckObject1, CheckObject2, nil, nil}
 
-			k8sCheckHandler.Check(ws.Resource_ContainerConfig)
-			logs.Info("########## Empty Dirty Data, Model: %s ##########", ws.Resource_ContainerConfig)
+			k8sCheckHandler.Check(models.Resource_ContainerConfig)
+			logs.Info("########## Empty Dirty Data, Model: %s ##########", models.Resource_ContainerConfig)
 
-			k8sCheckHandler.Check(ws.Resource_ContainerInfo)
-			logs.Info("########## Empty Dirty Data, Model: %s ##########", ws.Resource_ContainerInfo)
+			k8sCheckHandler.Check(models.Resource_ContainerInfo)
+			logs.Info("########## Empty Dirty Data, Model: %s ##########", models.Resource_ContainerInfo)
 		}
 	}
 }
 
 type Data struct {
-	items []*k8s.Cluster
+	items []*models.Cluster
 	total int
 }
 
 func SyncAll() {
 	// cluster
-	var cluster k8s.Cluster
+	var cluster models.Cluster
 	result := cluster.List(0, 0)
 
 	if result.Code == http.StatusOK && result.Data != nil {
 		data := result.Data.(map[string]interface{})
 		SyncCheckPoint := time.Now().Unix()
-		for _, c := range data["items"].([]*k8s.Cluster) {
+		for _, c := range data["items"].([]*models.Cluster) {
 			if c.IsSync == models.Cluster_IsSync {
 				clusterName := c.Name
 				c.SyncStatus = models.Cluster_Sync_Status_IN_PROGRESS

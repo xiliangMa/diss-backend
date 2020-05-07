@@ -7,7 +7,6 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
-	msl "github.com/xiliangMa/diss-backend/models/securitylog"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
@@ -15,8 +14,8 @@ import (
 )
 
 type SecurityLogService struct {
-	*msl.BenchMarkLog
-	*msl.IntrudeDetectLog
+	*models.BenchMarkLog
+	*models.IntrudeDetectLog
 }
 
 func (this *SecurityLogService) GetHostBenchMarkLogInfo() models.Result {

@@ -1,9 +1,8 @@
-package securitypolicy
+package models
 
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -21,17 +20,17 @@ type SystemTemplate struct {
 }
 
 type SystemTemplateInterface interface {
-	Add() models.Result
-	List() models.Result
-	Delete() models.Result
-	Update() models.Result
+	Add() Result
+	List() Result
+	Delete() Result
+	Update() Result
 	GetDefaultTemplate() map[string]*SystemTemplate
 }
 
-func (this *SystemTemplate) Add() models.Result {
+func (this *SystemTemplate) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
@@ -45,11 +44,11 @@ func (this *SystemTemplate) Add() models.Result {
 	return ResultData
 }
 
-func (this *SystemTemplate) List(from, limit int) models.Result {
+func (this *SystemTemplate) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var systemTemplateList []*SystemTemplate
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 	cond := orm.NewCondition()
 
@@ -65,13 +64,13 @@ func (this *SystemTemplate) List(from, limit int) models.Result {
 	if this.Type != "" {
 		cond = cond.And("type", this.Type)
 	}
-	if this.Version != models.All {
+	if this.Version != All {
 		cond = cond.And("name__contains", this.Name)
 	}
 	if this.Commands != "" {
 		cond = cond.And("commands__contains", this.Commands)
 	}
-	if this.Status != models.TMP_Status_ALl {
+	if this.Status != TMP_Status_ALl {
 		cond = cond.And("status", this.Status)
 	}
 	_, err = o.QueryTable(utils.SYSTemplate).SetCond(cond).RelatedSel().Limit(limit, from).All(&systemTemplateList)
@@ -95,10 +94,10 @@ func (this *SystemTemplate) List(from, limit int) models.Result {
 	return ResultData
 }
 
-func (this *SystemTemplate) Delete() models.Result {
+func (this *SystemTemplate) Delete() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 	cond := orm.NewCondition()
 
 	if this.Id != "" {
@@ -116,10 +115,10 @@ func (this *SystemTemplate) Delete() models.Result {
 	return ResultData
 }
 
-func (this *SystemTemplate) Update() models.Result {
+func (this *SystemTemplate) Update() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 
 	_, err := o.Update(this)
 	if err != nil {

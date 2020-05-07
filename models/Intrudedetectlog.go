@@ -1,9 +1,8 @@
-package securitylog
+package models
 
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
@@ -39,17 +38,17 @@ type DcokerIds struct {
 }
 
 type DcokerIdsInterface interface {
-	List(from, limit int) models.Result
-	List1(from, limit int) models.Result
-	GetIntrudeDetectLogStatistics(timeCycle int) models.Result
+	List(from, limit int) Result
+	List1(from, limit int) Result
+	GetIntrudeDetectLogStatistics(timeCycle int) Result
 }
 
-func (this *DcokerIds) GetIntrudeDetectLogStatistics(timeCycle int) models.Result {
+func (this *DcokerIds) GetIntrudeDetectLogStatistics(timeCycle int) Result {
 	o := orm.NewOrm()
 
 	o.Using(utils.DS_Security_Log)
 	dcokerIdsCountList := make(map[int]*int)
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 	now := time.Now()
 	for i := 0; i < timeCycle; i++ {
@@ -83,11 +82,11 @@ func (this *DcokerIds) GetIntrudeDetectLogStatistics(timeCycle int) models.Resul
 	return ResultData
 }
 
-func (this *IntrudeDetectLog) List(from, limit int) models.Result {
+func (this *IntrudeDetectLog) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var dcokerIdsList []*DcokerIds = nil
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 	containerId := this.ContainerId
 	//cond := orm.NewCondition()
@@ -95,7 +94,7 @@ func (this *IntrudeDetectLog) List(from, limit int) models.Result {
 	tt, _ := time.ParseInLocation("2006-01-02T15:04:05", this.ToTime, time.UTC)
 
 	var total int64
-	if this.TargeType == models.IDLT_Docker {
+	if this.TargeType == IDLT_Docker {
 		containerId = string([]byte(this.ContainerId)[:12])
 		total, err = o.Raw("select * from docker_ids where container_id = ? and created_at > ? and created_at < ? limit ? OFFSET ?", containerId, st.Unix(), tt.Unix(), limit, from).QueryRows(&dcokerIdsList)
 	} else {
@@ -122,11 +121,11 @@ func (this *IntrudeDetectLog) List(from, limit int) models.Result {
 	return ResultData
 }
 
-func (this *IntrudeDetectLog) List1(from, limit int) models.Result {
+func (this *IntrudeDetectLog) List1(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var dcokerIdsList []*DcokerIds = nil
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 	var total int64 = 0
 
@@ -137,10 +136,10 @@ func (this *IntrudeDetectLog) List1(from, limit int) models.Result {
 	// 根据 TargeType = host 如果快速查询所有主机日志可以设置 HostId=All
 	// 根据 TargeType = container 如果快速查询所有容器日志可以设置 ContianerId =All
 
-	if this.TargeType == models.IDLT_Host {
-		filterSql = filterSql + "container_id = '" + models.IDLT_Host + "' and "
+	if this.TargeType == IDLT_Host {
+		filterSql = filterSql + "container_id = '" + IDLT_Host + "' and "
 
-		if this.HostId != "" && this.HostId != models.All {
+		if this.HostId != "" && this.HostId != All {
 			filterSql = filterSql + "host_id = '" + this.HostId + "' and "
 		}
 		if this.HostName != "" {
@@ -162,9 +161,9 @@ func (this *IntrudeDetectLog) List1(from, limit int) models.Result {
 		}
 	}
 
-	if this.TargeType == models.IDLT_Docker {
-		if this.ContainerId == models.All {
-			filterSql = filterSql + "container_id != '" + models.IDLT_Host + "' and "
+	if this.TargeType == IDLT_Docker {
+		if this.ContainerId == All {
+			filterSql = filterSql + "container_id != '" + IDLT_Host + "' and "
 		} else {
 			containerId := this.ContainerId
 			// 如果是安全日志入口查询 不需要截取12位

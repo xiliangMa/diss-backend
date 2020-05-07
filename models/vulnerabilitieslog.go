@@ -1,9 +1,8 @@
-package securitylog
+package models
 
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
@@ -39,14 +38,14 @@ type FeedDataVulnerabilities struct {
 }
 
 type ImagePackageVulnerabilitiesInterface interface {
-	List(from, limit int) models.Result
+	List(from, limit int) Result
 }
 
-func (this *ImagePackageVulnerabilities) List(from, limit int) models.Result {
+func (this *ImagePackageVulnerabilities) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Diss_Api)
 	var ImagePackageVulnerabilitiesList []*ImagePackageVulnerabilities = nil
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 	var total int64 = 0
 	filter := ""

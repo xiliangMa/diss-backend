@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/models/k8s"
 	"github.com/xiliangMa/diss-backend/utils"
 )
 
@@ -17,7 +16,7 @@ type K8SController struct {
 // @Description Get Cluster List
 // @Param token header string true "authToken"
 // @Param user query string "admin" true "diss api 系统的登入用户 如果用户all，直接根据租户查询"
-// @Param body body k8s.Cluster false "集群"
+// @Param body body models.Cluster false "集群"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
@@ -38,7 +37,7 @@ func (this *K8SController) GetClusters() {
 
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
-	cluster := new(k8s.Cluster)
+	cluster := new(models.Cluster)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &cluster)
 	// 如果用户all， 直接根据租户查询
 	if user != "" && user != "all" {
@@ -54,7 +53,7 @@ func (this *K8SController) GetClusters() {
 // @Param token header string true "authToken"
 // @Param user query string "admin" true "diss api 系统的登入用户"
 // @Param clusterId path string "" true "clusterId"
-// @Param body body k8s.NameSpace false "命名空间"
+// @Param body body models.NameSpace false "命名空间"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
@@ -77,7 +76,7 @@ func (this *K8SController) GetNameSpaces() {
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 
-	ns := new(k8s.NameSpace)
+	ns := new(models.NameSpace)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &ns)
 	ns.ClusterId = clusterId
 	// 如果用户all， 直接根据租户查询
@@ -102,7 +101,7 @@ func (this *K8SController) GetPods() {
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 
-	pod := new(k8s.Pod)
+	pod := new(models.Pod)
 	pod.NameSpaceName = nsName
 	this.Data["json"] = pod.List(from, limit)
 	this.ServeJSON(false)
@@ -216,12 +215,12 @@ func (this *K8SController) GetContainerImageInfo() {
 // @Description BindAccount（绑定租户）
 // @Param token header string true "authToken"
 // @Param nsId path string "" true "nsId"
-// @Param body body k8s.NameSpace true "命名空间"
+// @Param body body models.NameSpace true "命名空间"
 // @Success 200 {object} models.Result
 // @router /namespaces/:nsId/bindaccount [put]
 func (this *K8SController) BindAccount() {
 	nsId := this.GetString(":nsId")
-	NS := new(k8s.NameSpace)
+	NS := new(models.NameSpace)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &NS)
 	NS.Id = nsId
 	this.Data["json"] = NS.BindAccount()
@@ -232,12 +231,12 @@ func (this *K8SController) BindAccount() {
 // @Description UnBindAccount（解除绑定）
 // @Param token header string true "authToken"
 // @Param nsId path string "" true "nsId"
-// @Param body body k8s.NameSpace true "命名空间"
+// @Param body body models.NameSpace true "命名空间"
 // @Success 200 {object} models.Result
 // @router /namespaces/:nsId/unbindaccount [delete]
 func (this *K8SController) UnBindAccount() {
 	nsId := this.GetString(":nsId")
-	NS := new(k8s.NameSpace)
+	NS := new(models.NameSpace)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &NS)
 	NS.Id = nsId
 	this.Data["json"] = NS.UnBindAccount()

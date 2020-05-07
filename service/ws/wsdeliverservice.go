@@ -7,22 +7,19 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/gorilla/websocket"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/models/global"
-	"github.com/xiliangMa/diss-backend/models/job"
-	"github.com/xiliangMa/diss-backend/models/ws"
 )
 
 type WSDeliverService struct {
-	*ws.Hub
+	*models.Hub
 	Bath                 int64
-	CurrentBatchTaskList []*job.Task
-	DelTask              *job.Task
+	CurrentBatchTaskList []*models.Task
+	DelTask              *models.Task
 }
 
 func (this *WSDeliverService) DeliverTaskToNats() {
 	logs.Info("################ Deliver Task <<<start>>> ################")
 	for _, task := range this.CurrentBatchTaskList {
-		result := ws.WsData{Type: ws.Type_Control, Tag: ws.Resource_Task, Data: task, RCType: ws.Resource_Control_Type_Post}
+		result := models.WsData{Type: models.Type_Control, Tag: models.Resource_Task, Data: task, RCType: models.Resource_Control_Type_Post}
 		data, _ := json.Marshal(result)
 		hostName := ""
 		if task.Host != nil {
@@ -32,7 +29,7 @@ func (this *WSDeliverService) DeliverTaskToNats() {
 			hostName = task.Container.HostName
 		}
 		subject := hostName + `_` + models.Topic_Task
-		err := global.NatsManager.Conn.Publish(subject, data)
+		err := models.NatsManager.Conn.Publish(subject, data)
 		if err == nil {
 			logs.Info("Deliver Task to Nats Success, Subject: %s Id: %s, data: %v", subject, task.Id, result)
 		} else {
@@ -51,13 +48,13 @@ func (this *WSDeliverService) DeliverTask() {
 	for _, task := range this.CurrentBatchTaskList {
 		if _, ok := this.Hub.DissClient[task.Host.Id]; ok {
 			client := this.Hub.DissClient[task.Host.Id]
-			result := ws.WsData{Type: ws.Type_Control, Tag: ws.Resource_Task, Data: task, RCType: ws.Resource_Control_Type_Post}
+			result := models.WsData{Type: models.Type_Control, Tag: models.Resource_Task, Data: task, RCType: models.Resource_Control_Type_Post}
 			data, _ := json.Marshal(result)
 			err := client.Conn.WriteMessage(websocket.TextMessage, data)
 			if err == nil {
 				msg := fmt.Sprintf("Deliver Task Success, Id: %s, data: %v", task.Id, result)
 				logs.Info(msg)
-				taskLog := job.TaskLog{RawLog: msg, Task: task, Account: task.Account}
+				taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account}
 				taskLog.Add()
 			} else {
 				//更新 task 状态
@@ -65,7 +62,7 @@ func (this *WSDeliverService) DeliverTask() {
 				task.Update()
 				msg := fmt.Sprintf("Deliver Task Fail, Id: %s, err: %s", task.Id, err.Error())
 				logs.Error(msg)
-				taskLog := job.TaskLog{RawLog: msg, Task: task, Account: task.Account}
+				taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account}
 				taskLog.Add()
 			}
 		} else {
@@ -75,7 +72,7 @@ func (this *WSDeliverService) DeliverTask() {
 			errMsg := "Agent not connect"
 			msg := fmt.Sprintf("Deliver Task Fail, Id: %s, err: %s", task.Id, errMsg)
 			logs.Error(msg)
-			taskLog := job.TaskLog{RawLog: msg, Task: task, Account: task.Account}
+			taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account}
 			taskLog.Add()
 		}
 	}
@@ -93,17 +90,17 @@ func (this *WSDeliverService) DeleteTask() error {
 		errMsg := "Agent not connect"
 		msg := fmt.Sprintf("Deliver Task Fail, Id: %s, err: %s", task.Id, errMsg)
 		logs.Error(msg)
-		taskLog := job.TaskLog{RawLog: msg, Task: task, Account: task.Account}
+		taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account}
 		taskLog.Add()
 		return errors.New(errMsg)
 	}
 	client := this.Hub.DissClient[hostId]
-	result := ws.WsData{Type: ws.Type_Control, Tag: ws.Resource_Task, RCType: ws.Resource_Control_Type_Delete, Data: task}
+	result := models.WsData{Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Delete, Data: task}
 	data, err := json.Marshal(result)
 	if err != nil {
 		msg := fmt.Sprintf("Delete Task Fail, Id: %s, err: %s", task.Id, err.Error())
 		logs.Error(msg)
-		taskLog := job.TaskLog{RawLog: msg, Task: task, Account: task.Account}
+		taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account}
 		taskLog.Add()
 		return err
 	}
@@ -111,7 +108,7 @@ func (this *WSDeliverService) DeleteTask() error {
 	if err != nil {
 		msg := fmt.Sprintf("Delete Task Fail, Id: %s, err: %s", task.Id, err.Error())
 		logs.Error(msg)
-		taskLog := job.TaskLog{RawLog: msg, Task: task, Account: task.Account}
+		taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account}
 		taskLog.Add()
 		return err
 	}

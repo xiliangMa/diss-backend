@@ -1,43 +1,41 @@
-package job
+package models
 
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	uuid "github.com/satori/go.uuid"
-	"github.com/xiliangMa/diss-backend/models"
-	msecuritypolicy "github.com/xiliangMa/diss-backend/models/securitypolicy"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"time"
 )
 
 type Job struct {
-	Id             string                          `orm:"pk;" description:"(job id)"`
-	Account        string                          `orm:"default(admin)" description:"(租户)"`
-	Name           string                          `orm:"" description:"(名称)"`
-	Description    string                          `orm:"" description:"(描述)"`
-	Spec           string                          `orm:"" description:"(定时器)"`
-	Type           string                          `orm:"" description:"(类型 重复执行 单次执行 )"`
-	Status         string                          `orm:"null;" description:"(状态: 执行中、启用、禁用)"`
-	SystemTemplate *msecuritypolicy.SystemTemplate `orm:"rel(fk);null;" description:"(系统模板)"`
-	TaskList       []*Task                         `orm:"reverse(many);null" description:"(任务列表)"`
-	//HostList       []*models.HostConfig            `orm:"reverse(many);null" description:"(主机列表)"`
-	//ContainerList  []*models.ContainerConfig       `orm:"reverse(many);null" description:"(容器列表)"`
-	CreateTime     time.Time                       `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
-	UpdateTime     time.Time                       `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
+	Id             string          `orm:"pk;" description:"(job id)"`
+	Account        string          `orm:"default(admin)" description:"(租户)"`
+	Name           string          `orm:"" description:"(名称)"`
+	Description    string          `orm:"" description:"(描述)"`
+	Spec           string          `orm:"" description:"(定时器)"`
+	Type           string          `orm:"" description:"(类型 重复执行 单次执行 )"`
+	Status         string          `orm:"null;" description:"(状态: 执行中、启用、禁用)"`
+	SystemTemplate *SystemTemplate `orm:"rel(fk);null;" description:"(系统模板)"`
+	Task           []*Task         `orm:"reverse(many);null" description:"(任务列表)"`
+	//HostConfig      []*HostConfig      `orm:"reverse(many);null" description:"(主机列表)"`
+	//ContainerConfig []*ContainerConfig `orm:"reverse(many);null" description:"(容器列表)"`
+	CreateTime time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
+	UpdateTime time.Time `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
 }
 
 type JobInterface interface {
-	Add() models.Result
-	List(from, limit int) models.Result
-	Delete() models.Result
+	Add() Result
+	List(from, limit int) Result
+	Delete() Result
 }
 
-func (this *Job) List(from, limit int) models.Result {
+func (this *Job) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var JobList []*Job
-	var ResultData models.Result
+	var ResultData Result
 	var err error
 	cond := orm.NewCondition()
 
@@ -71,10 +69,10 @@ func (this *Job) List(from, limit int) models.Result {
 	return ResultData
 }
 
-func (this *Job) Add() models.Result {
+func (this *Job) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 
 	uid, _ := uuid.NewV4()
 	this.Id = uid.String()
@@ -90,10 +88,10 @@ func (this *Job) Add() models.Result {
 	return ResultData
 }
 
-func (this *Job) Delete() models.Result {
+func (this *Job) Delete() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData models.Result
+	var ResultData Result
 	cond := orm.NewCondition()
 
 	if this.Id != "" {

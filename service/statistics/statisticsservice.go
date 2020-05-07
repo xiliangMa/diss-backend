@@ -2,14 +2,13 @@ package statistics
 
 import (
 	"github.com/xiliangMa/diss-backend/models"
-	msecuritylog "github.com/xiliangMa/diss-backend/models/securitylog"
 	"net/http"
 )
 
 type StatisticsService struct {
 	*models.HostConfig
 	*models.ContainerConfig
-	*msecuritylog.DcokerIds
+	*models.DcokerIds
 }
 
 func (this *StatisticsService) GetAssetStatistics() models.Result {
@@ -42,17 +41,17 @@ func (this *StatisticsService) GetBnechMarkProportionStatistics() models.Result 
 }
 
 func (this *StatisticsService) GetBnechMarkSummaryStatistics() models.Result {
-	bml := new(msecuritylog.BenchMarkLog)
+	bml := new(models.BenchMarkLog)
 	return bml.GetMarkSummary()
 }
 
 func (this *StatisticsService) GetIntrudeDetectLogStatistics(timeCycle int) models.Result {
-	dcokerIds := new(msecuritylog.DcokerIds)
+	dcokerIds := new(models.DcokerIds)
 	return dcokerIds.GetIntrudeDetectLogStatistics(timeCycle)
 }
 
 func (this *StatisticsService) GetHostBnechMarkSummaryStatistics(hostId string) models.Result {
-	bml := new(msecuritylog.BenchMarkLog)
+	bml := new(models.BenchMarkLog)
 	bml.HostId = hostId
 	return bml.GetHostMarkSummary()
 }
