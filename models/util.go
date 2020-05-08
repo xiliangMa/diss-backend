@@ -13,33 +13,34 @@ var (
 	Pod_Container_Statue_Terminated = "Terminated"
 	Pod_Container_Statue_Waiting    = "Waiting"
 
-	//容器状态
+	// 主机相关状态
+	Host_Status_Normal   = "Nornal"
+	Host_Status_Abnormal = "Abnormal"
+
+	// 主机-容器状态
 	Container_Status_Run   = "Run"
 	Container_Status_Pause = "Pause"
 	Container_Status_All   = "All"
 
-	// bnech mark
-	//Bench_Mark_Type_Docker     = 0
-	//Bench_Mark_Type_Kubernetes = 1
-
-	// 安全容器
-	Diss_All           = -1
-	Diss_Installed     = 0
-	Diss_Not_Installed = 1
+	// 主机-安全容器状态
+	Diss_Installed    = "Installed"
+	Diss_NotInstalled = "NotInstalled"
 
 	//安全状态
-	Diss_Status_All    = -1
-	Diss_status_Safe   = 0
-	Diss_Status_Unsafe = 1
+	Diss_status_Safe   = "Safe"
+	Diss_Status_Unsafe = "Unsafe"
 
 	//系统魔板类型(此处和ws resource tag 保持一致)
 	TMP_Type_BM_Docker = "DockerBenchMark"
 	TMP_Type_BM_K8S    = "KubernetesBenchMark"
 	TMP_Type_VS        = "SC_VirusScan"
 	TMP_Type_LS        = "SC_LeakScan"
-	TMP_Status_ALl     = -1
-	SC_Type_Host       = "host"
-	Sc_Type_Container  = "container"
+	TMP_Status_Enable  = "Enable"
+	TMP_Status_Disable = "Disable"
+
+	//安全检查类型
+	SC_Type_Host      = "host"
+	Sc_Type_Container = "container"
 
 	// 任务状态
 	Task_Status_Pending        = "Pending"
@@ -74,9 +75,8 @@ var (
 	IDLT_Host   = "host"
 
 	// 分组类型
-	Group_All       = -1
-	Group_Host      = 0
-	Group_Container = 1
+	Group_Type_Host      = "Host"
+	Group_Type_Container = "Container"
 
 	// 租户
 	Account_Admin = "admin"

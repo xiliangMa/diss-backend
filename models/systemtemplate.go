@@ -15,7 +15,7 @@ type SystemTemplate struct {
 	Type        string `orm:"" description:"(类型)"`
 	Version     string `orm:"null" description:"(版本)"`
 	Commands    string `orm:"null;" description:"(操作命令)"`
-	Status      int    `orm:"default(1);" description:"(类型 停用 0  启用 1)"`
+	Status      string `orm:"default(enable);" description:"(类型 enable disable)"`
 	IsDefault   bool   `orm:"default(false);" description:"(默认系统策略)"`
 }
 
@@ -70,7 +70,7 @@ func (this *SystemTemplate) List(from, limit int) Result {
 	if this.Commands != "" {
 		cond = cond.And("commands__contains", this.Commands)
 	}
-	if this.Status != TMP_Status_ALl {
+	if this.Status != All {
 		cond = cond.And("status", this.Status)
 	}
 	_, err = o.QueryTable(utils.SYSTemplate).SetCond(cond).RelatedSel().Limit(limit, from).All(&systemTemplateList)

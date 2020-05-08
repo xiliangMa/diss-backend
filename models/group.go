@@ -14,7 +14,7 @@ type Groups struct {
 	FirstLevel  string        `orm:"unique" description:"(一级分组)"`
 	SecondLevel string        `orm:"null" description:"(二级分组)"`
 	ThirdLevel  string        `orm:"null" description:"(三级分组)"`
-	Type        int           `orm:"default(0)" description:"(All -1 分组类型 0 主机 1 容器)"`
+	Type        string        `orm:"default(Host)" description:"(All Host Container)"`
 	AccountName string        `orm:"default(admin)" description:"(租户 默认 admin)"`
 	CreateTime  time.Time     `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
 	UpdateTime  time.Time     `orm:"auto_now;type(datetime)" description:"(更新时间)"`
@@ -70,7 +70,7 @@ func (this *Groups) List(from, limit int) Result {
 	if this.ThirdLevel != "" {
 		cond = cond.And("third_level__contains", this.ThirdLevel)
 	}
-	if this.Type != Group_All {
+	if this.Type != All {
 		cond = cond.And("type", this.Type)
 	}
 
