@@ -13,20 +13,20 @@ var (
 	Pod_Container_Statue_Terminated = "Terminated"
 	Pod_Container_Statue_Waiting    = "Waiting"
 
-	// 主机相关状态
-	Host_Status_Normal   = "Nornal"
-	Host_Status_Abnormal = "Abnormal"
-
-	// 主机-容器状态
+	//容器状态
 	Container_Status_Run   = "Run"
 	Container_Status_Pause = "Pause"
 	Container_Status_All   = "All"
+
+	// 主机相关状态
+	Host_Status_Normal   = "Nornal"
+	Host_Status_Abnormal = "Abnormal"
 
 	// 主机-安全容器状态
 	Diss_Installed    = "Installed"
 	Diss_NotInstalled = "NotInstalled"
 
-	//安全状态
+	// 主机-安全状态
 	Diss_status_Safe   = "Safe"
 	Diss_Status_Unsafe = "Unsafe"
 

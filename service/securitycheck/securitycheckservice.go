@@ -6,6 +6,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/ws"
+	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
 
@@ -140,7 +141,7 @@ func (this *SecurityCheckService) GetCurrentBatchTask() []*models.Task {
 	return this.CurrentBatchTaskList
 }
 
-func (this *SecurityCheckService) DeliverTask(isNats bool) models.Result {
+func (this *SecurityCheckService) DeliverTask() models.Result {
 	var ResultData models.Result
 	this.PrePare()
 	wsDelive := ws.WSDeliverService{
@@ -148,7 +149,7 @@ func (this *SecurityCheckService) DeliverTask(isNats bool) models.Result {
 		Bath:                 this.Bath,
 		CurrentBatchTaskList: this.CurrentBatchTaskList,
 	}
-	if isNats {
+	if utils.IsEnableNats() {
 		go wsDelive.DeliverTaskToNats()
 	} else {
 		go wsDelive.DeliverTask()

@@ -43,6 +43,7 @@ var (
 	Nats_Server_Url = "Nats_Server_Url"
 	Nats_Cluster_Id = "Nats_Cluster_Id"
 	Nats_Client_Id  = "Nats_Client_Id"
+	Nats_Enable     = "Nats_Enable"
 )
 
 func UnitConvert(size int64) string {
@@ -142,9 +143,20 @@ func GetNatsClusterId() string {
 }
 
 func IsEnableNats() bool {
+	runMode := beego.AppConfig.String("RunMode")
+	envRunMode := os.Getenv("RunMode")
+	if envRunMode != "" {
+		runMode = envRunMode
+	}
 	enable := false
 	if ok, _ := beego.AppConfig.Bool("nats::Enable"); ok {
 		enable = true
+	}
+	if runMode == Run_Mode_Prod {
+		ok := os.Getenv(Nats_Enable)
+		if ok == "true" {
+			enable = true
+		}
 	}
 	return enable
 }
