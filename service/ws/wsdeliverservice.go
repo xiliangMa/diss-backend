@@ -28,7 +28,7 @@ func (this *WSDeliverService) DeliverTaskToNats() {
 		if task.Container != nil {
 			hostName = task.Container.HostName
 		}
-		subject := hostName + `_` + models.Topic_Task
+		subject := hostName
 		err := models.NatsManager.Conn.Publish(subject, data)
 		if err == nil {
 			logs.Info("Deliver Task to Nats Success, Subject: %s Id: %s, data: %v", subject, task.Id, result)

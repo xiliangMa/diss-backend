@@ -1,24 +1,23 @@
-package ws
+package nats
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/astaxie/beego/logs"
-	"github.com/gorilla/websocket"
+	"github.com/nats-io/stan.go"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/service/nats"
 	"github.com/xiliangMa/diss-backend/service/synccheck"
 	"net/http"
-	"strings"
 )
 
-type WSMetricsService struct {
+type NatsSubService struct {
 	Message []byte
-	Conn    *websocket.Conn
+	Conn    stan.Conn
+	Subject string
 }
 
-func (this *WSMetricsService) Save() error {
+func (this *NatsSubService) Save() error {
 	ms := models.WsData{}
 	if err := json.Unmarshal(this.Message, &ms); err != nil {
 		logs.Error("Paraces WsData error %s", err)
@@ -28,26 +27,19 @@ func (this *WSMetricsService) Save() error {
 	case models.Type_Metric: // 数据上报
 		switch ms.Tag {
 		case models.Resource_HeartBeat:
-			heartBeat := models.HeartBeat{}
-			s, _ := json.Marshal(ms.Data)
-			if err := json.Unmarshal(s, &heartBeat); err != nil {
-				logs.Error("Paraces %s error %s", ms.Tag, err)
-				return err
-			}
-			ip := strings.Split(this.Conn.RemoteAddr().String(), ":")
-			client := &models.Client{Hub: models.WSHub, Conn: this.Conn, Send: make(chan []byte, 256), ClientIp: ip[0], SystemId: heartBeat.SystemId}
-			// 开启 nats 订阅
-			if models.WSHub != nil {
-				if _, ok := models.WSHub.DissClient[client.SystemId]; !ok {
-					nats.RunClientSub(client.SystemId)
-					logs.Info("Run nats client sub success , HostId: %s", client.SystemId)
-				}
-			}
-
-			client.Hub.Register <- client
-			logs.Info("############################ Agent Heater Beat data, >>> HostId: %s, Type: %s <<<", heartBeat.SystemId, models.Resource_HeartBeat)
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
-			this.ReceiveData(metricsResult)
+			// to do 可以暂时采用点对点的 websocket 上报
+			//heartBeat := models.HeartBeat{}
+			//s, _ := json.Marshal(ms.Data)
+			//if err := json.Unmarshal(s, &heartBeat); err != nil {
+			//	logs.Error("Paraces %s error %s", ms.Tag, err)
+			//	return err
+			//}
+			//ip := strings.Split(this.Conn.RemoteAddr().String(), ":")
+			//client := &models.Client{Hub: models.WSHub, Conn: this.Conn, Send: make(chan []byte, 256), ClientIp: ip[0], SystemId: heartBeat.SystemId}
+			//client.Hub.Register <- client
+			//logs.Info("Nats ############################ Agent Heater Beat data, >>> HostId: %s, Type: %s <<<", heartBeat.SystemId, models.Resource_HeartBeat)
+			//metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			//this.ReceiveData(metricsResult)
 		case models.Resource_HostConfig:
 			hostConfig := models.HostConfig{}
 			s, _ := json.Marshal(ms.Data)
@@ -55,7 +47,7 @@ func (this *WSMetricsService) Save() error {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
-			logs.Info("############################ Sync agent data, >>> HostId: %s, Type: %s <<<", hostConfig.Id, models.Resource_HostConfig)
+			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s <<<", hostConfig.Id, models.Resource_HostConfig)
 			if err := hostConfig.Inner_AddHostConfig(); err != nil {
 				return err
 			}
@@ -68,7 +60,7 @@ func (this *WSMetricsService) Save() error {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
-			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", hostInfo.Id, models.Resource_HostInfo)
+			logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", hostInfo.Id, models.Resource_HostInfo)
 			if err := hostInfo.Inner_AddHostInfo(); err != nil {
 				return err
 			}
@@ -84,7 +76,7 @@ func (this *WSMetricsService) Save() error {
 			}
 			size := len(containerConfigList)
 			if size != 0 {
-				logs.Info("############################ Sync agent data, >>>  HostName: %s, Type: %s, Size: %d <<<", containerConfigList[0].HostName, models.Resource_ContainerConfig, size)
+				logs.Info("Nats ############################ Sync agent data, >>>  HostName: %s, Type: %s, Size: %d <<<", containerConfigList[0].HostName, models.Resource_ContainerConfig, size)
 			}
 			for _, containerConfig := range containerConfigList {
 				//if result := containerConfig.Add(); result.Code != http.StatusOK {
@@ -112,7 +104,7 @@ func (this *WSMetricsService) Save() error {
 			}
 			size := len(containerInfoList)
 			if size != 0 {
-				logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerInfoList[0].HostId, models.Resource_ContainerInfo, size)
+				logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerInfoList[0].HostId, models.Resource_ContainerInfo, size)
 			}
 			for _, containerInfo := range containerInfoList {
 				//if result := containerInfo.Add(); result.Code != http.StatusOK {
@@ -140,7 +132,7 @@ func (this *WSMetricsService) Save() error {
 			}
 			size := len(imageConfigList)
 			if size != 0 {
-				logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageConfigList[0].HostId, models.Resource_ImageConfig, len(imageConfigList))
+				logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageConfigList[0].HostId, models.Resource_ImageConfig, len(imageConfigList))
 				//删除主机下的所有imageconfig
 				imageConfigList[0].Delete()
 			}
@@ -163,7 +155,7 @@ func (this *WSMetricsService) Save() error {
 			}
 			size := len(imageInfoList)
 			if size != 0 {
-				logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageInfoList[0].HostId, models.Resource_ImageInfo, len(imageInfoList))
+				logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageInfoList[0].HostId, models.Resource_ImageInfo, len(imageInfoList))
 				//删除主机下的所有imageginfo
 				imageInfoList[0].Delete()
 			}
@@ -184,7 +176,7 @@ func (this *WSMetricsService) Save() error {
 			}
 			size := len(hostPsList)
 			if size != 0 {
-				logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", hostPsList[0].HostId, models.Resource_HostPs, size)
+				logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", hostPsList[0].HostId, models.Resource_HostPs, size)
 				// 删除该主机下所有的进程
 				hostPsList[0].Delete()
 
@@ -208,7 +200,7 @@ func (this *WSMetricsService) Save() error {
 			size := len(containerPsList)
 
 			if size != 0 {
-				logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerPsList[0].HostId, models.Resource_ContainerPs, len(containerPsList))
+				logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerPsList[0].HostId, models.Resource_ContainerPs, len(containerPsList))
 				containerPsList[0].Delete()
 			}
 
@@ -229,7 +221,7 @@ func (this *WSMetricsService) Save() error {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
-			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", benchMarkLog.HostId, models.Resource_DockerBenchMark)
+			logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", benchMarkLog.HostId, models.Resource_DockerBenchMark)
 			if result := benchMarkLog.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
 			}
@@ -256,7 +248,7 @@ func (this *WSMetricsService) Save() error {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
-			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", benchMarkLog.HostId, models.Resource_KubernetesBenchMark)
+			logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", benchMarkLog.HostId, models.Resource_KubernetesBenchMark)
 			if result := benchMarkLog.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
 			}
@@ -283,7 +275,7 @@ func (this *WSMetricsService) Save() error {
 			}
 			size := len(cmdHistoryList.List)
 			if size != 0 {
-				logs.Info("############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Resource_HostCmdHistory, size)
+				logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Resource_HostCmdHistory, size)
 				// 删除该主机下所有的记录 type = 0
 				cmdHistoryList.List[0].Delete()
 			}
@@ -306,7 +298,7 @@ func (this *WSMetricsService) Save() error {
 			}
 			size := len(cmdHistoryList.List)
 			if size != 0 {
-				logs.Info("############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Resource_ContainerCmdHistory, size)
+				logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Resource_ContainerCmdHistory, size)
 				// 删除该主机下所有的记录 type = 1
 				cmdHistoryList.List[0].Delete()
 			}
@@ -336,7 +328,7 @@ func (this *WSMetricsService) Save() error {
 				if result := task.GetUnFinishedTaskList(); result.Code != http.StatusOK {
 					metricsResult.Code = result.Code
 					metricsResult.Msg = result.Message
-					logs.Error("############################ Get un finished task list  fail, >>> HostId: %s, error: <<<", task.Host.Id, result.Message)
+					logs.Error("Nats ############################ Get un finished task list  fail, >>> HostId: %s, error: <<<", task.Host.Id, result.Message)
 					return errors.New(result.Message)
 				} else {
 					metricsResult.Code = result.Code
@@ -345,9 +337,9 @@ func (this *WSMetricsService) Save() error {
 					if result.Data != nil {
 						data := result.Data.(map[string]interface{})
 						total := data["total"]
-						logs.Info("############################  Get un finished task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, models.Resource_Task, total)
+						logs.Info("Nats ############################  Get un finished task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, models.Resource_Task, total)
 					} else {
-						logs.Info("############################  Get un finished task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, models.Resource_Task, 0)
+						logs.Info("Nats ############################  Get un finished task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, models.Resource_Task, 0)
 					}
 				}
 				this.ReceiveData(metricsResult)
@@ -365,13 +357,13 @@ func (this *WSMetricsService) Save() error {
 					if result := task.Update(); result.Code != http.StatusOK {
 						metricsResult.Code = result.Code
 						metricsResult.Msg = result.Message
-						msg := fmt.Sprintf("############################ Update task Status: %s, fail, >>> HostId: %s, error: <<<", task.Status, task.Host.Id, result.Message)
+						msg := fmt.Sprintf("Nats ############################ Update task Status: %s, fail, >>> HostId: %s, error: <<<", task.Status, task.Host.Id, result.Message)
 						logs.Error(msg)
 						taskLog := models.TaskLog{RawLog: msg, Task: &task}
 						taskLog.Add()
 						return errors.New(result.Message)
 					} else {
-						msg := fmt.Sprintf("############################ Update task Status: %s, >>> HostId: %s, Type: %s, task id:  %v <<<", task.Status, task.Host.Id, models.Resource_Task, task.Id)
+						msg := fmt.Sprintf("Nats ############################ Update task Status: %s, >>> HostId: %s, Type: %s, task id:  %v <<<", task.Status, task.Host.Id, models.Resource_Task, task.Id)
 						logs.Info(msg)
 						taskLog := models.TaskLog{RawLog: msg, Task: &task}
 						taskLog.Add()
@@ -386,10 +378,20 @@ func (this *WSMetricsService) Save() error {
 	return nil
 }
 
-func (this *WSMetricsService) ReceiveData(result models.WsData) {
+func (this *NatsSubService) ReceiveData(result models.WsData) {
 	data, _ := json.Marshal(result)
-	err := this.Conn.WriteMessage(websocket.TextMessage, data)
+	err := this.Conn.Publish(this.Subject, data)
 	if err != nil {
-		logs.Error("############################ Received data from agent fail ############################", err)
+		logs.Error("Nats ############################ Received data from agent fail ############################", err)
+	}
+}
+
+func RunClientSub(subject string) {
+	natsManager := models.NatsManager
+	if natsManager != nil && natsManager.Conn != nil {
+		natsManager.Conn.Subscribe(subject, func(m *stan.Msg) {
+			natsSubService := NatsSubService{Conn: natsManager.Conn, Message: m.Data, Subject: subject}
+			natsSubService.Save()
+		}, stan.DurableName(subject))
 	}
 }

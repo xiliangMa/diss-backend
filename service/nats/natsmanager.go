@@ -2,7 +2,7 @@ package nats
 
 import (
 	"github.com/astaxie/beego/logs"
-	stan "github.com/nats-io/stan.go"
+	"github.com/nats-io/stan.go"
 	"github.com/xiliangMa/diss-backend/utils"
 )
 
