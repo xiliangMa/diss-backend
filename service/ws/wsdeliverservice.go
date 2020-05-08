@@ -7,6 +7,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/gorilla/websocket"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/utils"
 )
 
 type WSDeliverService struct {
@@ -21,15 +22,15 @@ func (this *WSDeliverService) DeliverTaskToNats() {
 	for _, task := range this.CurrentBatchTaskList {
 		result := models.WsData{Type: models.Type_Control, Tag: models.Resource_Task, Data: task, RCType: models.Resource_Control_Type_Post}
 		data, _ := json.Marshal(result)
-		hostName := ""
+		hostId := ""
 		if task.Host != nil {
-			hostName = task.Host.HostName
+			hostId = task.Host.Id
 		}
 		if task.Container != nil {
-			hostName = task.Container.HostName
+			hostId = task.Container.HostName
 		}
-		subject := hostName
-		err := models.NatsManager.Conn.Publish(subject, data)
+		subject := hostId
+		err := models.Nats.Conn.Publish(subject, data)
 		if err == nil {
 			logs.Info("Deliver Task to Nats Success, Subject: %s Id: %s, data: %v", subject, task.Id, result)
 		} else {
@@ -85,26 +86,34 @@ func (this *WSDeliverService) DeleteTask() error {
 	if task.Host == nil {
 		return nil
 	}
-	hostId := task.Host.Id
-	if _, ok := this.Hub.DissClient[hostId]; !ok {
-		errMsg := "Agent not connect"
-		msg := fmt.Sprintf("Deliver Task Fail, Id: %s, err: %s", task.Id, errMsg)
-		logs.Error(msg)
-		taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account}
-		taskLog.Add()
-		return errors.New(errMsg)
-	}
-	client := this.Hub.DissClient[hostId]
 	result := models.WsData{Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Delete, Data: task}
 	data, err := json.Marshal(result)
-	if err != nil {
-		msg := fmt.Sprintf("Delete Task Fail, Id: %s, err: %s", task.Id, err.Error())
-		logs.Error(msg)
-		taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account}
-		taskLog.Add()
-		return err
+	hostId := task.Host.Id
+
+	// 下发删除任务
+	if utils.IsEnableNats() {
+		// nats
+		err = models.Nats.Conn.Publish(task.Host.Id, data)
+	} else {
+		// websocket
+		if _, ok := this.Hub.DissClient[hostId]; !ok {
+			errMsg := "Agent not connect"
+			msg := fmt.Sprintf("Delete Task Fail, Id: %s, err: %s", task.Id, errMsg)
+			logs.Error(msg)
+			taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account}
+			taskLog.Add()
+			return errors.New(errMsg)
+		}
+		client := this.Hub.DissClient[hostId]
+		if err != nil {
+			msg := fmt.Sprintf("Delete Task Fail, Id: %s, err: %s", task.Id, err.Error())
+			logs.Error(msg)
+			taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account}
+			taskLog.Add()
+			return err
+		}
+		err = client.Conn.WriteMessage(websocket.TextMessage, data)
 	}
-	err = client.Conn.WriteMessage(websocket.TextMessage, data)
 	if err != nil {
 		msg := fmt.Sprintf("Delete Task Fail, Id: %s, err: %s", task.Id, err.Error())
 		logs.Error(msg)

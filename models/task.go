@@ -31,7 +31,7 @@ type Task struct {
 type TaskLog struct {
 	Id         string    `orm:"pk;" description:"(任务id)"`
 	Account    string    `orm:"default(admin)" description:"(租户)"`
-	Task       *Task     `orm:"rel(fk);null;" description:"(任务Id)"`
+	Task       *Task     `orm:"rel(fk);null;" description:"(任务)"`
 	RawLog     string    `orm:"" description:"(日志)"`
 	CreateTime time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
 }

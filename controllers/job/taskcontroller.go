@@ -44,25 +44,26 @@ func (this *TaskController) DeleteTask() {
 	task := new(models.Task)
 	task.Id = id
 	result := task.List(0, 0)
-	data := result.Data.(map[string]interface{})
-	if result.Code == http.StatusOK && data["total"] != 0 {
-		//向agent下发删除任务指令
-		deleteTaskList := data["items"]
-		WSDeliverService := ws.WSDeliverService{Hub: models.WSHub, DelTask: deleteTaskList.([]*models.Task)[0]}
-		err := WSDeliverService.DeleteTask()
-		if err == nil {
-			// agent 删除任务成功后 删除数据库
-			result = task.Delete()
-			msg := fmt.Sprintf("Delet Task success, Id: %s", task.Id)
-			taskLog := models.TaskLog{RawLog: msg, Task: task}
-			taskLog.Add()
-		} else {
-			result.Code = utils.DeleteTaskErr
-			result.Message = "DeleteTaskErr"
-			result.Data = nil
-			msg := fmt.Sprintf("Delet Task fail, Id: %s, err: %s", task.Id, result.Message)
-			taskLog := models.TaskLog{RawLog: msg, Task: task}
-			taskLog.Add()
+	if result.Data != nil {
+		data := result.Data.(map[string]interface{})
+		if result.Code == http.StatusOK && data["total"] != 0 {
+			//向agent下发删除任务指令
+			deleteTaskList := data["items"]
+			deleteTask := deleteTaskList.([]*models.Task)[0]
+			WSDeliverService := ws.WSDeliverService{Hub: models.WSHub, DelTask: deleteTask}
+			err := WSDeliverService.DeleteTask()
+			if err == nil {
+				// 更新数据库状态 设置为删除锁定
+				deleteTask.Status = models.Task_Status_Removing
+				deleteTask.Update()
+			} else {
+				result.Code = utils.DeleteTaskErr
+				result.Message = "DeleteTaskErr"
+				result.Data = nil
+				msg := fmt.Sprintf("Delet Task fail, Id: %s, err: %s", task.Id, result.Message)
+				taskLog := models.TaskLog{RawLog: msg, Task: task}
+				taskLog.Add()
+			}
 		}
 	}
 	this.Data["json"] = result

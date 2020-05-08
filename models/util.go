@@ -44,6 +44,7 @@ var (
 	// 任务状态
 	Task_Status_Pending        = "Pending"
 	Task_Status_Running        = "Running"
+	Task_Status_Removing       = "Removing"
 	Task_Status_Pause          = "Pause"
 	Task_Status_Finished       = "Finished"
 	Task_Status_Failed         = "Failed"
@@ -80,10 +81,8 @@ var (
 	// 租户
 	Account_Admin = "admin"
 
-	// nats topic
-	Topic_Task    = "Task"
-	Topic_Metrics = "Metrics"
-	Topic_Common  = "Common"
+	// nats subject (diss-backend 主题， agent 则以主机id区分标识)
+	Subject_Common = "Common"
 
 	// diss-api
 	//漏洞安全等级

@@ -1,4 +1,4 @@
-package nats
+package models
 
 import (
 	"github.com/astaxie/beego/logs"

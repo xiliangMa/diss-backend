@@ -357,21 +357,43 @@ func (this *NatsSubService) Save() error {
 					if result := task.Update(); result.Code != http.StatusOK {
 						metricsResult.Code = result.Code
 						metricsResult.Msg = result.Message
-						msg := fmt.Sprintf("Nats ############################ Update task Status: %s, fail, >>> HostId: %s, error: <<<", task.Status, task.Host.Id, result.Message)
+						msg := fmt.Sprintf("Nats ############################ Update task Status: %s, fail, >>> HostId: %s, task id: %s, error: <<<", task.Status, task.Host.Id, task.Id, result.Message)
 						logs.Error(msg)
 						taskLog := models.TaskLog{RawLog: msg, Task: &task}
 						taskLog.Add()
 						return errors.New(result.Message)
 					} else {
-						msg := fmt.Sprintf("Nats ############################ Update task Status: %s, >>> HostId: %s, Type: %s, task id:  %v <<<", task.Status, task.Host.Id, models.Resource_Task, task.Id)
+						msg := fmt.Sprintf("Nats ############################ Update task Status: %s, >>> HostId: %s, Type: %s, task id: %s <<<", task.Status, task.Host.Id, models.Resource_Task, task.Id)
 						logs.Info(msg)
 						taskLog := models.TaskLog{RawLog: msg, Task: &task}
 						taskLog.Add()
 					}
 					this.ReceiveData(metricsResult)
 				}
+			case models.Resource_Control_Type_Delete:
+				metricsResult := models.WsData{Code: http.StatusOK, Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Get}
+				task := models.Task{}
+				s, _ := json.Marshal(ms.Data)
+				if err := json.Unmarshal(s, &task); err != nil {
+					logs.Error("Paraces: %s type: %s error: %s  ", ms.Tag, ms.RCType, err)
+					return err
+				}
+				if result := task.Delete(); result.Code != http.StatusOK {
+					metricsResult.Code = result.Code
+					metricsResult.Msg = result.Message
+					msg := fmt.Sprintf("Nats ############################ Delete task fail, >>> HostId: %s, , task id: %s, error: <<<", task.Host.Id, task.Id, result.Message)
+					logs.Error(msg)
+					taskLog := models.TaskLog{RawLog: msg, Task: &task, Account: task.Account}
+					taskLog.Add()
+					return errors.New(result.Message)
+				} else {
+					msg := fmt.Sprintf("Nats ############################  Delete task success, >>> HostId: %s, Type: %s, task id: %s<<<", task.Host.Id, models.Resource_Task, task.Id)
+					logs.Info(msg)
+					taskLog := models.TaskLog{RawLog: msg, Task: &task, Account: task.Account}
+					taskLog.Add()
+				}
+				this.ReceiveData(metricsResult)
 			}
-
 		}
 	}
 
@@ -387,9 +409,9 @@ func (this *NatsSubService) ReceiveData(result models.WsData) {
 }
 
 func RunClientSub(subject string) {
-	natsManager := models.NatsManager
+	natsManager := models.Nats
 	if natsManager != nil && natsManager.Conn != nil {
-		natsManager.Conn.Subscribe(subject, func(m *stan.Msg) {
+		natsManager.Conn.Subscribe(models.Subject_Common, func(m *stan.Msg) {
 			natsSubService := NatsSubService{Conn: natsManager.Conn, Message: m.Data, Subject: subject}
 			natsSubService.Save()
 		}, stan.DurableName(subject))

@@ -4,6 +4,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/gorilla/websocket"
+	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/ws"
 	"net/http"
 )
@@ -19,7 +20,7 @@ var upgrader = websocket.Upgrader{
 }
 
 func (this *WSMetricController) Metrics() {
-	wsm := &ws.WSManager{
+	wsm := &models.WSManager{
 		Request:  this.Ctx.Request,
 		Response: this.Ctx.ResponseWriter,
 	}

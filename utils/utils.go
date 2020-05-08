@@ -140,3 +140,11 @@ func GetNatsClusterId() string {
 	}
 	return clusterId
 }
+
+func IsEnableNats() bool {
+	enable := false
+	if ok, _ := beego.AppConfig.Bool("nats::Enable"); ok {
+		enable = true
+	}
+	return enable
+}
