@@ -14,6 +14,7 @@ type ContainerConfig struct {
 	PodId          string `orm:"default(null)" description:"(pod id)"`
 	PodName        string `orm:"default(null)" description:"(pod 名)"`
 	HostName       string `orm:"" description:"(主机名)"`
+	HostId         string `orm:"" description:"(主机id)"`
 	AccountName    string `orm:"" description:"(租户)"`
 	ClusterName    string `orm:"" description:"(集群名)"`
 	SyncCheckPoint int64  `orm:"default(0);" description:"(同步检查点)"`
