@@ -409,9 +409,10 @@ func (this *NatsSubService) ReceiveData(result models.WsData) {
 }
 
 func RunClientSub(subject string) {
+	subject = models.Subject_Common + `-` + subject
 	natsManager := models.Nats
 	if natsManager != nil && natsManager.Conn != nil {
-		natsManager.Conn.Subscribe(models.Subject_Common, func(m *stan.Msg) {
+		natsManager.Conn.Subscribe(subject, func(m *stan.Msg) {
 			natsSubService := NatsSubService{Conn: natsManager.Conn, Message: m.Data, Subject: subject}
 			natsSubService.Save()
 		}, stan.DurableName(subject))
