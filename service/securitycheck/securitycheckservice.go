@@ -40,7 +40,8 @@ func (this *SecurityCheckService) PrePare() {
 func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityCheck) {
 	TMP_Type_BM_Docker_DT := this.DefaultTMP[models.TMP_Type_BM_Docker]
 	TMP_Type_BM_K8S_DT := this.DefaultTMP[models.TMP_Type_BM_K8S]
-	//TMP_Type_VS_DT := defaultTMP[models.TMP_Type_VS]
+	TMP_Type_DockerVS_DT := this.DefaultTMP[models.TMP_Type_DockerVS]
+	TMP_Type_HostVS_DT := this.DefaultTMP[models.TMP_Type_HostVS]
 	//TMP_Type_LS_DT := defaultTMP[models.TMP_Type_LS]
 	if securityCheck.BenchMarkCheck {
 		dockerTask := new(models.Task)
@@ -95,14 +96,35 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		task := new(models.Task)
 		uid, _ := uuid.NewV4()
 		task.Id = uid.String()
-		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_VS, uid)
-		//task.SystemTemplate = TMP_Type_VS_DT
+		if securityCheck.Type != models.SC_Type_Host {
+			//容器病毒
+			logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_DockerVS, uid)
+			task.SystemTemplate = TMP_Type_DockerVS_DT
+			task.Description = "System-Task-" + models.TMP_Type_DockerVS
+		} else {
+			//主机病毒
+			logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_HostVS, uid)
+			task.SystemTemplate = TMP_Type_HostVS_DT
+			task.Description = "System-Task-" + models.TMP_Type_HostVS
+		}
+		task.Type = models.Job_Type_Once
 		task.Name = "System-Task-" + task.Id
-		task.Description = "System-Task-" + models.TMP_Type_VS
 		task.Host = securityCheck.Host
+		task.Container = securityCheck.Container
 		task.Batch = this.Bath
+		task.Status = models.Task_Status_Pending
+		task.Account = this.Account
+
 		//添加task记录
 		task.Add()
+
+		//添加任务日志
+		taskLog := models.TaskLog{}
+		taskLog.Task = task
+		taskLog.Account = this.Account
+		taskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Btach: %v, Status: %s",
+			task.Id, task.Type, task.Batch, task.Status)
+		taskLog.Add()
 	}
 	if securityCheck.LeakScan {
 		//漏洞

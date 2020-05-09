@@ -22,14 +22,13 @@ func (this *WSDeliverService) DeliverTaskToNats() {
 	for _, task := range this.CurrentBatchTaskList {
 		result := models.WsData{Type: models.Type_Control, Tag: models.Resource_Task, Data: task, RCType: models.Resource_Control_Type_Post}
 		data, _ := json.Marshal(result)
-		hostId := ""
+		subject := ""
 		if task.Host != nil {
-			hostId = task.Host.Id
+			subject = task.Host.Id
 		}
 		if task.Container != nil {
-			hostId = task.Container.HostName
+			subject = task.Container.HostName
 		}
-		subject := hostId
 		err := models.Nats.Conn.Publish(subject, data)
 		if err == nil {
 			logs.Info("Deliver Task to Nats Success, Subject: %s Id: %s, data: %v", subject, task.Id, result)
