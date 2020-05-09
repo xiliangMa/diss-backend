@@ -15,7 +15,7 @@ type SystemTemplate struct {
 	Type        string `orm:"" description:"(类型)"`
 	Version     string `orm:"null" description:"(版本)"`
 	Commands    string `orm:"null;" description:"(操作命令)"`
-	Status      string `orm:"default(enable);" description:"(类型 enable disable)"`
+	Status      string `orm:"default(Enable);" description:"(类型 Enable Disable)"`
 	IsDefault   bool   `orm:"default(false);" description:"(默认系统策略)"`
 }
 
