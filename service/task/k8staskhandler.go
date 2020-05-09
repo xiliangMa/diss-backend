@@ -65,7 +65,7 @@ func (this *K8STaskHandler) SyncHostConfigAndInfo(clusterName, clusterId string)
 			info.KubeletVer = nStatusNodeinfo.KubeletVersion
 			info.Kubeproxy = nStatusNodeinfo.KubeProxyVersion
 			info.KubernetesVer = nStatusNodeinfo.KubeletVersion
-			info.DockerStatus = "Running"
+			info.DockerStatus = models.Host_Docker_Status_Nornal
 			config.Inner_AddHostConfig() // 添加 hostconfig
 			info.Inner_AddHostInfo()     // 添加 hostinfo
 

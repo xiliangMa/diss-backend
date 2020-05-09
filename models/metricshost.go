@@ -19,7 +19,7 @@ type HostConfig struct {
 	AccountName string  `orm:"default(admin)" description:"(租户)"`
 	GroupId     string  `orm:"-" description:"(查询参数：分组Id， 仅仅是查询使用, 返回数据看 Group)"`
 	Group       *Groups `orm:"rel(fk);null;on_delete(set_null)" description:"(分组)"`
-	Type        int8    `orm:"default(0);" description:"(类型 服务器: 0 虚拟机: 1)"`
+	Type        string  `orm:"default(Server);" description:"(类型 服务器: Server 虚拟机: Vm)"`
 	IsInK8s     bool    `orm:"default(false);" description:"(是否在k8s集群)"`
 	ClusterId   string  `orm:"default(null);" description:"(集群id)"`
 	Label       string  `orm:"default(null);" description:"(标签)"`

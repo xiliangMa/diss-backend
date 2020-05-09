@@ -19,7 +19,13 @@ var (
 	Container_Status_All   = "All"
 
 	// 主机相关状态
-	Host_Status_Normal   = "Nornal"
+	Host_Docker_Status_Nornal   = "Normal"
+	Host_Docker_Status_Abnormal = "Abnormal"
+
+	Host_Type_Server = "Server"
+	Host_Type_Vm     = "Vm"
+
+	Host_Status_Normal   = "Normal"
 	Host_Status_Abnormal = "Abnormal"
 
 	// 主机-安全容器状态
