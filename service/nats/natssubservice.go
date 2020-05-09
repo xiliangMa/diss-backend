@@ -359,13 +359,13 @@ func (this *NatsSubService) Save() error {
 						metricsResult.Msg = result.Message
 						msg := fmt.Sprintf("Nats ############################ Update task Status: %s, fail, >>> HostId: %s, task id: %s, error: <<<", task.Status, task.Host.Id, task.Id, result.Message)
 						logs.Error(msg)
-						taskLog := models.TaskLog{RawLog: msg, Task: &task}
+						taskLog := models.TaskLog{RawLog: msg, Task: &task, Account: task.Account}
 						taskLog.Add()
 						return errors.New(result.Message)
 					} else {
 						msg := fmt.Sprintf("Nats ############################ Update task Status: %s, >>> HostId: %s, Type: %s, task id: %s <<<", task.Status, task.Host.Id, models.Resource_Task, task.Id)
 						logs.Info(msg)
-						taskLog := models.TaskLog{RawLog: msg, Task: &task}
+						taskLog := models.TaskLog{RawLog: msg, Task: &task, Account: task.Account}
 						taskLog.Add()
 					}
 					this.ReceiveData(metricsResult)
