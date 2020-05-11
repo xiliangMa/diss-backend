@@ -104,4 +104,11 @@ var (
 	Vulnerabilities_Severity_Negligible = "Negligible"
 	Vulnerabilities_Severity_Low        = "Low"
 	Vulnerabilities_Severity_Critical   = "Critical"
+
+	//exported log type
+	ImageSecLog       = "ImageSecurityLog"  // 镜像安全日志
+	BenchScanLog      = "BenchmarkScanLog"  // 基线扫描日志
+	IDSLog            = "IntrudeDetectLog"  // 入侵检测日志
+	ContainerVirusLog = "ContainerVirusLog" // 容器杀毒日志
+	SecAuditLog       = "SecurityAuditLog"  // 安全审计日志
 )
