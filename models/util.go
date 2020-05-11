@@ -92,6 +92,12 @@ var (
 	// nats subject (diss-backend 主题， agent 则以主机id区分标识)
 	Subject_Common = "Common"
 
+	// 日志级别
+	Log_level_Debug = "Debug"
+	Log_level_Info  = "Info"
+	Log_level_Warn  = "Warn"
+	Log_level_Error = "Error"
+
 	// diss-api
 	//漏洞安全等级
 	Vulnerabilities_Severity_Medium     = "Medium"

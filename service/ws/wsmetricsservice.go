@@ -367,13 +367,13 @@ func (this *WSMetricsService) Save() error {
 						metricsResult.Msg = result.Message
 						msg := fmt.Sprintf("############################ Update task Status: %s, fail, >>> HostId: %s, error: <<<", task.Status, task.Host.Id, result.Message)
 						logs.Error(msg)
-						taskLog := models.TaskLog{RawLog: msg, Task: &task}
+						taskLog := models.TaskLog{RawLog: msg, Task: &task, Level: models.Log_level_Error}
 						taskLog.Add()
 						return errors.New(result.Message)
 					} else {
 						msg := fmt.Sprintf("############################ Update task Status: %s, >>> HostId: %s, Type: %s, task id:  %v <<<", task.Status, task.Host.Id, models.Resource_Task, task.Id)
 						logs.Info(msg)
-						taskLog := models.TaskLog{RawLog: msg, Task: &task}
+						taskLog := models.TaskLog{RawLog: msg, Task: &task, Level: models.Log_level_Info}
 						taskLog.Add()
 					}
 					this.ReceiveData(metricsResult)
