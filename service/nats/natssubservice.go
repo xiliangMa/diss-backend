@@ -12,9 +12,9 @@ import (
 )
 
 type NatsSubService struct {
-	Message []byte
-	Conn    stan.Conn
-	Subject string
+	Message       []byte
+	Conn          stan.Conn
+	ClientSubject string
 }
 
 func (this *NatsSubService) Save() error {
@@ -22,6 +22,9 @@ func (this *NatsSubService) Save() error {
 	if err := json.Unmarshal(this.Message, &ms); err != nil {
 		logs.Error("Paraces WsData error %s", err)
 		return err
+	}
+	if ms.Data == nil {
+		return nil
 	}
 	switch ms.Type {
 	case models.Type_Metric: // 数据上报
@@ -337,12 +340,14 @@ func (this *NatsSubService) Save() error {
 					if result.Data != nil {
 						data := result.Data.(map[string]interface{})
 						total := data["total"]
-						logs.Info("Nats ############################  Get un finished task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, models.Resource_Task, total)
-					} else {
-						logs.Info("Nats ############################  Get un finished task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, models.Resource_Task, 0)
+						if total != 0 {
+							logs.Info("Nats ############################  Get un finished task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, models.Resource_Task, total)
+							this.ReceiveData(metricsResult)
+						} else {
+							logs.Info("Nats ############################  Get un finished task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, models.Resource_Task, 0)
+						}
 					}
 				}
-				this.ReceiveData(metricsResult)
 			case models.Resource_Control_Type_Put:
 				//更新任务状态
 				metricsResult := models.WsData{Code: http.StatusOK, Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Put}
@@ -402,19 +407,19 @@ func (this *NatsSubService) Save() error {
 
 func (this *NatsSubService) ReceiveData(result models.WsData) {
 	data, _ := json.Marshal(result)
-	err := this.Conn.Publish(this.Subject, data)
+	err := this.Conn.Publish(this.ClientSubject, data)
 	if err != nil {
 		logs.Error("Nats ############################ Received data from agent fail ############################", err)
 	}
 }
 
-func RunClientSub(subject string) {
-	subject = models.Subject_Common + `-` + subject
+func RunClientSub(clientSubject string) {
+	serverSubject := models.Subject_Common + `-` + clientSubject
 	natsManager := models.Nats
 	if natsManager != nil && natsManager.Conn != nil {
-		natsManager.Conn.Subscribe(subject, func(m *stan.Msg) {
-			natsSubService := NatsSubService{Conn: natsManager.Conn, Message: m.Data, Subject: subject}
+		natsManager.Conn.Subscribe(serverSubject, func(m *stan.Msg) {
+			natsSubService := NatsSubService{Conn: natsManager.Conn, Message: m.Data, ClientSubject: clientSubject}
 			natsSubService.Save()
-		}, stan.DurableName(subject))
+		}, stan.DurableName(serverSubject))
 	}
 }
