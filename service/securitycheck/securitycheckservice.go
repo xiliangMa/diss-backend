@@ -81,11 +81,13 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		dockerTaskLog := models.TaskLog{}
 		dockerTaskLog.Task = dockerTask
 		dockerTaskLog.Account = this.Account
+		dockerTaskLog.Level = models.Log_level_Info
 		dockerTaskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Btach: %v, Status: %s",
 			dockerTask.Id, dockerTask.Type, dockerTask.Batch, dockerTask.Status)
 		k8sTaskLog := models.TaskLog{}
 		k8sTaskLog.Task = dockerTask
 		k8sTaskLog.Account = this.Account
+		k8sTaskLog.Level = models.Log_level_Info
 		k8sTaskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Btach: %v, Status: %s",
 			k8sTask.Id, k8sTask.Type, k8sTask.Batch, k8sTask.Status)
 		dockerTaskLog.Add()
@@ -122,6 +124,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		taskLog := models.TaskLog{}
 		taskLog.Task = task
 		taskLog.Account = this.Account
+		taskLog.Level = models.Log_level_Info
 		taskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Btach: %v, Status: %s",
 			task.Id, task.Type, task.Batch, task.Status)
 		taskLog.Add()

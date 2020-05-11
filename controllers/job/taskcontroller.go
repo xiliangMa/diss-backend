@@ -61,7 +61,7 @@ func (this *TaskController) DeleteTask() {
 				result.Message = "DeleteTaskErr"
 				result.Data = nil
 				msg := fmt.Sprintf("Delet Task fail, Id: %s, err: %s", task.Id, result.Message)
-				taskLog := models.TaskLog{RawLog: msg, Task: task}
+				taskLog := models.TaskLog{RawLog: msg, Task: task, Level: models.Log_level_Error}
 				taskLog.Add()
 			}
 		}
