@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/ws"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -56,6 +57,10 @@ func (this *TaskController) DeleteTask() {
 				// 更新数据库状态 设置为删除锁定
 				deleteTask.Status = models.Task_Status_Removing
 				deleteTask.Update()
+				msg := fmt.Sprintf("Update Task success, status: %s, Id: %s", deleteTask.Status, deleteTask.Id)
+				logs.Info(msg)
+				taskLog := models.TaskLog{RawLog: msg, Task: task, Level: models.Log_level_Info}
+				taskLog.Add()
 			} else {
 				result.Code = utils.DeleteTaskErr
 				result.Message = "DeleteTaskErr"

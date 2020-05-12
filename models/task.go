@@ -26,12 +26,13 @@ type Task struct {
 	CreateTime     time.Time        `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
 	UpdateTime     time.Time        `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
 	Job            *Job             `orm:"rel(fk);null;" description:"(job)"`
+	TaskLog        []*TaskLog       `orm:"reverse(many);null" description:"(主机列表)"`
 }
 
 type TaskLog struct {
 	Id         string    `orm:"pk;" description:"(任务id)"`
 	Account    string    `orm:"default(admin)" description:"(租户)"`
-	Task       *Task     `orm:"rel(fk);null;" description:"(任务)"`
+	Task       *Task     `orm:"rel(fk);null;cascade" description:"(任务)"`
 	RawLog     string    `orm:"" description:"(日志)"`
 	Level      string    `orm:"default(Info)" description:"(日志级别)"`
 	CreateTime time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
