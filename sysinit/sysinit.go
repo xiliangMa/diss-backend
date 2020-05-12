@@ -22,6 +22,9 @@ func init() {
 	// init task
 	InitTask()
 
+	// init logConfig
+	InitGlobalLogConfig()
+
 	// ================= 初始化全局变量
 	// 1. NatsManager
 	models.Nats = models.NewNatsManager()

@@ -105,6 +105,9 @@ var (
 	Vulnerabilities_Severity_Low        = "Low"
 	Vulnerabilities_Severity_Critical   = "Critical"
 
+	// LogConfigs
+	Log_Config_SysLog_Export = "SysLogExport"
+
 	//exported log type
 	ImageSecLog       = "ImageSecurityLog"  // 镜像安全日志
 	BenchScanLog      = "BenchmarkScanLog"  // 基线扫描日志

@@ -2,6 +2,7 @@ package system
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
 )
@@ -39,12 +40,16 @@ func (this *IntegrationController) UpdateLogConfig() {
 	logConfig := new(models.LogConfig)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &logConfig)
 
-	this.Data["json"] = logConfig.Update()
+	result := logConfig.Update()
+	this.Data["json"] = result
+	logConfigObj := result.Data.(*models.LogConfig)
+	models.GlobalLogConfig[models.Log_Config_SysLog_Export] = logConfigObj
 	this.ServeJSON(false)
 }
 
+////内部Action，仅用于测试
 // @Title Get SystemIntegration Config
-// @Description Get One SystemIntegration Config
+// @Description Get One SystemIntegration Config [Inner内部操作]
 // @Param token header string true "authToken"
 // @Param configName query string true "Config Name"
 // @Success 200 {object} models.Result
@@ -55,6 +60,7 @@ func (this *IntegrationController) InnerGetLogConfig() {
 	logConfig.ConfigName = configName
 	json.Unmarshal(this.Ctx.Input.RequestBody, &logConfig)
 
+	fmt.Println("==============global log config============", models.GlobalLogConfig[models.Log_Config_SysLog_Export])
 	this.Data["json"] = logConfig.InnerGet()
 	this.ServeJSON(false)
 }

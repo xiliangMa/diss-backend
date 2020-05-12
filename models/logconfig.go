@@ -23,7 +23,9 @@ type LogConfigInterface interface {
 	InnerGet()
 }
 
-func (this *LogConfig) InnerGet() Result {
+var GlobalLogConfig = map[string]*LogConfig{}
+
+func (this *LogConfig) InnerGet() []*LogConfig {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var logConfig []*LogConfig = nil
@@ -39,17 +41,17 @@ func (this *LogConfig) InnerGet() Result {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetLogConfigErr
 		logs.Error("Get LogConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
+		return nil
 	}
 
-	total, _ := o.QueryTable(utils.HostInfo).SetCond(cond).Count()
-	data := make(map[string]interface{})
-	data["item"] = logConfig
-	data["total"] = total
-
-	ResultData.Code = http.StatusOK
-	ResultData.Data = data
-	return ResultData
+	//total, _ := o.QueryTable(utils.LogConfig).SetCond(cond).Count()
+	//data := make(map[string]interface{})
+	//data["item"] = logConfig
+	//data["total"] = total
+	//
+	//ResultData.Code = http.StatusOK
+	//ResultData.Data = data
+	return logConfig
 }
 
 func (this *LogConfig) Add() Result {

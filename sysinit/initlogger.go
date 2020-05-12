@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
+	"github.com/xiliangMa/diss-backend/models"
 )
 
 type adapterMultiFileConfig struct {
@@ -50,4 +51,16 @@ func InitLogger() {
 	jsonbyte, _ := json.MarshalIndent(logConfig, "", "")
 	logs.Info("log config info %s", string(jsonbyte))
 	beego.SetLogger(logs.AdapterMultiFile, string(jsonbyte))
+}
+
+func InitGlobalLogConfig() {
+	var logConfig models.LogConfig
+	logConfig.ConfigName = models.Log_Config_SysLog_Export
+	syslogConfig := logConfig.InnerGet()
+	if syslogConfig != nil {
+		models.GlobalLogConfig[models.Log_Config_SysLog_Export] = syslogConfig[0]
+	} else {
+		models.GlobalLogConfig[models.Log_Config_SysLog_Export] = &logConfig
+	}
+
 }
