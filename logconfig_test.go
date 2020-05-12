@@ -7,10 +7,9 @@ import (
 	"testing"
 )
 
-func Test_LogConfig(t *testing.T) {
-	sysinit.InitGlobalLogConfig()
-}
-
 func Test_Syslog(t *testing.T) {
-	system.SendSysLog(models.SysLog_BenchScanLog, models.Log_level_Warn, "Test message +088l LLLds")
+
+	sysinit.InitGlobalLogConfig()
+	system.SendSysLog(models.SysLog_BenchScanLog, models.SysLog_IDSLog, "IDS log  message 079089")
+
 }

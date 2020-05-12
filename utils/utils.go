@@ -119,19 +119,6 @@ func GetNatsServerUrl() string {
 	return serverUrl
 }
 
-func GetSyslogServerUrl() string {
-	runMode := beego.AppConfig.String("RunMode")
-	envRunMode := os.Getenv("RunMode")
-	if envRunMode != "" {
-		runMode = envRunMode
-	}
-	serverUrl := beego.AppConfig.String("syslog::SyslogServer")
-	if runMode == Run_Mode_Prod {
-		serverUrl = os.Getenv(Syslog_Server_Url)
-	}
-	return serverUrl
-}
-
 func GetNatsClientId() string {
 	runMode := beego.AppConfig.String("RunMode")
 	envRunMode := os.Getenv("RunMode")

@@ -70,6 +70,7 @@ var (
 	AddJobErr                       = 75
 	DeleteJobErr                    = 76
 	GetLogConfigErr                 = 80
+	ConnectSyslogErr                = 81
 
 	//k8s 1001-1100
 	AddNameSpaceErr    = 1001
