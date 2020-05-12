@@ -19,6 +19,7 @@ import (
 	csecuritypolicy "github.com/xiliangMa/diss-backend/controllers/securitypolicy"
 	cstatistics "github.com/xiliangMa/diss-backend/controllers/statistics"
 	csystem "github.com/xiliangMa/diss-backend/controllers/system/system"
+
 	ws "github.com/xiliangMa/diss-backend/controllers/ws"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -117,6 +118,7 @@ func init() {
 		beego.NSNamespace("/v1/system",
 			beego.NSInclude(
 				&csystem.SystemController{},
+				&csystem.IntegrationController{},
 			),
 		),
 		beego.NSNamespace("/v1/jobs",

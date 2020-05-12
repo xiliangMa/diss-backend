@@ -69,6 +69,7 @@ var (
 	GetJobErr                       = 74
 	AddJobErr                       = 75
 	DeleteJobErr                    = 76
+	GetLogConfigErr                 = 80
 
 	//k8s 1001-1100
 	AddNameSpaceErr    = 1001

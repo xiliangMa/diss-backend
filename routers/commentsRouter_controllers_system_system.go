@@ -7,6 +7,33 @@ import (
 
 func init() {
 
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"],
+		beego.ControllerComments{
+			Method:           "AddLogConfig",
+			Router:           `/system/logconfig`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"],
+		beego.ControllerComments{
+			Method:           "UpdateLogConfig",
+			Router:           `/system/logconfig`,
+			AllowHTTPMethods: []string{"put"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"],
+		beego.ControllerComments{
+			Method:           "InnerGetLogConfig",
+			Router:           `/system/logconfig`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
 	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:SystemController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:SystemController"],
 		beego.ControllerComments{
 			Method:           "UploadK8sFile",

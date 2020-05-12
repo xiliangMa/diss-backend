@@ -22,3 +22,7 @@ conf/kubeconfig/*
 
 #upload
 upload/*
+
+
+#commentsRouters
+routers/commentsRouter___________________Volumes_MacData_King*

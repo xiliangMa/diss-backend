@@ -21,6 +21,7 @@ var (
 	CmdHistory       = "cmd_history"
 	Groups           = "groups"
 	Job              = "job"
+	LogConfig        = "log_config"
 
 	//security_log timescaledb
 	DcokerIds = "docker_ids"
