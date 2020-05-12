@@ -44,6 +44,9 @@ var (
 	Nats_Cluster_Id = "Nats_Cluster_Id"
 	Nats_Client_Id  = "Nats_Client_Id"
 	Nats_Enable     = "Nats_Enable"
+
+	// SysLog
+	Syslog_Server_Url = "Syslog_Server_Url"
 )
 
 func UnitConvert(size int64) string {
@@ -112,6 +115,19 @@ func GetNatsServerUrl() string {
 	serverUrl := beego.AppConfig.String("nats::ServerUrl")
 	if runMode == Run_Mode_Prod {
 		serverUrl = os.Getenv(Nats_Server_Url)
+	}
+	return serverUrl
+}
+
+func GetSyslogServerUrl() string {
+	runMode := beego.AppConfig.String("RunMode")
+	envRunMode := os.Getenv("RunMode")
+	if envRunMode != "" {
+		runMode = envRunMode
+	}
+	serverUrl := beego.AppConfig.String("syslog::SyslogServer")
+	if runMode == Run_Mode_Prod {
+		serverUrl = os.Getenv(Syslog_Server_Url)
 	}
 	return serverUrl
 }
