@@ -55,3 +55,9 @@ func SendSysLog(tag, level, msg string) {
 		}
 	}
 }
+
+func GetSyncSyslogFunc(exType string) func() {
+	return func() {
+		fmt.Println("Sync log data , type:", exType)
+	}
+}

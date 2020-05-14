@@ -2,6 +2,7 @@ package sysinit
 
 import (
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/task"
 	"github.com/xiliangMa/diss-backend/sysinit/db"
 )
 
@@ -22,8 +23,11 @@ func init() {
 	// init task
 	InitTask()
 
-	// init logConfig
+	// init global logConfig
 	InitGlobalLogConfig()
+
+	// init global syslog handler
+	task.InitGlobalSyslogHander()
 
 	// ================= 初始化全局变量
 	// 1. NatsManager

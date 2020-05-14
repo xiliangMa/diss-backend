@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/service/system/system"
+	"fmt"
+	"github.com/xiliangMa/diss-backend/service/task"
 	"github.com/xiliangMa/diss-backend/sysinit"
 	"testing"
 )
@@ -10,6 +10,9 @@ import (
 func Test_Syslog(t *testing.T) {
 
 	sysinit.InitGlobalLogConfig()
-	system.SendSysLog(models.SysLog_BenchScanLog, models.SysLog_IDSLog, "IDS log  message 079089")
+	//task.InitGlobalSyslogHander()
+	syslogHandler := task.GlobalSysLogTaskHandler
 
+	fmt.Printf("------------------sys export groups and taskids :\n %#v\n", syslogHandler.ExportTypes)
+	select {}
 }
