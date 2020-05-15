@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -60,6 +61,11 @@ func (this *ImageVirus) List(from, limit int) Result {
 	if this.Virus != "" {
 		filter = filter + utils.ImageVirus + `."virus" like '%` + this.Virus + "%' and "
 	}
+
+	if this.CreatedAt != 0 {
+		filter = filter + utils.ImageVirus + `."createdAt" > ` + fmt.Sprintf("%s", this.CreatedAt) + " and "
+	}
+
 	if filter != "" {
 		sql = sql + " where " + filter
 	}
@@ -126,6 +132,11 @@ func (this *DockerVirus) List(from, limit int) Result {
 			filterSql = filterSql + utils.DockerVirus + `."virus" like '%` + this.Virus + "%' and "
 		}
 	}
+
+	if this.CreatedAt != 0 {
+		filterSql = filterSql + utils.ImageVirus + `."createdAt" > ` + fmt.Sprintf("%s", this.CreatedAt) + " and "
+	}
+
 	if filterSql != "" {
 		sql = sql + ` where ` + filterSql
 		countSql = countSql + ` where ` + filterSql

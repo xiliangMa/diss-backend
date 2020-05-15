@@ -116,8 +116,12 @@ var (
 	GetDockerVirusErr                     = 1404
 	GetImagePackageVulnerabilitiesListErr = 1405
 
-	// config_timedata 1500-1500
-	GetLogConfigErr     = 1500
-	ConnectSyslogErr    = 1501
-	AddTimeEdgePointErr = 1530
+	// config_timedata 1500-1599
+	ConnectSyslogErr     = 1500
+	AddLogConfigErr      = 1501
+	GetLogConfigErr      = 1502
+	EditLogConfigErr     = 1503
+	AddTimeEdgePointErr  = 1530
+	GetTimeEdgePointErr  = 1531
+	EditTimeEdgePointErr = 1532
 )

@@ -94,12 +94,12 @@ func (this *BenchMarkLog) List(from, limit int, isInfo bool) Result {
 		_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Limit(limit, from).OrderBy("-update_time").All(&BenchMarkLogList)
 
 	} else {
+		fields := []string{"id", "bench_mark_name", "level", "project_name", "host_name", "host_id", "internal_addr", "public_addr", "o_s", "update_time", "fail_count", "warn_count", "pass_count", "info_count", "type", "result"}
 		if this.UpdateTime == "" {
 			_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Limit(limit, from).OrderBy("-update_time").
-				All(&BenchMarkLogList, "id", "bench_mark_name", "level", "project_name", "host_name", "host_id", "internal_addr", "public_addr",
-					"o_s", "update_time", "fail_count", "warn_count", "pass_count", "info_count", "type", "result")
+				All(&BenchMarkLogList, fields...)
 		} else {
-			_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Filter("update_time__gte", this.UpdateTime).Limit(limit, from).OrderBy("-update_time").All(&BenchMarkLogList)
+			_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Filter("update_time__gte", this.UpdateTime).Limit(limit, from).OrderBy("-update_time").All(&BenchMarkLogList, fields...)
 		}
 	}
 

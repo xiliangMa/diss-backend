@@ -22,7 +22,7 @@ type LogConfig struct {
 type LogConfigInterface interface {
 	Add() Result
 	Update() Result
-	InnerGet()
+	Get() []*LogConfig
 }
 
 var GlobalLogConfig = map[string]*LogConfig{}
@@ -67,7 +67,7 @@ func (this *LogConfig) Add() Result {
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.AddTaskLogErr
+		ResultData.Code = utils.AddLogConfigErr
 		logs.Error("Add LogConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
@@ -84,7 +84,7 @@ func (this *LogConfig) Update() Result {
 	_, err := o.Update(this)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.EditTaskErr
+		ResultData.Code = utils.EditLogConfigErr
 		logs.Error("Update LogConfig: %s failed, code: %d, err: %s", this.ConfigName, ResultData.Code, ResultData.Message)
 		return ResultData
 	}

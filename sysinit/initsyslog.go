@@ -1,9 +1,9 @@
 package sysinit
 
 import (
+	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/task"
-	"log"
 )
 
 func InitGlobalLogConfig() {
@@ -16,18 +16,27 @@ func InitGlobalLogConfig() {
 	} else {
 		models.GlobalLogConfig[models.Log_Config_SysLog_Export] = &logConfig
 	}
+
+	InitTimeEdgePoint()
 }
 
 func InitTimeEdgePoint() {
 
-	syslogHandler := task.GlobalSysLogTaskHandler
+	for exType, exGroup := range *task.AllExGroups() {
 
-	for exType, exGroup := range syslogHandler.ExportTypes {
-		log.Printf("extype: %s, exGroup: %#v\n", exType, exGroup)
+		TEPoint := new(models.TimeEdgePoint)
+		TEPoint.EdgePointCode = exType
+		TEPinDB := TEPoint.Get()
+		if len(TEPinDB) == 0 {
+			//初始起始时间设置为2018-1-1
+			uid, _ := uuid.NewV4()
+			TEPoint.TimePointA = "2018-01-01T0:00:00Z"
+
+			TEPoint.EdgePointName = exGroup.ExportName
+			TEPoint.TEPointId = uid.String()
+			TEPoint.Direction = "lookback"
+			TEPoint.ScopeSymbol = "----|"
+			TEPoint.Add()
+		}
 	}
-
-	TEPoint := new(models.TimeEdgePoint)
-	//初始起始时间设置为2018-1-1
-	TEPoint.TimePointA = "2018-01-01T0:00:00Z"
-	TEPoint.EdgePointCode = ""
 }

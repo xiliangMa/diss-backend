@@ -22,6 +22,7 @@ var (
 	Groups           = "groups"
 	Job              = "job"
 	LogConfig        = "log_config"
+	TimeEdgePoint    = "time_edge_point"
 
 	//security_log timescaledb
 	DcokerIds = "docker_ids"

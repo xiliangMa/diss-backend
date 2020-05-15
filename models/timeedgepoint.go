@@ -18,7 +18,13 @@ type TimeEdgePoint struct {
 	ScopeSymbol   string `orm:"" description:"(时间区域图示, 如----|)"`
 }
 
-func (this *TimeEdgePoint) AddTEPoint() Result {
+type TimeEdgePointInterface interface {
+	Add() Result
+	Update() Result
+	Get() []*TimeEdgePoint
+}
+
+func (this *TimeEdgePoint) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
@@ -29,10 +35,48 @@ func (this *TimeEdgePoint) AddTEPoint() Result {
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddTimeEdgePointErr
-		logs.Error("Add LogConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error("Add TimeEdgePoint failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
+}
+
+func (this *TimeEdgePoint) Update() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+
+	_, err := o.Update(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditTimeEdgePointErr
+		logs.Error("Update TimeEdgePoint: %s failed, code: %d, err: %s", this.EdgePointCode, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+func (this *TimeEdgePoint) Get() []*TimeEdgePoint {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var TEPoint []*TimeEdgePoint = nil
+	var ResultData Result
+	cond := orm.NewCondition()
+
+	if this.EdgePointCode != "" {
+		cond = cond.And("edge_point_code", this.EdgePointCode)
+	}
+
+	err := o.QueryTable(utils.TimeEdgePoint).SetCond(cond).One(&TEPoint)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetTimeEdgePointErr
+		//logs.Info("Get TimeEdgePoint failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return nil
+	}
+	return TEPoint
 }
