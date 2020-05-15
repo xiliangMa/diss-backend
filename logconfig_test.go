@@ -14,8 +14,15 @@ func Test_Syslog(t *testing.T) {
 	//task.InitGlobalSyslogHander()
 	syslogHandler := task.GlobalSysLogTaskHandler
 
-	fmt.Printf("------------------sys export groups and taskids :\n %#v\n", syslogHandler.ExportTypes)
+	fmt.Printf("Sys export groups and taskids :\n %#v\n", syslogHandler)
 	select {}
+}
+
+func Test_AddTEPoing(t *testing.T) {
+	sysinit.InitGlobalLogConfig()
+	//task.InitGlobalSyslogHander()
+	//task.GlobalSysLogTaskHandler
+	sysinit.InitTimeEdgePoint()
 }
 
 func Test_BenchmarkLog_list_timeranged(t *testing.T) {

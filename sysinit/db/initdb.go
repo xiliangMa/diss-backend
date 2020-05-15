@@ -89,8 +89,8 @@ func (this *DefaultDB) registerModel() {
 		new(models.ContainerConfig), new(models.ContainerInfo), new(models.ContainerPs),
 		new(models.HostConfig), new(models.HostInfo), new(models.HostPs), new(models.ImageConfig),
 		new(models.ImageInfo), new(models.Groups))
-	// logconfig
-	orm.RegisterModel(new(models.LogConfig))
+	// logconfig and timeedgepoint
+	orm.RegisterModel(new(models.LogConfig), new(models.TimeEdgePoint))
 }
 
 func (this *DefaultDB) InitSystemData() {

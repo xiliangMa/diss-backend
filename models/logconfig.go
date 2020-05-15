@@ -12,11 +12,11 @@ import (
 
 type LogConfig struct {
 	Id            string `orm:"pk;" description:"(Log配置id)"`
-	ConfigName    string `orm:"" description:"(配置项名称)"`
+	ConfigName    string `orm:"" description:"(配置项名称 支持的值 SysLogExport)"`
 	Enabled       bool   `orm:"" description:"(是否启用)"`
 	ServerUrl     string `orm:"" description:"(服务器url)"`
 	ServerPort    string `orm:"" description:"(服务器端口)"`
-	ExportedTypes string `orm:"" description:"(导出日志类型)"` //日志类型的枚举，多个，以, 分割
+	ExportedTypes string `orm:"" description:"(导出日志类型  多个枚举 以,分割)"` //日志类型的多个枚举，以, 分割
 }
 
 type LogConfigInterface interface {
@@ -56,6 +56,7 @@ func (this *LogConfig) InnerGet() []*LogConfig {
 	return logConfig
 }
 
+// 此项目前为内部使用
 func (this *LogConfig) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)

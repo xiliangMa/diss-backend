@@ -69,8 +69,6 @@ var (
 	GetJobErr                       = 74
 	AddJobErr                       = 75
 	DeleteJobErr                    = 76
-	GetLogConfigErr                 = 80
-	ConnectSyslogErr                = 81
 
 	//k8s 1001-1100
 	AddNameSpaceErr    = 1001
@@ -117,4 +115,9 @@ var (
 	GetImageVirusErr                      = 1403
 	GetDockerVirusErr                     = 1404
 	GetImagePackageVulnerabilitiesListErr = 1405
+
+	// config_timedata 1500-1500
+	GetLogConfigErr     = 1500
+	ConnectSyslogErr    = 1501
+	AddTimeEdgePointErr = 1530
 )

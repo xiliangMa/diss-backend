@@ -1,11 +1,11 @@
 package task
 
 import (
-	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/system/system"
+	"log"
 	"os"
 	"strings"
 )
@@ -45,7 +45,7 @@ func (this *SyslogTaskHandler) ReGenSyncSyslogTask() {
 	for _, exGroup := range this.ExportTypes {
 		if exGroup.TaskId != "" {
 			th.DelByID(exGroup.TaskId)
-			fmt.Printf("Delete logsync task type - %s \n", exGroup.TaskId)
+			log.Printf("Delete logsync task type - %s \n", exGroup.TaskId)
 		}
 	}
 	if len(this.ExportTypes) != 0 {
@@ -65,7 +65,6 @@ func (this *SyslogTaskHandler) ReGenSyncSyslogTask() {
 		}
 	}
 
-	fmt.Printf("------------------sys export groups and taskids :\n %#v\n", this.ExportTypes)
 	th.Start()
 
 }
