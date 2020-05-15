@@ -17,5 +17,5 @@ func Test_GetTimeFromNow(t *testing.T) {
 	//nowStr, _ := time.Parse(time.RFC3339, now.String())
 	timepoint := time.Now().Add(time.Hour * -36).Format("2006-01-02T15:04:05Z")
 
-	t.Log("Now:", now, "\n", "timepoint", timepoint)
+	t.Log("\n Now:", now, "\n", "Timepoint:", timepoint)
 }
