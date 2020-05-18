@@ -69,6 +69,10 @@ var (
 	GetJobErr                       = 74
 	AddJobErr                       = 75
 	DeleteJobErr                    = 76
+	AddSYSTemplateGroupErr          = 77
+	GetSYSTemplateGroupErr          = 78
+	DeleteSYSTemplateGroupErr       = 79
+	EditSYSTemplateGroupErr         = 80
 
 	//k8s 1001-1100
 	AddNameSpaceErr    = 1001

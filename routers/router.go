@@ -52,6 +52,11 @@ func init() {
 				&csecuritypolicy.SystemTemplateController{},
 			),
 		),
+		beego.NSNamespace("/v1/securitypolicy/systmpgroups",
+			beego.NSInclude(
+				&csecuritypolicy.SystemTemplateGroupController{},
+			),
+		),
 		beego.NSNamespace("/v1/securitylog",
 			beego.NSInclude(
 				&csecuritylog.IntrudeDetectLogController{},

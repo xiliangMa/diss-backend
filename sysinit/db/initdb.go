@@ -85,7 +85,7 @@ func (this *DefaultDB) registerModel() {
 	// task
 	orm.RegisterModel(new(models.Task), new(models.TaskLog), new(models.Job))
 	//base
-	orm.RegisterModel(new(models.SystemTemplate), new(models.CmdHistory),
+	orm.RegisterModel(new(models.SystemTemplate), new(models.SystemTemplateGroup), new(models.CmdHistory),
 		new(models.ContainerConfig), new(models.ContainerInfo), new(models.ContainerPs),
 		new(models.HostConfig), new(models.HostInfo), new(models.HostPs), new(models.ImageConfig),
 		new(models.ImageInfo), new(models.Groups))

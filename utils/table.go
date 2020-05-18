@@ -16,6 +16,7 @@ var (
 	ContainerPs      = "container_ps"
 	Task             = "task"
 	SYSTemplate      = "system_template"
+	SYSTemplateGroup = "system_template_group"
 	BenchMarkLog     = "bench_mark_log"
 	HostPs           = "host_ps"
 	CmdHistory       = "cmd_history"

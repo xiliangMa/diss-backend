@@ -10,19 +10,20 @@ import (
 )
 
 type Job struct {
-	Id             string          `orm:"pk;" description:"(job id)"`
-	Account        string          `orm:"default(admin)" description:"(租户)"`
-	Name           string          `orm:"" description:"(名称)"`
-	Description    string          `orm:"" description:"(描述)"`
-	Spec           string          `orm:"" description:"(定时器)"`
-	Type           string          `orm:"" description:"(类型 重复执行 单次执行 )"`
-	Status         string          `orm:"null;" description:"(状态: 执行中、启用、禁用)"`
-	SystemTemplate *SystemTemplate `orm:"rel(fk);null;" description:"(系统模板)"`
-	Task           []*Task         `orm:"reverse(many);null" description:"(任务列表)"`
-	//HostConfig      []*HostConfig      `orm:"reverse(many);null" description:"(主机列表)"`
-	//ContainerConfig []*ContainerConfig `orm:"reverse(many);null" description:"(容器列表)"`
-	CreateTime time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
-	UpdateTime time.Time `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
+	Id                  string               `orm:"pk;" description:"(job id)"`
+	Account             string               `orm:"default(admin)" description:"(租户)"`
+	Name                string               `orm:"" description:"(名称)"`
+	Description         string               `orm:"" description:"(描述)"`
+	Spec                string               `orm:"" description:"(定时器)"`
+	Type                string               `orm:"" description:"(类型 重复执行 单次执行 )"`
+	Status              string               `orm:"null;" description:"(状态: 执行中、启用、禁用)"`
+	CreateTime          time.Time            `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
+	UpdateTime          time.Time            `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
+	SystemTemplate      *SystemTemplate      `orm:"rel(fk);null;" description:"(策略)"`
+	SystemTemplateGroup *SystemTemplateGroup `orm:"rel(fk);null;" description:"(策略组)"`
+	Task                []*Task              `orm:"reverse(many);null" description:"(任务列表)"`
+	HostConfig          []*HostConfig        `orm:"reverse(many);null" description:"(主机列表)"`
+	ContainerConfig     []*ContainerConfig   `orm:"reverse(many);null" description:"(容器列表)"`
 }
 
 type JobInterface interface {
@@ -49,6 +50,11 @@ func (this *Job) List(from, limit int) Result {
 		cond = cond.And("name__icontains", this.Name)
 	}
 	_, err = o.QueryTable(utils.Job).SetCond(cond).RelatedSel().Limit(limit, from).OrderBy("-create_time").All(&JobList)
+	for _, job := range JobList {
+		o.LoadRelated(job, "HostConfig")
+		o.LoadRelated(job, "ContainerConfig")
+		o.LoadRelated(job, "Task")
+	}
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetJobErr

@@ -8,15 +8,31 @@ import (
 )
 
 type SystemTemplate struct {
-	Id          string `orm:"pk;" description:"(基线id)"`
-	Account     string `orm:"default(admin)" description:"(租户)"`
-	Name        string `orm:"" description:"(名称)"`
-	Description string `orm:"" description:"(描述)"`
-	Type        string `orm:"" description:"(类型)"`
-	Version     string `orm:"null" description:"(版本)"`
-	Commands    string `orm:"null;" description:"(操作命令)"`
-	Status      string `orm:"default(Enable);" description:"(类型 Enable Disable)"`
-	IsDefault   bool   `orm:"default(false);" description:"(默认系统策略)"`
+	Id                  string                 `orm:"pk;" description:"(id)"`
+	Account             string                 `orm:"default(admin)" description:"(租户)"`
+	Name                string                 `orm:"" description:"(名称)"`
+	Description         string                 `orm:"" description:"(描述)"`
+	Type                string                 `orm:"" description:"(类型)"`
+	Version             string                 `orm:"null" description:"(版本)"`
+	Commands            string                 `orm:"null;" description:"(操作命令)"`
+	Status              string                 `orm:"default(Enable);" description:"(类型 Enable Disable)"`
+	IsDefault           bool                   `orm:"default(false);" description:"(默认系统策略)"`
+	SystemTemplateGroup []*SystemTemplateGroup `orm:"rel(m2m);" description:"(策略组)"`
+	Job                 []*Job                 `orm:"reverse(many);null" description:"(job)"`
+	Task                []*Task                `orm:"reverse(many);null" description:"(task)"`
+}
+
+type SystemTemplateGroup struct {
+	Id             string            `orm:"pk;" description:"(基线id)"`
+	Account        string            `orm:"default(admin)" description:"(租户)"`
+	Name           string            `orm:"" description:"(名称)"`
+	Description    string            `orm:"" description:"(描述)"`
+	Type           string            `orm:"" description:"(类型)"`
+	Version        string            `orm:"null" description:"(版本)"`
+	Status         string            `orm:"default(Enable);" description:"(类型 Enable Disable)"`
+	IsDefault      bool              `orm:"default(false);" description:"(默认系统策略)"`
+	SystemTemplate []*SystemTemplate `orm:"reverse(many);null" description:"(策略模板)"`
+	Job            []*Job            `orm:"reverse(many);null" description:"(job)"`
 }
 
 type SystemTemplateInterface interface {
@@ -25,6 +41,12 @@ type SystemTemplateInterface interface {
 	Delete() Result
 	Update() Result
 	GetDefaultTemplate() map[string]*SystemTemplate
+}
+type SystemTemplateGroupInterface interface {
+	Add() Result
+	List() Result
+	Delete() Result
+	Update() Result
 }
 
 func (this *SystemTemplate) Add() Result {
@@ -70,10 +92,15 @@ func (this *SystemTemplate) List(from, limit int) Result {
 	if this.Commands != "" {
 		cond = cond.And("commands__contains", this.Commands)
 	}
-	if this.Status != All {
+	if this.Status != "" && this.Status != All {
 		cond = cond.And("status", this.Status)
 	}
 	_, err = o.QueryTable(utils.SYSTemplate).SetCond(cond).RelatedSel().Limit(limit, from).All(&systemTemplateList)
+	for _, systemTemplate := range systemTemplateList {
+		o.LoadRelated(systemTemplate, "SystemTemplateGroup")
+		o.LoadRelated(systemTemplate, "Job")
+		o.LoadRelated(systemTemplate, "Task")
+	}
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetSYSTemplateErr
@@ -150,4 +177,111 @@ func (this *SystemTemplate) GetDefaultTemplate() map[string]*SystemTemplate {
 		defaultTemplateList[systemTemplate.Type] = systemTemplate
 	}
 	return defaultTemplateList
+}
+
+func (this *SystemTemplateGroup) Add() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+
+	_, err := o.Insert(this)
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.AddSYSTemplateGroupErr
+		logs.Error("Add SystemTemplateGroup failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+func (this *SystemTemplateGroup) List(from, limit int) Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var SystemTemplateGroupList []*SystemTemplateGroup
+	var ResultData Result
+	var err error
+	cond := orm.NewCondition()
+
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	if this.Account != "" {
+		cond = cond.And("account", this.Account)
+	}
+	if this.Name != "" {
+		cond = cond.And("name__contains", this.Name)
+	}
+	if this.Type != "" {
+		cond = cond.And("type", this.Type)
+	}
+	if this.Version != All {
+		cond = cond.And("name__contains", this.Name)
+	}
+	if this.Status != "" && this.Status != All {
+		cond = cond.And("status", this.Status)
+	}
+
+	_, err = o.QueryTable(utils.SYSTemplateGroup).SetCond(cond).RelatedSel().Limit(limit, from).All(&SystemTemplateGroupList)
+	for _, systemTemplateGroup := range SystemTemplateGroupList {
+		o.LoadRelated(systemTemplateGroup, "SystemTemplate")
+		o.LoadRelated(systemTemplateGroup, "Job")
+	}
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetSYSTemplateGroupErr
+		logs.Error("Get SystemTemplateGroup List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	total, _ := o.QueryTable(utils.SYSTemplateGroup).SetCond(cond).Count()
+	data := make(map[string]interface{})
+	data["total"] = total
+	data["items"] = SystemTemplateGroupList
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
+	return ResultData
+}
+
+func (this *SystemTemplateGroup) Delete() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+	cond := orm.NewCondition()
+
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	_, err := o.QueryTable(utils.SYSTemplateGroup).SetCond(cond).Delete()
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteSYSTemplateGroupErr
+		logs.Error("Delete SystemTemplateGroup failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	return ResultData
+}
+
+func (this *SystemTemplateGroup) Update() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+
+	_, err := o.Update(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditSYSTemplateGroupErr
+		logs.Error("Update SystemTemplateGroup: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
 }
