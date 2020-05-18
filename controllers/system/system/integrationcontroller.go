@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/task"
+	"net/http"
 )
 
 type IntegrationController struct {
@@ -54,13 +55,17 @@ func (this *IntegrationController) UpdateLogConfig() {
 // @Param configName query string true "配置项名，支持的值:  SysLogExport"
 // @Success 200 {object} models.Result
 // @router /system/logconfig [get]
-func (this *IntegrationController) InnerGetLogConfig() {
+func (this *IntegrationController) GetLogConfig() {
 	logConfig := new(models.LogConfig)
 	configName := this.GetString(":configName")
 	logConfig.ConfigName = configName
 	json.Unmarshal(this.Ctx.Input.RequestBody, &logConfig)
 
-	this.Data["json"] = logConfig.InnerGet()
+	var ResultData models.Result
+	ResultData.Code = http.StatusOK
+	ResultData.Data = logConfig.InnerGet()
+
+	this.Data["json"] = ResultData
 	this.ServeJSON(false)
 }
 

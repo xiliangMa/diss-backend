@@ -27,7 +27,7 @@ func init() {
 
     beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"],
         beego.ControllerComments{
-            Method: "InnerGetLogConfig",
+            Method: "GetLogConfig",
             Router: `/system/logconfig`,
             AllowHTTPMethods: []string{"get"},
             MethodParams: param.Make(),
