@@ -12,45 +12,46 @@ import (
 	"time"
 )
 
-func OpenSyslog(tag string) *syslog.Writer {
+type SyslogHandler struct {
+	syslog *syslog.Writer
+}
+
+var GlobalSyslog =  new(SyslogHandler)
+
+func (this SyslogHandler) OpenSyslog(tag string) error{
 
 	syslogServer := models.GetSyslogServerUrl()
 	//log.Println("syslogServer: ", syslogServer)
 	sysLog, err := syslog.Dial("tcp", syslogServer,
 		syslog.LOG_WARNING, tag)
 	if err != nil {
-		log.Println(err)
+		log.Println("ErrorCode: " + strconv.Itoa(utils.ConnectSyslogErr), err)
 	}
-	return sysLog
+
+	this.syslog = sysLog
+	return err
 }
 
-func SendSysLog(tag, level, msg string) {
+func (this SyslogHandler) SendSysLog(tag, level, msg string) {
 	// 没有启用syslog日志导出，直接退出
 	syslogConfig := models.GlobalLogConfig[models.Log_Config_SysLog_Export]
 	if syslogConfig.Enabled == false {
 		return
 	}
-	// 打开syslog连接
-	sysLog := OpenSyslog(tag)
-	if sysLog == nil {
-		log.Println("Error : Cant connect syslog Server . ErrorCode: " + strconv.Itoa(utils.ConnectSyslogErr))
-		return
-	}
 
 	if strings.Contains(syslogConfig.ExportedTypes, tag) {
 		var err error
-		//sysLog.Emerg("Emerg messsage ---------")
-		//fmt.Fprintf(sysLog, "Level %s", level)
+
 		msgWithLevel := fmt.Sprintf("[%s] %s", level, msg)
 		switch level {
 		case models.Log_level_Warn:
-			err = sysLog.Warning(msgWithLevel)
+			err = this.syslog.Warning(msgWithLevel)
 		case models.Log_level_Info:
-			err = sysLog.Info(msgWithLevel)
+			err = this.syslog.Info(msgWithLevel)
 		case models.Log_level_Error:
-			err = sysLog.Err(msgWithLevel)
+			err = this.syslog.Err(msgWithLevel)
 		case models.Log_level_Debug:
-			err = sysLog.Debug(msgWithLevel)
+			err = this.syslog.Debug(msgWithLevel)
 		}
 		if err != nil {
 			log.Println("err ", err)
@@ -66,6 +67,13 @@ func GetSyncSyslogFunc(exType string) func() {
 		from := 0
 		limit := 3000
 
+
+		GlobalSyslog.OpenSyslog("init synclog")
+		if GlobalSyslog.syslog == nil{
+			log.Println("cant connet syslog server, code " + strconv.Itoa(utils.ConnectSyslogErr))
+			return
+		}
+
 		switch exType { //根据syslog日志的类型，对应获取不同数据，更新对应的时间边界点
 		case models.SysLog_BenchScanLog:
 			benchMarkLog := new(models.BenchMarkLog)
@@ -80,7 +88,7 @@ func GetSyncSyslogFunc(exType string) func() {
 					mapdata := loglist.Data.(map[string]interface{})
 					for _, logitem := range mapdata["items"].([]*models.BenchMarkLog) {
 						logitemJson, _ := json.Marshal(logitem)
-						SendSysLog(exType, models.Log_level_Info, string(logitemJson))
+						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
 				}
 
@@ -99,7 +107,7 @@ func GetSyncSyslogFunc(exType string) func() {
 					mapdata := loglist.Data.(map[string]interface{})
 					for _, logitem := range mapdata["items"].([]*models.DcokerIds) {
 						logitemJson, _ := json.Marshal(logitem)
-						SendSysLog(exType, models.Log_level_Info, string(logitemJson))
+						GlobalSyslog.SendSysLog( exType, models.Log_level_Info, string(logitemJson))
 					}
 				}
 				TEPinDB[0].TimePointA = time.Now().Add(time.Hour * -8).Format("2006-01-02T15:04:05Z")
@@ -121,7 +129,7 @@ func GetSyncSyslogFunc(exType string) func() {
 					mapdata := loglist.Data.(map[string]interface{})
 					for _, logitem := range mapdata["items"].([]*models.DockerVirus) {
 						logitemJson, _ := json.Marshal(logitem)
-						SendSysLog(exType, models.Log_level_Info, string(logitemJson))
+						GlobalSyslog.SendSysLog( exType, models.Log_level_Info, string(logitemJson))
 					}
 				}
 
@@ -144,7 +152,7 @@ func GetSyncSyslogFunc(exType string) func() {
 					mapdata := loglist.Data.(map[string]interface{})
 					for _, logitem := range mapdata["items"].([]*models.ImageVirus) {
 						logitemJson, _ := json.Marshal(logitem)
-						SendSysLog(exType, models.Log_level_Info, string(logitemJson))
+						GlobalSyslog.SendSysLog( exType, models.Log_level_Info, string(logitemJson))
 					}
 				}
 
