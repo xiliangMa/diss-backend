@@ -16,16 +16,16 @@ type SyslogHandler struct {
 	syslog *syslog.Writer
 }
 
-var GlobalSyslog =  new(SyslogHandler)
+var GlobalSyslog = new(SyslogHandler)
 
-func (this SyslogHandler) OpenSyslog(tag string) error{
+func (this SyslogHandler) OpenSyslog(tag string) error {
 
 	syslogServer := models.GetSyslogServerUrl()
 	//log.Println("syslogServer: ", syslogServer)
 	sysLog, err := syslog.Dial("tcp", syslogServer,
 		syslog.LOG_WARNING, tag)
 	if err != nil {
-		log.Println("ErrorCode: " + strconv.Itoa(utils.ConnectSyslogErr), err)
+		log.Println("ErrorCode: "+strconv.Itoa(utils.ConnectSyslogErr), err)
 	}
 
 	this.syslog = sysLog
@@ -67,9 +67,8 @@ func GetSyncSyslogFunc(exType string) func() {
 		from := 0
 		limit := 3000
 
-
 		GlobalSyslog.OpenSyslog("init synclog")
-		if GlobalSyslog.syslog == nil{
+		if GlobalSyslog.syslog == nil {
 			log.Println("cant connet syslog server, code " + strconv.Itoa(utils.ConnectSyslogErr))
 			return
 		}
@@ -107,7 +106,7 @@ func GetSyncSyslogFunc(exType string) func() {
 					mapdata := loglist.Data.(map[string]interface{})
 					for _, logitem := range mapdata["items"].([]*models.DcokerIds) {
 						logitemJson, _ := json.Marshal(logitem)
-						GlobalSyslog.SendSysLog( exType, models.Log_level_Info, string(logitemJson))
+						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
 				}
 				TEPinDB[0].TimePointA = time.Now().Add(time.Hour * -8).Format("2006-01-02T15:04:05Z")
@@ -129,7 +128,7 @@ func GetSyncSyslogFunc(exType string) func() {
 					mapdata := loglist.Data.(map[string]interface{})
 					for _, logitem := range mapdata["items"].([]*models.DockerVirus) {
 						logitemJson, _ := json.Marshal(logitem)
-						GlobalSyslog.SendSysLog( exType, models.Log_level_Info, string(logitemJson))
+						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
 				}
 
@@ -152,7 +151,7 @@ func GetSyncSyslogFunc(exType string) func() {
 					mapdata := loglist.Data.(map[string]interface{})
 					for _, logitem := range mapdata["items"].([]*models.ImageVirus) {
 						logitemJson, _ := json.Marshal(logitem)
-						GlobalSyslog.SendSysLog( exType, models.Log_level_Info, string(logitemJson))
+						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
 				}
 

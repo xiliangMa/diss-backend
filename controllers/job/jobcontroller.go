@@ -57,3 +57,20 @@ func (this *JobController) AddJob() {
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }
+
+// @Title UpdateJob
+// @Description Update Job
+// @Param token header string true "authToken"
+// @Param id path string "" true "id"
+// @Param body body models.Job false "Job"
+// @Success 200 {object} models.Result
+// @router /:id [put]
+func (this *JobController) UpdateJob() {
+	id := this.GetString(":id")
+	Job := new(models.Job)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &Job)
+	Job.Id = id
+	result := Job.Update()
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}

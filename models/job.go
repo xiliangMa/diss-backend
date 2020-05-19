@@ -114,3 +114,20 @@ func (this *Job) Delete() Result {
 	ResultData.Code = http.StatusOK
 	return ResultData
 }
+
+func (this *Job) Update() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+
+	_, err := o.Update(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditGroupErr
+		logs.Error("Update Job: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
