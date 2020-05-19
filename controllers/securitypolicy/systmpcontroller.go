@@ -27,3 +27,49 @@ func (this *SystemTemplateController) GetSystemTemplateLIst() {
 	this.Data["json"] = systemTemplate.List(from, limit)
 	this.ServeJSON(false)
 }
+
+// @Title DeleteSystemTemplate
+// @Description Delete SystemTemplate
+// @Param token header string true "authToken"
+// @Param id path string "" true "id"
+// @Success 200 {object} models.Result
+// @router /:id [delete]
+func (this *SystemTemplateController) DeleteSystemTemplate() {
+	id := this.GetString(":id")
+	systemTemplate := new(models.SystemTemplate)
+	systemTemplate.Id = id
+	result := systemTemplate.Delete()
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
+// @Title AddSystemTemplate
+// @Description Add SystemTemplate
+// @Param token header string true "authToken"
+// @Param body body models.SystemTemplate false "SystemTemplate"
+// @Success 200 {object} models.Result
+// @router /add [post]
+func (this *SystemTemplateController) AddSystemTemplate() {
+	systemTemplate := new(models.SystemTemplate)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &systemTemplate)
+	result := systemTemplate.Add()
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
+// @Title UpdateSystemTemplate
+// @Description Update SystemTemplate
+// @Param token header string true "authToken"
+// @Param id path string "" true "id"
+// @Param body body models.SystemTemplate false "SystemTemplate"
+// @Success 200 {object} models.Result
+// @router /:id [put]
+func (this *SystemTemplateController) UpdateSystemTemplate() {
+	id := this.GetString(":id")
+	systemTemplate := new(models.SystemTemplate)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &systemTemplate)
+	systemTemplate.Id = id
+	result := systemTemplate.Update()
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
