@@ -40,3 +40,35 @@ func (this *SystemTemplateGroupController) AddSystemTemplateGroup() {
 	this.Data["json"] = systemTemplateGroup.Add()
 	this.ServeJSON(false)
 }
+
+// @Title DeleteSystemTemplateGroup
+// @Description Delete SystemTemplateGroup
+// @Param token header string true "authToken"
+// @Param id path string "" true "id"
+// @Success 200 {object} models.Result
+// @router /:id [delete]
+func (this *SystemTemplateGroupController) DeleteSystemTemplateGroup() {
+	id := this.GetString(":id")
+	SystemTemplateGroup := new(models.SystemTemplateGroup)
+	SystemTemplateGroup.Id = id
+	result := SystemTemplateGroup.Delete()
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
+// @Title UpdateSystemTemplateGroup
+// @Description Update SystemTemplateGroup
+// @Param token header string true "authToken"
+// @Param id path string "" true "id"
+// @Param body body models.SystemTemplateGroup false "安全策略组"
+// @Success 200 {object} models.Result
+// @router /:id [put]
+func (this *SystemTemplateGroupController) UpdateSystemTemplateGroup() {
+	id := this.GetString(":id")
+	SystemTemplateGroup := new(models.SystemTemplateGroup)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &SystemTemplateGroup)
+	SystemTemplateGroup.Id = id
+	result := SystemTemplateGroup.Update()
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
