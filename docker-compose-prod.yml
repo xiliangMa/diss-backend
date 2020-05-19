@@ -35,3 +35,12 @@ services:
       - 5432:5432
     volumes:
       - /var/lib/diss/postgres:/var/lib/postgresql/data
+
+  diss-nats-streaming:
+    restart: unless-stopped
+    container_name: diss-nats-streaming
+    image: registry.cn-qingdao.aliyuncs.com/diss/nats-streaming:latest
+    ports:
+      - 8222:8222
+      - 4222:4222
+    command: -cid=diss-cluster -p 4222 -m 8222
