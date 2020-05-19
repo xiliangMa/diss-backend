@@ -89,8 +89,10 @@ func (this *DefaultDB) registerModel() {
 		new(models.ContainerConfig), new(models.ContainerInfo), new(models.ContainerPs),
 		new(models.HostConfig), new(models.HostInfo), new(models.HostPs), new(models.ImageConfig),
 		new(models.ImageInfo), new(models.Groups))
-	// logconfig and timeedgepoint
+	// logconfig and timeEdgepoint
 	orm.RegisterModel(new(models.LogConfig), new(models.TimeEdgePoint))
+	// license
+	orm.RegisterModel(new(models.LicenseFile), new(models.LicenseModule))
 }
 
 func (this *DefaultDB) InitSystemData() {
