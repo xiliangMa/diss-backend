@@ -36,12 +36,21 @@ var (
 	Diss_status_Safe   = "Safe"
 	Diss_Status_Unsafe = "Unsafe"
 
-	//系统魔板类型(此处和ws resource tag 保持一致)
+	//// 系统魔板类型(此处和ws resource tag 保持一致，和授权模块关联)
+	//镜像仓库扫描：
+	TMP_Type_ImageScan = "ImageScan"
+	//基线扫描：
 	TMP_Type_BM_Docker = "DockerBenchMark"
 	TMP_Type_BM_K8S    = "KubernetesBenchMark"
-	TMP_Type_DockerVS  = "DockerVirusScan"
-	TMP_Type_HostVS    = "HostVirusScan"
-	TMP_Type_LS        = "SC_LeakScan"
+	//入侵扫描
+	TMP_Type_IDS = "IntrudeDetectScan"
+	//安全审计
+	TMP_Type_SecurityAudit = "SecurityAudit"
+	//病毒扫描：
+	TMP_Type_DockerVS = "DockerVirusScan"
+	TMP_Type_HostVS   = "HostVirusScan"
+	//漏洞扫描
+	TMP_Type_LS = "SC_LeakScan"
 
 	TMP_Status_Enable  = "Enable"
 	TMP_Status_Disable = "Disable"
