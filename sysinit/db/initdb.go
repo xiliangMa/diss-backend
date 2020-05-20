@@ -98,25 +98,48 @@ func (this *DefaultDB) registerModel() {
 func (this *DefaultDB) InitSystemData() {
 	// 初始化
 	o := orm.NewOrm()
-	// 系统魔板
-	logs.Info("Init default data.")
-	_, err := o.Raw(dbscript.DefaultDockerBenchSql).Exec()
+	logs.Info("Init default data start................")
+
+	logs.Info("Init default syslog config >>>>>>>>>>>>>>>>")
+	// syslog配置
+	_, err := o.Raw(dbscript.DefaultLogConfigSql).Exec()
 	if err != nil {
-		logs.Error("Init DefaultDockerBenchSql fail, err: %s", err)
+		logs.Error("Init DefaultLogConfigSql fail, err: %s", err)
+	}
+
+	logs.Info("Init default SystemTemplate >>>>>>>>>>>>>>>>")
+	// 系统魔板
+	_, err = o.Raw(dbscript.DefaultDockerBenchSql).Exec()
+	if err != nil {
+		logs.Error("Init DefaultDockerBench fail, err: %s", err)
 	}
 
 	_, err = o.Raw(dbscript.DefaultK8sBenchSql).Exec()
 	if err != nil {
-		logs.Error("Init DefaultK8sBenchSql fail, err: %s", err)
+		logs.Error("Init DefaultK8sBench fail, err: %s", err)
 	}
 
 	_, err = o.Raw(dbscript.DefaultDockerVirusScanSql).Exec()
 	if err != nil {
-		logs.Error("Init DefaultDockerVirusScanSql fail, err: %s", err)
+		logs.Error("Init DefaultDockerVirusScan fail, err: %s", err)
 	}
 
-	_, err = o.Raw(dbscript.DefaultLogConfigSql).Exec()
+	logs.Info("Init default system Job >>>>>>>>>>>>>>>>")
+
+	//系统job
+	_, err = o.Raw(dbscript.DefaultDockerBenchJobSql).Exec()
 	if err != nil {
-		logs.Error("Init DefaultLogConfigSql fail, err: %s", err)
+		logs.Error("Init DefaultDockerBench Job fail, err: %s", err)
 	}
+
+	_, err = o.Raw(dbscript.DefaultK8sBenchJobSql).Exec()
+	if err != nil {
+		logs.Error("Init DefaultK8sBench Job fail, err: %s", err)
+	}
+
+	_, err = o.Raw(dbscript.DefaultDockerVirusScanJobSql).Exec()
+	if err != nil {
+		logs.Error("Init DefaultDockerVirusScan Job fail, err: %s", err)
+	}
+	logs.Info("Init default data end................")
 }
