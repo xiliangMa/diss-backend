@@ -1,17 +1,22 @@
 package models
 
-import "time"
+import (
+	"github.com/astaxie/beego/logs"
+	"github.com/astaxie/beego/orm"
+	"github.com/xiliangMa/diss-backend/utils"
+	"net/http"
+	"time"
+)
 
 type LicenseFile struct {
-	Id                string           `orm:"pk;" description:"(license file id)"`
-	ProductName       string           `orm:"" description:"(产品名称)"`
-	CustomerName      string           `orm:"" description:"(许可对象)"`
-	LicenseType       int              `orm:"" description:"(授权类型 0测试 1正式)"`
-	LicenseUuid       string           `orm:"" description:"(序列号)"`
-	LicenseBuyAt      time.Time        `orm:"" description:"(授权购买时间)"`
-	LicenseActiveAt   time.Time        `orm:"" description:"(激活时间)"`
-	LicenseModule     []*LicenseModule `orm:"reverse(many);null" description:"(授权的模块)"`
-	LicenseModuleJson string           `orm:"" description:"(授权的模块Json 格式版)"`
+	Id              string           `orm:"pk;" description:"(license file id)"`
+	ProductName     string           `orm:"" description:"(产品名称)"`
+	CustomerName    string           `orm:"" description:"(许可对象)"`
+	LicenseType     int              `orm:"" description:"(授权类型 0测试 1正式)"`
+	LicenseUuid     string           `orm:"" description:"(序列号)"`
+	LicenseBuyAt    time.Time        `orm:"null;type(datetime)" description:"(授权购买时间)"`
+	LicenseActiveAt time.Time        `orm:"null;auto_now;type(datetime)" description:"(激活时间)"`
+	LicenseModule   []*LicenseModule `orm:"reverse(many);null" description:"(授权的模块)"`
 }
 
 type LicenseModule struct {
@@ -20,4 +25,38 @@ type LicenseModule struct {
 	ModuleCode      string       `orm:"" description:"(授权模块)"`
 	LicenseCount    string       `orm:"" description:"(授权模块数量)"`
 	LicenseExpireAt time.Time    `orm:"" description:"(授权结束时间)"`
+}
+
+var LicenseModuleCodeMap = map[string]string{
+	"ImageScan":           "镜像仓库扫描",
+	"DockerBenchMark":     "Docker基线扫描",
+	"KubernetesBenchMark": "K8s基线扫描",
+	"IntrudeDetectScan":   "入侵扫描",
+	"SecurityAudit":       "安全审计",
+	"DockerVirusScan":     "Docker病毒扫描",
+	"HostVirusScan":       "主机病毒扫描",
+	"SC_LeakScan":         "漏洞扫描",
+}
+
+type LicenseFileInterface interface {
+	Add() Result
+	Update() Result
+	List(from, limit int) Result
+}
+
+func (licfile *LicenseFile) Add() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+
+	_, err := o.Insert(licfile)
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.AddLicenseFileErr
+		logs.Error("Add LicenseFile failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = licfile
+	return ResultData
 }

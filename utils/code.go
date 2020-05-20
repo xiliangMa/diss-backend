@@ -73,6 +73,7 @@ var (
 	GetSYSTemplateGroupErr          = 78
 	DeleteSYSTemplateGroupErr       = 79
 	EditSYSTemplateGroupErr         = 80
+	AddLicenseFileErr               = 81
 
 	//k8s 1001-1100
 	AddNameSpaceErr    = 1001
