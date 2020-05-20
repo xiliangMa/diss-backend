@@ -7,6 +7,9 @@ import (
 	"github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/service/task"
 	"github.com/xiliangMa/diss-backend/sysinit"
+	"github.com/xiliangMa/diss-backend/utils"
+	"log"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -25,6 +28,8 @@ func Test_AddTEPoint(t *testing.T) {
 	sysinit.InitTimeEdgePoint()
 }
 
+var GlobalSyslog = system.GlobalSyslog
+
 func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 
 	sysinit.InitGlobalLogConfig()
@@ -35,6 +40,14 @@ func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 	//default from and limit , for 3000 records
 	from := 0
 	limit := 3000
+
+	log.Println("Sync syslog data , type:", exType)
+
+	GlobalSyslog.OpenSyslog("init synclog")
+	if GlobalSyslog == nil {
+		log.Println("cant connet syslog server, code " + strconv.Itoa(utils.ConnectSyslogErr))
+		return
+	}
 
 	switch exType { //根据syslog日志的类型，对应获取不同数据，更新对应的时间边界点
 	case models.SysLog_BenchScanLog:
@@ -48,16 +61,14 @@ func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 
 			if loglist.Code == 200 && loglist.Data != nil {
 				mapdata := loglist.Data.(map[string]interface{})
-				for index, logitem := range mapdata["items"].([]*models.BenchMarkLog) {
-					fmt.Printf(" logs item %d:  %#v \n", index, logitem)
+				for _, logitem := range mapdata["items"].([]*models.BenchMarkLog) {
 					logitemJson, _ := json.Marshal(logitem)
-					system.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
+					GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 				}
 			}
 
-			TEPinDB[0].TimePointA = time.Now().Add(time.Hour * -8).Format("2006-01-02T15:04:05Z")
-			TEPinDB[0].Update()
-
+			//TEPinDB[0].TimePointA = time.Now().Add(time.Hour * -8).Format("2006-01-02T15:04:05Z")
+			//TEPinDB[0].Update()
 		}
 	case models.SysLog_IDSLog:
 		intrudeDetectLog := new(models.IntrudeDetectLog)
@@ -69,10 +80,9 @@ func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 			loglist := intrudeDetectLog.List1(from, limit)
 			if loglist.Code == 200 && loglist.Data != nil {
 				mapdata := loglist.Data.(map[string]interface{})
-				for index, logitem := range mapdata["items"].([]*models.DcokerIds) {
-					fmt.Printf(" logs item %d:  %#v \n", index, logitem)
+				for _, logitem := range mapdata["items"].([]*models.DcokerIds) {
 					logitemJson, _ := json.Marshal(logitem)
-					system.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
+					GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 				}
 			}
 			TEPinDB[0].TimePointA = time.Now().Add(time.Hour * -8).Format("2006-01-02T15:04:05Z")
@@ -92,10 +102,9 @@ func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 			limit = 30
 			if loglist.Code == 200 && loglist.Data != nil {
 				mapdata := loglist.Data.(map[string]interface{})
-				for index, logitem := range mapdata["items"].([]*models.DockerVirus) {
-					fmt.Printf(" logs item %d:  %#v \n", index, logitem)
+				for _, logitem := range mapdata["items"].([]*models.DockerVirus) {
 					logitemJson, _ := json.Marshal(logitem)
-					system.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
+					GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 				}
 			}
 
@@ -116,10 +125,9 @@ func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 			limit = 30
 			if loglist.Code == 200 && loglist.Data != nil {
 				mapdata := loglist.Data.(map[string]interface{})
-				for index, logitem := range mapdata["items"].([]*models.ImageVirus) {
-					fmt.Printf(" logs item %d:  %#v \n", index, logitem)
+				for _, logitem := range mapdata["items"].([]*models.ImageVirus) {
 					logitemJson, _ := json.Marshal(logitem)
-					system.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
+					GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 				}
 			}
 

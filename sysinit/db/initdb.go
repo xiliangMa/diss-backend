@@ -114,4 +114,9 @@ func (this *DefaultDB) InitSystemData() {
 	if err != nil {
 		logs.Error("Init DefaultDockerVirusScanSql fail, err: %s", err)
 	}
+
+	_, err = o.Raw(dbscript.DefaultLogConfigSql).Exec()
+	if err != nil {
+		logs.Error("Init DefaultLogConfigSql fail, err: %s", err)
+	}
 }

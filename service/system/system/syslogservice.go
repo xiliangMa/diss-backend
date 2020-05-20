@@ -3,9 +3,9 @@ package system
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
-	"log"
 	"log/syslog"
 	"strconv"
 	"strings"
@@ -21,11 +21,11 @@ var GlobalSyslog = new(SyslogHandler)
 func (this SyslogHandler) OpenSyslog(tag string) error {
 
 	syslogServer := models.GetSyslogServerUrl()
-	//log.Println("syslogServer: ", syslogServer)
+
 	sysLog, err := syslog.Dial("tcp", syslogServer,
 		syslog.LOG_WARNING, tag)
 	if err != nil {
-		log.Println("ErrorCode: "+strconv.Itoa(utils.ConnectSyslogErr), err)
+		logs.Error("ErrorCode: "+strconv.Itoa(utils.ConnectSyslogErr), err)
 	}
 
 	this.syslog = sysLog
@@ -54,14 +54,14 @@ func (this SyslogHandler) SendSysLog(tag, level, msg string) {
 			err = this.syslog.Debug(msgWithLevel)
 		}
 		if err != nil {
-			log.Println("err ", err)
+			logs.Error("err ", err)
 		}
 	}
 }
 
 func GetSyncSyslogFunc(exType string) func() {
 	return func() {
-		log.Println("Sync syslog data , type:", exType)
+		logs.Info("Sync syslog data , type:", exType)
 
 		//default from and limit , for 3000 records
 		from := 0
@@ -69,7 +69,7 @@ func GetSyncSyslogFunc(exType string) func() {
 
 		GlobalSyslog.OpenSyslog("init synclog")
 		if GlobalSyslog.syslog == nil {
-			log.Println("cant connet syslog server, code " + strconv.Itoa(utils.ConnectSyslogErr))
+			logs.Error("cant connet syslog server, code " + strconv.Itoa(utils.ConnectSyslogErr))
 			return
 		}
 

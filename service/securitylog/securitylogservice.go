@@ -123,7 +123,7 @@ func (this *SecurityLogService) GetIntrudeDetectLogInfo() models.Result {
 	esqueryStr = strings.Replace(esqueryStr, "!Filter@container!", containerFilterStr, 1)
 	esqueryStr = strings.Replace(esqueryStr, "!Param@limit!", limit, 1)
 
-	// log.Println("esqueryStr\n",  esqueryStr)
+
 	res, err := esclient.API.Search(esclient.Search.WithContext(context.Background()),
 		esclient.Search.WithIndex(hostId),
 		esclient.Search.WithBody(strings.NewReader(esqueryStr)),
