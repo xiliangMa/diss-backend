@@ -17,7 +17,7 @@ type Cluster struct {
 	IsSync      bool      `orm:"default(false);" description:"(是否同步)"`
 	Label       string    `orm:"default(null);" description:"(标签)"`
 	AccountName string    `orm:"-" description:"(租户)"`
-	SyncStatus  int       `orm:"default(0);" description:"(同步状态 0 成功 1 同步中 2 失败)"`
+	SyncStatus  string    `orm:"default(OK);" description:"(同步状态 Ok 成功 InProcess 同步中 Fail 失败)"`
 	CreateTime  time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
 	UpdateTime  time.Time `orm:"auto_now;type(datetime)" description:"(更新时间)"`
 }

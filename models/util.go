@@ -4,9 +4,9 @@ var (
 	All = "All"
 
 	// k8s
-	Cluster_Sync_Status_OK          = 0
-	Cluster_Sync_Status_IN_PROGRESS = 1
-	Cluster_Sync_Status_FAIL        = 2
+	Cluster_Sync_Status_OK          = "OK"
+	Cluster_Sync_Status_InProcess   = "InProcess"
+	Cluster_Sync_Status_Fail        = "Fail"
 	Cluster_IsSync                  = true
 	Cluster_NoSync                  = false
 	Cluster_Status_Active           = "Active"

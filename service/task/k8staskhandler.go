@@ -371,7 +371,7 @@ func SyncAll() {
 		for _, c := range data["items"].([]*models.Cluster) {
 			if c.IsSync == models.Cluster_IsSync {
 				clusterName := c.Name
-				c.SyncStatus = models.Cluster_Sync_Status_IN_PROGRESS
+				c.SyncStatus = models.Cluster_Sync_Status_InProcess
 				c.Update()
 				logs.Info("########################################## cluster:  %s, Sync start.", c.Name)
 				defer func() {
