@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
+	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"time"
@@ -21,9 +22,9 @@ type LicenseFile struct {
 
 type LicenseModule struct {
 	Id              string       `orm:"pk;" description:"(license module id)"`
-	LincenseFile    *LicenseFile `orm:"rel(fk);null;" description:"(license file)"`
+	LicenseFile     *LicenseFile `orm:"rel(fk);null;" description:"(license file)"`
 	ModuleCode      string       `orm:"" description:"(授权模块)"`
-	LicenseCount    string       `orm:"" description:"(授权模块数量)"`
+	LicenseCount    int          `orm:"" description:"(授权模块数量)"`
 	LicenseExpireAt time.Time    `orm:"" description:"(授权结束时间)"`
 }
 
@@ -48,8 +49,21 @@ func (licfile *LicenseFile) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
-
+	uuidlic,_ := uuid.NewV4()
+	licfile.Id = uuidlic.String()
 	_, err := o.Insert(licfile)
+
+	licmodules := []*LicenseModule{}
+	licmodules = licfile.LicenseModule
+	licfile.LicenseModule = nil
+	for _, licmodule := range licmodules{
+		uuidmodule,_ := uuid.NewV4()
+		licmodule.Id = uuidmodule.String()
+		licmodule.LicenseFile = licfile
+		o.Insert(licmodule)
+	}
+	//licfile.LicenseModule = licmodules
+
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddLicenseFileErr

@@ -2,6 +2,7 @@ package system
 
 import (
 	"encoding/json"
+	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 )
 
@@ -13,7 +14,12 @@ import (
 // @router /system/licensefile [post]
 func (this *IntegrationController) AddLicenseFile() {
 	licFile := new(models.LicenseFile)
-	json.Unmarshal(this.Ctx.Input.RequestBody, &licFile)
+	err := json.Unmarshal(this.Ctx.Input.RequestBody, &licFile)
+	if err!=nil{
+		logs.Info("parse json err:", err)
+	}
+
+	logs.Info("licFile: %#v", licFile.LicenseModule)
 
 	this.Data["json"] = licFile.Add()
 	this.ServeJSON(false)
