@@ -24,6 +24,7 @@ var (
 	Job              = "job"
 	LogConfig        = "log_config"
 	TimeEdgePoint    = "time_edge_point"
+	LicenseConfig    = "license_config"
 
 	//security_log timescaledb
 	DcokerIds = "docker_ids"

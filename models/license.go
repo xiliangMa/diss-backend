@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-type LicenseFile struct {
+type LicenseConfig struct {
 	Id              string           `orm:"pk;" description:"(license file id)"`
 	ProductName     string           `orm:"" description:"(产品名称)"`
 	CustomerName    string           `orm:"" description:"(许可对象)"`
@@ -21,11 +21,11 @@ type LicenseFile struct {
 }
 
 type LicenseModule struct {
-	Id              string       `orm:"pk;" description:"(license module id)"`
-	LicenseFile     *LicenseFile `orm:"rel(fk);null;" description:"(license file)"`
-	ModuleCode      string       `orm:"" description:"(授权模块)"`
-	LicenseCount    int          `orm:"" description:"(授权模块数量)"`
-	LicenseExpireAt time.Time    `orm:"" description:"(授权结束时间)"`
+	Id              string         `orm:"pk;" description:"(license module id)"`
+	LicenseFile     *LicenseConfig `orm:"rel(fk);null;" description:"(license file)"`
+	ModuleCode      string         `orm:"" description:"(授权模块)"`
+	LicenseCount    int            `orm:"" description:"(授权模块数量)"`
+	LicenseExpireAt time.Time      `orm:"" description:"(授权结束时间)"`
 }
 
 var LicenseModuleCodeMap = map[string]string{
@@ -39,38 +39,66 @@ var LicenseModuleCodeMap = map[string]string{
 	"SC_LeakScan":         "漏洞扫描",
 }
 
-type LicenseFileInterface interface {
+type LicenseConfigInterface interface {
 	Add() Result
 	Update() Result
+	Get() Result
 	List(from, limit int) Result
 }
 
-func (licfile *LicenseFile) Add() Result {
+func (licconfig *LicenseConfig) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
 	uuidlic,_ := uuid.NewV4()
-	licfile.Id = uuidlic.String()
-	_, err := o.Insert(licfile)
+	licconfig.Id = uuidlic.String()
+	_, err := o.Insert(licconfig)
 
 	licmodules := []*LicenseModule{}
-	licmodules = licfile.LicenseModule
-	licfile.LicenseModule = nil
+	licmodules = licconfig.LicenseModule
+	licconfig.LicenseModule = nil
 	for _, licmodule := range licmodules{
 		uuidmodule,_ := uuid.NewV4()
 		licmodule.Id = uuidmodule.String()
-		licmodule.LicenseFile = licfile
+		licmodule.LicenseFile = licconfig
 		o.Insert(licmodule)
 	}
-	//licfile.LicenseModule = licmodules
+	//licconfig.LicenseModule = licmodules
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddLicenseFileErr
-		logs.Error("Add LicenseFile failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error("Import LicenseFile failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK
-	ResultData.Data = licfile
+	ResultData.Data = licconfig
+	return ResultData
+}
+
+func (licconfig *LicenseConfig) Get() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+	var logConfigData []*LicenseConfig = nil
+
+	cond := orm.NewCondition()
+
+	if licconfig.LicenseUuid != "" {
+		cond = cond.And("license_uuid", licconfig.LicenseUuid)
+	}
+
+	err := o.QueryTable(utils.LicenseConfig).SetCond(cond).RelatedSel().One(&logConfigData)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetLogConfigErr
+		logs.Error("Get LogConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+	}
+	for _, logCofing := range logConfigData {
+		o.LoadRelated(logCofing, "LicenseModule")
+	}
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = logConfigData
 	return ResultData
 }
