@@ -9,6 +9,11 @@ var (
 	Cluster_Sync_Status_FAIL        = 2
 	Cluster_IsSync                  = true
 	Cluster_NoSync                  = false
+	Cluster_Status_Active           = "Active"
+	Cluster_Status_Unavailable      = "Unavailable"
+	Cluster_Type_Kubernets          = "Kubernets"
+	Cluster_Type_OpenShift          = "OpenShift"
+	Cluster_Type_Rancher            = "Rancher"
 	Pod_Container_Statue_Running    = "Running"
 	Pod_Container_Statue_Terminated = "Terminated"
 	Pod_Container_Statue_Waiting    = "Waiting"

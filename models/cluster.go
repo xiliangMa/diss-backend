@@ -12,8 +12,10 @@ type Cluster struct {
 	Id          string    `orm:"pk;" description:"(集群id)"`
 	Name        string    `orm:"unique;" description:"(集群名)"`
 	FileName    string    `orm:"" description:"(k8s 文件)"`
-	Status      uint8     `orm:"default(0);" description:"(集群状态)"`
+	Status      string    `orm:"default(Active);" description:"(集群状态 Active Unavailable)"`
+	Type        string    `orm:"default(Kubernetes);" description:"(类型 Kubernetes Openshift Rancher)"`
 	IsSync      bool      `orm:"default(false);" description:"(是否同步)"`
+	Label       string    `orm:"default(null);" description:"(标签)"`
 	AccountName string    `orm:"-" description:"(租户)"`
 	SyncStatus  int       `orm:"default(0);" description:"(同步状态 0 成功 1 同步中 2 失败)"`
 	CreateTime  time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
@@ -60,6 +62,15 @@ func (this *Cluster) List(from, limit int) Result {
 	}
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
+	}
+	if this.Status != "" && this.Status != All {
+		cond = cond.And("status", this.Status)
+	}
+	if this.Type != "" && this.Type != All {
+		cond = cond.And("type", this.Type)
+	}
+	if this.Label != "" {
+		cond = cond.And("label__contains", this.Label)
 	}
 	_, err = o.QueryTable(utils.Cluster).SetCond(cond).Limit(limit, from).All(&ClusterList)
 	total, _ = o.QueryTable(utils.Cluster).SetCond(cond).Count()
