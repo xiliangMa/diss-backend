@@ -93,11 +93,14 @@ func CreateKubeConfigDir(fpath string) {
 	}
 }
 
-func AddCluster(clusterName, path string) {
+func AddCluster(clusterName, path, clusterType string) {
 	var cluster models.Cluster
 	uid, _ := uuid.NewV4()
 	cluster.Id = uid.String()
 	cluster.Name = clusterName
+	cluster.Type = clusterType
+	cluster.Status = models.Cluster_Status_Active
+	cluster.SyncStatus = models.Cluster_Sync_Status_NotSynced
 	cluster.FileName = path
 	cluster.IsSync = models.Cluster_IsSync
 	cluster.Add()

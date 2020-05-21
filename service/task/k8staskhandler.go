@@ -403,7 +403,7 @@ func SyncAll() {
 
 				logs.Info("Sync end...., cluster name: %s ", clusterName)
 				// 更新同步时间、状态
-				c.SyncStatus = models.Cluster_Sync_Status_OK
+				c.SyncStatus = models.Cluster_Sync_Status_Synced
 				c.Update()
 				logs.Info("########################################## cluster:  %s, Sync end.", clusterName)
 			}
