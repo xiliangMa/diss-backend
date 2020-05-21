@@ -3,12 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/service/task"
 	"github.com/xiliangMa/diss-backend/sysinit"
 	"github.com/xiliangMa/diss-backend/utils"
-	"log"
 	"strconv"
 	"testing"
 	"time"
@@ -41,11 +41,11 @@ func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 	from := 0
 	limit := 3000
 
-	log.Println("Sync syslog data , type:", exType)
+	logs.Info("Sync syslog data , type:", exType)
 
 	GlobalSyslog.OpenSyslog("init synclog")
 	if GlobalSyslog == nil {
-		log.Println("cant connet syslog server, code " + strconv.Itoa(utils.ConnectSyslogErr))
+		logs.Info("cant connet syslog server, code " + strconv.Itoa(utils.ConnectSyslogErr))
 		return
 	}
 
