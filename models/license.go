@@ -46,37 +46,36 @@ type LicenseConfigInterface interface {
 	List(from, limit int) Result
 }
 
-func (licconfig *LicenseConfig) Add() Result {
+func (this *LicenseConfig) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
-	uuidlic,_ := uuid.NewV4()
-	licconfig.Id = uuidlic.String()
-	_, err := o.Insert(licconfig)
+	uuidlic, _ := uuid.NewV4()
+	this.Id = uuidlic.String()
+	_, err := o.Insert(this)
 
 	licmodules := []*LicenseModule{}
-	licmodules = licconfig.LicenseModule
-	licconfig.LicenseModule = nil
-	for _, licmodule := range licmodules{
-		uuidmodule,_ := uuid.NewV4()
+	licmodules = this.LicenseModule
+	this.LicenseModule = nil
+	for _, licmodule := range licmodules {
+		uuidmodule, _ := uuid.NewV4()
 		licmodule.Id = uuidmodule.String()
-		licmodule.LicenseFile = licconfig
+		licmodule.LicenseFile = this
 		o.Insert(licmodule)
 	}
-	//licconfig.LicenseModule = licmodules
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.AddLicenseFileErr
+		ResultData.Code = utils.ImportLicenseFileErr
 		logs.Error("Import LicenseFile failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK
-	ResultData.Data = licconfig
+	ResultData.Data = this
 	return ResultData
 }
 
-func (licconfig *LicenseConfig) Get() Result {
+func (this *LicenseConfig) Get() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
@@ -84,8 +83,8 @@ func (licconfig *LicenseConfig) Get() Result {
 
 	cond := orm.NewCondition()
 
-	if licconfig.LicenseUuid != "" {
-		cond = cond.And("license_uuid", licconfig.LicenseUuid)
+	if this.LicenseUuid != "" {
+		cond = cond.And("license_uuid", this.LicenseUuid)
 	}
 
 	err := o.QueryTable(utils.LicenseConfig).SetCond(cond).RelatedSel().One(&logConfigData)
@@ -100,5 +99,22 @@ func (licconfig *LicenseConfig) Get() Result {
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = logConfigData
+	return ResultData
+}
+
+func (this *LicenseConfig) Update() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+
+	_, err := o.Update(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditLicenseErr
+		logs.Error("Update license: %s failed, code: %d, err: %s", this.Id, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
 	return ResultData
 }

@@ -73,7 +73,6 @@ var (
 	GetSYSTemplateGroupErr          = 78
 	DeleteSYSTemplateGroupErr       = 79
 	EditSYSTemplateGroupErr         = 80
-	AddLicenseFileErr               = 81
 
 	//k8s 1001-1100
 	AddNameSpaceErr    = 1001
@@ -99,14 +98,22 @@ var (
 	EditTaskErr   = 1103
 
 	//system 1200-1300
-	CheckK8sFilePostErr         = 1200
-	CheckK8sFileCreateClientErr = 1201
-	CheckK8sFileIsExistErr      = 1202
-	UploadK8sFileErr            = 1203
-	CheckK8sFileTestErr         = 1204
-	UploadLogoErr               = 1205
-	ChecLogoPostErr             = 1206
-	CheckLogoIsNotExistErr      = 1207
+	CheckK8sFilePostErr             = 1200
+	CheckK8sFileCreateClientErr     = 1201
+	CheckK8sFileIsExistErr          = 1202
+	UploadK8sFileErr                = 1203
+	CheckK8sFileTestErr             = 1204
+	UploadLogoErr                   = 1205
+	ChecLogoPostErr                 = 1206
+	CheckLogoIsNotExistErr          = 1207
+	CheckLicenseFilePostErr         = 1208
+	CheckLicenseFileCreateClientErr = 1209
+	CheckLicenseFileIsExistErr      = 1210
+	ImportLicenseFileErr            = 1211
+	LicenseUnmarshalErr             = 1212
+	LicenseBase64DecodeErr          = 1213
+	EditLicenseErr                  = 1214
+	SaveLicenseFileErr              = 1215
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300

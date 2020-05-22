@@ -23,6 +23,8 @@ conf/kubeconfig/*
 #upload
 upload/*
 
+#license_srv
+license_srv/*
 
 #commentsRouters
 routers/commentsRouter___________________Volumes_MacData_King*
