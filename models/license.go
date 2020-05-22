@@ -28,17 +28,6 @@ type LicenseModule struct {
 	LicenseExpireAt time.Time      `orm:"" description:"(授权结束时间)"`
 }
 
-var LicenseModuleCodeMap = map[string]string{
-	"ImageScan":           "镜像仓库扫描",
-	"DockerBenchMark":     "Docker基线扫描",
-	"KubernetesBenchMark": "K8s基线扫描",
-	"IntrudeDetectScan":   "入侵扫描",
-	"SecurityAudit":       "安全审计",
-	"DockerVirusScan":     "Docker病毒扫描",
-	"HostVirusScan":       "主机病毒扫描",
-	"SC_LeakScan":         "漏洞扫描",
-}
-
 type LicenseConfigInterface interface {
 	Add() Result
 	Update() Result

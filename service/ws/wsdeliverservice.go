@@ -30,7 +30,6 @@ func (this *WSDeliverService) DeliverTaskToNats() {
 			subject = task.Container.HostName
 		}
 		err := models.Nats.Conn.Publish(subject, data)
-		logs.Error("==========", string(data))
 		if err == nil {
 			logs.Info("Deliver Task to Nats Success, Subject: %s Id: %s, data: %v", subject, task.Id, result)
 		} else {
