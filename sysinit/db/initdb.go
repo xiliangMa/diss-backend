@@ -100,16 +100,9 @@ func (this *DefaultDB) InitSystemData() {
 	o := orm.NewOrm()
 	logs.Info("Init default data start................")
 
-	logs.Info("Init default syslog config >>>>>>>>>>>>>>>>")
-	// syslog配置
-	_, err := o.Raw(dbscript.DefaultLogConfigSql).Exec()
-	if err != nil {
-		logs.Error("Init DefaultLogConfigSql fail, err: %s", err)
-	}
-
 	logs.Info("Init default SystemTemplate >>>>>>>>>>>>>>>>")
 	// 系统魔板
-	_, err = o.Raw(dbscript.DefaultDockerBenchSql).Exec()
+	_, err := o.Raw(dbscript.DefaultDockerBenchSql).Exec()
 	if err != nil {
 		logs.Error("Init DefaultDockerBench fail, err: %s", err)
 	}
