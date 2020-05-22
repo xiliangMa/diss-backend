@@ -70,7 +70,7 @@ func (this *Groups) List(from, limit int) Result {
 	if this.ThirdLevel != "" {
 		cond = cond.And("third_level__contains", this.ThirdLevel)
 	}
-	if this.Type != All {
+	if this.Type != "" && this.Type != All {
 		cond = cond.And("type", this.Type)
 	}
 
