@@ -11,6 +11,7 @@ type NameSpace struct {
 	Id             string `orm:"pk;" description:"(命名空间id)"`
 	Name           string `orm:"unique;" description:"(命名空间)"`
 	ClusterId      string `orm:"default(null);" description:"(集群id)"`
+	ClusterName    string `orm:"default(null);" description:"(集群名)"`
 	AccountName    string `orm:"" description:"(租户)"`
 	SyncCheckPoint int64  `orm:"default(0);" description:"(同步检查点)"`
 	Force          bool   `orm:"-" description:"(强制更新)"`
@@ -90,16 +91,12 @@ func (this *NameSpace) List(from, limit int) Result {
 		cond = cond.And("cluster_id", this.ClusterId)
 	}
 
-	if this.Id != "" {
-		cond = cond.And("id", this.Id)
+	if this.ClusterName != "" {
+		cond = cond.And("cluster_name__contains", this.ClusterName)
 	}
 
 	if this.AccountName != "" && this.AccountName != Account_Admin {
 		cond = cond.And("account_name", this.AccountName)
-	}
-
-	if this.AccountName == Account_Admin {
-		cond = cond.And("account_name", "")
 	}
 
 	_, err = o.QueryTable(utils.NameSpace).SetCond(cond).Limit(limit, from).All(&nameSpaceList)

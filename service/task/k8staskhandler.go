@@ -161,6 +161,8 @@ func (this *K8STaskHandler) SyncNameSpace(clusetrName, clusterId string) {
 			nsId := nId
 			ob.Id = nsId
 			ob.Name = nsName
+			ob.ClusterName = clusetrName
+			ob.AccountName = models.Account_Admin
 			ob.ClusterId = clusterId
 			ob.SyncCheckPoint = this.SyncCheckPoint
 			ob.Add(true)
