@@ -91,7 +91,7 @@ func (this *LicenseConfig) Get() Result {
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetLogConfigErr
-		logs.Error("Get LogConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error("Get license failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 	}
 	for _, logCofing := range logConfigData {
 		o.LoadRelated(logCofing, "LicenseModule")
