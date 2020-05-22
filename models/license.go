@@ -20,13 +20,14 @@ type LicenseConfig struct {
 }
 
 type LicenseHistory struct {
-	Id          string `orm:"pk;" description:"(history id)"`
-	LicenseJson string `orm:"" description:"(license json 文件)"`
+	Id          string    `orm:"pk;" description:"(history id)"`
+	LicenseJson string    `orm:"" description:"(license json 文件)"`
+	UpdateTime  time.Time `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
 }
 
 type LicenseModule struct {
 	Id              string         `orm:"pk;" description:"(license module id)"`
-	LicenseFile     *LicenseConfig `orm:"rel(fk);null;" description:"(license file)"`
+	LicenseConfig   *LicenseConfig `orm:"rel(fk);null;" description:"(license file)"`
 	ModuleCode      string         `orm:"" description:"(授权模块)"`
 	LicenseCount    int            `orm:"" description:"(授权模块数量)"`
 	LicenseExpireAt time.Time      `orm:"" description:"(授权结束时间)"`
@@ -55,7 +56,7 @@ func (this *LicenseConfig) Add() Result {
 	for _, licmodule := range licmodules {
 		uuidmodule, _ := uuid.NewV4()
 		licmodule.Id = uuidmodule.String()
-		licmodule.LicenseFile = this
+		licmodule.LicenseConfig = this
 		o.Insert(licmodule)
 	}
 
@@ -82,7 +83,7 @@ func (this *LicenseConfig) Get() Result {
 		cond = cond.And("id", this.Id)
 	}
 
-	err := o.QueryTable(utils.LicenseConfig).SetCond(cond).RelatedSel().One(&logConfigData)
+	_, err := o.QueryTable(utils.LicenseConfig).SetCond(cond).RelatedSel().All(&logConfigData)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetLogConfigErr

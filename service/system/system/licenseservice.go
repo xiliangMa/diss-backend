@@ -32,9 +32,17 @@ func License_RSA_Decrypt(licenseByte []byte, isUpdate bool) models.Result {
 	} else {
 		if isUpdate {
 			result = licenseObject.Update()
+			//添加license 历史
+			liceseHistory := models.LicenseHistory{}
+			liceseHistory.LicenseJson = string(plainText)
+			liceseHistory.Add()
 			logs.Info("Force update license file success, License: %s", string(plainText))
 		} else {
 			result = licenseObject.Add()
+			//添加license 历史
+			liceseHistory := models.LicenseHistory{}
+			liceseHistory.LicenseJson = string(plainText)
+			liceseHistory.Add()
 			logs.Info("License import success, License：", string(plainText))
 		}
 
@@ -44,7 +52,7 @@ func License_RSA_Decrypt(licenseByte []byte, isUpdate bool) models.Result {
 
 func CheckLicenseFilePost(ext, fName string) int {
 	var AllowExtMap map[string]bool = map[string]bool{
-		".license": true,
+		".lic": true,
 	}
 	if _, ok := AllowExtMap[ext]; !ok {
 		return utils.CheckLicenseFilePostErr
