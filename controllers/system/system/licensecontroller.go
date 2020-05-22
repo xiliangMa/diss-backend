@@ -90,13 +90,13 @@ func (this *IntegrationController) AddLicenseFile() {
 // @Title Get License
 // @Description GetLicense
 // @Param token header string true "authToken"
-// @Param LicenseUuid query string true "授权文件uuid"
+// @Param id query string true "id"
 // @Success 200 {object} models.Result
 // @router /system/license [get]
-func (this *IntegrationController) GetLicenseData() {
+func (this *IntegrationController) GetLicense() {
 	licConfig := new(models.LicenseConfig)
-	configId := this.GetString(":LicenseUuid")
-	licConfig.LicenseUuid = configId
+	configId := this.GetString("id")
+	licConfig.Id = configId
 	json.Unmarshal(this.Ctx.Input.RequestBody, &licConfig)
 
 	var ResultData models.Result

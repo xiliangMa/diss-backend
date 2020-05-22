@@ -10,14 +10,18 @@ import (
 )
 
 type LicenseConfig struct {
-	Id              string           `orm:"pk;" description:"(license file id)"`
+	Id              string           `orm:"pk;" description:"(序列号)"`
 	ProductName     string           `orm:"" description:"(产品名称)"`
 	CustomerName    string           `orm:"" description:"(许可对象)"`
 	LicenseType     int              `orm:"" description:"(授权类型 0测试 1正式)"`
-	LicenseUuid     string           `orm:"" description:"(序列号)"`
 	LicenseBuyAt    time.Time        `orm:"null;type(datetime)" description:"(授权购买时间)"`
 	LicenseActiveAt time.Time        `orm:"null;auto_now;type(datetime)" description:"(激活时间)"`
 	LicenseModule   []*LicenseModule `orm:"reverse(many);null" description:"(授权的模块)"`
+}
+
+type LicenseHistory struct {
+	Id          string `orm:"pk;" description:"(history id)"`
+	LicenseJson string `orm:"" description:"(license json 文件)"`
 }
 
 type LicenseModule struct {
@@ -32,6 +36,10 @@ type LicenseConfigInterface interface {
 	Add() Result
 	Update() Result
 	Get() Result
+}
+
+type LicenseHistoryInterface interface {
+	Add() Result
 	List(from, limit int) Result
 }
 
@@ -39,8 +47,6 @@ func (this *LicenseConfig) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
-	uuidlic, _ := uuid.NewV4()
-	this.Id = uuidlic.String()
 	_, err := o.Insert(this)
 
 	licmodules := []*LicenseModule{}
@@ -56,7 +62,7 @@ func (this *LicenseConfig) Add() Result {
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.ImportLicenseFileErr
-		logs.Error("Import LicenseFile failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error("Import License failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK
@@ -72,8 +78,8 @@ func (this *LicenseConfig) Get() Result {
 
 	cond := orm.NewCondition()
 
-	if this.LicenseUuid != "" {
-		cond = cond.And("license_uuid", this.LicenseUuid)
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
 	}
 
 	err := o.QueryTable(utils.LicenseConfig).SetCond(cond).RelatedSel().One(&logConfigData)
@@ -105,5 +111,56 @@ func (this *LicenseConfig) Update() Result {
 	}
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
+	return ResultData
+}
+
+func (this *LicenseHistory) Add() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+	uuidlic, _ := uuid.NewV4()
+	this.Id = uuidlic.String()
+	_, err := o.Insert(this)
+
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.AddLicenseHistoryErr
+		logs.Error("Add License history, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+func (this *LicenseHistory) List(from, limit int) Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var licenseHistoryList []*LicenseHistory = nil
+	var ResultData Result
+	var err error
+	cond := orm.NewCondition()
+	if this.LicenseJson != "" {
+		cond = cond.And("name__icontains", this.LicenseJson)
+	}
+	_, err = o.QueryTable(utils.LicenseHistory).SetCond(cond).Limit(limit, from).All(&licenseHistoryList)
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetLicenseHistoryErr
+		logs.Error("Get License History List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	total, _ := o.QueryTable(utils.LicenseHistory).SetCond(cond).Count()
+	data := make(map[string]interface{})
+	data["total"] = total
+	data["items"] = licenseHistoryList
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
 	return ResultData
 }

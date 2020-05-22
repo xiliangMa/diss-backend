@@ -92,7 +92,7 @@ func (this *DefaultDB) registerModel() {
 	// logconfig and timeEdgepoint
 	orm.RegisterModel(new(models.LogConfig), new(models.TimeEdgePoint))
 	// license
-	orm.RegisterModel(new(models.LicenseConfig), new(models.LicenseModule))
+	orm.RegisterModel(new(models.LicenseConfig), new(models.LicenseModule), new(models.LicenseHistory))
 }
 
 func (this *DefaultDB) InitSystemData() {
