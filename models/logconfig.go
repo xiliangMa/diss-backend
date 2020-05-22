@@ -38,7 +38,7 @@ func (this *LogConfig) InnerGet() []*LogConfig {
 		cond = cond.And("config_name", this.ConfigName)
 	}
 
-	err := o.QueryTable(utils.LogConfig).SetCond(cond).One(&logConfig)
+	_, err := o.QueryTable(utils.LogConfig).SetCond(cond).All(&logConfig)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetLogConfigErr
