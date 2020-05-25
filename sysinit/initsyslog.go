@@ -1,6 +1,7 @@
 package sysinit
 
 import (
+	"github.com/astaxie/beego/logs"
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/task"
@@ -11,7 +12,8 @@ func InitGlobalLogConfig() {
 	logConfig.ConfigName = models.Log_Config_SysLog_Export
 	syslogConfig := logConfig.InnerGet()
 
-	if syslogConfig != nil {
+	logs.Info("syslog Config ",syslogConfig)
+	if len(syslogConfig) > 0 {
 		models.GlobalLogConfig[models.Log_Config_SysLog_Export] = syslogConfig[0]
 	} else {
 		models.GlobalLogConfig[models.Log_Config_SysLog_Export] = &logConfig
