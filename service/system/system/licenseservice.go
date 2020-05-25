@@ -74,7 +74,7 @@ func CheckLicenseFile(h *multipart.FileHeader) (models.Result, string) {
 	ext := path.Ext(fName)
 
 	//创建目录
-	CreateKubeConfigDir(fpath)
+	CreateLicenseConfigDir(fpath)
 
 	// 后缀名不符合上传要求
 	if code := CheckLicenseFilePost(ext, fName); code != http.StatusOK {
@@ -93,6 +93,14 @@ func CheckLicenseFile(h *multipart.FileHeader) (models.Result, string) {
 	fpath = fpath + h.Filename
 	result.Code = http.StatusOK
 	return result, fpath
+}
+
+func CreateLicenseConfigDir(fpath string) {
+	_, err := os.Stat(fpath)
+	if os.IsNotExist(err) {
+		logs.Info("Create License Dir success, path: %s", fpath)
+		os.MkdirAll(beego.AppConfig.String("license::LicensePath"), os.ModePerm)
+	}
 }
 
 func getLicenseFilePath() string {

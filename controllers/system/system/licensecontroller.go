@@ -30,12 +30,14 @@ func (this *IntegrationController) AddLicenseFile() {
 
 	if result.Code == http.StatusOK {
 		err := this.SaveToFile(key, fpath)
+
 		if err != nil {
 			result.Code = utils.ImportLicenseFileErr
 			result.Message = "ImportLicenseFileErr"
 			logs.Error("Import license file fail, err: %s", err.Error())
 		} else {
 			// 添加license 到数据库
+
 			f, err := os.Open(fpath)
 			if err != nil {
 				result.Code = utils.ImportLicenseFileErr
@@ -77,7 +79,7 @@ func (this *IntegrationController) AddLicenseFile() {
 					result.Message = err.Error()
 					logs.Error("Read license file fail: %s", err)
 				} else {
-					result = css.License_RSA_Decrypt(licenseByte, false)
+					result = css.License_RSA_Decrypt(licenseByte, true)
 				}
 			}
 		}

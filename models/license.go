@@ -104,6 +104,7 @@ func (this *LicenseConfig) Update() Result {
 	var ResultData Result
 
 	_, err := o.Update(this)
+
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.EditLicenseErr
