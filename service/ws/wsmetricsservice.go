@@ -11,6 +11,7 @@ import (
 	"github.com/xiliangMa/diss-backend/service/synccheck"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type WSMetricsService struct {
@@ -36,6 +37,14 @@ func (this *WSMetricsService) Save() error {
 			}
 			ip := strings.Split(this.Conn.RemoteAddr().String(), ":")
 			client := &models.Client{Hub: models.WSHub, Conn: this.Conn, Send: make(chan []byte, 256), ClientIp: ip[0], SystemId: heartBeat.SystemId}
+			//更新主机心跳（更新时间
+			host := models.HostConfig{Id: heartBeat.SystemId}
+			data := host.List(0, 0).Data.(map[string]interface{})
+			if data["total"] != 0 {
+				currentHost := data["items"].([]*models.HostConfig)[0]
+				currentHost.UpdateTime = time.Now()
+				currentHost.Update()
+			}
 			// 开启 nats 订阅
 			if models.WSHub != nil {
 				if _, ok := models.WSHub.DissClient[client.SystemId]; !ok {
