@@ -373,41 +373,45 @@ func SyncAll() {
 		for _, c := range data["items"].([]*models.Cluster) {
 			if c.IsSync == models.Cluster_IsSync {
 				clusterName := c.Name
-				c.SyncStatus = models.Cluster_Sync_Status_InProcess
-				c.Update()
-				logs.Info("########################################## cluster:  %s, Sync start.", c.Name)
-				defer func() {
-					if err := recover(); err != nil {
-						logs.Error("########################################## cluster:  %s id: %s , Sync fail. err: %s", c.Name, c.Id, err)
-					}
-				}()
-
 				// 创建k8s客户端
 				this := NewK8STaskHandler(c.FileName)
-				this.SyncCheckPoint = SyncCheckPoint
-				// 同步 namespace
-				this.SyncNameSpace(clusterName, c.Id)
+				if this.Clientgo.ErrMessage == "" {
+					c.SyncStatus = models.Cluster_Sync_Status_InProcess
+					c.Update()
+					logs.Info("########################################## cluster:  %s, Sync start.", c.Name)
+					defer func() {
+						if err := recover(); err != nil {
+							logs.Error("########################################## cluster:  %s id: %s , Sync fail. err: %s", c.Name, c.Id, err)
+						}
+					}()
+					this.SyncCheckPoint = SyncCheckPoint
+					// 同步 namespace
+					this.SyncNameSpace(clusterName, c.Id)
 
-				// 同步 集群内的 hostconfig && hostInfo
-				this.SyncHostConfigAndInfo(clusterName, c.Id)
+					// 同步 集群内的 hostconfig && hostInfo
+					this.SyncHostConfigAndInfo(clusterName, c.Id)
 
-				// 单独同步 hostinfo
-				//this.SyncHostInfo(c.Name)
+					// 单独同步 hostinfo
+					//this.SyncHostInfo(c.Name)
 
-				// 同步HostImageConfig（无法通过k8s采集镜像的详细信息 imageconfig & imageinfo 均由agent采集）
-				//this.SyncHostImageConfig()
+					// 同步HostImageConfig（无法通过k8s采集镜像的详细信息 imageconfig & imageinfo 均由agent采集）
+					//this.SyncHostImageConfig()
 
-				// 同步 namespace 下的 pod
-				this.SyncNamespacePod(clusterName)
+					// 同步 namespace 下的 pod
+					this.SyncNamespacePod(clusterName)
 
-				// 同步 pod 内的 containerconfig && containerinfo
-				this.SyncPodContainerConfigAndInfo(clusterName)
+					// 同步 pod 内的 containerconfig && containerinfo
+					this.SyncPodContainerConfigAndInfo(clusterName)
 
-				logs.Info("Sync end...., cluster name: %s ", clusterName)
-				// 更新同步时间、状态
-				c.SyncStatus = models.Cluster_Sync_Status_Synced
-				c.Update()
-				logs.Info("########################################## cluster:  %s, Sync end.", clusterName)
+					logs.Info("Sync end...., cluster name: %s ", clusterName)
+					// 更新同步时间、状态
+					c.SyncStatus = models.Cluster_Sync_Status_Synced
+					c.Update()
+					logs.Info("########################################## cluster:  %s, Sync end.", clusterName)
+				} else {
+					logs.Error("########################################## cluster:  %s, Sync fail.", clusterName)
+				}
+
 			}
 		}
 

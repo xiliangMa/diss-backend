@@ -9,7 +9,7 @@ import (
 
 type NameSpace struct {
 	Id             string `orm:"pk;" description:"(命名空间id)"`
-	Name           string `orm:"unique;" description:"(命名空间)"`
+	Name           string `orm:"" description:"(命名空间)"`
 	ClusterId      string `orm:"default(null);" description:"(集群id)"`
 	ClusterName    string `orm:"default(null);" description:"(集群名)"`
 	AccountName    string `orm:"" description:"(租户)"`
