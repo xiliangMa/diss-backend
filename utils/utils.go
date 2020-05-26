@@ -2,6 +2,7 @@ package utils
 
 import (
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"os"
 	"strconv"
 )
@@ -40,10 +41,14 @@ var (
 	DS_Diss_Api_Port    = "DS_Diss_Api_Port"
 
 	// Nats
-	Nats_Server_Url = "Nats_Server_Url"
+	Nats_Prefix     = "Nats_Prefix"
 	Nats_Cluster_Id = "Nats_Cluster_Id"
 	Nats_Client_Id  = "Nats_Client_Id"
 	Nats_Enable     = "Nats_Enable"
+	Nats_Ip         = "Nats_Ip"
+	Nats_Port       = "Nats_Port"
+	Nats_User       = "Nats_User"
+	Nats_Pwd        = "Nats_Pwd"
 
 	// SysLog
 	Syslog_Server_Url = "Syslog_Server_Url"
@@ -106,16 +111,30 @@ func GetHostMarkSummarySql() string {
 	return sql
 }
 
+/**
+ * @serverUrl nats://diss:diss@111.229.167.6:4222
+ */
 func GetNatsServerUrl() string {
 	runMode := beego.AppConfig.String("RunMode")
 	envRunMode := os.Getenv("RunMode")
 	if envRunMode != "" {
 		runMode = envRunMode
 	}
-	serverUrl := beego.AppConfig.String("nats::ServerUrl")
+	prefix := beego.AppConfig.String("nats::Prefix")
+	ip := beego.AppConfig.String("nats::Ip")
+	port := beego.AppConfig.String("nats::Port")
+	user := beego.AppConfig.String("nats::User")
+	pwd := beego.AppConfig.String("nats::Pwd")
+	serverUrl := prefix + user + `:` + pwd + `@` + ip + `:` + port
 	if runMode == Run_Mode_Prod {
-		serverUrl = os.Getenv(Nats_Server_Url)
+		prefix = os.Getenv(Nats_Prefix)
+		ip = os.Getenv(Nats_Ip)
+		port = os.Getenv(Nats_Port)
+		user = os.Getenv(Nats_User)
+		pwd = os.Getenv(Nats_Pwd)
+		serverUrl = prefix + user + `:` + pwd + `@` + ip + `:` + port
 	}
+	logs.Info("Nats conect url: %s", serverUrl)
 	return serverUrl
 }
 
