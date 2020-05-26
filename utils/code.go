@@ -116,6 +116,7 @@ var (
 	SaveLicenseFileErr              = 1215
 	AddLicenseHistoryErr            = 1216
 	GetLicenseHistoryErr            = 1217
+	DeleteLicenseModuleErr 			= 1218
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300

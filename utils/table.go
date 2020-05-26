@@ -25,7 +25,9 @@ var (
 	LogConfig        = "log_config"
 	TimeEdgePoint    = "time_edge_point"
 	LicenseConfig    = "license_config"
+	LicenseModule    = "license_module"
 	LicenseHistory   = "license_history"
+
 
 	//security_log timescaledb
 	DcokerIds = "docker_ids"
