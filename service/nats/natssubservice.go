@@ -362,7 +362,7 @@ func (this *NatsSubService) Save() error {
 					if result := task.Update(); result.Code != http.StatusOK {
 						metricsResult.Code = result.Code
 						metricsResult.Msg = result.Message
-						msg := fmt.Sprintf("Nats ############################ Update task Status: %s, fail, >>> HostId: %s, task id: %s, error: <<<", task.Status, task.Host.Id, task.Id, result.Message)
+						msg := fmt.Sprintf("Nats ############################ Update task Status: %s, fail, >>> HostId: %s, task id: %s, error: %s <<<", task.Status, task.Host.Id, task.Id, result.Message)
 						logs.Error(msg)
 						taskLog := models.TaskLog{RawLog: msg, Task: &task, Account: task.Account, Level: models.Log_level_Error}
 						taskLog.Add()
@@ -386,7 +386,7 @@ func (this *NatsSubService) Save() error {
 				if result := task.Delete(); result.Code != http.StatusOK {
 					metricsResult.Code = result.Code
 					metricsResult.Msg = result.Message
-					msg := fmt.Sprintf("Nats ############################ Delete task fail, >>> HostId: %s, , task id: %s, error: <<<", task.Host.Id, task.Id, result.Message)
+					msg := fmt.Sprintf("Nats ############################ Delete task fail, >>> HostId: %s, , task id: %s, error: %s <<<", task.Host.Id, task.Id, result.Message)
 					logs.Error(msg)
 					taskLog := models.TaskLog{RawLog: msg, Task: &task, Account: task.Account, Level: models.Log_level_Error}
 					taskLog.Add()

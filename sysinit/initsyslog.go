@@ -12,7 +12,7 @@ func InitGlobalLogConfig() {
 	logConfig.ConfigName = models.Log_Config_SysLog_Export
 	syslogConfig := logConfig.InnerGet()
 
-	logs.Info("syslog Config ",syslogConfig)
+	logs.Info("syslog Config ", syslogConfig)
 	if len(syslogConfig) > 0 {
 		models.GlobalLogConfig[models.Log_Config_SysLog_Export] = syslogConfig[0]
 	} else {
