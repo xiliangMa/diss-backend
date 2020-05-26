@@ -22,6 +22,7 @@ services:
       - ./swagger:/opt/diss-backend/swagger
       - ./bin/diss-backend:/opt/diss-backend/diss-backend
       - ./entrypoint.sh:/opt/diss-backend/entrypoint.sh
+      - /etc/hosts:/etc/hosts
     entrypoint:
       - ./entrypoint.sh
 
