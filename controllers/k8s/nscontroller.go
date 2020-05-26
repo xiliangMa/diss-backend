@@ -27,3 +27,19 @@ func (this *NSController) GetNameSpaceList() {
 	this.Data["json"] = ns.List(from, limit)
 	this.ServeJSON(false)
 }
+
+// @Title UpdateNameSpaces
+// @Description Update NameSpaces
+// @Param token header string true "authToken"
+// @Param id path string "" true "Id"
+// @Param body body models.NameSpace true "命名空间"
+// @Success 200 {object} models.Result
+// @router /:id [put]
+func (this *NSController) UpdateNameSpace() {
+	id := this.GetString(":id")
+	nameSpace := new(models.NameSpace)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &nameSpace)
+	nameSpace.Id = id
+	this.Data["json"] = nameSpace.Update()
+	this.ServeJSON(false)
+}
