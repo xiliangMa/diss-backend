@@ -69,9 +69,6 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 		updateHostConfig.HostName = this.HostName
 		updateHostConfig.IsInK8s = this.IsInK8s
 		updateHostConfig.OS = this.OS
-		updateHostConfig.Status = this.Status
-		updateHostConfig.Diss = this.Diss
-		updateHostConfig.DissStatus = this.DissStatus
 		updateHostConfig.AccountName = Account_Admin
 		resilt := updateHostConfig.Update()
 		if resilt.Code != http.StatusOK {

@@ -40,8 +40,9 @@ func (this *WSMetricsService) Save() error {
 			//更新主机心跳（更新时间
 			host := models.HostConfig{Id: heartBeat.SystemId}
 			data := host.List(0, 0).Data.(map[string]interface{})
-			if data["total"] != 0 {
-				currentHost := data["items"].([]*models.HostConfig)[0]
+			items := data["items"].([]*models.HostConfig)
+			if len(items) != 0 {
+				currentHost := items[0]
 				currentHost.HeartBeat = time.Now()
 				currentHost.IsEnableHeartBeat = true
 				currentHost.Update()

@@ -53,6 +53,9 @@ func (this *HostConfig) List(from, limit int) Result {
 	data := make(map[string]interface{})
 	data["items"] = HostConfigList
 	data["total"] = total
+	if total == 0 {
+		ResultData.Data = nil
+	}
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
