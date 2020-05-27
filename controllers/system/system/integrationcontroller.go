@@ -5,7 +5,6 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/task"
-	"net/http"
 )
 
 type IntegrationController struct {
@@ -36,8 +35,18 @@ func (this *IntegrationController) AddLogConfig() {
 func (this *IntegrationController) UpdateLogConfig() {
 	logConfig := new(models.LogConfig)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &logConfig)
+	var result models.Result
 
-	result := logConfig.Update()
+	logConfig.ConfigName = models.Log_Config_SysLog_Export
+	chkconfig := logConfig.Get()
+	chkconfigData := chkconfig.Data.([]*models.LogConfig)
+	if len(chkconfigData) > 0 {
+		logConfig.Id = chkconfigData[0].Id
+		result = logConfig.Update()
+	} else {
+		result = logConfig.Add()
+	}
+
 	this.Data["json"] = result
 
 	// 更新log全局配置
@@ -61,11 +70,7 @@ func (this *IntegrationController) GetLogConfig() {
 	logConfig.ConfigName = configName
 	json.Unmarshal(this.Ctx.Input.RequestBody, &logConfig)
 
-	var ResultData models.Result
-	ResultData.Code = http.StatusOK
-	ResultData.Data = logConfig.InnerGet()
-
-	this.Data["json"] = ResultData
+	this.Data["json"] = logConfig.Get()
 	this.ServeJSON(false)
 }
 

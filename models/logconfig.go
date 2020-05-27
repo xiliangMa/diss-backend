@@ -16,7 +16,7 @@ type LogConfig struct {
 	Enabled       bool   `orm:"" description:"(是否启用)"`
 	ServerUrl     string `orm:"" description:"(服务器url)"`
 	ServerPort    string `orm:"" description:"(服务器端口)"`
-	ExportedTypes string `orm:"" description:"(导出日志类型  多个枚举 以,分割)"` //日志类型的多个枚举，以, 分割
+	ExportedTypes string `orm:"" description:"(导出日志类型  多个枚举 以,分割)"`
 }
 
 type LogConfigInterface interface {
@@ -27,7 +27,7 @@ type LogConfigInterface interface {
 
 var GlobalLogConfig = map[string]*LogConfig{}
 
-func (this *LogConfig) InnerGet() []*LogConfig {
+func (this *LogConfig) Get() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var logConfig []*LogConfig = nil
@@ -43,7 +43,6 @@ func (this *LogConfig) InnerGet() []*LogConfig {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetLogConfigErr
 		logs.Error("Get LogConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return nil
 	}
 
 	//total, _ := o.QueryTable(utils.LogConfig).SetCond(cond).Count()
@@ -51,9 +50,9 @@ func (this *LogConfig) InnerGet() []*LogConfig {
 	//data["item"] = logConfig
 	//data["total"] = total
 	//
-	//ResultData.Code = http.StatusOK
-	//ResultData.Data = data
-	return logConfig
+	ResultData.Code = http.StatusOK
+	ResultData.Data = logConfig
+	return ResultData
 }
 
 // 此项目前为内部使用
