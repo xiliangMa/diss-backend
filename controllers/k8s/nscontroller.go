@@ -28,8 +28,8 @@ func (this *NSController) GetNameSpaceList() {
 	this.ServeJSON(false)
 }
 
-// @Title UpdateNameSpaces
-// @Description Update NameSpaces
+// @Title UpdateNameSpace
+// @Description Update NameSpace
 // @Param token header string true "authToken"
 // @Param id path string "" true "Id"
 // @Param body body models.NameSpace true "命名空间"
