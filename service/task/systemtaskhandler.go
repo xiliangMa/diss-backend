@@ -21,14 +21,16 @@ func (this *SystemCheckHandler) SystemCheck() {
 		if sub > agentHeartBeatTime {
 			host.Diss = models.Diss_NotInstalled
 			host.DissStatus = models.Diss_Status_Unsafe
-			host.Status = models.Host_Status_Abnormal
 			host.Update()
 			logs.Warn("Heartbeat abnormal, HostId: %s, Duration: %v Minutes", host.Id, sub)
 		} else {
-			host.Diss = models.Diss_Installed
-			host.DissStatus = models.Diss_status_Safe
-			host.Status = models.Host_Status_Normal
-			host.Update()
+			if host.Status == models.Diss_NotInstalled {
+				host.Diss = models.Diss_Installed
+				host.DissStatus = models.Diss_status_Safe
+				host.Status = models.Host_Status_Normal
+				host.Update()
+			}
+
 		}
 	}
 }

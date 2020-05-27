@@ -40,8 +40,8 @@ func (this *K8STaskHandler) SyncHostConfigAndInfo(clusterName, clusterId string)
 			config.IsInK8s = true
 			config.ClusterId = clusterId
 			config.IsInK8s = true
-			config.Diss = models.Diss_Installed
-			config.DissStatus = models.Diss_status_Safe
+			config.Diss = models.Diss_NotInstalled
+			config.DissStatus = models.Diss_Status_Unsafe
 			config.Status = models.Host_Status_Normal
 
 			// 同步 hostinfo

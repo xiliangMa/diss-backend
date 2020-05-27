@@ -40,7 +40,7 @@ func (this *WSMetricController) Metrics() {
 			break
 		}
 		wsmh := &ws.WSMetricsService{message, wsconn}
-		wsmh.Save()
+		go wsmh.Save()
 	}
 	this.Data["json"] = nil
 	this.ServeJSON(false)
