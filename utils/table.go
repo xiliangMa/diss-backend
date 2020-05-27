@@ -28,7 +28,6 @@ var (
 	LicenseModule    = "license_module"
 	LicenseHistory   = "license_history"
 
-
 	//security_log timescaledb
 	DcokerIds = "docker_ids"
 	TaskLog   = "task_log"
