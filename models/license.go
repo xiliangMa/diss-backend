@@ -164,7 +164,7 @@ func (this *LicenseConfig) Get() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
-	var logConfigData []*LicenseConfig = nil
+	var licConfigData []*LicenseConfig = nil
 
 	cond := orm.NewCondition()
 
@@ -172,18 +172,18 @@ func (this *LicenseConfig) Get() Result {
 		cond = cond.And("id", this.Id)
 	}
 
-	_, err := o.QueryTable(utils.LicenseConfig).SetCond(cond).RelatedSel().All(&logConfigData)
+	_, err := o.QueryTable(utils.LicenseConfig).SetCond(cond).RelatedSel().All(&licConfigData)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetLogConfigErr
 		logs.Error("Get license failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 	}
-	for _, logCofing := range logConfigData {
-		o.LoadRelated(logCofing, "LicenseModule")
+	for _, licCofing := range licConfigData {
+		o.LoadRelated(licCofing, "Modules")
 	}
 
 	ResultData.Code = http.StatusOK
-	ResultData.Data = logConfigData
+	ResultData.Data = licConfigData
 	return ResultData
 }
 
