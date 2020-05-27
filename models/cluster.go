@@ -102,7 +102,7 @@ func (this *Cluster) Update() Result {
 	_, err := o.Update(this)
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.EditHostErr
+		ResultData.Code = utils.EditClusterErr
 		logs.Error("Update cluster: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
 		return ResultData
 	}

@@ -90,6 +90,7 @@ var (
 	UnBindNameSpaceErr = 1013
 	BindPodErr         = 1014
 	UnBindPodErr       = 1015
+	EditClusterErr     = 1006
 
 	//task 1100-1200
 	AddTaskErr    = 1100
