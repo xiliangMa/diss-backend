@@ -271,7 +271,7 @@ func (this *NameSpace) EmptyDirtyData() error {
 	if err != nil {
 		logs.Error("Empty Dirty Data failed,  model: %s, code: %d, err: %s", utils.NameSpace, utils.EmptyDirtyDataNameSpaceErr, err.Error())
 	} else {
-		logs.Error("Empty Dirty Data success,  model: %s, ", utils.NameSpace)
+		logs.Info("Empty Dirty Data success,  model: %s, ", utils.NameSpace)
 	}
 	return err
 }
