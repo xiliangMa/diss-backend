@@ -9,14 +9,15 @@ import (
 	"time"
 )
 
+
 type LicenseConfig struct {
-	Id              string           `orm:"pk;" description:"(序列号)"`
-	ProductName     string           `orm:"" description:"(产品名称)"`
-	CustomerName    string           `orm:"" description:"(许可对象)"`
-	LicenseType     int              `orm:"" description:"(授权类型 0测试 1正式)"`
-	LicenseBuyAt    time.Time        `orm:"null;type(datetime)" description:"(授权购买时间)"`
-	LicenseActiveAt time.Time        `orm:"null;auto_now;type(datetime)" description:"(激活时间)"`
-	LicenseModule   []*LicenseModule `orm:"reverse(many);null" description:"(授权的模块)"`
+	Id           string           `orm:"pk;" description:"(序列号)"`
+	ProductName  string           `orm:"" description:"(产品名称)"`
+	CustomerName string           `orm:"" description:"(许可对象)"`
+	Type         int              `orm:"" description:"(授权类型 0测试 1正式)"`
+	BuyAt        time.Time        `orm:"null;type(datetime)" description:"(授权购买时间)"`
+	ActiveAt     time.Time        `orm:"null;auto_now;type(datetime)" description:"(激活时间)"`
+	Modules      []*LicenseModule `orm:"reverse(many);null" description:"(授权的模块)"`
 }
 
 type LicenseHistory struct {
@@ -25,12 +26,9 @@ type LicenseHistory struct {
 	UpdateTime  time.Time `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
 }
 
-type LicenseModule struct {
-	Id              string         `orm:"pk;" description:"(license module id)"`
-	LicenseConfig   *LicenseConfig `orm:"rel(fk);null;" description:"(license file)"`
-	ModuleCode      string         `orm:"" description:"(授权模块)"`
-	LicenseCount    int            `orm:"" description:"(授权模块数量)"`
-	LicenseExpireAt time.Time      `orm:"" description:"(授权结束时间)"`
+type LinceseModuleInterface interface {
+	Add()
+	Remove(string)
 }
 
 type LicenseConfigInterface interface {
@@ -39,31 +37,122 @@ type LicenseConfigInterface interface {
 	Get() Result
 }
 
+type LicenseModule struct {
+	Id              string         `orm:"pk;" description:"(license module id)"`
+	LicenseConfig   *LicenseConfig `orm:"rel(fk);null" description:"(license file)"`
+	ModuleCode      string         `orm:"" description:"(授权模块)"`
+	LicenseCount    int            `orm:"" description:"(授权模块数量)"`
+	LicenseExpireAt time.Time      `orm:"" description:"(授权结束时间)"`
+}
+
 type LicenseHistoryInterface interface {
 	Add() Result
 	List(from, limit int) Result
 }
 
-func (this *LicenseConfig) Add() Result {
+func (this *LicenseModule)  Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
 	_, err := o.Insert(this)
 
-	licmodules := []*LicenseModule{}
-	licmodules = this.LicenseModule
-	this.LicenseModule = nil
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.ImportLicenseFileErr
+		logs.Error("Import License failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+func (this *LicenseModule)  Remove(licid string) Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+	cond := orm.NewCondition()
+	cond = cond.And("license_config_id", licid)
+	_, err := o.QueryTable(utils.LicenseModule).SetCond(cond).Delete()
+
+	if err != nil  {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteLicenseModuleErr
+		logs.Error("Import License failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+
+func (this *LicenseConfig) Add() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+
+	err := o.Begin()
+	licmodules := this.Modules
 	for _, licmodule := range licmodules {
 		uuidmodule, _ := uuid.NewV4()
-		licmodule.Id = uuidmodule.String()
-		licmodule.LicenseConfig = this
-		o.Insert(licmodule)
+		tmplicmodule := LicenseModule{Id:uuidmodule.String(), LicenseConfig:this, LicenseCount:licmodule.LicenseCount,LicenseExpireAt:licmodule.LicenseExpireAt,ModuleCode:licmodule.ModuleCode}
+		_ = tmplicmodule.Add()
+		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+			o.Rollback()
+		}
 	}
+
+	_, err = o.Insert(this)
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+		o.Rollback()
+	}
+	err = o.Commit()
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.ImportLicenseFileErr
 		logs.Error("Import License failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+func (this *LicenseConfig) Update() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+
+	err := o.Begin()
+
+	_, err = o.Update(this)
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+		o.Rollback()
+	}
+
+	licmodules := this.Modules
+	tmpmodule := LicenseModule{}
+	tmpmodule.Remove(this.Id)
+	for _, licmodule := range licmodules {
+		uuidmodule, _ := uuid.NewV4()
+		tmplicmodule := LicenseModule{Id:uuidmodule.String(), LicenseConfig:this, LicenseCount:licmodule.LicenseCount,LicenseExpireAt:licmodule.LicenseExpireAt, ModuleCode:licmodule.ModuleCode}
+		_ = tmplicmodule.Add()
+		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+			o.Rollback()
+		}
+	}
+
+	err = o.Commit()
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditLicenseErr
+		logs.Error("Update license: %s failed, code: %d, err: %s", this.Id, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK
@@ -95,24 +184,6 @@ func (this *LicenseConfig) Get() Result {
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = logConfigData
-	return ResultData
-}
-
-func (this *LicenseConfig) Update() Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
-	var ResultData Result
-
-	_, err := o.Update(this)
-
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.EditLicenseErr
-		logs.Error("Update license: %s failed, code: %d, err: %s", this.Id, ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-	ResultData.Code = http.StatusOK
-	ResultData.Data = this
 	return ResultData
 }
 
