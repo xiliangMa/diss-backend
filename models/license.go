@@ -114,7 +114,7 @@ func (this *LicenseConfig) Add() Result {
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.ImportLicenseFileErr
-		if errCommit != nil{
+		if errCommit != nil {
 			ResultData.Code = utils.LicenseCommitErr
 		}
 		logs.Error("Import License failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -155,7 +155,7 @@ func (this *LicenseConfig) Update() Result {
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.EditLicenseErr
-		if errCommit != nil{
+		if errCommit != nil {
 			ResultData.Code = utils.LicenseCommitErr
 		}
 		logs.Error("Update license: %s failed, code: %d, err: %s", this.Id, ResultData.Code, ResultData.Message)

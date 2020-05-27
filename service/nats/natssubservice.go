@@ -364,7 +364,7 @@ func (this *NatsSubService) Save() error {
 						metricsResult.Msg = result.Message
 						msg := ""
 						if task.Host == nil {
-							msg = fmt.Sprintf("Nats ############################ Update task Status: %s, fail, >>> HostName: %s, task id: %s, error: %s <<<", task.Status, task.Host.HostName, task.Id, result.Message)
+							msg = fmt.Sprintf("Nats ############################ Update task Status: %s, fail, >>> HostName: %s, task id: %s, error: %s <<<", task.Status, task.Container.HostName, task.Id, result.Message)
 						} else {
 							msg = fmt.Sprintf("Nats ############################ Update task Status: %s, fail, >>> HostId: %s, task id: %s, error: %s <<<", task.Status, task.Host.Id, task.Id, result.Message)
 						}
@@ -373,7 +373,12 @@ func (this *NatsSubService) Save() error {
 						taskLog.Add()
 						return errors.New(result.Message)
 					} else {
-						msg := fmt.Sprintf("Nats ############################ Update task Success, Status: %s >>> HostId: %s, Type: %s, task id: %s <<<", task.Status, task.Host.Id, models.Resource_Task, task.Id)
+						msg := ""
+						if task.Host == nil {
+							msg = fmt.Sprintf("Nats ############################ Update task Success, Status: %s >>> HostName: %s, Type: %s, task id: %s <<<", task.Status, task.Container.HostName, models.Resource_Task, task.Id)
+						} else {
+							msg = fmt.Sprintf("Nats ############################ Update task Success, Status: %s >>> HostId: %s, Type: %s, task id: %s <<<", task.Status, task.Host.Id, models.Resource_Task, task.Id)
+						}
 						logs.Info(msg)
 						taskLog := models.TaskLog{RawLog: msg, Task: &task, Account: task.Account, Level: models.Log_level_Info}
 						taskLog.Add()
@@ -391,13 +396,23 @@ func (this *NatsSubService) Save() error {
 				if result := task.Delete(); result.Code != http.StatusOK {
 					metricsResult.Code = result.Code
 					metricsResult.Msg = result.Message
-					msg := fmt.Sprintf("Nats ############################ Delete task fail, >>> HostId: %s, , task id: %s, error: %s <<<", task.Host.Id, task.Id, result.Message)
+					msg := ""
+					if task.Host == nil {
+						msg = fmt.Sprintf("Nats ############################ Delete task fail, >>> HostName: %s, , task id: %s, error: %s <<<", task.Container.HostName, task.Id, result.Message)
+					} else {
+						msg = fmt.Sprintf("Nats ############################ Delete task fail, >>> HostId: %s, , task id: %s, error: %s <<<", task.Host.Id, task.Id, result.Message)
+					}
 					logs.Error(msg)
 					taskLog := models.TaskLog{RawLog: msg, Task: &task, Account: task.Account, Level: models.Log_level_Error}
 					taskLog.Add()
 					return errors.New(result.Message)
 				} else {
-					msg := fmt.Sprintf("Nats ############################  Delete task success, >>> HostId: %s, Type: %s, task id: %s<<<", task.Host.Id, models.Resource_Task, task.Id)
+					msg := ""
+					if task.Host == nil {
+						msg = fmt.Sprintf("Nats ############################  Delete task success, >>> HostNam: %s, Type: %s, task id: %s<<<", task.Container.HostName, models.Resource_Task, task.Id)
+					} else {
+						msg = fmt.Sprintf("Nats ############################  Delete task success, >>> HostId: %s, Type: %s, task id: %s<<<", task.Host.Id, models.Resource_Task, task.Id)
+					}
 					logs.Info(msg)
 					taskLog := models.TaskLog{RawLog: msg, Task: &task, Account: task.Account, Level: models.Log_level_Info}
 					taskLog.Add()
