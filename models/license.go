@@ -93,6 +93,8 @@ func (this *LicenseConfig) Add() Result {
 	var ResultData Result
 
 	err := o.Begin()
+	tmpmodule := LicenseModule{}
+	tmpmodule.Remove(this.Id)
 	licmodules := this.Modules
 	for _, licmodule := range licmodules {
 		uuidmodule, _ := uuid.NewV4()
@@ -107,11 +109,14 @@ func (this *LicenseConfig) Add() Result {
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		o.Rollback()
 	}
-	err = o.Commit()
+	errCommit := o.Commit()
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.ImportLicenseFileErr
+		if errCommit != nil{
+			ResultData.Code = utils.LicenseCommitErr
+		}
 		logs.Error("Import License failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
@@ -145,11 +150,14 @@ func (this *LicenseConfig) Update() Result {
 		}
 	}
 
-	err = o.Commit()
+	errCommit := o.Commit()
 
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.EditLicenseErr
+		if errCommit != nil{
+			ResultData.Code = utils.LicenseCommitErr
+		}
 		logs.Error("Update license: %s failed, code: %d, err: %s", this.Id, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
@@ -162,7 +170,7 @@ func (this *LicenseConfig) Get() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
-	var logConfigData []*LicenseConfig = nil
+	var licConfigData []*LicenseConfig = nil
 
 	cond := orm.NewCondition()
 
@@ -170,18 +178,18 @@ func (this *LicenseConfig) Get() Result {
 		cond = cond.And("id", this.Id)
 	}
 
-	_, err := o.QueryTable(utils.LicenseConfig).SetCond(cond).RelatedSel().All(&logConfigData)
+	_, err := o.QueryTable(utils.LicenseConfig).SetCond(cond).RelatedSel().All(&licConfigData)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetLogConfigErr
 		logs.Error("Get license failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 	}
-	for _, logCofing := range logConfigData {
-		o.LoadRelated(logCofing, "LicenseModule")
+	for _, licCofing := range licConfigData {
+		o.LoadRelated(licCofing, "Modules")
 	}
 
 	ResultData.Code = http.StatusOK
-	ResultData.Data = logConfigData
+	ResultData.Data = licConfigData
 	return ResultData
 }
 
