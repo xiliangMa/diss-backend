@@ -42,7 +42,8 @@ func (this *WSMetricsService) Save() error {
 			data := host.List(0, 0).Data.(map[string]interface{})
 			if data["total"] != 0 {
 				currentHost := data["items"].([]*models.HostConfig)[0]
-				currentHost.UpdateTime = time.Now()
+				currentHost.HeartBeat = time.Now()
+				currentHost.IsEnableHeartBeat = true
 				currentHost.Update()
 			}
 			// 开启 nats 订阅

@@ -9,7 +9,6 @@ import (
 	"time"
 )
 
-
 type LicenseConfig struct {
 	Id           string           `orm:"pk;" description:"(序列号)"`
 	ProductName  string           `orm:"" description:"(产品名称)"`
@@ -50,7 +49,7 @@ type LicenseHistoryInterface interface {
 	List(from, limit int) Result
 }
 
-func (this *LicenseModule)  Add() Result {
+func (this *LicenseModule) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
@@ -68,7 +67,7 @@ func (this *LicenseModule)  Add() Result {
 	return ResultData
 }
 
-func (this *LicenseModule)  Remove(licid string) Result {
+func (this *LicenseModule) Remove(licid string) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
@@ -76,7 +75,7 @@ func (this *LicenseModule)  Remove(licid string) Result {
 	cond = cond.And("license_config_id", licid)
 	_, err := o.QueryTable(utils.LicenseModule).SetCond(cond).Delete()
 
-	if err != nil  {
+	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteLicenseModuleErr
 		logs.Error("Import License failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -88,7 +87,6 @@ func (this *LicenseModule)  Remove(licid string) Result {
 	return ResultData
 }
 
-
 func (this *LicenseConfig) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
@@ -98,7 +96,7 @@ func (this *LicenseConfig) Add() Result {
 	licmodules := this.Modules
 	for _, licmodule := range licmodules {
 		uuidmodule, _ := uuid.NewV4()
-		tmplicmodule := LicenseModule{Id:uuidmodule.String(), LicenseConfig:this, LicenseCount:licmodule.LicenseCount,LicenseExpireAt:licmodule.LicenseExpireAt,ModuleCode:licmodule.ModuleCode}
+		tmplicmodule := LicenseModule{Id: uuidmodule.String(), LicenseConfig: this, LicenseCount: licmodule.LicenseCount, LicenseExpireAt: licmodule.LicenseExpireAt, ModuleCode: licmodule.ModuleCode}
 		_ = tmplicmodule.Add()
 		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 			o.Rollback()
@@ -140,7 +138,7 @@ func (this *LicenseConfig) Update() Result {
 	tmpmodule.Remove(this.Id)
 	for _, licmodule := range licmodules {
 		uuidmodule, _ := uuid.NewV4()
-		tmplicmodule := LicenseModule{Id:uuidmodule.String(), LicenseConfig:this, LicenseCount:licmodule.LicenseCount,LicenseExpireAt:licmodule.LicenseExpireAt, ModuleCode:licmodule.ModuleCode}
+		tmplicmodule := LicenseModule{Id: uuidmodule.String(), LicenseConfig: this, LicenseCount: licmodule.LicenseCount, LicenseExpireAt: licmodule.LicenseExpireAt, ModuleCode: licmodule.ModuleCode}
 		_ = tmplicmodule.Add()
 		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 			o.Rollback()

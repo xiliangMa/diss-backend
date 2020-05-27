@@ -10,22 +10,23 @@ import (
 )
 
 type HostConfig struct {
-	Id          string    `orm:"pk;" description:"(主机id)"`
-	HostName    string    `orm:"" description:"(主机名)"`
-	OS          string    `orm:"" description:"(系统)"`
-	PG          string    `orm:"default(sys-default)" description:"(安全策略组)"`
-	Status      string    `orm:"default(Normal)" description:"(主机状态 正常 Normal 异常 Abnormal)"`
-	Diss        string    `orm:"default(Installed)" description:"(安全容器 Installed NotInstalled)"`
-	DissStatus  string    `orm:"default(Safe)" description:"(安全状态 Safe Unsafe)"`
-	AccountName string    `orm:"default(admin)" description:"(租户)"`
-	GroupId     string    `orm:"-" description:"(查询参数：分组Id， 仅仅是查询使用, 返回数据看 Group)"`
-	Group       *Groups   `orm:"rel(fk);null;on_delete(set_null)" description:"(分组)"`
-	Type        string    `orm:"default(Server);" description:"(类型 服务器: Server 虚拟机: Vm)"`
-	IsInK8s     bool      `orm:"default(false);" description:"(是否在k8s集群)"`
-	ClusterId   string    `orm:"default(null);" description:"(集群id)"`
-	Label       string    `orm:"default(null);" description:"(标签)"`
-	Job         *Job      `orm:"rel(fk);null;" description:"(job)"`
-	UpdateTime  time.Time `orm:"null;auto_now;type(datetime)" description:"(更新时间/心跳)"`
+	Id                string    `orm:"pk;" description:"(主机id)"`
+	HostName          string    `orm:"" description:"(主机名)"`
+	OS                string    `orm:"" description:"(系统)"`
+	PG                string    `orm:"default(sys-default)" description:"(安全策略组)"`
+	Status            string    `orm:"default(Normal)" description:"(主机状态 正常 Normal 异常 Abnormal)"`
+	Diss              string    `orm:"default(Installed)" description:"(安全容器 Installed NotInstalled)"`
+	DissStatus        string    `orm:"default(Safe)" description:"(安全状态 Safe Unsafe)"`
+	AccountName       string    `orm:"default(admin)" description:"(租户)"`
+	GroupId           string    `orm:"-" description:"(查询参数：分组Id， 仅仅是查询使用, 返回数据看 Group)"`
+	Group             *Groups   `orm:"rel(fk);null;on_delete(set_null)" description:"(分组)"`
+	Type              string    `orm:"default(Server);" description:"(类型 服务器: Server 虚拟机: Vm)"`
+	IsInK8s           bool      `orm:"default(false);" description:"(是否在k8s集群)"`
+	ClusterId         string    `orm:"default(null);" description:"(集群id)"`
+	Label             string    `orm:"default(null);" description:"(标签)"`
+	Job               *Job      `orm:"rel(fk);null;" description:"(job)"`
+	IsEnableHeartBeat bool      `orm:"default(false);" description:"(是否开启心跳上报)"`
+	HeartBeat         time.Time `orm:"null;type(datetime)" description:"(心跳)"`
 }
 
 type HostInfo struct {
@@ -69,6 +70,8 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 		updateHostConfig.IsInK8s = this.IsInK8s
 		updateHostConfig.OS = this.OS
 		updateHostConfig.Status = this.Status
+		updateHostConfig.Diss = this.Diss
+		updateHostConfig.DissStatus = this.DissStatus
 		updateHostConfig.AccountName = Account_Admin
 		resilt := updateHostConfig.Update()
 		if resilt.Code != http.StatusOK {
