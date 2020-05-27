@@ -93,6 +93,8 @@ func (this *LicenseConfig) Add() Result {
 	var ResultData Result
 
 	err := o.Begin()
+	tmpmodule := LicenseModule{}
+	tmpmodule.Remove(this.Id)
 	licmodules := this.Modules
 	for _, licmodule := range licmodules {
 		uuidmodule, _ := uuid.NewV4()
@@ -107,11 +109,14 @@ func (this *LicenseConfig) Add() Result {
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		o.Rollback()
 	}
-	err = o.Commit()
+	errCommit := o.Commit()
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.ImportLicenseFileErr
+		if errCommit != nil{
+			ResultData.Code = utils.LicenseCommitErr
+		}
 		logs.Error("Import License failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
@@ -145,11 +150,14 @@ func (this *LicenseConfig) Update() Result {
 		}
 	}
 
-	err = o.Commit()
+	errCommit := o.Commit()
 
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.EditLicenseErr
+		if errCommit != nil{
+			ResultData.Code = utils.LicenseCommitErr
+		}
 		logs.Error("Update license: %s failed, code: %d, err: %s", this.Id, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
