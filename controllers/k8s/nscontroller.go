@@ -43,3 +43,35 @@ func (this *NSController) UpdateNameSpace() {
 	this.Data["json"] = nameSpace.Update()
 	this.ServeJSON(false)
 }
+
+// @Title BindAccount
+// @Description BindAccount（绑定租户）
+// @Param token header string true "authToken"
+// @Param nsId path string "" true "nsId"
+// @Param body body models.NameSpace true "命名空间"
+// @Success 200 {object} models.Result
+// @router /:nsId/bindaccount [put]
+func (this *NSController) BindAccount() {
+	nsId := this.GetString(":nsId")
+	NS := new(models.NameSpace)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &NS)
+	NS.Id = nsId
+	this.Data["json"] = NS.BindAccount()
+	this.ServeJSON(false)
+}
+
+// @Title UnBindAccount
+// @Description UnBindAccount（解除绑定）
+// @Param token header string true "authToken"
+// @Param nsId path string "" true "nsId"
+// @Param body body models.NameSpace true "命名空间"
+// @Success 200 {object} models.Result
+// @router /:nsId/unbindaccount [delete]
+func (this *NSController) UnBindAccount() {
+	nsId := this.GetString(":nsId")
+	NS := new(models.NameSpace)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &NS)
+	NS.Id = nsId
+	this.Data["json"] = NS.UnBindAccount()
+	this.ServeJSON(false)
+}
