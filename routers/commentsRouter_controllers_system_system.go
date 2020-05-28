@@ -27,6 +27,15 @@ func init() {
 
     beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"],
         beego.ControllerComments{
+            Method: "GetLicenseHistory",
+            Router: `/system/licensehistory`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"],
+        beego.ControllerComments{
             Method: "AddLogConfig",
             Router: `/system/logconfig`,
             AllowHTTPMethods: []string{"post"},

@@ -108,3 +108,22 @@ func (this *IntegrationController) GetLicense() {
 	this.Data["json"] = ResultData
 	this.ServeJSON(false)
 }
+
+// @Title Get License History
+// @Description Get LicenseHistory
+// @Param token header string true "authToken"
+// @Param from query int 0 false "from"
+// @Param limit query int 50 false "limit"
+// @Success 200 {object} models.Result
+// @router /system/licensehistory [get]
+func (this *IntegrationController) GetLicenseHistory() {
+	licHistory := new(models.LicenseHistory)
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+	var ResultData models.Result
+	ResultData.Code = http.StatusOK
+	ResultData.Data = licHistory.List(from, limit)
+
+	this.Data["json"] = ResultData
+	this.ServeJSON(false)
+}
