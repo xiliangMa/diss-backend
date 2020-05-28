@@ -109,10 +109,7 @@ func (this *ContainerConfig) List(from, limit int, groupSearch bool) Result {
 		}
 	}
 
-	if this.AccountName == "" {
-		this.AccountName = Account_Admin
-	}
-	if this.AccountName != Account_Admin {
+	if this.AccountName != "" && this.AccountName != Account_Admin {
 		cond = cond.And("account_name", this.AccountName)
 	}
 	// 分组条件 只能查询pod 为空的主机
