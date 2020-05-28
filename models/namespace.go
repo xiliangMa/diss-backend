@@ -143,7 +143,7 @@ func (this *NameSpace) UnBindAccount() Result {
 	o.Using(utils.DS_Default)
 	var ResultData Result
 	err := o.Begin()
-	params := orm.Params{"account_name": ""}
+	params := orm.Params{"account_name": Account_Admin}
 	cond := orm.NewCondition()
 	cond = cond.And("id", this.Id)
 
@@ -197,7 +197,7 @@ func (this *NameSpace) BindAccount() Result {
 	if this.Force {
 		dbList[0].AccountName = this.AccountName
 	} else {
-		if dbList[0].AccountName == "" {
+		if dbList[0].AccountName == "" || dbList[0].AccountName == Account_Admin {
 			dbList[0].AccountName = this.AccountName
 		} else {
 			if this.Force != true {
