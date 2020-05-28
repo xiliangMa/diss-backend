@@ -213,6 +213,9 @@ func (this *Task) List(from, limit int) Result {
 	if this.Host != nil && this.Host.Id != "" {
 		cond = cond.And("host_id", this.Host.Id)
 	}
+	if this.Container != nil && this.Container.Id != "" {
+		cond = cond.And("container_id", this.Container.Id)
+	}
 	if this.Account != "" {
 		cond = cond.And("account", this.Account)
 	}
