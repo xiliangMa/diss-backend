@@ -53,7 +53,6 @@ func (this *NatsSubService) Save() error {
 				return err
 			}
 			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s <<<", hostConfig.Id, models.Resource_HostConfig)
-			hostConfig.IsEnableHeartBeat = true
 			if err := hostConfig.Inner_AddHostConfig(); err != nil {
 				return err
 			}
