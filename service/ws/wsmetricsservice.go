@@ -44,7 +44,6 @@ func (this *WSMetricsService) Save() error {
 			if len(items) != 0 {
 				currentHost := items[0]
 				currentHost.HeartBeat = time.Now()
-				currentHost.IsEnableHeartBeat = true
 				currentHost.Update()
 			}
 			// 开启 nats 订阅

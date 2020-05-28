@@ -2,12 +2,10 @@ package ws
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/gorilla/websocket"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/utils"
 )
 
 type WSDeliverService struct {
@@ -77,50 +75,4 @@ func (this *WSDeliverService) DeliverTask() {
 		}
 	}
 	logs.Info("################ Deliver Task <<<end>>> ################")
-}
-
-func (this *WSDeliverService) DeleteTask() error {
-	logs.Info("################ Delete Task <<<start>>> ################")
-	task := this.DelTask
-	if task.Host == nil {
-		return nil
-	}
-	result := models.WsData{Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Delete, Data: task}
-	data, err := json.Marshal(result)
-	hostId := task.Host.Id
-
-	// 下发删除任务
-	if utils.IsEnableNats() {
-		// nats
-		err = models.Nats.Conn.Publish(task.Host.Id, data)
-	} else {
-		// websocket
-		if _, ok := this.Hub.DissClient[hostId]; !ok {
-			errMsg := "Agent not connect"
-			msg := fmt.Sprintf("Delete Task Fail, Id: %s, err: %s", task.Id, errMsg)
-			logs.Error(msg)
-			taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account, Level: models.Log_level_Error}
-			taskLog.Add()
-			return errors.New(errMsg)
-		}
-		client := this.Hub.DissClient[hostId]
-		if err != nil {
-			msg := fmt.Sprintf("Delete Task Fail, Id: %s, err: %s", task.Id, err.Error())
-			logs.Error(msg)
-			taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account, Level: models.Log_level_Error}
-			taskLog.Add()
-			return err
-		}
-		err = client.Conn.WriteMessage(websocket.TextMessage, data)
-	}
-	if err != nil {
-		msg := fmt.Sprintf("Delete Task Fail, Id: %s, err: %s", task.Id, err.Error())
-		logs.Error(msg)
-		taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account, Level: models.Log_level_Error}
-		taskLog.Add()
-		return err
-	}
-	logs.Info("Delete Task Success, Id: %s, data: %v", task.Id, result)
-	logs.Info("################ Delete Task <<<end>>> ################")
-	return nil
 }

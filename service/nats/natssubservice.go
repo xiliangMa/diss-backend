@@ -8,6 +8,7 @@ import (
 	"github.com/nats-io/stan.go"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/synccheck"
+	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
 
@@ -15,6 +16,7 @@ type NatsSubService struct {
 	Message       []byte
 	Conn          stan.Conn
 	ClientSubject string
+	DelTask       *models.Task
 }
 
 func (this *NatsSubService) Save() error {
@@ -51,6 +53,7 @@ func (this *NatsSubService) Save() error {
 				return err
 			}
 			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s <<<", hostConfig.Id, models.Resource_HostConfig)
+			hostConfig.IsEnableHeartBeat = true
 			if err := hostConfig.Inner_AddHostConfig(); err != nil {
 				return err
 			}
@@ -409,7 +412,7 @@ func (this *NatsSubService) Save() error {
 				} else {
 					msg := ""
 					if task.Host == nil {
-						msg = fmt.Sprintf("Nats ############################  Delete task success, >>> HostNam: %s, Type: %s, task id: %s<<<", task.Container.HostName, models.Resource_Task, task.Id)
+						msg = fmt.Sprintf("Nats ############################  Delete task success, >>> HostName: %s, Type: %s, task id: %s<<<", task.Container.HostName, models.Resource_Task, task.Id)
 					} else {
 						msg = fmt.Sprintf("Nats ############################  Delete task success, >>> HostId: %s, Type: %s, task id: %s<<<", task.Host.Id, models.Resource_Task, task.Id)
 					}
@@ -422,6 +425,40 @@ func (this *NatsSubService) Save() error {
 		}
 	}
 
+	return nil
+}
+
+func (this *NatsSubService) DeleteTask() error {
+	logs.Info("################ Delete Task <<<start>>> ################")
+	task := this.DelTask
+	result := models.WsData{Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Delete, Data: task}
+	data, err := json.Marshal(result)
+
+	// 下发删除任务
+	subject := ""
+	// nats
+	if task.Host != nil {
+		subject = task.Host.Id
+	}
+	if task.Container != nil {
+		subject = task.Container.HostName
+	}
+	if subject != "" {
+		err = models.Nats.Conn.Publish(subject, data)
+		if err == nil {
+			logs.Info("Deliver Task to Nats Success, Subject: %s Id: %s, RCType: %s, data: %v", subject, task.Id, models.Resource_Control_Type_Delete, result)
+		}
+	} else {
+		return errors.New(string(utils.ResourceNotFoundErr))
+	}
+	if err != nil {
+		msg := fmt.Sprintf("Delete Task Fail, Id: %s, err: %s", task.Id, err.Error())
+		logs.Error(msg)
+		taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account, Level: models.Log_level_Error}
+		taskLog.Add()
+		return err
+	}
+	logs.Info("################ Delete Task <<<end>>> ################")
 	return nil
 }
 

@@ -43,7 +43,6 @@ func (this *K8STaskHandler) SyncHostConfigAndInfo(clusterName, clusterId string)
 			config.Diss = models.Diss_NotInstalled
 			config.DissStatus = models.Diss_Status_Unsafe
 			config.Status = models.Host_Status_Normal
-			config.IsEnableHeartBeat = false
 
 			// 同步 hostinfo
 			info := new(models.HostInfo)
