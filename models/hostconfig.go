@@ -23,6 +23,9 @@ func (this *HostConfig) List(from, limit int) Result {
 	var ResultData Result
 	var err error
 	cond := orm.NewCondition()
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
 	if this.Diss != "" && this.Diss != All {
 		cond = cond.And("diss", this.Diss)
 	}
