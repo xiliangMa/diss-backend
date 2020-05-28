@@ -92,7 +92,7 @@ func (this *IntegrationController) AddLicenseFile() {
 // @Title Get License
 // @Description GetLicense
 // @Param token header string true "authToken"
-// @Param id query string true "id"
+// @Param id query string false "id"
 // @Success 200 {object} models.Result
 // @router /system/license [get]
 func (this *IntegrationController) GetLicense() {

@@ -184,8 +184,8 @@ func (this *LicenseConfig) Get() Result {
 		ResultData.Code = utils.GetLogConfigErr
 		logs.Error("Get license failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 	}
-	for _, licCofing := range licConfigData {
-		o.LoadRelated(licCofing, "Modules")
+	for _, licConfig := range licConfigData {
+		o.LoadRelated(licConfig, "Modules")
 	}
 
 	ResultData.Code = http.StatusOK
