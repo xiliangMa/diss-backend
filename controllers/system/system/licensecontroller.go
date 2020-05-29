@@ -101,11 +101,7 @@ func (this *IntegrationController) GetLicense() {
 	licConfig.Id = configId
 	json.Unmarshal(this.Ctx.Input.RequestBody, &licConfig)
 
-	var ResultData models.Result
-	ResultData.Code = http.StatusOK
-	ResultData.Data = licConfig.Get()
-
-	this.Data["json"] = ResultData
+	this.Data["json"] = licConfig.Get()
 	this.ServeJSON(false)
 }
 
@@ -120,10 +116,7 @@ func (this *IntegrationController) GetLicenseHistory() {
 	licHistory := new(models.LicenseHistory)
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
-	var ResultData models.Result
-	ResultData.Code = http.StatusOK
-	ResultData.Data = licHistory.List(from, limit)
 
-	this.Data["json"] = ResultData
+	this.Data["json"] = licHistory.List(from, limit)
 	this.ServeJSON(false)
 }
