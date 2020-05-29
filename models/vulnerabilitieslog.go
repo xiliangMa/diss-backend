@@ -13,6 +13,7 @@ import (
 type ImagePackageVulnerabilities struct {
 	PkgUserId                  string    `description:"(用户Id)"`
 	PkgImageId                 string    `description:"(镜像id)"`
+	PkgImageName               string    `description:"(镜像名)"`
 	PkgName                    string    `description:"(名称)"`
 	PkgVersion                 string    `description:"(版本)"`
 	PkgType                    string    `description:"(类型)"`
@@ -41,6 +42,11 @@ type ImagePackageVulnerabilitiesInterface interface {
 	List(from, limit int) Result
 }
 
+/**
+ * select a.*, b."link",c."registry", c."repo", c."tag" from image_package_vulnerabilities as a
+	join feed_data_vulnerabilities as b on a.vulnerability_id = b."id" and a.vulnerability_namespace_name = b."namespace_name"
+	join catalog_image_docker as c on a.pkg_image_id = c."imageId"
+*/
 func (this *ImagePackageVulnerabilities) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Diss_Api)
@@ -50,10 +56,14 @@ func (this *ImagePackageVulnerabilities) List(from, limit int) Result {
 	var total int64 = 0
 	filter := ""
 
-	countSql := "select " + `"count"(a.pkg_image_id)` + " from " + utils.ImagePackageVulnerabilities + ` as a join ` + utils.FeedDataVulnerabilities +
-		` as b on a.vulnerability_id = b."id" and a.vulnerability_namespace_name = b."namespace_name" `
-	sql := "select * from " + utils.ImagePackageVulnerabilities + ` as a join ` + utils.FeedDataVulnerabilities +
-		` as b on a.vulnerability_id = b."id" and a.vulnerability_namespace_name = b."namespace_name" `
+	countSql := `select "count"(d.pkg_image_id) from (select a.*, b."link", concat_ws(':', concat_ws('/', c."registry", c."repo"), c."tag") as pkg_image_name  from ` + utils.ImagePackageVulnerabilities +
+		` as a join ` + utils.FeedDataVulnerabilities +
+		` as b on a.vulnerability_id = b."id" and a.vulnerability_namespace_name = b."namespace_name" ` +
+		` join catalog_image_docker as c on a.pkg_image_id = c."imageId") as d `
+	sql := `select * from (select a.*, b."link", concat_ws(':', concat_ws('/', c."registry", c."repo"), c."tag") as pkg_image_name  from ` + utils.ImagePackageVulnerabilities +
+		` as a join ` + utils.FeedDataVulnerabilities +
+		` as b on a.vulnerability_id = b."id" and a.vulnerability_namespace_name = b."namespace_name" ` +
+		` join catalog_image_docker as c on a.pkg_image_id = c."imageId") as d `
 
 	if this.Severity != "" {
 		sql = sql + `and b."severity" = '` + this.Severity + `'`
@@ -68,6 +78,9 @@ func (this *ImagePackageVulnerabilities) List(from, limit int) Result {
 	}
 	if this.VulnerabilityId != "" {
 		filter = filter + `vulnerability_id = '` + this.VulnerabilityId + "' and "
+	}
+	if this.PkgImageName != "" {
+		filter = filter + `d.pkg_image_name like '%` + this.PkgImageName + `%'`
 	}
 
 	if filter != "" {
