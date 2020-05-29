@@ -28,16 +28,31 @@ func (this *IntegrationController) AddLicenseFile() {
 
 	defer f.Close()
 
-	if result.Code == http.StatusOK {
-		err := this.SaveToFile(key, fpath)
+	err := this.SaveToFile(key, fpath)
 
+	if err != nil && result.Code != utils.CheckLicenseFileIsExistErr {
+		result.Code = utils.ImportLicenseFileErr
+		result.Message = "ImportLicenseFileErr"
+		logs.Error("Import license file fail, err: %s", err.Error())
+	}
+
+	if isForce { // 强制更新
+		// 更新返回值
+		result.Code = http.StatusOK
+		result.Message = ""
+
+		//更新数据库
+		licenseByte, err = ioutil.ReadAll(f)
 		if err != nil {
 			result.Code = utils.ImportLicenseFileErr
-			result.Message = "ImportLicenseFileErr"
-			logs.Error("Import license file fail, err: %s", err.Error())
+			result.Message = err.Error()
+			logs.Error("Read license file fail: %s", err)
 		} else {
+			result = css.License_RSA_Decrypt(licenseByte, true)
+		}
+	} else {
+		if result.Code == http.StatusOK {
 			// 添加license 到数据库
-
 			f, err := os.Open(fpath)
 			if err != nil {
 				result.Code = utils.ImportLicenseFileErr
@@ -51,35 +66,6 @@ func (this *IntegrationController) AddLicenseFile() {
 					logs.Error("Read license file fail: %s", err)
 				} else {
 					result = css.License_RSA_Decrypt(licenseByte, false)
-				}
-			}
-		}
-	} else {
-		// 强制更新
-		if result.Code == utils.CheckLicenseFileIsExistErr && isForce {
-			// 更新返回值
-			result.Code = http.StatusOK
-			result.Message = ""
-
-			// 更新上传文件path
-			fpath = fpath + h.Filename
-
-			// 删除旧文件
-			os.Remove(fpath)
-
-			err := this.SaveToFile(key, fpath)
-			if err != nil {
-				result.Code = utils.SaveLicenseFileErr
-				result.Message = err.Error()
-			} else {
-				//更新数据库
-				licenseByte, err = ioutil.ReadAll(f)
-				if err != nil {
-					result.Code = utils.ImportLicenseFileErr
-					result.Message = err.Error()
-					logs.Error("Read license file fail: %s", err)
-				} else {
-					result = css.License_RSA_Decrypt(licenseByte, true)
 				}
 			}
 		}
