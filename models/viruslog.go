@@ -99,7 +99,7 @@ func (this *ImageVirus) List(from, limit int) Result {
 func (this *DockerVirus) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Diss_Api)
-	var imageVirusList []*ImageVirus = nil
+	var dockerVirusList []*DockerVirus = nil
 	var ResultData Result
 	var err error
 	var total int64 = 0
@@ -148,7 +148,7 @@ func (this *DockerVirus) List(from, limit int) Result {
 		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
 		resultSql = resultSql + limitSql
 	}
-	_, err = o.Raw(resultSql).QueryRows(&imageVirusList)
+	_, err = o.Raw(resultSql).QueryRows(&dockerVirusList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetDockerVirusErr
@@ -159,7 +159,7 @@ func (this *DockerVirus) List(from, limit int) Result {
 	o.Raw(countSql).QueryRow(&total)
 	data := make(map[string]interface{})
 	data["total"] = total
-	data["items"] = imageVirusList
+	data["items"] = dockerVirusList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
