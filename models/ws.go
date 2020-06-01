@@ -2,6 +2,8 @@ package models
 
 const (
 	// #################### ws 通信资源
+	Resource_HostConfigDynamic   = "HostConfigDynamic"
+	Resource_HostInfoDynamic     = "HostInfoDynamic"
 	Resource_HostConfig          = "HostConfig"
 	Resource_HostInfo            = "HostInfo"
 	Resource_ImageConfig         = "ImageConfig"

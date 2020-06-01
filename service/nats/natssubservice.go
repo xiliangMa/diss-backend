@@ -45,6 +45,34 @@ func (this *NatsSubService) Save() error {
 			//logs.Info("Nats ############################ Agent Heater Beat data, >>> HostId: %s, Type: %s <<<", heartBeat.SystemId, models.Resource_HeartBeat)
 			//metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			//this.ReceiveData(metricsResult)
+		case models.Resource_HostInfoDynamic:
+			// k8s 主机更新主机的外网ip
+			hostInfo := models.HostInfo{}
+			s, _ := json.Marshal(ms.Data)
+			if err := json.Unmarshal(s, &hostInfo); err != nil {
+				logs.Error("Paraces %s error %s", ms.Tag, err)
+				return err
+			}
+			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s <<<", hostInfo.Id, models.Resource_HostInfoDynamic)
+			if result := hostInfo.UpdateDynamic(); result.Code != http.StatusOK {
+				return errors.New(result.Message)
+			}
+			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			this.ReceiveData(metricsResult)
+		case models.Resource_HostConfigDynamic:
+			// k8s 主机更新主机的外网ip
+			hostConfig := models.HostConfig{}
+			s, _ := json.Marshal(ms.Data)
+			if err := json.Unmarshal(s, &hostConfig); err != nil {
+				logs.Error("Paraces %s error %s", ms.Tag, err)
+				return err
+			}
+			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s <<<", hostConfig.Id, models.Resource_HostConfigDynamic)
+			if result := hostConfig.UpdateDynamic(); result.Code != http.StatusOK {
+				return errors.New(result.Message)
+			}
+			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			this.ReceiveData(metricsResult)
 		case models.Resource_HostConfig:
 			hostConfig := models.HostConfig{}
 			s, _ := json.Marshal(ms.Data)

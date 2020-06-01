@@ -12,6 +12,7 @@ type HostConfigInterface interface {
 	Inner_AddHostInfo() error
 	List(from, limit int) Result
 	Update() Result
+	UpdateDynamic() Result
 	Count() int64
 	GetBnechMarkProportion() (int64, int64)
 }
@@ -75,6 +76,33 @@ func (this *HostConfig) Update() Result {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.EditHostConfigErr
 		logs.Error("Update HostConfig: %s failed, code: %d, err: %s", this.HostName, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+func (this *HostConfig) UpdateDynamic() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+	hostConfig := new(HostConfig)
+	cond := orm.NewCondition()
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	if err := o.QueryTable(utils.HostConfig).SetCond(cond).One(hostConfig); err != nil {
+		ResultData.Code = utils.HostConfigNotFoundErr
+		ResultData.Message = err.Error()
+		logs.Error("Get HostConfig: %s failed, code: %d, err: %s", this.HostName, ResultData.Code, ResultData.Message)
+	}
+	hostConfig.PublicAddr = this.PublicAddr
+	_, err := o.Update(hostConfig)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditHostConfigDynamicErr
+		logs.Error("Update HostInfo Dynamic failed, HostName: %s, failed, code: %d, err: %s", this.HostName, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK

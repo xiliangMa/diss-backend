@@ -32,23 +32,28 @@ type HostConfig struct {
 }
 
 type HostInfo struct {
-	Id            string `orm:"pk;" description:"(主机id)"`
-	HostName      string `orm:"" description:"(主机名称)"`
-	InternalAddr  string `orm:"default(null);" description:"(主机ip 内)"`
-	PublicAddr    string `orm:"default(null);" description:"(主机ip 外)"`
-	CpuCore       int64  `orm:"" description:"(cpu)"`
-	Mem           string `orm:"" description:"(内存)"`
-	Disk          string `orm:"" description:"(磁盘)"`
-	OS            string `orm:"" description:"(系统)"`
-	OSVer         string `orm:"" description:"(系统版本)"`
-	Kernel        string `orm:"" description:"(内核)"`
-	Architecture  string `orm:"" description:"(架构)"`
-	Mac           string `orm:"" description:"(mac)"`
-	DockerRuntime string `orm:"" description:"(容器运行时)"`
-	KubernetesVer string `orm:"" description:"(kubernetes 版本)"`
-	KubeletVer    string `orm:"" description:"(kubelet 版本)"`
-	Kubeproxy     string `orm:"" description:"(kubeproxy 版本)"`
-	DockerStatus  string `orm:"default(false);" description:"(容器状态)"`
+	Id                    string `orm:"pk;" description:"(主机id)"`
+	HostName              string `orm:"" description:"(主机名称)"`
+	InternalAddr          string `orm:"default(null);" description:"(主机ip 内)"`
+	PublicAddr            string `orm:"default(null);" description:"(主机ip 外)"`
+	CpuCore               int64  `orm:"" description:"(cpu)"`
+	Mem                   string `orm:"" description:"(内存)"`
+	Disk                  string `orm:"" description:"(磁盘)"`
+	OS                    string `orm:"" description:"(系统)"`
+	OSVer                 string `orm:"" description:"(系统版本)"`
+	Kernel                string `orm:"" description:"(内核)"`
+	Architecture          string `orm:"" description:"(架构)"`
+	Mac                   string `orm:"" description:"(mac)"`
+	DockerRuntime         string `orm:"" description:"(容器运行时)"`
+	KubernetesVer         string `orm:"" description:"(kubernetes 版本)"`
+	KubeletVer            string `orm:"" description:"(kubelet 版本)"`
+	Kubeproxy             string `orm:"" description:"(kubeproxy 版本)"`
+	DockerStatus          string `orm:"default(false);" description:"(容器状态)"`
+	ImageCount            int    `orm:"default(0);" description:"(镜像数)"`
+	ContainerCount        int    `orm:"default(0);" description:"(容器数)"`
+	ContainerRunningCount int    `orm:"default(0);" description:"(容器Running数)"`
+	ContainerPausedCount  int    `orm:"default(0);" description:"(容器Paused数)"`
+	ContainerStoppedCount int    `orm:"default(0);" description:"(容器Stopped数)"`
 }
 
 func (this *HostConfig) Inner_AddHostConfig() error {
@@ -77,9 +82,9 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 		}
 		updateHostConfig.OS = this.OS
 		updateHostConfig.AccountName = Account_Admin
-		resilt := updateHostConfig.Update()
-		if resilt.Code != http.StatusOK {
-			return errors.New(resilt.Message)
+		result := updateHostConfig.Update()
+		if result.Code != http.StatusOK {
+			return errors.New(result.Message)
 		}
 	} else {
 		// 插入数据
@@ -111,10 +116,32 @@ func (this *HostInfo) Inner_AddHostInfo() error {
 	}
 
 	if len(hostInfoList) != 0 {
-		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接更新）
-		resilt := this.Update()
-		if resilt.Code != http.StatusOK {
-			return errors.New(resilt.Message)
+		// agent 或者 k8s 数据更新 （因为有diss-backend的关系数据，防止覆盖diss-backend的数据，需要替换更新）
+		updateHostInfo := hostInfoList[0]
+		updateHostInfo.HostName = this.HostName
+		updateHostInfo.OS = this.OS
+		updateHostInfo.InternalAddr = this.InternalAddr
+		if this.PublicAddr != "" {
+			updateHostInfo.PublicAddr = this.PublicAddr
+		}
+		if this.ImageCount != 0 {
+			updateHostInfo.ImageCount = this.ImageCount
+		}
+		if this.ContainerCount != 0 {
+			updateHostInfo.ContainerCount = this.ContainerCount
+		}
+		if this.ContainerRunningCount != 0 {
+			updateHostInfo.ContainerRunningCount = this.ContainerRunningCount
+		}
+		if this.ContainerPausedCount != 0 {
+			updateHostInfo.ContainerPausedCount = this.ContainerPausedCount
+		}
+		if this.ContainerStoppedCount != 0 {
+			updateHostInfo.ContainerStoppedCount = this.ContainerStoppedCount
+		}
+		result := updateHostInfo.Update()
+		if result.Code != http.StatusOK {
+			return errors.New(result.Message)
 		}
 	} else {
 		// 插入数据

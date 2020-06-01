@@ -74,6 +74,9 @@ var (
 	DeleteSYSTemplateGroupErr       = 79
 	EditSYSTemplateGroupErr         = 80
 	ResourceNotFoundErr             = 81
+	HostConfigNotFoundErr           = 82
+	EditHostInfoDynamicErr          = 83
+	EditHostConfigDynamicErr        = 84
 
 	//k8s 1001-1100
 	AddNameSpaceErr    = 1001
