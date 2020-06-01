@@ -50,8 +50,10 @@ func (this *K8STaskHandler) SyncHostConfigAndInfo(clusterName, clusterId string)
 			info.Id = nodeId
 			if n.Status.Addresses[0].Type == "InternalIP" {
 				info.InternalAddr = n.Status.Addresses[0].Address
+				config.InternalAddr = n.Status.Addresses[0].Address
 			} else {
 				info.InternalAddr = n.Status.Addresses[1].Address
+				config.InternalAddr = n.Status.Addresses[1].Address
 			}
 			capacity := n.Status.Capacity
 			c, _ := capacity.Cpu().AsInt64()

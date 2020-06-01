@@ -14,6 +14,8 @@ type HostConfig struct {
 	HostName          string    `orm:"" description:"(主机名)"`
 	OS                string    `orm:"" description:"(系统)"`
 	PG                string    `orm:"default(sys-default)" description:"(安全策略组)"`
+	InternalAddr      string    `orm:"default(null);" description:"(主机ip 内)"`
+	PublicAddr        string    `orm:"default(null);" description:"(主机ip 外)"`
 	Status            string    `orm:"default(Normal)" description:"(主机状态 正常 Normal 异常 Abnormal)"`
 	Diss              string    `orm:"default(Installed)" description:"(安全容器 Installed NotInstalled)"`
 	DissStatus        string    `orm:"default(Safe)" description:"(安全状态 Safe Unsafe)"`
@@ -68,6 +70,11 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 		// agent 或者 k8s 数据更新 （因为有diss-backend的关系数据，防止覆盖diss-backend的数据，需要替换更新）
 		updateHostConfig.HostName = this.HostName
 		updateHostConfig.IsInK8s = this.IsInK8s
+		updateHostConfig.OS = this.OS
+		updateHostConfig.InternalAddr = this.InternalAddr
+		if this.PublicAddr != "" {
+			updateHostConfig.PublicAddr = this.PublicAddr
+		}
 		updateHostConfig.OS = this.OS
 		updateHostConfig.AccountName = Account_Admin
 		resilt := updateHostConfig.Update()
