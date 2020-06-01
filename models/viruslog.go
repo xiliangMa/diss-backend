@@ -11,6 +11,8 @@ import (
 )
 
 type ImageVirus struct {
+	ImageId     string `orm:"column(imageId)" description:"(镜像Id)"`
+	ImageName   string `orm:"" description:"(镜像名)"`
 	ImageDigest string `orm:"column(imageDigest)" description:"(镜像digest)"`
 	UserId      string `orm:"column(userId)" description:"(用户id)"`
 	FileName    string `description:"(文件名)"`
@@ -41,35 +43,48 @@ type DockerVirusInterface interface {
 	List(from, limit int) Result
 }
 
+/**
+ 	select * from (
+	select a.*, concat_ws(':', concat_ws('/', b."registry", b."repo"), b."tag") as image_name from image_virus as a
+	JOIN catalog_image_docker as b ON  a."imageId" = b."imageId" )
+	as c  where c."userId" = 'admin' and c."image_name" like '%docker.io/openstack001/av-sample:2%' limit 20 OFFSET 0
+*/
 func (this *ImageVirus) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Diss_Api)
 	var imageVirusList []*ImageVirus = nil
-	var tempList []*ImageVirus = nil
 	var ResultData Result
 	var err error
 	var total int64 = 0
 
-	sql := "select * from " + utils.ImageVirus
+	sql := ` select * from (select a.*, concat_ws(':', concat_ws('/', b."registry", b."repo"), b."tag") as image_name from image_virus as a
+	JOIN catalog_image_docker as b ON  a."imageId" = b."imageId" ) as c `
+	countSql := `select "count"(c."imageId") from (select a.*, concat_ws(':', concat_ws('/', b."registry", b."repo"), b."tag") as image_name from image_virus as a
+	JOIN catalog_image_docker as b ON  a."imageId" = b."imageId" ) as c `
 	filter := ""
 	if this.ImageDigest != "" {
-		filter = filter + utils.ImageVirus + `."imageDigest" = '` + this.ImageDigest + "' and "
+		filter = filter + `c."imageId" = '` + this.ImageId + "' and "
 	}
 	if this.UserId != "" {
-		filter = filter + utils.ImageVirus + `."userId" = '` + this.UserId + "' and "
+		filter = filter + `c."userId" = '` + this.UserId + "' and "
 	}
 	if this.Virus != "" {
-		filter = filter + utils.ImageVirus + `."virus" like '%` + this.Virus + "%' and "
+		filter = filter + `c."virus" like '%` + this.Virus + "%' and "
 	}
 
 	if this.CreatedAt != 0 {
-		filter = filter + utils.ImageVirus + `."createdAt" > ` + fmt.Sprintf("%s", this.CreatedAt) + " and "
+		filter = filter + `c."createdAt" > ` + fmt.Sprintf("%s", this.CreatedAt) + " and "
+	}
+	if this.ImageName != "" {
+		filter = filter + `c."image_name" like '%` + this.ImageName + `%'`
 	}
 
 	if filter != "" {
 		sql = sql + " where " + filter
+		countSql = countSql + " where " + filter
 	}
 	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
+	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
 	resultSql := sql
 	if from >= 0 && limit > 0 {
 		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
@@ -83,7 +98,7 @@ func (this *ImageVirus) List(from, limit int) Result {
 		return ResultData
 	}
 
-	total, _ = o.Raw(sql).QueryRows(&tempList)
+	o.Raw(countSql).QueryRow(&total)
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = imageVirusList
