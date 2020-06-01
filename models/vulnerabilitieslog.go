@@ -16,6 +16,7 @@ type ImagePackageVulnerabilities struct {
 	PkgImageName               string    `description:"(镜像名)"`
 	PkgName                    string    `description:"(名称)"`
 	PkgVersion                 string    `description:"(版本)"`
+	PkgPath                    string    `description:"(Path)"`
 	PkgType                    string    `description:"(类型)"`
 	PkgArch                    string    `description:"(架构)"`
 	VulnerabilityId            string    `description:"(漏铜Id)"`
@@ -43,9 +44,12 @@ type ImagePackageVulnerabilitiesInterface interface {
 }
 
 /**
- * select a.*, b."link",c."registry", c."repo", c."tag" from image_package_vulnerabilities as a
+   	select * from (
+	select a.*, b."link", b."severity", concat_ws(':', concat_ws('/', c."registry", c."repo"), c."tag") as pkg_image_name  from image_package_vulnerabilities as a
 	join feed_data_vulnerabilities as b on a.vulnerability_id = b."id" and a.vulnerability_namespace_name = b."namespace_name"
 	join catalog_image_docker as c on a.pkg_image_id = c."imageId"
+	) as d
+	where d."severity" = 'Low' and d."pkg_user_id" = 'admin' and d."vulnerability_id" = 'CVE-2016-2781' and d."pkg_image_name" like '%docker.io/mysql:8.0.17%' limit 20 OFFSET 0
 */
 func (this *ImagePackageVulnerabilities) List(from, limit int) Result {
 	o := orm.NewOrm()
@@ -56,31 +60,30 @@ func (this *ImagePackageVulnerabilities) List(from, limit int) Result {
 	var total int64 = 0
 	filter := ""
 
-	countSql := `select "count"(d.pkg_image_id) from (select a.*, b."link", concat_ws(':', concat_ws('/', c."registry", c."repo"), c."tag") as pkg_image_name  from ` + utils.ImagePackageVulnerabilities +
+	countSql := `select "count"(d.pkg_image_id) from (select a.*, b."link", b."severity", concat_ws(':', concat_ws('/', c."registry", c."repo"), c."tag") as pkg_image_name  from ` + utils.ImagePackageVulnerabilities +
 		` as a join ` + utils.FeedDataVulnerabilities +
 		` as b on a.vulnerability_id = b."id" and a.vulnerability_namespace_name = b."namespace_name" ` +
 		` join catalog_image_docker as c on a.pkg_image_id = c."imageId") as d `
-	sql := `select * from (select a.*, b."link", concat_ws(':', concat_ws('/', c."registry", c."repo"), c."tag") as pkg_image_name  from ` + utils.ImagePackageVulnerabilities +
+	sql := `select * from (select a.*, b."link", b."severity", concat_ws(':', concat_ws('/', c."registry", c."repo"), c."tag") as pkg_image_name  from ` + utils.ImagePackageVulnerabilities +
 		` as a join ` + utils.FeedDataVulnerabilities +
 		` as b on a.vulnerability_id = b."id" and a.vulnerability_namespace_name = b."namespace_name" ` +
 		` join catalog_image_docker as c on a.pkg_image_id = c."imageId") as d `
 
 	if this.Severity != "" {
-		sql = sql + `and b."severity" = '` + this.Severity + `'`
-		countSql = countSql + `and b."severity" = '` + this.Severity + `'`
+		filter = filter + `d."severity" = '` + this.Severity + `' and `
 	}
 
 	if this.PkgUserId != "" {
-		filter = filter + `pkg_user_id = '` + this.PkgUserId + "' and "
+		filter = filter + `d."pkg_user_id" = '` + this.PkgUserId + "' and "
 	}
 	if this.PkgImageId != "" {
-		filter = filter + `pkg_image_id = '` + this.PkgImageId + "' and "
+		filter = filter + `d."pkg_image_id" = '` + this.PkgImageId + "' and "
 	}
 	if this.VulnerabilityId != "" {
-		filter = filter + `vulnerability_id = '` + this.VulnerabilityId + "' and "
+		filter = filter + `d."vulnerability_id" = '` + this.VulnerabilityId + "' and "
 	}
 	if this.PkgImageName != "" {
-		filter = filter + `d.pkg_image_name like '%` + this.PkgImageName + `%'`
+		filter = filter + `d."pkg_image_name" like '%` + this.PkgImageName + `%'`
 	}
 
 	if filter != "" {
