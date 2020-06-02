@@ -416,7 +416,7 @@ func (this *NatsSubService) Save() error {
 					this.ReceiveData(metricsResult)
 				}
 			case models.Resource_Control_Type_Delete:
-				metricsResult := models.WsData{Code: http.StatusOK, Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Get}
+				metricsResult := models.WsData{Code: http.StatusOK, Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Delete}
 				task := models.Task{}
 				s, _ := json.Marshal(ms.Data)
 				if err := json.Unmarshal(s, &task); err != nil {

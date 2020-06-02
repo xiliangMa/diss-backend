@@ -254,11 +254,12 @@ func (this *Task) Delete() Result {
 	o.Using(utils.DS_Default)
 	var ResultData Result
 	cond := orm.NewCondition()
+	var err error
 
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
+		_, err = o.QueryTable(utils.Task).SetCond(cond).Delete()
 	}
-	_, err := o.QueryTable(utils.Task).SetCond(cond).Delete()
 
 	if err != nil {
 		ResultData.Message = err.Error()
