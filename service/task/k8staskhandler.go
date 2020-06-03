@@ -17,9 +17,9 @@ type K8STaskHandler struct {
 	SyncCheckPoint int64
 }
 
-func NewK8STaskHandler(path string) *K8STaskHandler {
+func NewK8STaskHandler(params *utils.ApiParams) *K8STaskHandler {
 	return &K8STaskHandler{
-		Clientgo: utils.CreateK8sClient(path),
+		Clientgo: utils.CreateK8sClient(params),
 	}
 }
 
@@ -376,7 +376,14 @@ func SyncAll() {
 			if c.IsSync == models.Cluster_IsSync {
 				clusterName := c.Name
 				// 创建k8s客户端
-				this := NewK8STaskHandler(c.FileName)
+				params := utils.ApiParams{}
+				if c.AuthType == models.Api_Auth_Type_BearerToken {
+					params.BearerToken = c.BearerToken
+					params.MasterUrl = c.MasterUrls
+				} else {
+					params.KubeConfigPath = c.FileName
+				}
+				this := NewK8STaskHandler(&params)
 				if this.Clientgo.ErrMessage == "" {
 					c.SyncStatus = models.Cluster_Sync_Status_InProcess
 					c.Update()

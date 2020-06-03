@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
+	"github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/models"
 	css "github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -19,68 +20,108 @@ type ClusterController struct {
 // @Title AddCluster
 // @Description Add Cluster
 // @Param token header string true "authToken"
-// @Param k8sFile formData file true "k8sFile"
+// @Param authType formData string true "default:KubeConfig、BearerToken"
+// @Param masterUrl formData string false "ApiServer 访问地址"
+// @Param bearerToken formData string false "ApiServer 访问token"
+// @Param k8sFile formData file false "KubeConfig 文件"
 // @Param clusterName formData string true "clusterName"
 // @Param type formData string true "类型 Kubernetes Openshift Rancher"
 // @Param isForce formData bool true true "force"
 // @Success 200 {object} models.Result
 // @router /add [post]
 func (this *ClusterController) UploadK8sFile() {
-	ClusterType := this.GetString("type")
-	key := "k8sFile"
+	authType := this.GetString("authType")
+	masterUrl := this.GetString("masterUrl")
+	bearerToken := this.GetString("bearerToken")
+	clusterType := this.GetString("type")
 	isForce, _ := this.GetBool("isForce", true)
 	clusterName := this.GetString("clusterName")
-	f, h, _ := this.GetFile(key)
-	result, fpath := css.Check(h)
-	defer f.Close()
-	if result.Code == http.StatusOK {
-		err := this.SaveToFile(key, fpath)
-		if err != nil {
-			result.Code = utils.UploadK8sFileErr
-			result.Message = "UploadK8sFileErr"
-			logs.Error("Upload k8s file  fail, err: %s", err.Error())
-		} else {
-			//检查连接是否可用
-			if code := css.TestK8sFile(fpath); code != http.StatusOK {
-				result.Code = code
-				result.Message = "CheckK8sFileTestErr"
-				os.Remove(fpath)
-			} else {
-				logs.Info("Upload k8s file success, file name: %s", h.Filename)
-				// 添加集群记录
-				css.AddCluster(clusterName, fpath, ClusterType)
+
+	cluster := models.Cluster{}
+	uid, _ := uuid.NewV4()
+	cluster.Id = uid.String()
+	cluster.Name = clusterName
+	cluster.Type = clusterType
+	cluster.Status = models.Cluster_Status_Active
+	cluster.SyncStatus = models.Cluster_Sync_Status_NotSynced
+	cluster.IsSync = models.Cluster_IsSync
+	cluster.AuthType = authType
+	if authType == models.Api_Auth_Type_BearerToken {
+		cluster.MasterUrls = masterUrl
+		cluster.BearerToken = bearerToken
+	}
+
+	params := utils.ApiParams{}
+	params.AuthType = authType
+	params.BearerToken = bearerToken
+	params.MasterUrl = masterUrl
+
+	result := models.Result{Code: http.StatusOK}
+	fpath := ""
+
+	switch authType {
+	//BearerToken 方式
+	case models.Api_Auth_Type_BearerToken:
+		if result = css.TestClient(params); result.Code == http.StatusOK {
+			if result = cluster.Add(); result.Code == http.StatusOK {
+				logs.Info("Add Cluster success, MasterUrl: %s", cluster.MasterUrls)
 			}
 		}
-	} else {
-		// 强制更新
-		if result.Code == utils.CheckK8sFileIsExistErr && isForce {
-			// 更新返回值
-			result.Code = http.StatusOK
-			result.Message = ""
-
-			// 更新上传文件path
-			fpath = fpath + h.Filename
-
-			// 删除旧文件
-			os.Remove(fpath)
-
+	case models.Api_Auth_Type_KubeConfig:
+		// KubeConfig 方式
+		key := "k8sFile"
+		f, h, _ := this.GetFile(key)
+		result, fpath = css.Check(h)
+		defer f.Close()
+		if result.Code == http.StatusOK {
 			err := this.SaveToFile(key, fpath)
 			if err != nil {
 				result.Code = utils.UploadK8sFileErr
-				result.Message = err.Error()
+				result.Message = "UploadK8sFileErr"
+				logs.Error("Upload KubeConfig file  fail, err: %s", err.Error())
 			} else {
 				//检查连接是否可用
-				if code := css.TestK8sFile(fpath); code != http.StatusOK {
-					result.Code = code
-					result.Message = "CheckK8sFileTestErr"
+				params.KubeConfigPath = fpath
+				if result = css.TestClient(params); result.Code != http.StatusOK {
 					os.Remove(fpath)
 				} else {
-					logs.Info("Force update k8s file success, file name: %s", h.Filename)
-					// to do 强制更新后文件名相同、内容不一样
+					logs.Info("Upload KubeConfig file success, file name: %s", h.Filename)
+					// 添加集群记录
+					cluster.FileName = fpath
+					result = cluster.Add()
+				}
+			}
+		} else {
+			// 强制更新
+			if result.Code == utils.CheckK8sFileIsExistErr && isForce {
+				// 更新返回值
+				result.Code = http.StatusOK
+				result.Message = ""
+
+				// 更新上传文件path
+				fpath = fpath + h.Filename
+
+				// 删除旧文件
+				os.Remove(fpath)
+
+				err := this.SaveToFile(key, fpath)
+				if err != nil {
+					result.Code = utils.UploadK8sFileErr
+					result.Message = err.Error()
+				} else {
+					//检查连接是否可用
+					params.KubeConfigPath = fpath
+					if result = css.TestClient(params); result.Code != http.StatusOK {
+						os.Remove(fpath)
+					} else {
+						logs.Info("Force update k8s file success, file name: %s", h.Filename)
+						// to do 强制更新后文件名相同、内容不一样
+					}
 				}
 			}
 		}
 	}
+
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }

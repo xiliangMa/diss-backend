@@ -95,6 +95,7 @@ var (
 	BindPodErr         = 1014
 	UnBindPodErr       = 1015
 	EditClusterErr     = 1006
+	ClusterIsExistErr  = 1007
 
 	//task 1100-1200
 	AddTaskErr    = 1100
@@ -107,7 +108,7 @@ var (
 	CheckK8sFileCreateClientErr     = 1201
 	CheckK8sFileIsExistErr          = 1202
 	UploadK8sFileErr                = 1203
-	CheckK8sFileTestErr             = 1204
+	CreateClientByKubeConfigErr     = 1204
 	UploadLogoErr                   = 1205
 	ChecLogoPostErr                 = 1206
 	CheckLogoIsNotExistErr          = 1207
@@ -123,6 +124,7 @@ var (
 	GetLicenseHistoryErr            = 1217
 	DeleteLicenseModuleErr          = 1218
 	LicenseCommitErr                = 1219
+	CreateClientByBearerTokenErr    = 1220
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300

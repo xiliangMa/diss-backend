@@ -18,6 +18,8 @@ var (
 	Pod_Container_Statue_Running    = "Running"
 	Pod_Container_Statue_Terminated = "Terminated"
 	Pod_Container_Statue_Waiting    = "Waiting"
+	Api_Auth_Type_KubeConfig        = "KubeConfig"
+	Api_Auth_Type_BearerToken       = "BearerToken"
 
 	//容器状态
 	Container_Status_Run   = "Run"
@@ -51,9 +53,9 @@ var (
 	//入侵扫描
 	TMP_Type_IDS = "IntrudeDetectScan"
 	//安全审计
-	TMP_Type_DockerSecurityAudit = "DockerSecurityAudit"
+	TMP_Type_DockerSecurityAudit     = "DockerSecurityAudit"
 	TMP_Type_KubernetesSecurityAudit = "KubernetesSecurityAudit"
-	TMP_Type_CommandSecurityAudit = "CommandSecurityAudit"
+	TMP_Type_CommandSecurityAudit    = "CommandSecurityAudit"
 	//病毒扫描：
 	TMP_Type_DockerVS = "DockerVirusScan"
 	TMP_Type_HostVS   = "HostVirusScan"

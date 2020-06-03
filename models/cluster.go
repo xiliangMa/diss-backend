@@ -5,13 +5,17 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strings"
 	"time"
 )
 
 type Cluster struct {
 	Id          string    `orm:"pk" description:"(集群id)"`
 	Name        string    `orm:"unique" description:"(集群名)"`
-	FileName    string    `orm:"" description:"(k8s 文件)"`
+	FileName    string    `orm:"" description:"(KubeConfig 文件)"`
+	AuthType    string    `orm:"default(KubeConfig)" description:"(认证类型 KubeConfig BearerToken)"`
+	BearerToken string    `orm:"default()" description:"(Token)"`
+	MasterUrls  string    `orm:"default()" description:"(ApiServer 访问地址)"`
 	Status      string    `orm:"default(Active)" description:"(集群状态 Active Unavailable)"`
 	Type        string    `orm:"default(Kubernetes)" description:"(类型 Kubernetes Openshift Rancher)"`
 	IsSync      bool      `orm:"default(false)" description:"(是否同步)"`
@@ -23,26 +27,43 @@ type Cluster struct {
 }
 
 type ClusterInterface interface {
-	Add()
-	Delete()
-	Edit()
-	Get()
-	List()
+	Add() Result
+	Update() Result
+	List(from, limit int) Result
+	ListByAccount(from, limit int) Result
 }
 
 func (this *Cluster) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ResultData Result
+	ResultData :=  Result{Code: http.StatusOK}
+	cond := orm.NewCondition()
 
-	_, err := o.Insert(this)
+	if this.MasterUrls != "" {
+		cond = cond.And("master_urls__contains", this.MasterUrls)
+	}
+
+	count, err := o.QueryTable(utils.Cluster).SetCond(cond).Count()
+	if count != 0 {
+		ResultData.Message = "ClusterIsExistErr"
+		ResultData.Code = utils.ClusterIsExistErr
+		logs.Error("Add Cluster failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	_, err = o.Insert(this)
+	if err != nil && strings.Contains(err.Error(), "duplicate key value violates unique") {
+		ResultData.Message = "ClusterIsExistErr"
+		ResultData.Code = utils.ClusterIsExistErr
+		logs.Error("Add Cluster failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddClusterErr
 		logs.Error("Add Cluster failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
-	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
 }

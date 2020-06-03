@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"flag"
 	"github.com/astaxie/beego/logs"
 	"github.com/ghodss/yaml"
 	"io/ioutil"
@@ -12,8 +13,16 @@ import (
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"math/rand"
 	"time"
 )
+
+type ApiParams struct {
+	KubeConfigPath string
+	BearerToken    string
+	MasterUrl      string
+	AuthType       string
+}
 
 type ClientGo struct {
 	ClientSet  *kubernetes.Clientset
@@ -104,14 +113,21 @@ type NodeMetrics struct {
 	} `json:"usage"`
 }
 
-func CreateK8sClient(path string) ClientGo {
+func CreateK8sClient(params *ApiParams) ClientGo {
 	clientgo := ClientGo{nil, ""}
-	config, err := clientcmd.BuildConfigFromFlags("", path)
+	config, err := clientcmd.BuildConfigFromFlags("", params.KubeConfigPath)
+	if params.AuthType == "BearerToken" {
+		// 这里是使用用户名和密码调用APIserver，所以kubeconfig为空
+		kubeconfig := flag.String(string(rand.Intn(1000)), "", "BearerToken")
+		flag.Parse()
+		config, err = clientcmd.BuildConfigFromFlags(params.MasterUrl, *kubeconfig)
+		config.Insecure = true
+		config.BearerToken = params.BearerToken
+	}
 	if err != nil {
 		clientgo.ErrMessage = "BuildConfigFromFlags"
 		return clientgo
 	}
-
 	// 根据指定的 config 创建 clientset
 	clientSet, err := kubernetes.NewForConfig(config)
 	clientgo.ClientSet = clientSet
