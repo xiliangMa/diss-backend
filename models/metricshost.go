@@ -26,7 +26,7 @@ type HostConfig struct {
 	IsInK8s           bool      `orm:"default(false);" description:"(是否在k8s集群)"`
 	ClusterId         string    `orm:"default(null);" description:"(集群id)"`
 	Label             string    `orm:"default(null);" description:"(标签)"`
-	Job               *Job      `orm:"rel(fk);null;" description:"(job)"`
+	Job               []*Job    `orm:"rel(m2m);null;" description:"(job)"`
 	IsEnableHeartBeat bool      `orm:"default(false);" description:"(是否开启心跳上报)"`
 	HeartBeat         time.Time `orm:"null;type(datetime)" description:"(心跳)"`
 }

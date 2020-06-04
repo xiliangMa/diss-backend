@@ -24,7 +24,7 @@ type ContainerConfig struct {
 	Age            string `orm:"null;" description:"(运行时长)"`
 	CreateTime     string `orm:"null;" description:"(创建时间);"`
 	UpdateTime     string `orm:"null;" description:"(更新时间);"`
-	Job            *Job   `orm:"rel(fk);null;" description:"(job)"`
+	Job            []*Job `orm:"rel(m2m);null;" description:"(job)"`
 }
 
 type ContainerConfigInterface interface {

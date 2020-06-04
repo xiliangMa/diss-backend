@@ -77,6 +77,10 @@ var (
 	HostConfigNotFoundErr           = 82
 	EditHostInfoDynamicErr          = 83
 	EditHostConfigDynamicErr        = 84
+	RelationJobHostErr              = 85
+	RelationJobContainerErr         = 86
+	EditJobErr                      = 87
+	JobCommitErr                    = 88
 
 	//k8s 1001-1100
 	AddNameSpaceErr    = 1001
@@ -125,7 +129,7 @@ var (
 	DeleteLicenseModuleErr          = 1218
 	LicenseCommitErr                = 1219
 	CreateClientByBearerTokenErr    = 1220
-	ClusterotvailableOrNoHostErr    = 12201
+	ClusterotvailableOrNoHostErr    = 1221
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300
