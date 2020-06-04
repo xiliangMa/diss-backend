@@ -13,7 +13,7 @@ import (
 type SecurityCheckService struct {
 	*models.SecurityCheckList
 	DefaultTMP           map[string]*models.SystemTemplate
-	Bath                 int64
+	Batch                int64
 	CurrentBatchTaskList []*models.Task
 	Account              string
 }
@@ -55,7 +55,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		dockerTask.Name = "System-Task-" + dockerTask.Id
 		dockerTask.Description = "System-Task-" + models.TMP_Type_BM_Docker
 		dockerTask.Host = securityCheck.Host
-		dockerTask.Batch = this.Bath
+		dockerTask.Batch = this.Batch
 		dockerTask.Status = models.Task_Status_Pending
 		dockerTask.Account = this.Account
 
@@ -69,7 +69,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		k8sTask.Name = "System-Task-" + k8sTask.Id
 		k8sTask.Description = "System-Task-" + models.TMP_Type_BM_K8S
 		k8sTask.Host = securityCheck.Host
-		k8sTask.Batch = this.Bath
+		k8sTask.Batch = this.Batch
 		k8sTask.Status = models.Task_Status_Pending
 		k8sTask.Account = this.Account
 
@@ -82,13 +82,13 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		dockerTaskLog.Task = dockerTask
 		dockerTaskLog.Account = this.Account
 		dockerTaskLog.Level = models.Log_level_Info
-		dockerTaskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Btach: %v, Status: %s",
+		dockerTaskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Batch: %v, Status: %s",
 			dockerTask.Id, dockerTask.Type, dockerTask.Batch, dockerTask.Status)
 		k8sTaskLog := models.TaskLog{}
 		k8sTaskLog.Task = dockerTask
 		k8sTaskLog.Account = this.Account
 		k8sTaskLog.Level = models.Log_level_Info
-		k8sTaskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Btach: %v, Status: %s",
+		k8sTaskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Batch: %v, Status: %s",
 			k8sTask.Id, k8sTask.Type, k8sTask.Batch, k8sTask.Status)
 		dockerTaskLog.Add()
 		k8sTaskLog.Add()
@@ -113,7 +113,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		task.Name = "System-Task-" + task.Id
 		task.Host = securityCheck.Host
 		task.Container = securityCheck.Container
-		task.Batch = this.Bath
+		task.Batch = this.Batch
 		task.Status = models.Task_Status_Pending
 		task.Account = this.Account
 
@@ -125,7 +125,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		taskLog.Task = task
 		taskLog.Account = this.Account
 		taskLog.Level = models.Log_level_Info
-		taskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Btach: %v, Status: %s",
+		taskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Batch: %v, Status: %s",
 			task.Id, task.Type, task.Batch, task.Status)
 		taskLog.Add()
 	}
@@ -139,7 +139,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		task.Name = "System-Task-" + task.Id
 		task.Description = "System-Task-" + models.TMP_Type_LS
 		task.Host = securityCheck.Host
-		task.Batch = this.Bath
+		task.Batch = this.Batch
 		//添加task记录
 		task.Add()
 	}
@@ -157,7 +157,7 @@ func (this *SecurityCheckService) PrePareDefaultTMP() map[string]*models.SystemT
 func (this *SecurityCheckService) GetCurrentBatchTask() []*models.Task {
 	if this.CurrentBatchTaskList == nil {
 		task := new(models.Task)
-		task.Batch = this.Bath
+		task.Batch = this.Batch
 		if err, taskList := task.GetCurrentBatchTaskList(); err == nil {
 			this.CurrentBatchTaskList = taskList
 		}
@@ -171,7 +171,7 @@ func (this *SecurityCheckService) DeliverTask() models.Result {
 	this.PrePare()
 	wsDelive := ws.WSDeliverService{
 		Hub:                  models.WSHub,
-		Bath:                 this.Bath,
+		Bath:                 this.Batch,
 		CurrentBatchTaskList: this.CurrentBatchTaskList,
 	}
 	if utils.IsEnableNats() {
