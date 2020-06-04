@@ -36,7 +36,7 @@ type ClusterInterface interface {
 func (this *Cluster) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	ResultData :=  Result{Code: http.StatusOK}
+	ResultData := Result{Code: http.StatusOK}
 	cond := orm.NewCondition()
 
 	if this.MasterUrls != "" {

@@ -24,7 +24,6 @@ import (
 //	sysinit.InitTimeEdgePoint()
 //}
 
-
 func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 
 	exType := models.SysLog_ImageSecLog

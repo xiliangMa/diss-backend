@@ -18,7 +18,7 @@ type ClusterController struct {
 }
 
 // @Title AddCluster
-// @Description Add Cluster
+// @Description Add Cluster "authType=KubeConfig, 需要 上传KubeConfig文件; authType=BearerToken， 需要设置 masterUrl、bearerToken 参数"
 // @Param token header string true "authToken"
 // @Param authType formData string true "default:KubeConfig、BearerToken"
 // @Param masterUrl formData string false "ApiServer 访问地址"
@@ -26,7 +26,7 @@ type ClusterController struct {
 // @Param k8sFile formData file false "KubeConfig 文件"
 // @Param clusterName formData string true "clusterName"
 // @Param type formData string true "类型 Kubernetes Openshift Rancher"
-// @Param isForce formData bool true true "force"
+// @Param isForce formData bool false true "force"
 // @Success 200 {object} models.Result
 // @router /add [post]
 func (this *ClusterController) UploadK8sFile() {
