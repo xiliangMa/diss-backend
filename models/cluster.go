@@ -5,7 +5,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -13,7 +12,7 @@ type Cluster struct {
 	Id          string    `orm:"pk" description:"(集群id)"`
 	Name        string    `orm:"unique" description:"(集群名)"`
 	FileName    string    `orm:"" description:"(KubeConfig 文件)"`
-	AuthType    string    `orm:"default(KubeConfig)" description:"(认证类型 KubeConfig BearerToken)"`
+	AuthType    string    `orm:"default(BearerToken)" description:"(认证类型 KubeConfig BearerToken)"`
 	BearerToken string    `orm:"default()" description:"(Token)"`
 	MasterUrls  string    `orm:"default()" description:"(ApiServer 访问地址)"`
 	Status      string    `orm:"default(Active)" description:"(集群状态 Active Unavailable)"`
@@ -33,37 +32,56 @@ type ClusterInterface interface {
 	ListByAccount(from, limit int) Result
 }
 
-func (this *Cluster) Add() Result {
+func (this *Cluster) Add(isForce bool) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	ResultData := Result{Code: http.StatusOK}
 	cond := orm.NewCondition()
+	cluster := new(Cluster)
+
+	if this.Name != "" {
+		cond = cond.And("name", this.Name)
+	}
 
 	if this.MasterUrls != "" {
-		cond = cond.And("master_urls__contains", this.MasterUrls)
+		cond = cond.Or("master_urls__contains", this.MasterUrls)
 	}
 
-	count, err := o.QueryTable(utils.Cluster).SetCond(cond).Count()
-	if count != 0 {
-		ResultData.Message = "ClusterIsExistErr"
-		ResultData.Code = utils.ClusterIsExistErr
-		logs.Error("Add Cluster failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-	_, err = o.Insert(this)
-	if err != nil && strings.Contains(err.Error(), "duplicate key value violates unique") {
-		ResultData.Message = "ClusterIsExistErr"
-		ResultData.Code = utils.ClusterIsExistErr
-		logs.Error("Add Cluster failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
+	if this.FileName != "" {
+		cond = cond.Or("file_name", this.FileName)
 	}
 
-	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.AddClusterErr
-		logs.Error("Add Cluster failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
+	switch isForce {
+	case true: // 更新
+		o.QueryTable(utils.Cluster).SetCond(cond).One(cluster)
+		if cluster != nil {
+			cluster.Name = this.Name
+			cluster.FileName = this.FileName
+			cluster.BearerToken = this.BearerToken
+			cluster.MasterUrls = this.MasterUrls
+			cluster.Status = Cluster_Status_Active
+			cluster.IsSync = Cluster_IsSync
+			cluster.Update()
+		}
+	case false: // 添加
+		// 根据 master_urls 或者 集群名的唯一性 判断是否重复
+		count, err := o.QueryTable(utils.Cluster).SetCond(cond).Count()
+		if count != 0 {
+			ResultData.Message = "ClusterIsExistErr"
+			ResultData.Code = utils.ClusterIsExistErr
+			logs.Error("Add Cluster failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+			return ResultData
+		}
+		_, err = o.Insert(this)
+
+		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+			ResultData.Message = err.Error()
+			ResultData.Code = utils.AddClusterErr
+			logs.Error("Add Cluster failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+			return ResultData
+		}
 	}
+
 	ResultData.Data = this
 	return ResultData
 }

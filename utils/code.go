@@ -125,6 +125,7 @@ var (
 	DeleteLicenseModuleErr          = 1218
 	LicenseCommitErr                = 1219
 	CreateClientByBearerTokenErr    = 1220
+	ClusterotvailableOrNoHostErr    = 12201
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300

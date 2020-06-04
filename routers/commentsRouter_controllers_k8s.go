@@ -27,7 +27,7 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/k8s:ClusterController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/k8s:ClusterController"],
 		beego.ControllerComments{
-			Method:           "UploadK8sFile",
+			Method:           "AddCluster",
 			Router:           `/add`,
 			AllowHTTPMethods: []string{"post"},
 			MethodParams:     param.Make(),

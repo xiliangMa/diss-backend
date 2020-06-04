@@ -58,20 +58,31 @@ func Check(h *multipart.FileHeader) (models.Result, string) {
 }
 
 func TestClient(params utils.ApiParams) models.Result {
-	code := http.StatusOK
-	message := ""
-	if clientgo := utils.CreateK8sClient(&params); clientgo.ErrMessage != "" {
+	ResultData := models.Result{}
+	ResultData.Code = http.StatusOK
+	// 检测连接是否可用
+	clientgo := utils.CreateK8sClient(&params)
+	if clientgo.ErrMessage != "" {
 		switch params.AuthType {
 		case models.Api_Auth_Type_BearerToken:
-			code = utils.CreateClientByBearerTokenErr
-			message = "CreateClientByBearerTokenErr"
+			ResultData.Code = utils.CreateClientByBearerTokenErr
+			ResultData.Message = "CreateClientByBearerTokenErr"
 		case models.Api_Auth_Type_KubeConfig:
-			code = utils.CreateClientByKubeConfigErr
-			message = "CreateClientByKubeConfigErr"
+			ResultData.Code = utils.CreateClientByKubeConfigErr
+			ResultData.Message = "CreateClientByKubeConfigErr"
 		}
 		logs.Error("K8s client connect fail, AuthType: %s, err: %s", params.AuthType, clientgo.ErrMessage)
+		return ResultData
+	} else {
+		// 检测集群是否有主机
+		nodes, err := clientgo.GetNodes()
+		if err != nil || len(nodes.Items) == 0 {
+			ResultData.Code = utils.ClusterotvailableOrNoHostErr
+			ResultData.Message = "ClusterotvailableOrNoHostErr"
+		}
 	}
-	return models.Result{Code: code, Message: message}
+	return ResultData
+
 }
 
 func getK8sFilePath() string {

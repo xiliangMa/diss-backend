@@ -20,7 +20,7 @@ type ClusterController struct {
 // @Title AddCluster
 // @Description Add Cluster "authType=KubeConfig, 需要 上传KubeConfig文件; authType=BearerToken， 需要设置 masterUrl、bearerToken 参数"
 // @Param token header string true "authToken"
-// @Param authType formData string true "default:KubeConfig、BearerToken"
+// @Param authType formData string true "default: BearerToken、KubeConfig"
 // @Param masterUrl formData string false "ApiServer 访问地址"
 // @Param bearerToken formData string false "ApiServer 访问token"
 // @Param k8sFile formData file false "KubeConfig 文件"
@@ -29,7 +29,7 @@ type ClusterController struct {
 // @Param isForce formData bool false true "force"
 // @Success 200 {object} models.Result
 // @router /add [post]
-func (this *ClusterController) UploadK8sFile() {
+func (this *ClusterController) AddCluster() {
 	authType := this.GetString("authType")
 	masterUrl := this.GetString("masterUrl")
 	bearerToken := this.GetString("bearerToken")
@@ -63,7 +63,7 @@ func (this *ClusterController) UploadK8sFile() {
 	//BearerToken 方式
 	case models.Api_Auth_Type_BearerToken:
 		if result = css.TestClient(params); result.Code == http.StatusOK {
-			if result = cluster.Add(); result.Code == http.StatusOK {
+			if result = cluster.Add(isForce); result.Code == http.StatusOK {
 				logs.Info("Add Cluster success, MasterUrl: %s", cluster.MasterUrls)
 			}
 		}
@@ -88,7 +88,7 @@ func (this *ClusterController) UploadK8sFile() {
 					logs.Info("Upload KubeConfig file success, file name: %s", h.Filename)
 					// 添加集群记录
 					cluster.FileName = fpath
-					result = cluster.Add()
+					result = cluster.Add(isForce)
 				}
 			}
 		} else {
@@ -114,7 +114,9 @@ func (this *ClusterController) UploadK8sFile() {
 					if result = css.TestClient(params); result.Code != http.StatusOK {
 						os.Remove(fpath)
 					} else {
+						cluster.FileName = fpath
 						logs.Info("Force update k8s file success, file name: %s", h.Filename)
+						result = cluster.Add(isForce)
 						// to do 强制更新后文件名相同、内容不一样
 					}
 				}
