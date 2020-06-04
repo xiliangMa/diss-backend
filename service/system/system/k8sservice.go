@@ -77,8 +77,8 @@ func TestClient(params utils.ApiParams) models.Result {
 		// 检测集群是否有主机
 		nodes, err := clientgo.GetNodes()
 		if err != nil || len(nodes.Items) == 0 {
-			ResultData.Code = utils.ClusterotvailableOrNoHostErr
-			ResultData.Message = "ClusterotvailableOrNoHostErr"
+			ResultData.Code = utils.ClusterNotAvailableOrNoHostErr
+			ResultData.Message = "ClusterNotAvailableOrNoHostErr"
 		}
 	}
 	return ResultData
