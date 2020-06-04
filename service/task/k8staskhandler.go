@@ -377,12 +377,10 @@ func SyncAll() {
 				clusterName := c.Name
 				// 创建k8s客户端
 				params := utils.ApiParams{}
-				if c.AuthType == models.Api_Auth_Type_BearerToken {
-					params.BearerToken = c.BearerToken
-					params.MasterUrl = c.MasterUrls
-				} else {
-					params.KubeConfigPath = c.FileName
-				}
+				params.AuthType = c.AuthType
+				params.BearerToken = c.BearerToken
+				params.MasterUrl = c.MasterUrls
+				params.KubeConfigPath = c.FileName
 				this := NewK8STaskHandler(&params)
 				if this.Clientgo.ErrMessage == "" {
 					c.SyncStatus = models.Cluster_Sync_Status_InProcess

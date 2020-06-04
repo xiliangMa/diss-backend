@@ -114,8 +114,9 @@ type NodeMetrics struct {
 }
 
 func CreateK8sClient(params *ApiParams) ClientGo {
+	var config *restclient.Config
+	var err error
 	clientgo := ClientGo{nil, ""}
-	config, err := clientcmd.BuildConfigFromFlags("", params.KubeConfigPath)
 	if params.AuthType == "BearerToken" {
 		// 这里是使用用户名和密码调用APIserver，所以kubeconfig为空
 		kubeconfig := flag.String(string(rand.Intn(1000)), "", "BearerToken")
@@ -123,6 +124,8 @@ func CreateK8sClient(params *ApiParams) ClientGo {
 		config, err = clientcmd.BuildConfigFromFlags(params.MasterUrl, *kubeconfig)
 		config.Insecure = true
 		config.BearerToken = params.BearerToken
+	} else {
+		config, err = clientcmd.BuildConfigFromFlags("", params.KubeConfigPath)
 	}
 	if err != nil {
 		clientgo.ErrMessage = "BuildConfigFromFlags"
