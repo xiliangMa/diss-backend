@@ -86,13 +86,13 @@ func TestClient(params utils.ApiParams) models.Result {
 }
 
 func getK8sFilePath() string {
-	return beego.AppConfig.String("k8s::KubeCongigPath")
+	return beego.AppConfig.String("k8s::KubeConfigPath")
 }
 
 func CreateKubeConfigDir(fpath string) {
 	_, err := os.Stat(fpath)
 	if os.IsNotExist(err) {
 		logs.Info("Create KubeConfig Dir success, path: %s", fpath)
-		os.MkdirAll(beego.AppConfig.String("k8s::KubeCongigPath"), os.ModePerm)
+		os.MkdirAll(beego.AppConfig.String("k8s::KubeConfigPath"), os.ModePerm)
 	}
 }
