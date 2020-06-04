@@ -1,39 +1,31 @@
-package main
+package system
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/service/system/system"
-	"github.com/xiliangMa/diss-backend/service/task"
-	"github.com/xiliangMa/diss-backend/sysinit"
 	"github.com/xiliangMa/diss-backend/utils"
 	"strconv"
 	"testing"
 	"time"
 )
 
-func Test_Syslog(t *testing.T) {
+//func Test_Syslog(t *testing.T) {
+//
+//	sysinit.InitGlobalLogConfig()
+//	syslogHandler := task.GlobalSysLogTaskHandler
+//
+//	fmt.Printf("Sys export groups and taskids :\n %#v\n", syslogHandler)
+//	select {}
+//}
+//
+//func Test_AddTEPoint(t *testing.T) {
+//	sysinit.InitGlobalLogConfig()
+//	sysinit.InitTimeEdgePoint()
+//}
 
-	sysinit.InitGlobalLogConfig()
-	syslogHandler := task.GlobalSysLogTaskHandler
-
-	fmt.Printf("Sys export groups and taskids :\n %#v\n", syslogHandler)
-	select {}
-}
-
-func Test_AddTEPoint(t *testing.T) {
-	sysinit.InitGlobalLogConfig()
-	sysinit.InitTimeEdgePoint()
-}
-
-var GlobalSyslog = system.GlobalSyslog
 
 func Test_BenchmarkLog_list_timeranged(t *testing.T) {
-
-	sysinit.InitGlobalLogConfig()
-	sysinit.InitTimeEdgePoint()
 
 	exType := models.SysLog_ImageSecLog
 
