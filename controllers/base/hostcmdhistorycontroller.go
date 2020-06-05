@@ -28,7 +28,7 @@ func (this *HostCmdHistoryController) GetHostCmdHistoryList() {
 	cmdHistory := new(models.CmdHistory)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &cmdHistory)
 	cmdHistory.HostId = hostId
-	cmdHistory.Type = 0
+	cmdHistory.Type = models.Cmd_History_Type_Host
 	this.Data["json"] = cmdHistory.List(from, limit)
 	this.ServeJSON(false)
 

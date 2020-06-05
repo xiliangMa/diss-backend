@@ -5,16 +5,18 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 type CmdHistory struct {
-	Id          string `orm:"pk;" description:"(id)"`
-	HostId      string `orm:"" description:"(主机id)"`
-	ContainerId string `orm:"" description:"(容器id)"`
-	User        string `orm:"" description:"(用户)"`
+	Id          string `orm:"pk;size(64)" description:"(id)"`
+	HostId      string `orm:"size(64)" description:"(主机id)"`
+	ContainerId string `orm:"size(256)" description:"(容器id)"`
+	User        string `orm:"size(32)" description:"(用户)"`
 	Command     string `orm:"" description:"(命令)"`
 	CreateTime  string `orm:"null;" description:"(更新时间)"`
-	Type        int8   `orm:"default(0);" description:"(类型 0 host 1 container)"`
+	Type        string `orm:"default(Host);size(32)" description:"(类型 Host Container)"`
 }
 
 type CmdHistoryList struct {
@@ -22,20 +24,25 @@ type CmdHistoryList struct {
 }
 
 type CmdHistoryInterface interface {
-	Add()
-	MultiAdd()
-	Delete()
-	Edit()
-	Get()
-	List()
+	Add() Result
+	List() Result
+	Delete() Result
 }
 
 func (this *CmdHistory) Add() Result {
+	insetSql := `INSERT INTO cmd_history VALUES(?, ?, ?, ? , ?, ?, ?)`
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+	o.Using(utils.DS_Security_Log)
 	var ResultData Result
-	var err error
-	_, err = o.Insert(this)
+
+	_, err := o.Raw(insetSql, this.Id,
+		this.HostId,
+		this.ContainerId,
+		this.User,
+		this.Command,
+		this.CreateTime,
+		this.Type).Exec()
+
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddCmdHistoryErr
@@ -45,81 +52,16 @@ func (this *CmdHistory) Add() Result {
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
-	return ResultData
-}
-
-func (this *CmdHistoryList) MultiAdd() Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
-	var ResultData Result
-	var err error
-	_, err = o.InsertMulti(len(this.List), this.List)
-	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.AddCmdHistoryErr
-		logs.Error("Add CmdHistory failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-
-	ResultData.Code = http.StatusOK
-	ResultData.Data = this
-	return ResultData
-}
-
-func (this *CmdHistory) List(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
-	var imageList []*CmdHistory
-	var ResultData Result
-	var err error
-
-	cond := orm.NewCondition()
-	cond = cond.And("type", this.Type)
-	if this.HostId != "" {
-		cond = cond.And("host_id", this.HostId)
-	}
-	if this.ContainerId != "" {
-		cond = cond.And("container_id", this.ContainerId)
-	}
-
-	if this.Command != "" {
-		cond = cond.And("command__contains", this.Command)
-	}
-
-	_, err = o.QueryTable(utils.CmdHistory).SetCond(cond).Limit(limit, from).All(&imageList)
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetCmdHistoryErr
-		logs.Error("Get CmdHistory List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-
-	total, _ := o.QueryTable(utils.CmdHistory).SetCond(cond).Count()
-	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = imageList
-
-	ResultData.Code = http.StatusOK
-	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
 }
 
 func (this *CmdHistory) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+	o.Using(utils.DS_Security_Log)
 	var ResultData Result
-	cond := orm.NewCondition()
+	deleteSql := `DELETE FROM cmd_history WHERE TYPE = ? AND host_id = ?`
 
-	cond = cond.And("type", this.Type)
-	if this.HostId != "" {
-		cond = cond.And("host_id", this.HostId)
-	}
-
-	_, err := o.QueryTable(utils.CmdHistory).SetCond(cond).Delete()
-
+	_, err := o.Raw(deleteSql, this.Type, this.HostId).Exec()
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteCmdHistoryErr
@@ -129,3 +71,69 @@ func (this *CmdHistory) Delete() Result {
 	ResultData.Code = http.StatusOK
 	return ResultData
 }
+
+func (this *CmdHistory) List(from, limit int) Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Security_Log)
+	var cmdHistoryList []*CmdHistory
+	var ResultData Result
+	var err error
+	var total = 0
+
+	sql := `SELECT * FROM ` + utils.CmdHistory
+	countSql := `SELECT "count"(id) FROM ` + utils.CmdHistory
+	filter := ""
+
+	if this.Type != "" {
+		filter = filter + ` type = '` + this.Type + `' and `
+
+	}
+	if this.HostId != "" {
+		filter = filter + `host_id = '` + this.HostId + `' and `
+	}
+	if this.ContainerId != "" {
+		filter = filter + `container_id = '` + this.ContainerId + `' and `
+	}
+	if this.Command != "" {
+		filter = filter + `command like '%` + this.Command + `%' and `
+	}
+
+	// to do 根据时间维度查询
+	//if this.CreatedAt != 0 {
+	//	filter = filter + `c."createdAt" > ` + fmt.Sprintf("%s", this.CreatedAt) + " and "
+	//}
+
+	if filter != "" {
+		sql = sql + " where " + filter
+		countSql = countSql + " where " + filter
+	}
+	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
+	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
+	resultSql := sql
+	if from >= 0 && limit > 0 {
+		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
+		resultSql = resultSql + limitSql
+	}
+	_, err = o.Raw(resultSql).QueryRows(&cmdHistoryList)
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetCmdHistoryErr
+		logs.Error("Get CmdHistory List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	o.Raw(countSql).QueryRow(&total)
+	data := make(map[string]interface{})
+	data["total"] = total
+	data["items"] = cmdHistoryList
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
+	return ResultData
+}
+
+

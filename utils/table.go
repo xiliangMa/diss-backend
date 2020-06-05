@@ -19,7 +19,6 @@ var (
 	SYSTemplateGroup = "system_template_group"
 	BenchMarkLog     = "bench_mark_log"
 	HostPs           = "host_ps"
-	CmdHistory       = "cmd_history"
 	Groups           = "groups"
 	Job              = "job"
 	LogConfig        = "log_config"
@@ -29,8 +28,9 @@ var (
 	LicenseHistory   = "license_history"
 
 	//security_log timescaledb
-	DcokerIds = "docker_ids"
-	TaskLog   = "task_log"
+	DcokerIds  = "docker_ids"
+	TaskLog    = "task_log"
+	CmdHistory = "cmd_history"
 
 	//Diss_api
 	Accounts                    = "accounts"

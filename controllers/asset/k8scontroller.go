@@ -165,7 +165,7 @@ func (this *K8SController) GetContainerCmdHistorys() {
 	cmdHistory := new(models.CmdHistory)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &cmdHistory)
 	cmdHistory.ContainerId = containerId
-	cmdHistory.Type = 1
+	cmdHistory.Type = models.Cmd_History_Type_Container
 	this.Data["json"] = cmdHistory.List(from, limit)
 	this.ServeJSON(false)
 

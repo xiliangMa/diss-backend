@@ -21,6 +21,9 @@ var (
 	Api_Auth_Type_KubeConfig        = "KubeConfig"
 	Api_Auth_Type_BearerToken       = "BearerToken"
 
+	Cmd_History_Type_Host      = "Host"
+	Cmd_History_Type_Container = "Container"
+
 	//容器状态
 	Container_Status_Run   = "Run"
 	Container_Status_Pause = "Pause"

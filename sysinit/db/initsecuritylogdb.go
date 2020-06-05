@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/lib/pq"
+	"github.com/xiliangMa/diss-backend/sysinit/dbscript/timescaledb"
 	"github.com/xiliangMa/diss-backend/utils"
 	"os"
 )
@@ -50,10 +51,6 @@ func (this *SecurityLogDb) InitDB() {
 		port = os.Getenv(utils.DS_Security_Log_Port)
 	}
 
-	// demo mysql
-	//orm.RegisterDataBase("default", "mysql", "root:abc123@tcp(127.0.0.1:3306)/uranus_local?charset=utf8")
-	//DS := fmt.Sprintf("%s%s%s%s%s%s%s%s", dbUser, ":", dbPwd, "@tcp(", dbHost, ":"+port+")/", dbName, "?charset=utf8")
-
 	// postgres
 	DS := fmt.Sprintf("%s%s%s%s%s%s", "host="+dbHost, " port="+port, " user="+dbUser, " password="+dbPwd, " dbname="+dbName, " sslmode=disable")
 	orm.RegisterDriver(driver, orm.DRPostgres)
@@ -62,11 +59,19 @@ func (this *SecurityLogDb) InitDB() {
 		logs.Error("DB Register fail, >>> DSAlias: %s <<<, Err: %s", DSAlias, err)
 	}
 
-	//registerSecurityLogModel()
-	// auto create db
-	//err = orm.RunSyncdb(DSAlias, force, true)
-	//if err != nil {
-	//	logs.Error("Auth Create table fail, >>> DSAlias: %s <<<, Err: %s", DSAlias, err)
-	//}
+	//创建数据表
+	this.CreateOrUpdateDb()
+}
 
+func (this *SecurityLogDb) CreateOrUpdateDb() {
+	dbName := utils.DS_Security_Log
+	o := orm.NewOrm()
+	o.Using(dbName)
+	logs.Info("Create Or Update Db: %s data start................", dbName)
+
+	logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", utils.CmdHistory)
+	_, err := o.Raw(timescaledb.Tab_Create_CmdHistory).Exec()
+	if err != nil {
+		logs.Error("Create tab Table: %s fail, err: %s ", utils.CmdHistory, err)
+	}
 }
