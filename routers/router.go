@@ -14,6 +14,7 @@ import (
 	cbase "github.com/xiliangMa/diss-backend/controllers/base"
 	cjob "github.com/xiliangMa/diss-backend/controllers/job"
 	ck8s "github.com/xiliangMa/diss-backend/controllers/k8s"
+	csecurityaudit "github.com/xiliangMa/diss-backend/controllers/securityaudit"
 	csecuritycheck "github.com/xiliangMa/diss-backend/controllers/securitycheck"
 	csecuritylog "github.com/xiliangMa/diss-backend/controllers/securitylog"
 	csecuritypolicy "github.com/xiliangMa/diss-backend/controllers/securitypolicy"
@@ -63,6 +64,11 @@ func init() {
 				&csecuritylog.BenchMarkLogController{},
 				&csecuritylog.VirusLogController{},
 				&csecuritylog.VulnerabilitiesLogController{},
+			),
+		),
+		beego.NSNamespace("/v1/securityaudit",
+			beego.NSInclude(
+				&csecurityaudit.CmdHistoryController{},
 			),
 		),
 		beego.NSNamespace("/auth",

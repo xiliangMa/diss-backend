@@ -7,16 +7,19 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type CmdHistory struct {
-	Id          string `orm:"pk;size(64)" description:"(id)"`
-	HostId      string `orm:"size(64)" description:"(主机id)"`
-	ContainerId string `orm:"size(256)" description:"(容器id)"`
-	User        string `orm:"size(32)" description:"(用户)"`
-	Command     string `orm:"" description:"(命令)"`
-	CreateTime  string `orm:"null;" description:"(更新时间)"`
-	Type        string `orm:"default(Host);size(32)" description:"(类型 Host Container)"`
+	Id          string    `orm:"pk;size(64)" description:"(id)"`
+	HostId      string    `orm:"size(64)" description:"(主机id)"`
+	ContainerId string    `orm:"size(256)" description:"(容器id)"`
+	User        string    `orm:"size(32)" description:"(用户)"`
+	Command     string    `orm:"" description:"(命令)"`
+	CreateTime  time.Time `orm:"null;" description:"(更新时间)"`
+	Type        string    `orm:"default(Host);size(32)" description:"(类型 Host Container)"`
+	StartTime   time.Time `orm:"-" description:"(开始时间)"`
+	EndTime     time.Time `orm:"-" description:"(结束时间)"`
 }
 
 type CmdHistoryList struct {
@@ -98,10 +101,9 @@ func (this *CmdHistory) List(from, limit int) Result {
 		filter = filter + `command like '%` + this.Command + `%' and `
 	}
 
-	// to do 根据时间维度查询
-	//if this.CreatedAt != 0 {
-	//	filter = filter + `c."createdAt" > ` + fmt.Sprintf("%s", this.CreatedAt) + " and "
-	//}
+	if this.StartTime.String() != "" && this.EndTime.String() != "" {
+		filter = filter + `create_time  BETWEEN '` + this.StartTime.String() + `' and '` + this.EndTime.String() + `' and `
+	}
 
 	if filter != "" {
 		sql = sql + " where " + filter
@@ -114,6 +116,7 @@ func (this *CmdHistory) List(from, limit int) Result {
 		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
 		resultSql = resultSql + limitSql
 	}
+
 	_, err = o.Raw(resultSql).QueryRows(&cmdHistoryList)
 
 	if err != nil {
@@ -135,5 +138,3 @@ func (this *CmdHistory) List(from, limit int) Result {
 	}
 	return ResultData
 }
-
-
