@@ -344,6 +344,23 @@ func (this *NatsSubService) Save() error {
 			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
+		case models.Resource_DockerEvent:
+			dockerEventList := []models.DockerEvent{}
+			s, _ := json.Marshal(ms.Data)
+			if err := json.Unmarshal(s, &dockerEventList); err != nil {
+				logs.Error("Paraces %s error %s", ms.Tag, err)
+				return err
+			}
+			size := len(dockerEventList)
+			if size != 0 {
+				logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", dockerEventList[0].HostId, models.Resource_DockerEvent, size)
+			}
+			for _, dcokerEvent := range dockerEventList {
+				dcokerEvent.Add()
+			}
+			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			this.ReceiveData(metricsResult)
+			return nil
 		}
 	case models.Type_Control:
 		switch ms.Tag {

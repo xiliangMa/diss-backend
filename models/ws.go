@@ -21,6 +21,7 @@ const (
 	Resource_HeartBeat           = "HeartBeat"
 	Resource_Received            = "Received"
 	Resource_Task                = "Task"
+	Resource_DockerEvent         = "DockerEvent"
 
 	// #################### ws 通信类型
 	Type_Metric       = "Metric"       //指标类型

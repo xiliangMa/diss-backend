@@ -135,6 +135,8 @@ var (
 	GetIntrudeDetectLogErr = 1300
 	AddTaskLogErr          = 1301
 	GetTaskLogErr          = 1302
+	GetDockerEventListErr  = 1303
+	AddDockerEventErr      = 1304
 
 	// diss_api 1400-1500
 	GetAccountsErr                        = 1400
@@ -144,7 +146,6 @@ var (
 	GetDockerVirusErr                     = 1404
 	GetImagePackageVulnerabilitiesListErr = 1405
 	GetFeedListErr                        = 1406
-	GetDockerEventListErr                 = 1407
 
 	// config_timedata 1500-1599
 	ConnectSyslogErr     = 1500

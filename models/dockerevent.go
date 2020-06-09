@@ -100,3 +100,33 @@ func (this *DockerEvent) List(from, limit int) Result {
 	}
 	return ResultData
 }
+
+func (this *DockerEvent) Add() Result {
+	insetSql := `INSERT INTO docker_event VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	o := orm.NewOrm()
+	o.Using(utils.DS_Security_Log)
+	var ResultData Result
+
+	_, err := o.Raw(insetSql,
+		this.Id,
+		this.HostId,
+		this.From,
+		this.Type,
+		this.Action,
+		this.Actor,
+		this.Status,
+		this.Scope,
+		this.Time,
+		this.TimeNano).Exec()
+
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.AddDockerEventErr
+		logs.Error("Add DockerEvent failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
