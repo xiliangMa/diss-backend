@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/job"
+	"github.com/xiliangMa/diss-backend/service/securitycheck"
+	"time"
 )
 
 // Job 接口
@@ -72,5 +75,33 @@ func (this *JobController) UpdateJob() {
 	Job.Id = id
 	result := Job.Update()
 	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
+// @Title ActiveJob
+// @Description Gen Tasks From Job , and Delivery Tasks
+// @Param token header string true "authToken"
+// @Param id path string "" true "id"
+// @Success 200 {object} models.Result
+// @router /active/:id [put]
+func (this *JobController) ActiveJob() {
+	id := this.GetString(":id")
+	Job := new(models.Job)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &Job)
+	Job.Id = id
+
+	jobservice := job.JobService{}
+	jobservice.JobParm = Job
+
+	account := this.GetString("account")
+	if account == "" {
+		account = models.Account_Admin
+	}
+	batch := time.Now().Unix()
+	actChecklist := jobservice.GetCheckList()
+	secCheckList := models.SecurityCheckList{CheckList: actChecklist}
+	securityCheckService := securitycheck.SecurityCheckService{SecurityCheckList: &secCheckList, Batch: batch, Account: account}
+
+	this.Data["json"] = securityCheckService.DeliverTask()
 	this.ServeJSON(false)
 }

@@ -43,6 +43,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 	TMP_Type_DockerVS_DT := this.DefaultTMP[models.TMP_Type_DockerVS]
 	TMP_Type_HostVS_DT := this.DefaultTMP[models.TMP_Type_HostVS]
 	//TMP_Type_LS_DT := defaultTMP[models.TMP_Type_LS]
+
 	if securityCheck.BenchMarkCheck {
 		dockerTask := new(models.Task)
 		uid1, _ := uuid.NewV4()
@@ -50,7 +51,12 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_BM_Docker, uid1)
 
 		//基线-Docker
-		dockerTask.Type = models.Job_Type_Once
+		if (*securityCheck).CronType == "" {
+			dockerTask.Type = models.Job_Type_Once
+		}else{
+			dockerTask.Type = securityCheck.CronType
+		}
+
 		dockerTask.SystemTemplate = TMP_Type_BM_Docker_DT
 		dockerTask.Name = "System-Task-" + dockerTask.Id
 		dockerTask.Description = "System-Task-" + models.TMP_Type_BM_Docker
@@ -64,7 +70,13 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		k8sTask.Id = uid2.String()
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_BM_K8S, uid2)
 		//基线-K8S
-		k8sTask.Type = models.Job_Type_Once
+		if (*securityCheck).CronType == "" {
+			k8sTask.Type = models.Job_Type_Once
+		}else{
+			k8sTask.Type = securityCheck.CronType
+		}
+
+
 		k8sTask.SystemTemplate = TMP_Type_BM_K8S_DT
 		k8sTask.Name = "System-Task-" + k8sTask.Id
 		k8sTask.Description = "System-Task-" + models.TMP_Type_BM_K8S
@@ -109,7 +121,12 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 			task.SystemTemplate = TMP_Type_HostVS_DT
 			task.Description = "System-Task-" + models.TMP_Type_HostVS
 		}
-		task.Type = models.Job_Type_Once
+
+		if (*securityCheck).CronType == "" {
+			task.Type = models.Job_Type_Once
+		}else{
+			task.Type = securityCheck.CronType
+		}
 		task.Name = "System-Task-" + task.Id
 		task.Host = securityCheck.Host
 		task.Container = securityCheck.Container

@@ -30,6 +30,7 @@ type JobInterface interface {
 	Add() Result
 	List(from, limit int) Result
 	Delete() Result
+	Internal_Get(id string) Job
 }
 
 func (this *Job) List(from, limit int) Result {
@@ -73,6 +74,34 @@ func (this *Job) List(from, limit int) Result {
 		ResultData.Data = nil
 	}
 	return ResultData
+}
+
+func (this *Job) Internal_Get(id string) []*Job {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var JobList []*Job
+	var ResultData Result
+	var err error
+	cond := orm.NewCondition()
+
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+
+	_, err = o.QueryTable(utils.Job).SetCond(cond).RelatedSel().All(&JobList)
+	for _, job := range JobList {
+		o.LoadRelated(job, "HostConfig")
+		o.LoadRelated(job, "ContainerConfig")
+		o.LoadRelated(job, "Task")
+	}
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetJobErr
+		logs.Error("Get Job Item failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return JobList
+	}
+
+	return JobList
 }
 
 func (this *Job) Add() Result {

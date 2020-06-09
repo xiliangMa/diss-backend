@@ -54,7 +54,8 @@ var (
 	TMP_Type_BM_Docker = "DockerBenchMark"
 	TMP_Type_BM_K8S    = "KubernetesBenchMark"
 	//入侵扫描
-	TMP_Type_IDS = "IntrudeDetectScan"
+	TMP_Type_IDS_Docker = "DockerIntrudeDetectScan"
+	TMP_Type_IDS_Host   = "HostIntrudeDetectScan"
 	//安全审计
 	TMP_Type_DockerSecurityAudit     = "DockerSecurityAudit"
 	TMP_Type_KubernetesSecurityAudit = "KubernetesSecurityAudit"
