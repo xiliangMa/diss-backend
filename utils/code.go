@@ -143,6 +143,7 @@ var (
 	GetImageVirusErr                      = 1403
 	GetDockerVirusErr                     = 1404
 	GetImagePackageVulnerabilitiesListErr = 1405
+	GetfeedListErr                        = 1406
 
 	// config_timedata 1500-1599
 	ConnectSyslogErr     = 1500

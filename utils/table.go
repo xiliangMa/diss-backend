@@ -39,4 +39,5 @@ var (
 	DockerVirus                 = "docker_virus"
 	ImagePackageVulnerabilities = "image_package_vulnerabilities"
 	FeedDataVulnerabilities     = "feed_data_vulnerabilities"
+	Feeds                       = "feeds"
 )

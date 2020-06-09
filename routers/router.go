@@ -120,6 +120,7 @@ func init() {
 			beego.NSInclude(
 				&csystem.SystemController{},
 				&csystem.IntegrationController{},
+				&csystem.FeedsController{},
 			),
 		),
 		beego.NSNamespace("/v1/jobs",
