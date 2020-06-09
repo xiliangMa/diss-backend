@@ -18,8 +18,8 @@ type CmdHistory struct {
 	Command     string    `orm:"" description:"(命令)"`
 	CreateTime  time.Time `orm:"null;" description:"(更新时间)"`
 	Type        string    `orm:"default(Host);size(32)" description:"(类型 Host Container)"`
-	StartTime   time.Time `orm:"-" description:"(开始时间)"`
-	EndTime     time.Time `orm:"-" description:"(结束时间)"`
+	StartTime   time.Time `orm:"-;default(null)" description:"(开始时间)"`
+	EndTime     time.Time `orm:"-";default(null) description:"(结束时间)"`
 }
 
 type CmdHistoryList struct {
@@ -101,7 +101,7 @@ func (this *CmdHistory) List(from, limit int) Result {
 		filter = filter + `command like '%` + this.Command + `%' and `
 	}
 
-	if this.StartTime.String() != "" && this.EndTime.String() != "" {
+	if this.StartTime.String() != Null_Time && this.EndTime.String() != Null_Time {
 		filter = filter + `create_time  BETWEEN '` + this.StartTime.String() + `' and '` + this.EndTime.String() + `' and `
 	}
 

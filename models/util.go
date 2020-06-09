@@ -136,4 +136,6 @@ var (
 	SysLog_ContainerVirusLog = "ContainerVirusLog" // 容器杀毒日志
 	SysLog_IDSLog            = "IntrudeDetectLog"  // 入侵检测日志
 	SysLog_SecAuditLog       = "SecurityAuditLog"  // 安全审计日志
+
+	Null_Time = "0001-01-01 00:00:00 +0000 UTC"
 )
