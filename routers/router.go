@@ -69,6 +69,7 @@ func init() {
 		beego.NSNamespace("/v1/securityaudit",
 			beego.NSInclude(
 				&csecurityaudit.CmdHistoryController{},
+				&csecurityaudit.DockerEventController{},
 			),
 		),
 		beego.NSNamespace("/auth",

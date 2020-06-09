@@ -28,9 +28,10 @@ var (
 	LicenseHistory   = "license_history"
 
 	//security_log timescaledb
-	DcokerIds  = "docker_ids"
-	TaskLog    = "task_log"
-	CmdHistory = "cmd_history"
+	DcokerIds   = "docker_ids"
+	TaskLog     = "task_log"
+	CmdHistory  = "cmd_history"
+	DockerEvent = "docker_event"
 
 	//Diss_api
 	Accounts                    = "accounts"

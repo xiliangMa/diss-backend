@@ -74,4 +74,10 @@ func (this *SecurityLogDb) CreateOrUpdateDb() {
 	if err != nil {
 		logs.Error("Create tab Table: %s fail, err: %s ", utils.CmdHistory, err)
 	}
+
+	logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", utils.DockerEvent)
+	_, err = o.Raw(timescaledb.Tab_Create_DockerEvent).Exec()
+	if err != nil {
+		logs.Error("Create tab Table: %s fail, err: %s ", utils.DockerEvent, err)
+	}
 }

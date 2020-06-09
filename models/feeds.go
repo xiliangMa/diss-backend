@@ -59,7 +59,7 @@ func (this *Feeds) List(from, limit int) Result {
 
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetfeedListErr
+		ResultData.Code = utils.GetFeedListErr
 		logs.Error("Get feed List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
