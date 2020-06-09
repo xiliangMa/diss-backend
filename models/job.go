@@ -16,7 +16,7 @@ type Job struct {
 	Description         string               `orm:"" description:"(描述)"`
 	Spec                string               `orm:"" description:"(定时器)"`
 	Type                string               `orm:"" description:"(类型 重复执行 单次执行 )"`
-	Status              string               `orm:"null;" description:"(状态: 执行中、启用、禁用)"`
+	Status              string               `orm:"default(Disable)" description:"(状态: 执行中、启用、禁用)"`
 	CreateTime          time.Time            `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
 	UpdateTime          time.Time            `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
 	SystemTemplate      *SystemTemplate      `orm:"rel(fk);null;" description:"(策略)"`
@@ -24,6 +24,7 @@ type Job struct {
 	Task                []*Task              `orm:"reverse(many);null" description:"(任务列表)"`
 	HostConfig          []*HostConfig        `orm:"reverse(many);null" description:"(主机列表)"`
 	ContainerConfig     []*ContainerConfig   `orm:"reverse(many);null" description:"(容器列表)"`
+	JobLevel            string               `orm:"default(System)" description:"(任务级别)"`
 }
 
 type JobInterface interface {
@@ -51,6 +52,7 @@ func (this *Job) List(from, limit int) Result {
 		cond = cond.And("name__icontains", this.Name)
 	}
 	_, err = o.QueryTable(utils.Job).SetCond(cond).RelatedSel().Limit(limit, from).OrderBy("-create_time").All(&JobList)
+
 	for _, job := range JobList {
 		o.LoadRelated(job, "HostConfig")
 		o.LoadRelated(job, "ContainerConfig")
@@ -113,6 +115,7 @@ func (this *Job) Add() Result {
 
 	uid, _ := uuid.NewV4()
 	this.Id = uid.String()
+
 	_, err = o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		o.Rollback()
@@ -147,13 +150,13 @@ func (this *Job) Delete() Result {
 		cond = cond.And("id", this.Id)
 	}
 	_, err := o.QueryTable(utils.Job).SetCond(cond).Delete()
-
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteImageInfoErr
 		logs.Error("Delete Job failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
+
 	ResultData.Code = http.StatusOK
 	return ResultData
 }
@@ -164,7 +167,6 @@ func (this *Job) Update() Result {
 	var ResultData Result
 
 	err := o.Begin()
-
 	_, err = o.Update(this)
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -193,6 +195,7 @@ func (this *Job) Update() Result {
 func (this *Job) fillRelationData(o orm.Ormer) Result {
 	var ResultData Result
 	m2m := o.QueryM2M(this, "HostConfig")
+	m2m.Clear()
 	for _, hostconfig := range this.HostConfig {
 		if m2m.Exist(hostconfig) != true {
 			_, err := m2m.Add(hostconfig)
@@ -210,6 +213,7 @@ func (this *Job) fillRelationData(o orm.Ormer) Result {
 		}
 	}
 	m2m = o.QueryM2M(this, "ContainerConfig")
+	m2m.Clear()
 	for _, containerconfig := range this.ContainerConfig {
 		if m2m.Exist(containerconfig) != true {
 			_, err := m2m.Add(containerconfig)

@@ -86,7 +86,6 @@ var (
 	HostExistInJobErr               = 91
 	ContainerExistInJobErr          = 92
 
-
 	//k8s 1001-1100
 	AddNameSpaceErr    = 1001
 	AddPodErr          = 1002
@@ -109,11 +108,12 @@ var (
 	DeletePodErr       = 1009
 	DeleteClusterErr   = 1010
 
-	//task 1100-1200
-	AddTaskErr    = 1100
-	GetTaskErr    = 1101
-	DeleteTaskErr = 1102
-	EditTaskErr   = 1103
+	//task job 1100-1200
+	AddTaskErr     = 1100
+	GetTaskErr     = 1101
+	DeleteTaskErr  = 1102
+	EditTaskErr    = 1103
+	JobDisabledErr = 1104
 
 	//system 1200-1300
 	CheckK8sFilePostErr             = 1200

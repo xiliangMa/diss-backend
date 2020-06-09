@@ -5,8 +5,6 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/job"
-	"github.com/xiliangMa/diss-backend/service/securitycheck"
-	"time"
 )
 
 // Job 接口
@@ -91,17 +89,10 @@ func (this *JobController) ActiveJob() {
 	Job.Id = id
 
 	jobservice := job.JobService{}
-	jobservice.JobParm = Job
+	jobservice.JobParam = Job
 
 	account := this.GetString("account")
-	if account == "" {
-		account = models.Account_Admin
-	}
-	batch := time.Now().Unix()
-	actChecklist := jobservice.GetCheckList()
-	secCheckList := models.SecurityCheckList{CheckList: actChecklist}
-	securityCheckService := securitycheck.SecurityCheckService{SecurityCheckList: &secCheckList, Batch: batch, Account: account}
 
-	this.Data["json"] = securityCheckService.DeliverTask()
+	this.Data["json"] = jobservice.GenTaskList(account)
 	this.ServeJSON(false)
 }

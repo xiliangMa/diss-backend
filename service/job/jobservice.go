@@ -1,19 +1,34 @@
 package job
 
 import (
+	"fmt"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/securitycheck"
+	"github.com/xiliangMa/diss-backend/utils"
+	"time"
 )
 
 type JobService struct {
-	JobParm *models.Job
+	JobParam *models.Job
 }
 
-func (this *JobService) GetCheckList() []*models.SecurityCheck {
-	joblist := this.JobParm.Get(this.JobParm.Id)
+func (this *JobService) GenTaskList(account string) models.Result {
+	var ResultData models.Result
+
+	if account == "" {
+		account = models.Account_Admin
+	}
+	batch := time.Now().Unix()
+	joblist := this.JobParam.Get(this.JobParam.Id)
 	secCheckList := []*models.SecurityCheck{}
 	if len(joblist) > 0 {
 		job := joblist[0]
 
+		if job.Status == models.Job_Status_Disable {
+			ResultData.Code = utils.JobDisabledErr
+			ResultData.Message = fmt.Sprintf("Id: %s , Name: %s Job is Disabled", job.Id, job.Name)
+			return ResultData
+		}
 		// 通过job内容 构建checklist
 		targetType := job.SystemTemplate.Type //目标类型为检查模板的类型
 		resType := models.SC_Type_Host        // 资源类型包括 主机 容器 镜像
@@ -33,7 +48,7 @@ func (this *JobService) GetCheckList() []*models.SecurityCheck {
 					seccheck.LeakScan = true
 				}
 				seccheck.Host = checkHost
-				seccheck.CronType = job.Type
+				seccheck.Job = job
 				secCheckList = append(secCheckList, seccheck)
 			}
 		} else if (resType == models.Sc_Type_Container) && (job.ContainerConfig != nil) {
@@ -49,11 +64,14 @@ func (this *JobService) GetCheckList() []*models.SecurityCheck {
 					seccheck.LeakScan = true
 				}
 				seccheck.Container = checkContainer
-				seccheck.CronType = job.Type
+				seccheck.Job = job
 				secCheckList = append(secCheckList, seccheck)
 			}
 		}
 	}
 
-	return secCheckList
+	SecCheckListModel := models.SecurityCheckList{CheckList: secCheckList}
+	securityCheckService := securitycheck.SecurityCheckService{SecurityCheckList: &SecCheckListModel, Batch: batch, Account: account}
+	result := securityCheckService.DeliverTask()
+	return result
 }

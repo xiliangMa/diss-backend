@@ -11,5 +11,5 @@ type SecurityCheck struct {
 	Host           *HostConfig      `orm:"null" description:"(主机)"`
 	Container      *ContainerConfig `orm:"null" description:"(容器)"`
 	Type           string           `orm:"default(host)" description:"(类型 host  container)"`
-	CronType       string           `orm:"" description:"(定时周期类型)"`
+	Job            *Job             `orm:"null" description:"(来源任务)"`
 }

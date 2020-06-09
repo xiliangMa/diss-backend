@@ -70,6 +70,10 @@ var (
 	TMP_Status_Enable  = "Enable"
 	TMP_Status_Disable = "Disable"
 
+	Job_Status_Enable  = "Enable"
+	Job_Status_Active  = "Active"
+	Job_Status_Disable = "Disable"
+
 	//安全检查类型
 	SC_Type_Host      = "host"
 	Sc_Type_Container = "container"
@@ -88,6 +92,10 @@ var (
 	//任务类型
 	Job_Type_Once     = "Once"
 	Job_Type_Periodic = "Periodical"
+
+	//任务级别
+	Job_Level_System = "System" // 系统级
+	Job_Level_User   = "User"   // 用户级
 
 	//基线日志类型
 	BMLT_Host_All    = "host"
