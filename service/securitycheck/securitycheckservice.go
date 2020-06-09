@@ -53,7 +53,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		//基线-Docker
 		if (*securityCheck).CronType == "" {
 			dockerTask.Type = models.Job_Type_Once
-		}else{
+		} else {
 			dockerTask.Type = securityCheck.CronType
 		}
 
@@ -72,10 +72,9 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		//基线-K8S
 		if (*securityCheck).CronType == "" {
 			k8sTask.Type = models.Job_Type_Once
-		}else{
+		} else {
 			k8sTask.Type = securityCheck.CronType
 		}
-
 
 		k8sTask.SystemTemplate = TMP_Type_BM_K8S_DT
 		k8sTask.Name = "System-Task-" + k8sTask.Id
@@ -124,7 +123,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 
 		if (*securityCheck).CronType == "" {
 			task.Type = models.Job_Type_Once
-		}else{
+		} else {
 			task.Type = securityCheck.CronType
 		}
 		task.Name = "System-Task-" + task.Id
