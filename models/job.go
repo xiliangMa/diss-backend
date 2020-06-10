@@ -30,7 +30,7 @@ type JobInterface interface {
 	Add() Result
 	List(from, limit int) Result
 	Delete() Result
-	Internal_Get(id string) Job
+	Get(id string) Job
 }
 
 func (this *Job) List(from, limit int) Result {
@@ -76,7 +76,7 @@ func (this *Job) List(from, limit int) Result {
 	return ResultData
 }
 
-func (this *Job) Internal_Get(id string) []*Job {
+func (this *Job) Get(id string) []*Job {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var JobList []*Job
@@ -122,48 +122,15 @@ func (this *Job) Add() Result {
 		return ResultData
 	}
 
-	m2m := o.QueryM2M(this, "HostConfig")
-	for _, hostconfig := range this.HostConfig {
-		if m2m.Exist(hostconfig) != true {
-			_, err := m2m.Add(hostconfig)
-			if err != nil {
-				ResultData.Message = err.Error()
-				ResultData.Code = utils.RelationJobHostErr
-				o.Rollback()
-				logs.Error("Relation Job %s to HostConifg error, code %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
-			}
-		} else {
-			ResultData.Message = "Host Resource Exist"
-			ResultData.Code = utils.RelationJobHostErr
-			logs.Warn("Relation Job %s to HostConifg error, code %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
-		}
-	}
-	m2m = o.QueryM2M(this, "ContainerConfig")
-	for _, containerconfig := range this.ContainerConfig {
-		if m2m.Exist(containerconfig) != true {
-			_, err := m2m.Add(containerconfig)
-			if err != nil {
-				ResultData.Message = err.Error()
-				ResultData.Code = utils.RelationJobContainerErr
-				o.Rollback()
-				logs.Error("Relation Job %s to ContainerConfig error, code %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
-			}
-		} else {
-			ResultData.Message = "Container Resource Exist"
-			ResultData.Code = utils.RelationJobContainerErr
-			logs.Warn("Relation Job %s to HostConifg error, code %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
-		}
+	result := this.fillRelationData(o)
+	if result.Code != 0 && result.Code != utils.ContainerExistInJobErr && result.Code != utils.HostExistInJobErr {
+		return result
 	}
 
-	errCommit := o.Commit()
-	if err != nil {
+	err = o.Commit()
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+		ResultData.Code = utils.JobCommitErr
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.AddJobErr
-		if errCommit != nil {
-			ResultData.Code = utils.JobCommitErr
-		}
-		logs.Error("Add Job: %s failed, code: %d, err: %s", this.Id, ResultData.Code, ResultData.Message)
-		return ResultData
 	}
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
@@ -196,7 +163,9 @@ func (this *Job) Update() Result {
 	o.Using(utils.DS_Default)
 	var ResultData Result
 
-	_, err := o.Update(this)
+	err := o.Begin()
+
+	_, err = o.Update(this)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.EditJobErr
@@ -205,53 +174,57 @@ func (this *Job) Update() Result {
 		return ResultData
 	}
 
-	m2mhost := o.QueryM2M(this, "HostConfig")
-	_, err = m2mhost.Clear()
-	for _, hostconfig := range this.HostConfig {
-		if m2mhost.Exist(hostconfig) != true {
-			_, err := m2mhost.Add(hostconfig)
-			if err != nil {
-				ResultData.Message = err.Error()
-				ResultData.Code = utils.RelationJobHostErr
-				o.Rollback()
-				logs.Error("Relation Job %s to HostConifg error, code %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
-			}
-		} else {
-			ResultData.Message = "Host Resource Exist"
-			ResultData.Code = utils.RelationJobHostErr
-			logs.Warn("Relation Job %s to HostConifg error, code %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
-		}
-	}
-	m2mcontainer := o.QueryM2M(this, "ContainerConfig")
-	_, err = m2mcontainer.Clear()
-	for _, containerconfig := range this.ContainerConfig {
-		if m2mcontainer.Exist(containerconfig) != true {
-			_, err := m2mcontainer.Add(containerconfig)
-			if err != nil {
-				ResultData.Message = err.Error()
-				ResultData.Code = utils.RelationJobContainerErr
-				o.Rollback()
-				logs.Error("Relation Job %s to ContainerConfig error, code %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
-			}
-		} else {
-			ResultData.Message = "Container Resource Exist"
-			ResultData.Code = utils.RelationJobContainerErr
-			logs.Warn("Relation Job %s to HostConifg error, code %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
-		}
+	result := this.fillRelationData(o)
+	if result.Code != 0 && result.Code != utils.ContainerExistInJobErr && result.Code != utils.HostExistInJobErr {
+		return result
 	}
 
-	errCommit := o.Commit()
-	if err != nil {
+	err = o.Commit()
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+		ResultData.Code = utils.JobCommitErr
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.EditJobErr
-		if errCommit != nil {
-			ResultData.Code = utils.JobCommitErr
-		}
-		logs.Error("Update Job: %s failed, code: %d, err: %s", this.Id, ResultData.Code, ResultData.Message)
-		return ResultData
 	}
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
+	return ResultData
+}
+
+func (this *Job) fillRelationData(o orm.Ormer) Result {
+	var ResultData Result
+	m2m := o.QueryM2M(this, "HostConfig")
+	for _, hostconfig := range this.HostConfig {
+		if m2m.Exist(hostconfig) != true {
+			_, err := m2m.Add(hostconfig)
+			if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+				ResultData.Message = err.Error()
+				ResultData.Code = utils.RelationJobHostErr
+				o.Rollback()
+				logs.Error("Relation Job %s to HostConifg error, code %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+				return ResultData
+			}
+		} else {
+			ResultData.Message = "Host Resource Exist"
+			ResultData.Code = utils.HostExistInJobErr
+			logs.Warn("Relation Job %s to HostConifg error, code %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+		}
+	}
+	m2m = o.QueryM2M(this, "ContainerConfig")
+	for _, containerconfig := range this.ContainerConfig {
+		if m2m.Exist(containerconfig) != true {
+			_, err := m2m.Add(containerconfig)
+			if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+				ResultData.Message = err.Error()
+				ResultData.Code = utils.RelationJobContainerErr
+				o.Rollback()
+				logs.Error("Relation Job %s to ContainerConfig error, code %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+				return ResultData
+			}
+		} else {
+			ResultData.Message = "Container Resource Exist"
+			ResultData.Code = utils.ContainerExistInJobErr
+			logs.Warn("Relation Job %s to HostConifg error, code %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+		}
+	}
 	return ResultData
 }

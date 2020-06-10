@@ -9,7 +9,7 @@ type JobService struct {
 }
 
 func (this *JobService) GetCheckList() []*models.SecurityCheck {
-	joblist := this.JobParm.Internal_Get(this.JobParm.Id)
+	joblist := this.JobParm.Get(this.JobParm.Id)
 	secCheckList := []*models.SecurityCheck{}
 	if len(joblist) > 0 {
 		job := joblist[0]

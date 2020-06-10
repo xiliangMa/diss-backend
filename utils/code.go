@@ -83,6 +83,9 @@ var (
 	JobCommitErr                    = 88
 	DeleteHostConfigErr             = 89
 	DeleteHostinfoErr               = 90
+	HostExistInJobErr               = 91
+	ContainerExistInJobErr          = 92
+
 
 	//k8s 1001-1100
 	AddNameSpaceErr    = 1001
