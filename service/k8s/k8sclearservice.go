@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
+	"os"
 )
 
 type K8sClearService struct {
@@ -36,7 +37,7 @@ func (this *K8sClearService) ClearAll() {
 			this.ClearPod(cluster)
 
 			// 清除ns
-			this.ClearPod(cluster)
+			this.ClearNs(cluster)
 
 			// 清除node
 			this.ClearNode(cluster)
@@ -68,6 +69,9 @@ func (this *K8sClearService) Check(cluster *models.Cluster) *models.Cluster {
 func (this *K8sClearService) ClearCluster(cluster *models.Cluster) {
 	msg := fmt.Sprintf("Clear Cluster, Cluster: %s ", cluster.Name)
 	logs.Info(msg)
+	if cluster.AuthType == models.Api_Auth_Type_KubeConfig {
+		os.Remove(cluster.FileName)
+	}
 	cluster.Delete()
 }
 
