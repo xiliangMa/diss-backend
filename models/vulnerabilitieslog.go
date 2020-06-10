@@ -80,7 +80,7 @@ func (this *ImagePackageVulnerabilities) List(from, limit int) Result {
 		filter = filter + `d."pkg_image_id" = '` + this.PkgImageId + "' and "
 	}
 	if this.VulnerabilityId != "" {
-		filter = filter + `d."vulnerability_id" = '` + this.VulnerabilityId + "' and "
+		filter = filter + `d."vulnerability_id" like '%` + this.VulnerabilityId + `%' and `
 	}
 	if this.PkgImageName != "" {
 		filter = filter + `d."pkg_image_name" like '%` + this.PkgImageName + `%'`
