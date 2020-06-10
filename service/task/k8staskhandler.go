@@ -296,6 +296,7 @@ func (this *K8STaskHandler) SyncPodContainerConfigAndInfo(clusterName string) {
 						ccob.CreateTime = startTime
 						ccob.UpdateTime = startTime
 						ccob.SyncCheckPoint = this.SyncCheckPoint
+						ccob.AccountName = models.Account_Admin
 
 						//同步 containerinfo
 						ciob := new(models.ContainerInfo)

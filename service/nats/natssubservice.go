@@ -115,6 +115,7 @@ func (this *NatsSubService) Save() error {
 				//if result := containerConfig.Add(); result.Code != http.StatusOK {
 				//	return errors.New(result.Message)
 				//}
+				containerConfig.AccountName = models.Account_Admin
 				containerConfig.Add()
 			}
 			// 清除脏数据
