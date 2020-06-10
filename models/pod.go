@@ -141,3 +141,27 @@ func (this *Pod) EmptyDirtyData() error {
 	}
 	return err
 }
+
+func (this *Pod) Delete() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+	cond := orm.NewCondition()
+
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	if this.ClusterName != "" {
+		cond = cond.And("cluster_name", this.ClusterName)
+	}
+	_, err := o.QueryTable(utils.Pod).SetCond(cond).Delete()
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteNameSpaceErr
+		logs.Error("Delete NameSpace failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	return ResultData
+}

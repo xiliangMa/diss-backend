@@ -20,7 +20,7 @@ type Cluster struct {
 	IsSync      bool      `orm:"default(false)" description:"(是否同步)"`
 	Label       string    `orm:"default(null)" description:"(标签)"`
 	AccountName string    `orm:"-" description:"(租户)"`
-	SyncStatus  string    `orm:"default(NotSynced)" description:"(同步状态 NotSynced 未同步 Synced 成功 InProcess 同步中 Fail 失败)"`
+	SyncStatus  string    `orm:"default(NotSynced)" description:"(同步状态 NotSynced 未同步 Synced 成功 InProcess 同步中 Fail 失败 Clearing 清理中)"`
 	CreateTime  time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
 	UpdateTime  time.Time `orm:"auto_now;type(datetime)" description:"(更新时间)"`
 }
@@ -198,5 +198,26 @@ func (this *Cluster) ListByAccount(from, limit int) Result {
 	if total == 0 {
 		ResultData.Data = nil
 	}
+	return ResultData
+}
+
+func (this *Cluster) Delete() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+	cond := orm.NewCondition()
+
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	_, err := o.QueryTable(utils.Cluster).SetCond(cond).Delete()
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteClusterErr
+		logs.Error("Delete Cluster failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
 	return ResultData
 }

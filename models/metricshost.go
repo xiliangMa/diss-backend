@@ -54,6 +54,7 @@ type HostInfo struct {
 	ContainerRunningCount int    `orm:"default(0);" description:"(容器Running数)"`
 	ContainerPausedCount  int    `orm:"default(0);" description:"(容器Paused数)"`
 	ContainerStoppedCount int    `orm:"default(0);" description:"(容器Stopped数)"`
+	ClusterId             string `orm:"default(null);" description:"(集群id)"`
 }
 
 func (this *HostConfig) Inner_AddHostConfig() error {
@@ -76,6 +77,7 @@ func (this *HostConfig) Inner_AddHostConfig() error {
 		updateHostConfig.HostName = this.HostName
 		updateHostConfig.IsInK8s = this.IsInK8s
 		updateHostConfig.OS = this.OS
+		updateHostConfig.ClusterId = this.ClusterId
 		updateHostConfig.InternalAddr = this.InternalAddr
 		if this.PublicAddr != "" {
 			updateHostConfig.PublicAddr = this.PublicAddr
@@ -120,6 +122,7 @@ func (this *HostInfo) Inner_AddHostInfo() error {
 		updateHostInfo := hostInfoList[0]
 		updateHostInfo.HostName = this.HostName
 		updateHostInfo.OS = this.OS
+		updateHostInfo.ClusterId = this.ClusterId
 		updateHostInfo.InternalAddr = this.InternalAddr
 		if this.PublicAddr != "" {
 			updateHostInfo.PublicAddr = this.PublicAddr

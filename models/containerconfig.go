@@ -179,6 +179,9 @@ func (this *ContainerConfig) Delete() Result {
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
+	if this.ClusterName != "" {
+		cond = cond.And("cluster_name", this.ClusterName)
+	}
 	if !o.QueryTable(utils.ContainerConfig).SetCond(cond).Exist() {
 		ResultData.Message = "ContainerConfigNotFoundErr"
 		ResultData.Code = utils.ContainerConfigNotFoundErr

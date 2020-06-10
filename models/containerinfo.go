@@ -156,6 +156,10 @@ func (this *ContainerInfo) Delete() Result {
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
+	if this.ClusterName != "" {
+		cond = cond.And("cluster_name", this.ClusterName)
+	}
+
 	_, err := o.QueryTable(utils.ContainerInfo).SetCond(cond).Delete()
 
 	if err != nil {

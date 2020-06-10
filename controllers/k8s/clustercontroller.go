@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/k8s"
 	css "github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -158,5 +159,23 @@ func (this *ClusterController) UpdateCluster() {
 	json.Unmarshal(this.Ctx.Input.RequestBody, &cluster)
 	cluster.Id = id
 	this.Data["json"] = cluster.Update()
+	this.ServeJSON(false)
+}
+
+// @Title DeleteCluster
+// @Description delete Cluster
+// @Param token header string true "authToken"
+// @Param id path string "" true "Id"
+// @Success 200 {object} models.Result
+// @router /:id [delete]
+func (this *ClusterController) DeleteCluster() {
+	id := this.GetString(":id")
+	clusterList := []*models.Cluster{}
+	cluster := new(models.Cluster)
+	cluster.Id = id
+	clusterList = append(clusterList, cluster)
+	k8sClearService := k8s.K8sClearService{ClusterList: clusterList}
+	go k8sClearService.ClearAll()
+	this.Data["json"] = models.Result{Code: http.StatusOK}
 	this.ServeJSON(false)
 }

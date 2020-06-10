@@ -81,6 +81,8 @@ var (
 	RelationJobContainerErr         = 86
 	EditJobErr                      = 87
 	JobCommitErr                    = 88
+	DeleteHostConfigErr             = 89
+	DeleteHostinfoErr               = 90
 
 	//k8s 1001-1100
 	AddNameSpaceErr    = 1001
@@ -100,6 +102,9 @@ var (
 	UnBindPodErr       = 1015
 	EditClusterErr     = 1006
 	ClusterIsExistErr  = 1007
+	DeleteNameSpaceErr = 1008
+	DeletePodErr       = 1009
+	DeleteClusterErr   = 1010
 
 	//task 1100-1200
 	AddTaskErr    = 1100

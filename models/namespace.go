@@ -20,6 +20,7 @@ type NameSpace struct {
 type NameSpaceInterface interface {
 	Add() Result
 	Edit() Result
+	Delete() Result
 	Get() Result
 	List() Result
 	BindAccount() Result
@@ -274,4 +275,28 @@ func (this *NameSpace) EmptyDirtyData() error {
 		logs.Info("Empty Dirty Data success,  model: %s, ", utils.NameSpace)
 	}
 	return err
+}
+
+func (this *NameSpace) Delete() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+	cond := orm.NewCondition()
+
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	if this.ClusterId != "" {
+		cond = cond.And("cluster_id", this.ClusterId)
+	}
+	_, err := o.QueryTable(utils.NameSpace).SetCond(cond).Delete()
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteNameSpaceErr
+		logs.Error("Delete NameSpace failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	return ResultData
 }

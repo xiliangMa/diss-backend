@@ -7,6 +7,7 @@ var (
 	Cluster_Sync_Status_NotSynced   = "NotSynced"
 	Cluster_Sync_Status_Synced      = "Synced"
 	Cluster_Sync_Status_InProcess   = "InProcess"
+	Cluster_Sync_Status_Clearing    = "Clearing"
 	Cluster_Sync_Status_Fail        = "Fail"
 	Cluster_IsSync                  = true
 	Cluster_NoSync                  = false

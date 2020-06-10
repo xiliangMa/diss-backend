@@ -11,6 +11,7 @@ type HostInfoInterface interface {
 	Inner_AddHostInfo() error
 	Update() Result
 	List() Result
+	Delete() Result
 	UpdateDynamic() Result
 }
 
@@ -91,5 +92,29 @@ func (this *HostInfo) UpdateDynamic() Result {
 	}
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
+	return ResultData
+}
+
+func (this *HostInfo) Delete() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+	cond := orm.NewCondition()
+
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	if this.ClusterId != "" {
+		cond = cond.And("cluster_id", this.ClusterId)
+	}
+	_, err := o.QueryTable(utils.HostInfo).SetCond(cond).Delete()
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteHostinfoErr
+		logs.Error("Delete HostInfo failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
 	return ResultData
 }

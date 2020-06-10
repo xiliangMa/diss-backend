@@ -12,6 +12,7 @@ type HostConfigInterface interface {
 	Inner_AddHostInfo() error
 	List(from, limit int) Result
 	Update() Result
+	Delete() Result
 	UpdateDynamic() Result
 	Count() int64
 	GetBnechMarkProportion() (int64, int64)
@@ -124,4 +125,28 @@ func (this *HostConfig) GetBnechMarkProportion() (int64, int64) {
 	dockerBenchMarkCount, _ := o.QueryTable(utils.HostConfig).Count()
 	k8sBenchMarkCount, _ := o.QueryTable(utils.HostConfig).Filter("is_in_k8s", false).Count()
 	return dockerBenchMarkCount, k8sBenchMarkCount
+}
+
+func (this *HostConfig) Delete() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+	cond := orm.NewCondition()
+
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	if this.ClusterId != "" {
+		cond = cond.And("cluster_id", this.ClusterId)
+	}
+	_, err := o.QueryTable(utils.HostConfig).SetCond(cond).Delete()
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteHostConfigErr
+		logs.Error("Delete HostConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	return ResultData
 }
