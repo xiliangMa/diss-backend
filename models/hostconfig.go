@@ -93,7 +93,7 @@ func (this *HostConfig) UpdateDynamic() Result {
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
-	if err := o.QueryTable(utils.HostConfig).SetCond(cond).One(hostConfig); err != nil {
+	if err := o.QueryTable(utils.HostConfig).SetCond(cond).One(hostConfig); err != nil || hostConfig != nil {
 		ResultData.Code = utils.HostConfigNotFoundErr
 		ResultData.Message = err.Error()
 		logs.Error("Get HostConfig: %s failed, code: %d, err: %s", this.HostName, ResultData.Code, ResultData.Message)
