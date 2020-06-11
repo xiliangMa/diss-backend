@@ -55,7 +55,7 @@ func (this *Groups) List(from, limit int) Result {
 	var err error
 
 	cond := orm.NewCondition()
-	if this.AccountName != "" {
+	if this.AccountName != "" && this.AccountName != Account_Admin {
 		cond = cond.And("account_name", this.AccountName)
 	}
 	if this.Id != "" {
