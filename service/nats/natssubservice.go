@@ -67,6 +67,7 @@ func (this *NatsSubService) Save() error {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
+
 			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s <<<", hostConfig.Id, models.Resource_HostConfigDynamic)
 			if result := hostConfig.UpdateDynamic(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
