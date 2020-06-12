@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/k8s"
 	"github.com/xiliangMa/diss-backend/service/synccheck"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -13,13 +14,13 @@ import (
 )
 
 type K8STaskHandler struct {
-	Clientgo       utils.ClientGo
+	Clientgo       k8s.ClientGo
 	SyncCheckPoint int64
 }
 
-func NewK8STaskHandler(params *utils.ApiParams) *K8STaskHandler {
+func NewK8STaskHandler(params *k8s.ApiParams) *K8STaskHandler {
 	return &K8STaskHandler{
-		Clientgo: utils.CreateK8sClient(params),
+		Clientgo: k8s.CreateK8sClient(params),
 	}
 }
 
@@ -378,7 +379,7 @@ func SyncAll() {
 			if c.IsSync == models.Cluster_IsSync {
 				clusterName := c.Name
 				// 创建k8s客户端
-				params := utils.ApiParams{}
+				params := k8s.ApiParams{}
 				params.AuthType = c.AuthType
 				params.BearerToken = c.BearerToken
 				params.MasterUrl = c.MasterUrls
