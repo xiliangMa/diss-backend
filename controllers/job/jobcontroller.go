@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/service/job"
+	jobservice "github.com/xiliangMa/diss-backend/service/job"
+	"net/http"
 )
 
 // Job 接口
@@ -38,19 +39,19 @@ func (this *JobController) GetJobList() {
 // @router /:id [delete]
 func (this *JobController) DeleteJob() {
 	id := this.GetString(":id")
-	Job := new(models.Job)
-	Job.Id = id
+	job := new(models.Job)
+	job.Id = id
 
-	jobservice := new(job.JobService)
-	jobservice.JobParam = Job
-	result := jobservice.CheckRuningTask()
-	if result.Code != 0 {
+	jobService := new(jobservice.JobService)
+	jobService.JobParam = job
+	result := jobService.CheckRuningTask()
+	if result.Code != http.StatusOK {
 		this.Data["json"] = result
 		this.ServeJSON(false)
 		return
 	}
-	result = jobservice.RemoveAssocTasks()
-	result = Job.Delete()
+	result = jobService.RemoveAssocTasks()
+	result = job.Delete()
 
 	this.Data["json"] = result
 	this.ServeJSON(false)
@@ -100,9 +101,9 @@ func (this *JobController) ActiveJob() {
 	json.Unmarshal(this.Ctx.Input.RequestBody, &Job)
 	Job.Id = id
 
-	jobservice := job.JobService{}
-	jobservice.JobParam = Job
+	jobService := jobservice.JobService{}
+	jobService.JobParam = Job
 
-	this.Data["json"] = jobservice.ActiveJob()
+	this.Data["json"] = jobService.ActiveJob()
 	this.ServeJSON(false)
 }

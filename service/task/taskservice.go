@@ -3,9 +3,11 @@ package task
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/nats"
 	"github.com/xiliangMa/diss-backend/utils"
+	"net/http"
 )
 
 type TaskService struct {
@@ -22,6 +24,7 @@ func (this *TaskService) RemoveTask() models.Result {
 		task.Status = models.Task_Status_Removing
 		task.Update()
 		msg := fmt.Sprintf("Update Task success, status: %s, Id: %s", task.Status, task.Id)
+		logs.Info(msg)
 		taskRawInfo, _ := json.Marshal(task)
 		taskLog := models.TaskLog{Account: task.Account, RawLog: msg, Task: string(taskRawInfo), Level: models.Log_level_Info}
 		taskLog.Add()
@@ -30,6 +33,7 @@ func (this *TaskService) RemoveTask() models.Result {
 		if err.Error() == string(utils.ResourceNotFoundErr) {
 			task.Delete()
 			msg := fmt.Sprintf("Delete Task success, status: %s, Id: %s", task.Status, task.Id)
+			logs.Error(msg)
 			taskRawInfo, _ := json.Marshal(task)
 			taskLog := models.TaskLog{Account: task.Account, RawLog: msg, Task: string(taskRawInfo), Level: models.Log_level_Info}
 			taskLog.Add()
@@ -43,5 +47,6 @@ func (this *TaskService) RemoveTask() models.Result {
 			taskLog.Add()
 		}
 	}
+	result.Code = http.StatusOK
 	return result
 }

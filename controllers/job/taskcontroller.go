@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/service/task"
+	taskservice "github.com/xiliangMa/diss-backend/service/task"
 	"net/http"
 )
 
@@ -48,9 +48,9 @@ func (this *TaskController) DeleteTask() {
 			//向agent下发删除任务指令
 			deleteTaskList := data["items"]
 			deleteTask := deleteTaskList.([]*models.Task)[0]
-			taskservice := new(task.TaskService)
-			taskservice.Task = deleteTask
-			result = taskservice.RemoveTask()
+			taskService := new(taskservice.TaskService)
+			taskService.Task = deleteTask
+			result = taskService.RemoveTask()
 		}
 	}
 	this.Data["json"] = result

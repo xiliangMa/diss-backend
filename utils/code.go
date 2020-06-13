@@ -113,13 +113,13 @@ var (
 	ClusterIsSyncingOrIsClearingErr  = 1013
 
 	//task job 1100-1200
-	AddTaskErr       = 1100
-	GetTaskErr       = 1101
-	DeleteTaskErr    = 1102
-	EditTaskErr      = 1103
-	JobIsDisabledErr = 1104
-	TaskIsRunningErr = 1105
-	TaskCommitErr    = 1106
+	AddTaskErr        = 1100
+	GetTaskErr        = 1101
+	DeleteTaskErr     = 1102
+	EditTaskErr       = 1103
+	JobIsDisabledErr  = 1104
+	TaskIsRunningWarn = 1105
+	TaskCommitErr     = 1106
 
 	//system 1200-1300
 	CheckK8sFilePostErr             = 1200

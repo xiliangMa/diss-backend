@@ -6,8 +6,9 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/securitycheck"
-	"github.com/xiliangMa/diss-backend/service/task"
+	taskservice "github.com/xiliangMa/diss-backend/service/task"
 	"github.com/xiliangMa/diss-backend/utils"
+	"net/http"
 	"time"
 )
 
@@ -94,7 +95,8 @@ func (this *JobService) SetTPLType(targetType, resType string) (seccheck *models
 	return seccheck
 }
 
-//判断通过次job生成的task中是否有运行的
+
+//判断通过此job生成的task中是否有运行的
 func (this *JobService) CheckRuningTask() models.Result {
 	var result models.Result
 	var runingTasks []*models.Task
@@ -103,19 +105,20 @@ func (this *JobService) CheckRuningTask() models.Result {
 	job := this.JobParam.Get()
 	if job.Id != "" {
 		o.LoadRelated(job, "Task")
-		for _, Task := range job.Task {
-			if Task.Status == models.Task_Status_Running {
-				runingTasks = append(runingTasks, Task)
+		for _, task := range job.Task {
+			if task.Status == models.Task_Status_Running {
+				runingTasks = append(runingTasks, task)
 			}
 		}
 	}
 	if len(runingTasks) > 0 {
-		result.Code = utils.TaskIsRunningErr
-		result.Message = "Some Task in Running Status"
+		result.Code = utils.TaskIsRunningWarn
+		msg := fmt.Sprintf("Some Task is Running, code: %d", result.Code)
+		logs.Warn(msg)
+		result.Message = msg
 		result.Data = runingTasks
 	}
-	result.Code = 0
-	result.Message = "No Task rel this Job is Running"
+	result.Code = http.StatusOK
 	return result
 }
 
@@ -127,14 +130,16 @@ func (this *JobService) RemoveAssocTasks() models.Result {
 	job := this.JobParam
 	if job.Id != "" {
 		o.LoadRelated(job, "Task")
-		for _, Task := range job.Task {
-			taskservice := new(task.TaskService)
-			taskservice.Task = Task
-			result = taskservice.RemoveTask()
-			if result.Code != 0 {
+		for _, task := range job.Task {
+			taskService := new(taskservice.TaskService)
+			taskService.Task = task
+			result = taskService.RemoveTask()
+			if result.Code != http.StatusOK {
 				o.Rollback()
 				result.Code = utils.DeleteTaskErr
-				result.Message = "Delete assoc task error , Id: " + Task.Id
+				msg := fmt.Sprintf("Delete assoc task error, Id: %s , code: %d", task.Id, result.Code)
+				logs.Error(msg)
+				result.Message = msg
 				return result
 			}
 		}
@@ -143,6 +148,9 @@ func (this *JobService) RemoveAssocTasks() models.Result {
 	if err != nil {
 		result.Code = utils.TaskCommitErr
 		result.Message = err.Error()
+		logs.Error("Commit Job: %s failed, code: %d, err: %s", job.Name, result.Code, result.Message)
+		return result
 	}
+	result.Code = http.StatusOK
 	return result
 }

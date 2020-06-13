@@ -136,6 +136,8 @@ func (this *Job) Add() Result {
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Code = utils.JobCommitErr
 		ResultData.Message = err.Error()
+		logs.Error("Commit Job: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+		return ResultData
 	}
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
@@ -157,6 +159,7 @@ func (this *Job) Delete() Result {
 		o.Rollback()
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteJobErr
+		logs.Error("Delete Job: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	// 移除job本身
@@ -179,6 +182,8 @@ func (this *Job) Delete() Result {
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Code = utils.JobCommitErr
 		ResultData.Message = err.Error()
+		logs.Error("Commit Job: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+		return ResultData
 	}
 
 	ResultData.Code = http.StatusOK
@@ -211,6 +216,8 @@ func (this *Job) Update() Result {
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Code = utils.JobCommitErr
 		ResultData.Message = err.Error()
+		logs.Error("Commit Job: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+		return ResultData
 	}
 
 	ResultData.Code = http.StatusOK
