@@ -28,6 +28,7 @@ type DockerEvent struct {
 
 type DockerEventInterface interface {
 	List(from, limit int) Result
+	Add() Result
 }
 
 func (this *DockerEvent) List(from, limit int) Result {
