@@ -32,6 +32,7 @@ var (
 	TaskLog     = "task_log"
 	CmdHistory  = "cmd_history"
 	DockerEvent = "docker_event"
+	UserEvent   = "user_event"
 
 	//Diss_api
 	Accounts                    = "accounts"

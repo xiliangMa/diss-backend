@@ -37,4 +37,20 @@ var (
 	-- Primary Key structure for table docker_event
 	-- ----------------------------
 	ALTER TABLE "public"."docker_event" ADD CONSTRAINT "docker_event_pkey" PRIMARY KEY ("id");`
+
+	Tab_Create_UserEvent = `CREATE TABLE "public"."user_event" (
+	  "id" varchar(128) COLLATE "pg_catalog"."default" NOT NULL,
+	  "user_name" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "account_name" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "raw_log" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT 'null'::text,
+	  "model_type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "create_time" timestamptz(6) NOT NULL
+	)
+	;
+	ALTER TABLE "public"."user_event" OWNER TO "postgres";
+	
+	-- ----------------------------
+	-- Primary Key structure for table user_event
+	-- ----------------------------
+	ALTER TABLE "public"."user_event" ADD CONSTRAINT "user_event_pkey" PRIMARY KEY ("id");`
 )

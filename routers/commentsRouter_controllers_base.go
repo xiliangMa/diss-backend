@@ -7,15 +7,6 @@ import (
 
 func init() {
 
-	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:ContainerCmdHistoryController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:ContainerCmdHistoryController"],
-		beego.ControllerComments{
-			Method:           "GetContainerCmdHistorys",
-			Router:           `/`,
-			AllowHTTPMethods: []string{"post"},
-			MethodParams:     param.Make(),
-			Filters:          nil,
-			Params:           nil})
-
 	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:ContainerController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:ContainerController"],
 		beego.ControllerComments{
 			Method:           "GetContainersList",
@@ -79,15 +70,6 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
-	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:HostCmdHistoryController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:HostCmdHistoryController"],
-		beego.ControllerComments{
-			Method:           "GetHostCmdHistoryList",
-			Router:           `/`,
-			AllowHTTPMethods: []string{"post"},
-			MethodParams:     param.Make(),
-			Filters:          nil,
-			Params:           nil})
-
 	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:HostController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:HostController"],
 		beego.ControllerComments{
 			Method:           "HostList",
@@ -137,6 +119,15 @@ func init() {
 		beego.ControllerComments{
 			Method:           "GetImageInfo",
 			Router:           `/:imageId/info`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:UserController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:UserController"],
+		beego.ControllerComments{
+			Method:           "UserEventList",
+			Router:           `/events`,
 			AllowHTTPMethods: []string{"post"},
 			MethodParams:     param.Make(),
 			Filters:          nil,

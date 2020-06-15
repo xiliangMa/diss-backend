@@ -171,6 +171,12 @@
 			"revisionTime": "2019-04-11T12:52:29Z"
 		},
 		{
+			"checksumSHA1": "Tutue3nEgM/87jitUcYv6ODwyNE=",
+			"path": "github.com/satori/go.uuid",
+			"revision": "b2ce2384e17bbe0c6d34077efa39dbab3e09123b",
+			"revisionTime": "2018-10-28T12:50:25Z"
+		},
+		{
 			"checksumSHA1": "v5CCEZdC63TIkIL8TUeURBcZzNc=",
 			"path": "github.com/shiena/ansicolor",
 			"revision": "a422bbe96644373c5753384a59d678f7d261ff10",

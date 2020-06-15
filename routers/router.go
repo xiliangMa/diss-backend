@@ -28,6 +28,11 @@ import (
 
 func init() {
 	ns := beego.NewNamespace("/api",
+		beego.NSNamespace("/v1/users",
+			beego.NSInclude(
+				&cbase.UserController{},
+			),
+		),
 		beego.NSNamespace("/v1/statistics",
 			beego.NSInclude(
 				&cstatistics.StatisticsController{},
