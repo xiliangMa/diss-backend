@@ -20,9 +20,9 @@ import (
 	csecuritypolicy "github.com/xiliangMa/diss-backend/controllers/securitypolicy"
 	cstatistics "github.com/xiliangMa/diss-backend/controllers/statistics"
 	csystem "github.com/xiliangMa/diss-backend/controllers/system/system"
+	"github.com/xiliangMa/diss-backend/service/auth"
 
 	ws "github.com/xiliangMa/diss-backend/controllers/ws"
-	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
 
@@ -151,7 +151,7 @@ func init() {
 
 	var isLogin = func(ctx *context.Context) {
 		if ctx.Request.Method != "OPTIONS" {
-			_, code := utils.CheckToken(ctx.Input.Header("token"))
+			_, code := auth.CheckToken(ctx.Input.Header("token"))
 			if code != http.StatusOK {
 				ctx.Redirect(http.StatusUnauthorized, "/swagger")
 			}

@@ -156,6 +156,7 @@ var (
 	GetDockerVirusErr                     = 1404
 	GetImagePackageVulnerabilitiesListErr = 1405
 	GetFeedListErr                        = 1406
+	NotFoundUserAccessCredentialsErr      = 1407
 
 	// config_timedata 1500-1599
 	ConnectSyslogErr     = 1500

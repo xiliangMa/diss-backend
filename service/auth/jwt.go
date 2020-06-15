@@ -1,9 +1,11 @@
-package utils
+package auth
 
 import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"time"
 )
@@ -13,18 +15,22 @@ var (
 )
 
 func GreateToken(name, pwd string) (string, int) {
-	if name == beego.AppConfig.String("system::AdminUser") && pwd == beego.AppConfig.String("system::AdminPwd") {
+	//检测 diss-api 用户
+	loginUser := models.UserAccessCredentials{UserName: name, Value: pwd}
+	if user := loginUser.Get(); user != nil || (name == beego.AppConfig.String("system::AdminUser") && pwd == beego.AppConfig.String("system::AdminPwd")) {
 		// Create token
 		token := jwt.New(jwt.SigningMethodHS256)
 
 		claims := token.Claims.(jwt.MapClaims)
-		claims["name"] = "Jon Snow"
+		claims["name"] = beego.AppConfig.String("AppName")
 		claims["admin"] = true
-		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+		claims["exp"] = time.Now().Add(time.Hour * 1).Unix()
+		claims["UserName"] = name
+		claims["Pwd"] = pwd
 
 		t, err := token.SignedString([]byte("secret"))
 		if err != nil {
-			return err.Error(), SiginErr
+			return err.Error(), utils.SiginErr
 		}
 		return t, http.StatusOK
 	}
@@ -42,12 +48,12 @@ func CheckToken(tokenString string) (string, int) {
 	})
 
 	if err != nil {
-		return err.Error(), AuthorizeErr
+		return err.Error(), utils.AuthorizeErr
 	}
 
 	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		return "", http.StatusOK
 	} else {
-		return "AuthorizeErr", AuthorizeErr
+		return "AuthorizeErr", utils.AuthorizeErr
 	}
 }

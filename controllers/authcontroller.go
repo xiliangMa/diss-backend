@@ -4,7 +4,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/utils"
+	"github.com/xiliangMa/diss-backend/service/auth"
 	"net/http"
 )
 
@@ -22,7 +22,7 @@ func (this *AuthController) Login() {
 	name := this.GetString("name")
 	pwd := this.GetString("pwd")
 	var ResultData models.Result
-	result, code := utils.GreateToken(name, pwd)
+	result, code := auth.GreateToken(name, pwd)
 	ResultData.Code = code
 	if code != http.StatusOK {
 		ResultData.Message = result
@@ -42,7 +42,7 @@ func (this *AuthController) Authorize() {
 
 	token := this.Ctx.Request.Header.Get("token")
 	var ResultData models.Result
-	result, code := utils.CheckToken(token)
+	result, code := auth.CheckToken(token)
 	ResultData.Code = code
 	if code != http.StatusOK {
 		ResultData.Message = result
