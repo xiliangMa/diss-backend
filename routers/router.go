@@ -150,8 +150,9 @@ func init() {
 	beego.Router("/metrics", &ws.WSMetricController{}, "*:Metrics")
 
 	var isLogin = func(ctx *context.Context) {
+		jwtService := auth.JwtService{}
 		if ctx.Request.Method != "OPTIONS" {
-			_, code := auth.CheckToken(ctx.Input.Header("token"))
+			_, code := jwtService.CheckToken(ctx.Input.Header("token"))
 			if code != http.StatusOK {
 				ctx.Redirect(http.StatusUnauthorized, "/swagger")
 			}

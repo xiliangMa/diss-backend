@@ -22,7 +22,8 @@ func (this *AuthController) Login() {
 	name := this.GetString("name")
 	pwd := this.GetString("pwd")
 	var ResultData models.Result
-	result, code := auth.GreateToken(name, pwd)
+	jwtService := auth.JwtService{}
+	result, code := jwtService.GreateToken(name, pwd)
 	ResultData.Code = code
 	if code != http.StatusOK {
 		ResultData.Message = result
@@ -42,7 +43,8 @@ func (this *AuthController) Authorize() {
 
 	token := this.Ctx.Request.Header.Get("token")
 	var ResultData models.Result
-	result, code := auth.CheckToken(token)
+	jwtService := auth.JwtService{}
+	result, code := jwtService.CheckToken(token)
 	ResultData.Code = code
 	if code != http.StatusOK {
 		ResultData.Message = result
