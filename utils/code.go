@@ -109,11 +109,11 @@ var (
 	DeleteClusterErr   = 1010
 
 	//task job 1100-1200
-	AddTaskErr     = 1100
-	GetTaskErr     = 1101
-	DeleteTaskErr  = 1102
-	EditTaskErr    = 1103
-	JobDisabledErr = 1104
+	AddTaskErr       = 1100
+	GetTaskErr       = 1101
+	DeleteTaskErr    = 1102
+	EditTaskErr      = 1103
+	JobIsDisabledErr = 1104
 
 	//system 1200-1300
 	CheckK8sFilePostErr             = 1200

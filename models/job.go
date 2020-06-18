@@ -78,10 +78,10 @@ func (this *Job) List(from, limit int) Result {
 	return ResultData
 }
 
-func (this *Job) Get(id string) []*Job {
+func (this *Job) Get() *Job {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var JobList []*Job
+	job := new(Job)
 	var ResultData Result
 	var err error
 	cond := orm.NewCondition()
@@ -89,21 +89,21 @@ func (this *Job) Get(id string) []*Job {
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
+	err = o.QueryTable(utils.Job).SetCond(cond).RelatedSel().One(job)
 
-	_, err = o.QueryTable(utils.Job).SetCond(cond).RelatedSel().All(&JobList)
-	for _, job := range JobList {
+	if job.Id != "" {
 		o.LoadRelated(job, "HostConfig")
 		o.LoadRelated(job, "ContainerConfig")
 		o.LoadRelated(job, "Task")
 	}
-	if err != nil {
+	if err != nil && utils.IgnoreQuerySeterNoRowFoundErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetJobErr
 		logs.Error("Get Job Item failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return JobList
+		return job
 	}
 
-	return JobList
+	return job
 }
 
 func (this *Job) Add() Result {
@@ -149,10 +149,11 @@ func (this *Job) Delete() Result {
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
+
 	_, err := o.QueryTable(utils.Job).SetCond(cond).Delete()
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.DeleteImageInfoErr
+		ResultData.Code = utils.DeleteJobErr
 		logs.Error("Delete Job failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
@@ -176,9 +177,11 @@ func (this *Job) Update() Result {
 		return ResultData
 	}
 
-	result := this.fillRelationData(o)
-	if result.Code != 0 && result.Code != utils.ContainerExistInJobErr && result.Code != utils.HostExistInJobErr {
-		return result
+	if this.Status != Job_Status_Active {
+		result := this.fillRelationData(o)
+		if result.Code != 0 && result.Code != utils.ContainerExistInJobErr && result.Code != utils.HostExistInJobErr {
+			return result
+		}
 	}
 
 	err = o.Commit()

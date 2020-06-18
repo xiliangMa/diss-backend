@@ -15,7 +15,6 @@ type SecurityCheckService struct {
 	DefaultTMP           map[string]*models.SystemTemplate
 	Batch                int64
 	CurrentBatchTaskList []*models.Task
-	Account              string
 }
 
 func (this *SecurityCheckService) PrePare() {
@@ -87,7 +86,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		task.Container = securityCheck.Container
 		task.Batch = this.Batch
 		task.Status = models.Task_Status_Pending
-		task.Account = this.Account
+		task.Account = securityCheck.Job.Account
 		task.Job = securityCheck.Job
 		task.Spec = securityCheck.Job.Spec
 		//添加task记录
@@ -96,7 +95,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		//添加任务日志
 		taskLog := models.TaskLog{}
 		taskLog.Task = task
-		taskLog.Account = this.Account
+		taskLog.Account = securityCheck.Job.Account
 		taskLog.Level = models.Log_level_Info
 		taskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Batch: %v, Status: %s",
 			task.Id, task.Type, task.Batch, task.Status)
@@ -113,6 +112,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		task.Description = taskpre + models.TMP_Type_LS
 		task.Host = securityCheck.Host
 		task.Batch = this.Batch
+		task.Account = securityCheck.Job.Account
 		task.Job = securityCheck.Job
 		task.Spec = securityCheck.Job.Spec
 		//添加task记录
@@ -140,13 +140,13 @@ func (this *SecurityCheckService) genBenchmarkTask(securityCheck *models.Securit
 	task.Host = securityCheck.Host
 	task.Batch = this.Batch
 	task.Status = models.Task_Status_Pending
-	task.Account = this.Account
+	task.Account = securityCheck.Job.Account
 	task.Job = securityCheck.Job
 	task.Spec = securityCheck.Job.Spec
 	task.Add()
 	taskLog := models.TaskLog{}
 	taskLog.Task = task
-	taskLog.Account = this.Account
+	taskLog.Account = securityCheck.Job.Account
 	taskLog.Level = models.Log_level_Info
 	taskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Batch: %v, Status: %s",
 		task.Id, task.Type, task.Batch, task.Status)
@@ -174,10 +174,13 @@ func (this *SecurityCheckService) GetCurrentBatchTask() []*models.Task {
 	return this.CurrentBatchTaskList
 }
 
-func (this *SecurityCheckService) DeliverTask() models.Result {
+func (this *SecurityCheckService) DeliverTask(isPrepare bool) models.Result {
 	var ResultData models.Result
 
-	this.PrePare()
+	if isPrepare {
+		this.PrePare()
+	}
+
 	wsDelive := ws.WSDeliverService{
 		Hub:                  models.WSHub,
 		Bath:                 this.Batch,

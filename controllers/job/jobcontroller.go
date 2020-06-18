@@ -80,6 +80,7 @@ func (this *JobController) UpdateJob() {
 // @Description Gen Tasks From Job , and Delivery Tasks
 // @Param token header string true "authToken"
 // @Param id path string "" true "id"
+// @Param account query string "admin" false "租户"
 // @Success 200 {object} models.Result
 // @router /active/:id [put]
 func (this *JobController) ActiveJob() {
@@ -91,8 +92,6 @@ func (this *JobController) ActiveJob() {
 	jobservice := job.JobService{}
 	jobservice.JobParam = Job
 
-	account := this.GetString("account")
-
-	this.Data["json"] = jobservice.GenTaskList(account)
+	this.Data["json"] = jobservice.ActiveJob()
 	this.ServeJSON(false)
 }

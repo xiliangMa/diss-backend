@@ -90,6 +90,14 @@ func IgnoreLastInsertIdErrForPostgres(err error) error {
 	return err
 }
 
+func IgnoreQuerySeterNoRowFoundErrForPostgres(err error) error {
+	msg := "<QuerySeter> no row found"
+	if err.Error() == msg {
+		return nil
+	}
+	return err
+}
+
 func GetMarkSummarySql(BMLT string) string {
 	sql := "select " +
 		"sum(fail_count) as fail_count, " +
