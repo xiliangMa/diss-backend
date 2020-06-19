@@ -86,4 +86,10 @@ func (this *SecurityLogDb) CreateOrUpdateDb() {
 	if err != nil {
 		logs.Error("Create tab Table: %s fail, err: %s ", utils.UserEvent, err)
 	}
+
+	logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", utils.TaskLog)
+	_, err = o.Raw(timescaledb.Tab_Create_TaskLog).Exec()
+	if err != nil {
+		logs.Error("Create tab Table: %s fail, err: %s ", utils.TaskLog, err)
+	}
 }

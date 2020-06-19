@@ -52,7 +52,8 @@ func (this *WSDeliverService) DeliverTask() {
 			if err == nil {
 				msg := fmt.Sprintf("Deliver Task Success, Id: %s, data: %v", task.Id, result)
 				logs.Info(msg)
-				taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account, Level: models.Log_level_Info}
+				taskRawInfo, _ := json.Marshal(task)
+				taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Info}
 				taskLog.Add()
 			} else {
 				//更新 task 状态
@@ -60,7 +61,8 @@ func (this *WSDeliverService) DeliverTask() {
 				task.Update()
 				msg := fmt.Sprintf("Deliver Task Fail, Id: %s, err: %s", task.Id, err.Error())
 				logs.Error(msg)
-				taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account, Level: models.Log_level_Error}
+				taskRawInfo, _ := json.Marshal(task)
+				taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Error}
 				taskLog.Add()
 			}
 		} else {
@@ -70,7 +72,8 @@ func (this *WSDeliverService) DeliverTask() {
 			errMsg := "Agent not connect"
 			msg := fmt.Sprintf("Deliver Task Fail, Id: %s, err: %s", task.Id, errMsg)
 			logs.Error(msg)
-			taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account, Level: models.Log_level_Error}
+			taskRawInfo, _ := json.Marshal(task)
+			taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Error}
 			taskLog.Add()
 		}
 	}

@@ -53,4 +53,20 @@ var (
 	-- Primary Key structure for table user_event
 	-- ----------------------------
 	ALTER TABLE "public"."user_event" ADD CONSTRAINT "user_event_pkey" PRIMARY KEY ("id");`
+
+	Tab_Create_TaskLog = `CREATE TABLE "public"."task_log" (
+	  "id" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
+	  "account" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT 'admin'::character varying,
+	  "task" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
+	  "raw_log" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
+	  "level" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT 'Info'::character varying,
+	  "create_time" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text
+	)
+	;
+	ALTER TABLE "public"."task_log" OWNER TO "postgres";
+	
+	-- ----------------------------
+	-- Primary Key structure for table task_log
+	-- ----------------------------
+	ALTER TABLE "public"."task_log" ADD CONSTRAINT "task_log_pkey" PRIMARY KEY ("id");`
 )

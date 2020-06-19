@@ -419,7 +419,8 @@ func (this *NatsSubService) Save() error {
 							msg = fmt.Sprintf("Update task Status: %s, fail, >>> HostId: %s, task id: %s, error: %s <<<", task.Status, task.Host.Id, task.Id, result.Message)
 						}
 						logs.Error(logTag + msg)
-						taskLog := models.TaskLog{RawLog: msg, Task: &task, Account: task.Account, Level: models.Log_level_Error}
+						taskRawInfo, _ := json.Marshal(task)
+						taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Error}
 						taskLog.Add()
 						return errors.New(result.Message)
 					} else {
@@ -430,7 +431,8 @@ func (this *NatsSubService) Save() error {
 							msg = fmt.Sprintf("Update task Success, Status: %s >>> HostId: %s, Type: %s, task id: %s <<<", task.Status, task.Host.Id, models.Resource_Task, task.Id)
 						}
 						logs.Info(logTag + msg)
-						taskLog := models.TaskLog{RawLog: msg, Task: &task, Account: task.Account, Level: models.Log_level_Info}
+						taskRawInfo, _ := json.Marshal(task)
+						taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Info}
 						taskLog.Add()
 					}
 					this.ReceiveData(metricsResult)
@@ -454,7 +456,8 @@ func (this *NatsSubService) Save() error {
 						msg = fmt.Sprintf("Delete task fail, >>> HostId: %s, , task id: %s, error: %s <<<", task.Host.Id, task.Id, result.Message)
 					}
 					logs.Error(msg)
-					taskLog := models.TaskLog{RawLog: msg, Task: &task, Account: task.Account, Level: models.Log_level_Error}
+					taskRawInfo, _ := json.Marshal(task)
+					taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Error}
 					taskLog.Add()
 					return errors.New(result.Message)
 				} else {
@@ -465,7 +468,8 @@ func (this *NatsSubService) Save() error {
 						msg = fmt.Sprintf("Delete task success, >>> HostId: %s, Type: %s, task id: %s<<<", task.Host.Id, models.Resource_Task, task.Id)
 					}
 					logs.Info(logTag + msg)
-					taskLog := models.TaskLog{RawLog: msg, Task: &task, Account: task.Account, Level: models.Log_level_Info}
+					taskRawInfo, _ := json.Marshal(task)
+					taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Info}
 					taskLog.Add()
 				}
 				this.ReceiveData(metricsResult)
@@ -502,7 +506,8 @@ func (this *NatsSubService) DeleteTask() error {
 	if err != nil {
 		msg := fmt.Sprintf("Delete Task Fail, Id: %s, err: %s", task.Id, err.Error())
 		logs.Error(msg)
-		taskLog := models.TaskLog{RawLog: msg, Task: task, Account: task.Account, Level: models.Log_level_Error}
+		taskRawInfo, _ := json.Marshal(task)
+		taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Error}
 		taskLog.Add()
 		return err
 	}

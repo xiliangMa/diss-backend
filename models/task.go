@@ -3,11 +3,8 @@ package models
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"strconv"
-	"strings"
 	"time"
 )
 
@@ -26,16 +23,6 @@ type Task struct {
 	CreateTime     time.Time        `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
 	UpdateTime     time.Time        `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
 	Job            *Job             `orm:"rel(fk);null;" description:"(job)"`
-	TaskLog        []*TaskLog       `orm:"reverse(many);null" description:"(主机列表)"`
-}
-
-type TaskLog struct {
-	Id         string    `orm:"pk;" description:"(任务id)"`
-	Account    string    `orm:"default(admin)" description:"(租户)"`
-	Task       *Task     `orm:"rel(fk);null;cascade" description:"(任务)"`
-	RawLog     string    `orm:"" description:"(日志)"`
-	Level      string    `orm:"default(Info)" description:"(日志级别)"`
-	CreateTime time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
 }
 
 type TaskLogInterface interface {
@@ -50,136 +37,6 @@ type TaskInterface interface {
 	Update() Result
 	GetCurrentBatchTaskList() (error, []*Task)
 	GetUnFinishedTaskList() Result
-}
-
-func (this *TaskLog) AddForRaw() Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
-	var ResultData Result
-
-	uid, _ := uuid.NewV4()
-	insetSql := `INSERT INTO ` + utils.TaskLog + ` ( id, task_id, raw_log) VALUES (?,?,?)`
-	_, err := o.Raw(insetSql, uid, this.Task, this.RawLog).Exec()
-	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.AddTaskLogErr
-		logs.Error("Add Task Log failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-	ResultData.Code = http.StatusOK
-	ResultData.Data = this
-	return ResultData
-}
-
-func (this *TaskLog) ListForRaw(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
-	var TaskList []*Task
-	var ResultData Result
-	var err error
-	var total int64 = 0
-
-	filterSql := ""
-	countSql := `select "count"(id) from ` + utils.TaskLog
-	sql := "select * from " + utils.TaskLog
-
-	//if this.Task != "" {
-	//	filterSql = filterSql + "task_id = '" + this.Task + "' and "
-	//}
-	if filterSql != "" {
-		sql = sql + ` where ` + filterSql
-		countSql = countSql + ` where ` + filterSql
-	}
-	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
-	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
-	resultSql := sql
-	if from >= 0 && limit > 0 {
-		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
-		resultSql = resultSql + limitSql
-	}
-
-	_, err = o.Raw(resultSql).QueryRows(&TaskList)
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetTaskLogErr
-		logs.Error("Get Task Log List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-
-	o.Raw(countSql).QueryRow(&total)
-	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = TaskList
-
-	ResultData.Code = http.StatusOK
-	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
-	return ResultData
-}
-
-func (this *TaskLog) Add() Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
-	var ResultData Result
-
-	uuid, _ := uuid.NewV4()
-	this.Id = uuid.String()
-	_, err := o.Insert(this)
-	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.AddTaskLogErr
-		logs.Error("Add Task Log failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-	ResultData.Code = http.StatusOK
-	ResultData.Data = this
-	return ResultData
-}
-
-func (this *TaskLog) List(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
-	var TaskLogList []*TaskLog
-	var ResultData Result
-	var err error
-	cond := orm.NewCondition()
-
-	if this.Id != "" {
-		cond = cond.And("id", this.Id)
-	}
-	if this.Level != "" {
-		cond = cond.And("level", this.Level)
-	}
-	if this.Task != nil && this.Task.Id != "" {
-		cond = cond.And("task_id", this.Task.Id)
-	}
-	if this.RawLog != "" {
-		cond = cond.And("raw_log__icontains", this.RawLog)
-	}
-	if this.Account != "" {
-		cond = cond.And("account", this.Account)
-	}
-	_, err = o.QueryTable(utils.TaskLog).SetCond(cond).RelatedSel().Limit(limit, from).OrderBy("-create_time").All(&TaskLogList)
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetTaskLogErr
-		logs.Error("Get Task List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-
-	total, _ := o.QueryTable(utils.TaskLog).SetCond(cond).Count()
-	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = TaskLogList
-
-	ResultData.Code = http.StatusOK
-	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
-	return ResultData
 }
 
 func (this *Task) Add() Result {

@@ -59,7 +59,8 @@ func (this *TaskController) DeleteTask() {
 				deleteTask.Update()
 				msg := fmt.Sprintf("Update Task success, status: %s, Id: %s", deleteTask.Status, deleteTask.Id)
 				logs.Info(msg)
-				taskLog := models.TaskLog{RawLog: msg, Task: task, Level: models.Log_level_Info}
+				taskRawInfo, _ := json.Marshal(task)
+				taskLog := models.TaskLog{Account: task.Account, RawLog: msg, Task: string(taskRawInfo), Level: models.Log_level_Info}
 				taskLog.Add()
 			} else {
 				//如果操作资源不存在（无法给nats下发任务） 直接删除
@@ -67,14 +68,16 @@ func (this *TaskController) DeleteTask() {
 					task.Delete()
 					msg := fmt.Sprintf("Delete Task success, status: %s, Id: %s", deleteTask.Status, deleteTask.Id)
 					logs.Info(msg)
-					taskLog := models.TaskLog{RawLog: msg, Task: task, Level: models.Log_level_Info}
+					taskRawInfo, _ := json.Marshal(task)
+					taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Level: models.Log_level_Info}
 					taskLog.Add()
 				} else {
 					result.Code = utils.DeleteTaskErr
 					result.Message = "DeleteTaskErr"
 					result.Data = nil
 					msg := fmt.Sprintf("Delet Task fail, Id: %s, err: %s", task.Id, result.Message)
-					taskLog := models.TaskLog{RawLog: msg, Task: task, Level: models.Log_level_Error}
+					taskRawInfo, _ := json.Marshal(task)
+					taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Level: models.Log_level_Error}
 					taskLog.Add()
 				}
 			}

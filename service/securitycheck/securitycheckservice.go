@@ -1,6 +1,7 @@
 package securitycheck
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego/logs"
 	uuid "github.com/satori/go.uuid"
@@ -94,7 +95,8 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 
 		//添加任务日志
 		taskLog := models.TaskLog{}
-		taskLog.Task = task
+		taskRawInfo, _ := json.Marshal(task)
+		taskLog.Task = string(taskRawInfo)
 		taskLog.Account = securityCheck.Job.Account
 		taskLog.Level = models.Log_level_Info
 		taskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Batch: %v, Status: %s",
@@ -145,7 +147,8 @@ func (this *SecurityCheckService) genBenchmarkTask(securityCheck *models.Securit
 	task.Spec = securityCheck.Job.Spec
 	task.Add()
 	taskLog := models.TaskLog{}
-	taskLog.Task = task
+	taskRawInfo, _ := json.Marshal(task)
+	taskLog.Task = string(taskRawInfo)
 	taskLog.Account = securityCheck.Job.Account
 	taskLog.Level = models.Log_level_Info
 	taskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Batch: %v, Status: %s",
