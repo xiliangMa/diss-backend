@@ -14,12 +14,14 @@ import (
 type SecurityCheckService struct {
 	*models.SecurityCheckList
 	DefaultTMP           map[string]*models.SystemTemplate
+	DefaultJob           map[string]*models.Job
 	Batch                int64
 	CurrentBatchTaskList []*models.Task
 }
 
 func (this *SecurityCheckService) PrePare() {
 	logs.Info("################ PrePare work <<<start>>> ################")
+	this.PrePareDefaultJob()
 	this.PrePareDefaultTMP()
 	logs.Info("PrePare task start ......")
 	for _, securityCheck := range this.SecurityCheckList.CheckList {
@@ -39,17 +41,47 @@ func (this *SecurityCheckService) PrePare() {
 
 func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityCheck) {
 
+	//默认Job
+	Job_Type_BM_Docker := this.DefaultJob[models.TMP_Type_BM_Docker]
+	Job_Type_BM_K8S := this.DefaultJob[models.TMP_Type_BM_K8S]
+	Job_Type_DockerVS := this.DefaultJob[models.TMP_Type_DockerVS]
+	Job_Type_HostVS := this.DefaultJob[models.TMP_Type_HostVS]
+
+	// 默认模板
 	TMP_Type_BM_Docker_DT := this.DefaultTMP[models.TMP_Type_BM_Docker]
 	TMP_Type_BM_K8S_DT := this.DefaultTMP[models.TMP_Type_BM_K8S]
 	TMP_Type_DockerVS_DT := this.DefaultTMP[models.TMP_Type_DockerVS]
 	TMP_Type_HostVS_DT := this.DefaultTMP[models.TMP_Type_HostVS]
 	//TMP_Type_LS_DT := defaultTMP[models.TMP_Type_LS]
+
+	// 检测是否是系统Job
+	if securityCheck.Job == nil {
+		if securityCheck.DockerBenchMarkCheck {
+			securityCheck.Job = Job_Type_BM_Docker
+		}
+		if securityCheck.KubeBenchMarkCheck {
+			securityCheck.Job = Job_Type_BM_K8S
+		}
+
+		//todo
+		if securityCheck.VirusScan && securityCheck.Type == models.SC_Type_Host {
+			securityCheck.Job = Job_Type_HostVS
+		}
+
+		if securityCheck.VirusScan && securityCheck.Type == models.Sc_Type_Container {
+			securityCheck.Job = Job_Type_DockerVS
+		}
+		//todo
+		//if securityCheck.LeakScan {
+		//}
+	}
+
 	taskpre := "系统任务-"
 	if securityCheck.Job.JobLevel == models.Job_Level_User {
 		taskpre = "用户任务-"
 	}
 
-	if securityCheck.BenchMarkCheck {
+	if securityCheck.DockerBenchMarkCheck {
 
 		if securityCheck.Job.JobLevel == models.Job_Level_System || securityCheck.Job.SystemTemplate.Type == models.TMP_Type_BM_Docker {
 			this.genBenchmarkTask(securityCheck, TMP_Type_BM_Docker_DT, taskpre)
@@ -163,6 +195,15 @@ func (this *SecurityCheckService) PrePareDefaultTMP() map[string]*models.SystemT
 	}
 	logs.Info("PrePare Default Template: %v", this.DefaultTMP)
 	return this.DefaultTMP
+}
+
+func (this *SecurityCheckService) PrePareDefaultJob() map[string]*models.Job {
+	if this.DefaultTMP == nil {
+		defaultJob := new(models.Job)
+		this.DefaultJob = defaultJob.GetDefaultJob()
+	}
+	logs.Info("PrePare Default Job: %v", this.DefaultJob)
+	return this.DefaultJob
 }
 
 func (this *SecurityCheckService) GetCurrentBatchTask() []*models.Task {

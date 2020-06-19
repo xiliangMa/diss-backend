@@ -15,7 +15,8 @@ type Job struct {
 	Name                string               `orm:"" description:"(名称)"`
 	Description         string               `orm:"" description:"(描述)"`
 	Spec                string               `orm:"" description:"(定时器)"`
-	Type                string               `orm:"" description:"(类型 重复执行 单次执行 )"`
+	Type                string               `orm:"" description:"(类型 重复执行 单次执行)"`
+	SystemTemplateType  string               `orm:"default(Disable)" description:"(模板类型)"`
 	Status              string               `orm:"default(Disable)" description:"(状态: 执行中、启用、禁用)"`
 	CreateTime          time.Time            `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
 	UpdateTime          time.Time            `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
@@ -32,6 +33,7 @@ type JobInterface interface {
 	List(from, limit int) Result
 	Delete() Result
 	Get(id string) Job
+	GetDefaultJob() map[string]*Job
 }
 
 func (this *Job) List(from, limit int) Result {
@@ -234,4 +236,24 @@ func (this *Job) fillRelationData(o orm.Ormer) Result {
 		}
 	}
 	return ResultData
+}
+
+func (this *Job) GetDefaultJob() map[string]*Job {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var systemJobList []*Job
+	defaultJobList := make(map[string]*Job)
+	var err error
+	cond := orm.NewCondition()
+	cond = cond.And("job_level", Job_Level_System)
+	_, err = o.QueryTable(utils.Job).SetCond(cond).RelatedSel().All(&systemJobList)
+	if err != nil {
+		logs.Error("Get SystemJob List failed, code: %d, err: %s", utils.GetSYSJobErr, err.Error())
+		return nil
+	}
+
+	for _, systemJob := range systemJobList {
+		defaultJobList[systemJob.SystemTemplateType] = systemJob
+	}
+	return defaultJobList
 }

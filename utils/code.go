@@ -85,6 +85,7 @@ var (
 	DeleteHostinfoErr               = 90
 	HostExistInJobErr               = 91
 	ContainerExistInJobErr          = 92
+	GetSYSJobErr                    = 93
 
 	//k8s 1001-1100
 	AddNameSpaceErr    = 1001
