@@ -137,6 +137,11 @@ func CreateK8sClient(params *ApiParams) ClientGo {
 	if err != nil {
 		clientgo.ErrMessage = err.Error()
 	}
+
+	// 检测是否可用
+	if _, err := clientgo.GetNodes(); err != nil {
+		clientgo.ErrMessage = err.Error()
+	}
 	return clientgo
 }
 

@@ -391,6 +391,9 @@ func SyncAll() {
 					logs.Info("########################################## cluster:  %s, Sync start.", c.Name)
 					defer func() {
 						if err := recover(); err != nil {
+							// 更新集群的同步状态
+							c.SyncStatus = models.Cluster_Sync_Status_Fail
+							c.Update()
 							logs.Error("########################################## cluster:  %s id: %s , Sync fail. err: %s", c.Name, c.Id, err)
 						}
 					}()
@@ -419,6 +422,9 @@ func SyncAll() {
 					c.Update()
 					logs.Info("########################################## cluster:  %s, Sync end.", clusterName)
 				} else {
+					// 更新集群的同步状态
+					c.SyncStatus = models.Cluster_Sync_Status_Fail
+					c.Update()
 					logs.Error("########################################## cluster:  %s, Sync fail.", clusterName)
 				}
 
