@@ -40,7 +40,18 @@ func (this *JobController) DeleteJob() {
 	id := this.GetString(":id")
 	Job := new(models.Job)
 	Job.Id = id
-	result := Job.Delete()
+
+	jobservice := new(job.JobService)
+	jobservice.JobParam = Job
+	result := jobservice.CheckRuningTask()
+	if result.Code != 0 {
+		this.Data["json"] = result
+		this.ServeJSON(false)
+		return
+	}
+	result = jobservice.RemoveAssocTasks()
+	result = Job.Delete()
+
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }

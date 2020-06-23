@@ -2,12 +2,9 @@ package job
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/service/nats"
-	"github.com/xiliangMa/diss-backend/utils"
+	"github.com/xiliangMa/diss-backend/service/task"
 	"net/http"
 )
 
@@ -42,45 +39,18 @@ func (this *TaskController) GetTaskList() {
 // @router /:id [delete]
 func (this *TaskController) DeleteTask() {
 	id := this.GetString(":id")
-	task := new(models.Task)
-	task.Id = id
-	result := task.List(0, 0)
+	Task := new(models.Task)
+	Task.Id = id
+	result := Task.List(0, 0)
 	if result.Data != nil {
 		data := result.Data.(map[string]interface{})
 		if result.Code == http.StatusOK && data["total"] != 0 {
 			//向agent下发删除任务指令
 			deleteTaskList := data["items"]
 			deleteTask := deleteTaskList.([]*models.Task)[0]
-			natsSubService := nats.NatsSubService{DelTask: deleteTask}
-			err := natsSubService.DeleteTask()
-			if err == nil {
-				// 更新数据库状态 设置为删除锁定
-				deleteTask.Status = models.Task_Status_Removing
-				deleteTask.Update()
-				msg := fmt.Sprintf("Update Task success, status: %s, Id: %s", deleteTask.Status, deleteTask.Id)
-				logs.Info(msg)
-				taskRawInfo, _ := json.Marshal(task)
-				taskLog := models.TaskLog{Account: task.Account, RawLog: msg, Task: string(taskRawInfo), Level: models.Log_level_Info}
-				taskLog.Add()
-			} else {
-				//如果操作资源不存在（无法给nats下发任务） 直接删除
-				if err.Error() == string(utils.ResourceNotFoundErr) {
-					task.Delete()
-					msg := fmt.Sprintf("Delete Task success, status: %s, Id: %s", deleteTask.Status, deleteTask.Id)
-					logs.Info(msg)
-					taskRawInfo, _ := json.Marshal(task)
-					taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Level: models.Log_level_Info}
-					taskLog.Add()
-				} else {
-					result.Code = utils.DeleteTaskErr
-					result.Message = "DeleteTaskErr"
-					result.Data = nil
-					msg := fmt.Sprintf("Delet Task fail, Id: %s, err: %s", task.Id, result.Message)
-					taskRawInfo, _ := json.Marshal(task)
-					taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Level: models.Log_level_Error}
-					taskLog.Add()
-				}
-			}
+			taskservice := new(task.TaskService)
+			taskservice.Task = deleteTask
+			result = taskservice.RemoveTask()
 		}
 	}
 	this.Data["json"] = result

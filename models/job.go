@@ -146,18 +146,39 @@ func (this *Job) Delete() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
+
+	err := o.Begin()
+	// 移除job-host  , job-container关联
+	m2mhost := o.QueryM2M(this, "HostConfig")
+	_, err = m2mhost.Clear()
+	m2mcont := o.QueryM2M(this, "ContainerConfig")
+	_, err = m2mcont.Clear()
+	if err != nil {
+		o.Rollback()
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteJobErr
+		return ResultData
+	}
+	// 移除job本身
 	cond := orm.NewCondition()
 
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
 
-	_, err := o.QueryTable(utils.Job).SetCond(cond).Delete()
+	_, err = o.QueryTable(utils.Job).SetCond(cond).Delete()
 	if err != nil {
+		o.Rollback()
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteJobErr
 		logs.Error("Delete Job failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
+	}
+
+	err = o.Commit()
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+		ResultData.Code = utils.JobCommitErr
+		ResultData.Message = err.Error()
 	}
 
 	ResultData.Code = http.StatusOK

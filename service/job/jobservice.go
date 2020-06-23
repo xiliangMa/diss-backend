@@ -3,8 +3,10 @@ package job
 import (
 	"fmt"
 	"github.com/astaxie/beego/logs"
+	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/securitycheck"
+	"github.com/xiliangMa/diss-backend/service/task"
 	"github.com/xiliangMa/diss-backend/utils"
 	"time"
 )
@@ -90,4 +92,57 @@ func (this *JobService) SetTPLType(targetType, resType string) (seccheck *models
 		seccheck.LeakScan = true
 	}
 	return seccheck
+}
+
+//判断通过次job生成的task中是否有运行的
+func (this *JobService) CheckRuningTask() models.Result {
+	var result models.Result
+	var runingTasks []*models.Task
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	job := this.JobParam.Get()
+	if job.Id != "" {
+		o.LoadRelated(job, "Task")
+		for _, Task := range job.Task {
+			if Task.Status == models.Task_Status_Running {
+				runingTasks = append(runingTasks, Task)
+			}
+		}
+	}
+	if len(runingTasks) > 0 {
+		result.Code = utils.TaskIsRunningErr
+		result.Message = "Some Task in Running Status"
+		result.Data = runingTasks
+	}
+	result.Code = 0
+	result.Message = "No Task rel this Job is Running"
+	return result
+}
+
+func (this *JobService) RemoveAssocTasks() models.Result {
+	var result models.Result
+	o := orm.NewOrm()
+	err := o.Begin()
+	//移除相关的task
+	job := this.JobParam
+	if job.Id != "" {
+		o.LoadRelated(job, "Task")
+		for _, Task := range job.Task {
+			taskservice := new(task.TaskService)
+			taskservice.Task = Task
+			result = taskservice.RemoveTask()
+			if result.Code != 0 {
+				o.Rollback()
+				result.Code = utils.DeleteTaskErr
+				result.Message = "Delete assoc task error , Id: " + Task.Id
+				return result
+			}
+		}
+	}
+	err = o.Commit()
+	if err != nil {
+		result.Code = utils.TaskCommitErr
+		result.Message = err.Error()
+	}
+	return result
 }
