@@ -11,6 +11,7 @@ import (
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"os"
+	"time"
 )
 
 // 集群接口
@@ -177,5 +178,22 @@ func (this *ClusterController) DeleteCluster() {
 	k8sClearService := k8s.K8sClearService{ClusterList: clusterList}
 	go k8sClearService.ClearAll()
 	this.Data["json"] = models.Result{Code: http.StatusOK}
+	this.ServeJSON(false)
+}
+
+// @Title SyncCluster
+// @Description Sync Cluster
+// @Param token header string true "authToken"
+// @Param id path string "" true "Id"
+// @Success 200 {object} models.Result
+// @router /:id/sync [post]
+func (this *ClusterController) SyncCluster() {
+	id := this.GetString(":id")
+	cluster := new(models.Cluster)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &cluster)
+	cluster.Id = id
+	syncCheckPoint := time.Now().Unix()
+	K8sSyncService := k8s.NewK8sSyncService(syncCheckPoint, cluster)
+	this.Data["json"] = K8sSyncService.Sync()
 	this.ServeJSON(false)
 }

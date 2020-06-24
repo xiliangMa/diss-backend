@@ -14,8 +14,9 @@ func InitTask() {
 		// 启动 k8s 同步任务
 		k8sSyncTaskId, _ := uuid.NewV4()
 		syncSpec := beego.AppConfig.String("k8s::SyncSpec")
+		k8STaskHandler := task.K8STaskHandler{}
 		logs.Info("Start K8S Sync TaskHandler SyncSpec: %s", syncSpec)
-		if err := th.AddByFunc(k8sSyncTaskId.String(), syncSpec, task.SyncAll); err != nil {
+		if err := th.AddByFunc(k8sSyncTaskId.String(), syncSpec, k8STaskHandler.SyncAll); err != nil {
 			logs.Error("Start K8S Sync TaskHandler fail, err: %s", err)
 			os.Exit(-1)
 		} else {

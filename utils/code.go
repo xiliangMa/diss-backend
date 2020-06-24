@@ -88,26 +88,29 @@ var (
 	GetSYSJobErr                    = 93
 
 	//k8s 1001-1100
-	AddNameSpaceErr    = 1001
-	AddPodErr          = 1002
-	AddClusterErr      = 1003
-	GetClusterErr      = 1004
-	GetPodErr          = 1005
-	EditNameSpaceErr   = 1006
-	EditPodErr         = 1007
-	GetNameSpaceErr    = 1008
-	IsBindErr          = 1009
-	NoNameSpacedErr    = 1010
-	NameSpaceExistErr  = 1011
-	BindNameSpaceErr   = 1012
-	UnBindNameSpaceErr = 1013
-	BindPodErr         = 1014
-	UnBindPodErr       = 1015
-	EditClusterErr     = 1006
-	ClusterIsExistErr  = 1007
-	DeleteNameSpaceErr = 1008
-	DeletePodErr       = 1009
-	DeleteClusterErr   = 1010
+	AddNameSpaceErr                  = 1001
+	AddPodErr                        = 1002
+	AddClusterErr                    = 1003
+	GetClusterErr                    = 1004
+	GetPodErr                        = 1005
+	EditNameSpaceErr                 = 1006
+	EditPodErr                       = 1007
+	GetNameSpaceErr                  = 1008
+	IsBindErr                        = 1009
+	NoNameSpacedErr                  = 1010
+	NameSpaceExistErr                = 1011
+	BindNameSpaceErr                 = 1012
+	UnBindNameSpaceErr               = 1013
+	BindPodErr                       = 1014
+	UnBindPodErr                     = 1015
+	EditClusterErr                   = 1006
+	ClusterIsExistErr                = 1007
+	DeleteNameSpaceErr               = 1008
+	DeletePodErr                     = 1009
+	DeleteClusterErr                 = 1010
+	ClusterNoExistErr                = 1011
+	ClusterNotActiveOrNotvailableErr = 1012
+	ClusterIsSyncingOrIsClearingErr  = 1013
 
 	//task job 1100-1200
 	AddTaskErr       = 1100
