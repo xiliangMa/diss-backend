@@ -13,7 +13,7 @@ var (
 	podName             = "kube-bench"
 	clientgo            ClientGo
 	kubeBenchJobCommand = []string{"kube-bench", "node", "--benchmark", "cis-1.3"}
-	authType            = "KubeConfig" // KubeConfig BearerToken
+	authType            = "BearerToken" // KubeConfig BearerToken
 	bearerToken         = `eyJhbGciOiJSUzI1NiIsImtpZCI6ImlrYm03UV84cW5lNC1SMFUwaWtJdlVOUDNLSlRFcUppenJOb1JiUDYtMlUifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJkaXNzLXRva2VuLXJmNmRiIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImRpc3MiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiJiY2JiYzE4Yy0wNmU4LTQ0Y2MtODdhYi1lMDU3ZTdmZjI2YzUiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06ZGlzcyJ9.i-HABTH2V8ROo-YR2lrqkImUyEa2fLAXrLsG6HBnS0YhZmp5yd4JwtmzEBZscN6TM2xuu0O1_wFvjaFiUmQ1mw_7YaClPqaGEm3gQdTrktmPql5dk0SgiONPInT7LlpSZix_g184TECv25VThWdPMwvYJwxLgU6ngn8EsOTBX0o2dUafI3kI9skJeS9_oCAu6DzrBUUSc0nYg7Uj5IE12e8pmkw54SuQSB7oje9MWxWgU5IYuysyHf0VvUMAgjlir5EYuCLINISokvXF0yGmktXHZ41Z5HonDlIt1jLMqhM4XBihI1SDlh_tZPlokKfG6oOg3IJzGe0LjJk589vvIg`
 	masterUrl           = `https://47.105.151.140:8443`
 )
@@ -48,6 +48,17 @@ func Test_GetPodsByNameSpace(t *testing.T) {
 		pods, err := clientgo.GetPodsByNameSpace(namespaces)
 		if err == nil {
 			t.Logf("default 命名空间下的 pod 个数 %d", len(pods.Items))
+		}
+	} else {
+		t.Error("K8S Client create Fail")
+	}
+}
+
+func Test_GetServicesByNameSpace(t *testing.T) {
+	if clientgo.ErrMessage == "" {
+		services, err := clientgo.GetServices(namespaces)
+		if err == nil {
+			t.Logf("default 命名空间下的 service 个数 %d", len(services.Items))
 		}
 	} else {
 		t.Error("K8S Client create Fail")

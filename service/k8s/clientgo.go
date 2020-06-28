@@ -165,6 +165,10 @@ func (clientgo *ClientGo) GetJob(namespace, job string) (*batchv1.Job, error) {
 	return clientgo.ClientSet.BatchV1().Jobs(namespace).Get(job, metav1.GetOptions{})
 }
 
+func (clientgo *ClientGo) GetServices(namespace string) (*v1.ServiceList, error) {
+	return clientgo.ClientSet.CoreV1().Services(namespace).List(metav1.ListOptions{})
+}
+
 func (clientgo *ClientGo) CreateJobByYml(kubeBenchJobCommand []string, file, namespace string) (*batchv1.Job, error) {
 	bytes, err := ioutil.ReadFile(file)
 	if err != nil {
