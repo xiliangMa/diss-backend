@@ -9,24 +9,23 @@ import (
 
 type Pod struct {
 	Id             string `orm:"pk;" description:"(pod id)"`
-	Name           string `orm:"unique;" description:"(集群名)"`
-	AccountName    string `orm:"" description:"(租户)"`
-	PodIp          string `orm:"default(null);" description:"(pod ip)"`
-	Status         string `orm:"" description:"(pod状态)"`
-	GroupId        string `orm:"default(null);" description:"(租户id)"`
-	GroupName      string `orm:"default(null);" description:"(租户名)"`
+	Name           string `orm:"unique;size(128)" description:"(Pod名)"`
+	AccountName    string `orm:"size(32)" description:"(租户)"`
+	GroupId        string `orm:"size(64);default(null)" description:"(租户id)"`
+	GroupName      string `orm:"size(32);default(null)" description:"(租户名)"`
 	SyncCheckPoint int64  `orm:"default(0);" description:"(同步检查点)"`
-	HostIp         string `orm:"default(null);" description:"(主机ip， 默认内网ip)"`
-	HostName       string `orm:"default(null);" description:"(host name)"`
-	NameSpaceName  string `orm:"default(null);" description:"(命名空间)"`
-	ClusterName    string `orm:"" description:"(集群名)"`
+	NameSpaceName  string `orm:"size(255);default(null);" description:"(命名空间)"`
+	HostName       string `orm:"size(64);default(null);" description:"(主机名)"`
+	ClusterName    string `orm:"size(32)" description:"(集群名)"`
+	KMetaData      string `orm:"" description:"(源数据)"`
+	KSpec          string `orm:"" description:"(Spec数据)"`
+	KStatus        string `orm:"" description:"(状态数据)"`
 }
 
 type PodInterface interface {
 	Add() Result
 	Delete() Result
 	Update() Result
-	Get() Result
 	List(from, limit int) Result
 	EmptyDirtyData() error
 }
@@ -54,13 +53,12 @@ func (this *Pod) Add() Result {
 	if len(podList) != 0 {
 		updatePod := podList[0]
 		// agent 或者 k8s 数据更新 （因为有diss-backend的关系数据，防止覆盖diss-backend的数据，需要替换更新）
-		updatePod.HostName = this.HostName
 		updatePod.Name = this.Name
-		updatePod.PodIp = this.PodIp
-		updatePod.Status = this.Status
-		updatePod.HostIp = this.HostIp
-		updatePod.HostName = this.HostName
+		updatePod.KMetaData = this.KMetaData
+		updatePod.KSpec = this.KSpec
+		updatePod.KStatus = this.KStatus
 		updatePod.NameSpaceName = this.NameSpaceName
+		updatePod.ClusterName = this.ClusterName
 		return updatePod.Update()
 	} else {
 		_, err = o.Insert(this)

@@ -10,6 +10,7 @@ import (
 
 type K8sClearService struct {
 	ClusterList []*models.Cluster
+	DropCluster bool
 }
 
 // todo 删除任务
@@ -29,6 +30,9 @@ func (this *K8sClearService) ClearAll() {
 			// 更新同步状态未Clearing、并设置为禁止同步
 			cluster.IsSync = false
 			cluster.SyncStatus = models.Cluster_Sync_Status_Clearing
+			if !this.DropCluster {
+				cluster.SyncStatus = models.Cluster_Sync_Status_NotSynced
+			}
 			cluster.Update()
 
 			// 清除Container
@@ -44,7 +48,9 @@ func (this *K8sClearService) ClearAll() {
 			this.ClearNode(cluster)
 
 			// 清除集群
-			this.ClearCluster(cluster)
+			if this.DropCluster {
+				this.ClearCluster(cluster)
+			}
 
 			msg = fmt.Sprintf("Clear Cluster: %s sucess......", cluster.Name)
 			logs.Info(msg)
@@ -71,12 +77,17 @@ func (this *K8sClearService) ClearCluster(cluster *models.Cluster) {
 	msg := fmt.Sprintf("Clear Cluster, Cluster: %s ", cluster.Name)
 	logs.Info(msg)
 	if cluster.AuthType == models.Api_Auth_Type_KubeConfig {
-		uploadPath := beego.AppConfig.String("system::UploadPath")
-		file := fmt.Sprintf("%+v%+v", uploadPath, cluster.FileName)
-		err := os.Remove(file)
-		if err != nil {
-			logs.Error("Remove kubeconfig fail, file: %s, err：%s", file, err.Error())
+		if beego.AppConfig.String("RunMode") == "prod" {
+			uploadPath := beego.AppConfig.String("system::UploadPath")
+			file := fmt.Sprintf("%+v%+v", uploadPath, cluster.FileName)
+			err := os.Remove(file)
+			if err != nil {
+				logs.Error("Remove kubeconfig fail, file: %s, err：%s", file, err.Error())
+			}
+		} else {
+			os.Remove(cluster.FileName)
 		}
+
 	}
 	cluster.Delete()
 }

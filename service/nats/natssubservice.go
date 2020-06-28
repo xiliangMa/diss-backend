@@ -97,7 +97,7 @@ func (this *NatsSubService) Save() error {
 				return err
 			}
 			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s <<<", hostConfig.Id, models.Resource_HostConfig)
-			if err := hostConfig.Inner_AddHostConfig(); err != nil {
+			if err := hostConfig.Add(); err != nil {
 				return err
 			}
 			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
@@ -110,7 +110,7 @@ func (this *NatsSubService) Save() error {
 				return err
 			}
 			logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", hostInfo.Id, models.Resource_HostInfo)
-			if err := hostInfo.Inner_AddHostInfo(); err != nil {
+			if err := hostInfo.Add(); err != nil {
 				return err
 			}
 			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
@@ -423,9 +423,9 @@ func (this *NatsSubService) Save() error {
 						metricsResult.Msg = result.Message
 						msg := ""
 						if task.Host == nil {
-							msg = fmt.Sprintf("Update task Status: %s, fail, >>> HostName: %s, task id: %s, error: %s <<<", task.Status, task.Container.HostName, task.Id, result.Message)
+							msg = fmt.Sprintf("Update task KStatus: %s, fail, >>> HostName: %s, task id: %s, error: %s <<<", task.Status, task.Container.HostName, task.Id, result.Message)
 						} else {
-							msg = fmt.Sprintf("Update task Status: %s, fail, >>> HostId: %s, task id: %s, error: %s <<<", task.Status, task.Host.Id, task.Id, result.Message)
+							msg = fmt.Sprintf("Update task KStatus: %s, fail, >>> HostId: %s, task id: %s, error: %s <<<", task.Status, task.Host.Id, task.Id, result.Message)
 						}
 						logs.Error(logTag + msg)
 						taskRawInfo, _ := json.Marshal(task)
@@ -435,9 +435,9 @@ func (this *NatsSubService) Save() error {
 					} else {
 						msg := ""
 						if task.Host == nil {
-							msg = fmt.Sprintf("Update task Success, Status: %s >>> HostName: %s, Type: %s, task id: %s <<<", task.Status, task.Container.HostName, models.Resource_Task, task.Id)
+							msg = fmt.Sprintf("Update task Success, KStatus: %s >>> HostName: %s, Type: %s, task id: %s <<<", task.Status, task.Container.HostName, models.Resource_Task, task.Id)
 						} else {
-							msg = fmt.Sprintf("Update task Success, Status: %s >>> HostId: %s, Type: %s, task id: %s <<<", task.Status, task.Host.Id, models.Resource_Task, task.Id)
+							msg = fmt.Sprintf("Update task Success, KStatus: %s >>> HostId: %s, Type: %s, task id: %s <<<", task.Status, task.Host.Id, models.Resource_Task, task.Id)
 						}
 						logs.Info(logTag + msg)
 						taskRawInfo, _ := json.Marshal(task)

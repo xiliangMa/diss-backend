@@ -67,7 +67,7 @@ func (this *WSMetricsService) Save() error {
 				return err
 			}
 			logs.Info("############################ Sync agent data, >>> HostId: %s, Type: %s <<<", hostConfig.Id, models.Resource_HostConfig)
-			if err := hostConfig.Inner_AddHostConfig(); err != nil {
+			if err := hostConfig.Add(); err != nil {
 				return err
 			}
 			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
@@ -80,7 +80,7 @@ func (this *WSMetricsService) Save() error {
 				return err
 			}
 			logs.Info("############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", hostInfo.Id, models.Resource_HostInfo)
-			if err := hostInfo.Inner_AddHostInfo(); err != nil {
+			if err := hostInfo.Add(); err != nil {
 				return err
 			}
 			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
@@ -376,14 +376,14 @@ func (this *WSMetricsService) Save() error {
 					if result := task.Update(); result.Code != http.StatusOK {
 						metricsResult.Code = result.Code
 						metricsResult.Msg = result.Message
-						msg := fmt.Sprintf("############################ Update task Status: %s, fail, >>> HostId: %s, error: <<<", task.Status, task.Host.Id, result.Message)
+						msg := fmt.Sprintf("############################ Update task KStatus: %s, fail, >>> HostId: %s, error: <<<", task.Status, task.Host.Id, result.Message)
 						logs.Error(msg)
 						taskRawInfo, _ := json.Marshal(task)
 						taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Level: models.Log_level_Error}
 						taskLog.Add()
 						return errors.New(result.Message)
 					} else {
-						msg := fmt.Sprintf("############################ Update task Status: %s, >>> HostId: %s, Type: %s, task id:  %v <<<", task.Status, task.Host.Id, models.Resource_Task, task.Id)
+						msg := fmt.Sprintf("############################ Update task KStatus: %s, >>> HostId: %s, Type: %s, task id:  %v <<<", task.Status, task.Host.Id, models.Resource_Task, task.Id)
 						logs.Info(msg)
 						taskRawInfo, _ := json.Marshal(task)
 						taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Level: models.Log_level_Info}

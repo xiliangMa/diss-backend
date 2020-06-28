@@ -1,21 +1,94 @@
 package models
 
 import (
+	"errors"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"time"
 )
 
+type HostConfig struct {
+	Id                string    `orm:"pk;size(128)" description:"(主机id)"`
+	HostName          string    `orm:"size(64)" description:"(主机名)"`
+	OS                string    `orm:"size(32)" description:"(系统)"`
+	PG                string    `orm:"size(32);default(sys-default)" description:"(安全策略组)"`
+	InternalAddr      string    `orm:"size(32);default(null);" description:"(主机ip 内)"`
+	PublicAddr        string    `orm:"size(32);default(null);" description:"(主机ip 外)"`
+	Status            string    `orm:"size(32);default(Normal)" description:"(主机状态 正常 Normal 异常 Abnormal)"`
+	Diss              string    `orm:"size(32);default(Installed)" description:"(安全容器 Installed NotInstalled)"`
+	DissStatus        string    `orm:"size(32);default(Safe)" description:"(安全状态 Safe Unsafe)"`
+	AccountName       string    `orm:"size(32);default(admin)" description:"(租户)"`
+	GroupId           string    `orm:"-" description:"(查询参数：分组Id， 仅仅是查询使用, 返回数据看 Group)"`
+	Group             *Groups   `orm:"rel(fk);null;on_delete(set_null)" description:"(分组)"`
+	Type              string    `orm:"size(32);default(Server);" description:"(类型 服务器: Server 虚拟机: Vm)"`
+	IsInK8s           bool      `orm:"default(false);" description:"(是否在k8s集群)"`
+	ClusterId         string    `orm:"size(128);default(null);" description:"(集群id)"`
+	ClusterName       string    `orm:"size(128);default(null);" description:"(集群名)"`
+	Label             string    `orm:"size(32);default(null);" description:"(标签)"`
+	Job               []*Job    `orm:"rel(m2m);null;" description:"(job)"`
+	IsEnableHeartBeat bool      `orm:"default(false);" description:"(是否开启心跳上报)"`
+	HeartBeat         time.Time `orm:"null;type(datetime)" description:"(心跳)"`
+	KMetaData         string    `orm:"" description:"(源数据)"`
+	KSpec             string    `orm:"" description:"(Spec数据)"`
+	KStatus           string    `orm:"" description:"(状态数据)"`
+}
+
 type HostConfigInterface interface {
-	Inner_AddHostConfig() error
-	Inner_AddHostInfo() error
+	Add() error
 	List(from, limit int) Result
 	Update() Result
 	Delete() Result
 	UpdateDynamic() Result
 	Count() int64
 	GetBnechMarkProportion() (int64, int64)
+}
+
+func (this *HostConfig) Add() error {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var err error
+	var hostConfigList []*HostConfig
+	cond := orm.NewCondition()
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+
+	_, err = o.QueryTable(utils.HostConfig).SetCond(cond).All(&hostConfigList)
+	if err != nil {
+		return err
+	}
+	if len(hostConfigList) != 0 {
+		updateHostConfig := hostConfigList[0]
+		// agent 或者 k8s 数据更新 （因为有diss-backend的关系数据，防止覆盖diss-backend的数据，需要替换更新）
+		updateHostConfig.HostName = this.HostName
+		updateHostConfig.IsInK8s = this.IsInK8s
+		updateHostConfig.OS = this.OS
+		updateHostConfig.ClusterId = this.ClusterId
+		updateHostConfig.InternalAddr = this.InternalAddr
+		if this.PublicAddr != "" {
+			updateHostConfig.PublicAddr = this.PublicAddr
+		}
+		updateHostConfig.OS = this.OS
+		updateHostConfig.AccountName = Account_Admin
+		result := updateHostConfig.Update()
+		if result.Code != http.StatusOK {
+			return errors.New(result.Message)
+		}
+	} else {
+		// 插入数据
+		this.AccountName = Account_Admin
+		//添加默认数据
+		this.PG = "Sys-Default"
+		_, err = o.Insert(this)
+		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+			logs.Error("DB Metrics data --- Add %s failed, err: %s", Resource_HostConfig, err.Error())
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (this *HostConfig) List(from, limit int) Result {

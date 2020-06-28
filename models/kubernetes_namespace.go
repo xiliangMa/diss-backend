@@ -9,19 +9,20 @@ import (
 
 type NameSpace struct {
 	Id             string `orm:"pk;" description:"(命名空间id)"`
-	Name           string `orm:"" description:"(命名空间)"`
-	ClusterId      string `orm:"default(null);" description:"(集群id)"`
-	ClusterName    string `orm:"default(null);" description:"(集群名)"`
-	AccountName    string `orm:"" description:"(租户)"`
+	Name           string `orm:"size(32)" description:"(命名空间)"`
+	ClusterId      string `orm:"size(64);" description:"(集群id)"`
+	ClusterName    string `orm:"size(32)" description:"(集群名)"`
+	AccountName    string `orm:"size(32);default(admin)" description:"(租户)"`
 	SyncCheckPoint int64  `orm:"default(0);" description:"(同步检查点)"`
-	Force          bool   `orm:"-" description:"(强制更新)"`
+	Force          bool   `orm:"-" description:"(强制)"`
+	KMetaData      string `orm:"" description:"(源数据)"`
+	KSpec          string `orm:"" description:"(Spec数据)"`
+	KStatus        string `orm:"" description:"(状态数据)"`
 }
 
 type NameSpaceInterface interface {
 	Add() Result
-	Edit() Result
 	Delete() Result
-	Get() Result
 	List() Result
 	BindAccount() Result
 	UnBindAccount() Result
@@ -29,7 +30,7 @@ type NameSpaceInterface interface {
 	EmptyDirtyData() error
 }
 
-func (this *NameSpace) Add(syncK8s bool) Result {
+func (this *NameSpace) Add(update bool) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
@@ -48,7 +49,7 @@ func (this *NameSpace) Add(syncK8s bool) Result {
 	}
 
 	if count != 0 {
-		if syncK8s {
+		if update {
 			// 同步更新k8s数据
 			this.AccountName = dbNS[0].AccountName
 			this.Update()

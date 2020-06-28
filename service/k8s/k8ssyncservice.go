@@ -126,6 +126,7 @@ func (this *K8sSyncService) SyncCluster() models.Result {
 		this.Cluster.SyncStatus = models.Cluster_Sync_Status_Fail
 		this.Cluster.Update()
 		logs.Error("########################################## cluster:  %s, Sync fail. err: %s ", clusterName, this.Clientgo.ErrMessage)
+		return resultData
 	}
 
 	resultData.Code = http.StatusOK
@@ -133,7 +134,8 @@ func (this *K8sSyncService) SyncCluster() models.Result {
 }
 
 func (this *K8sSyncService) SyncHostConfigAndInfo() {
-	nodes, err := this.Clientgo.GetNodes()
+	nodeService := NodeService{NodeInterface: this.Clientgo.ClientSet.CoreV1().Nodes()}
+	nodes, err := nodeService.List()
 	clusterName := this.Cluster.Name
 	clusterId := this.Cluster.Id
 
@@ -151,6 +153,7 @@ func (this *K8sSyncService) SyncHostConfigAndInfo() {
 			config.OS = n.Status.NodeInfo.OSImage
 			config.IsInK8s = true
 			config.ClusterId = clusterId
+			config.ClusterName = clusterName
 			config.IsInK8s = true
 			config.Diss = models.Diss_NotInstalled
 			config.DissStatus = models.Diss_Status_Unsafe
@@ -184,52 +187,24 @@ func (this *K8sSyncService) SyncHostConfigAndInfo() {
 			info.KubernetesVer = nStatusNodeinfo.KubeletVersion
 			info.DockerStatus = models.Host_Docker_Status_Nornal
 			info.ClusterId = clusterId
-			config.Inner_AddHostConfig() // 添加 hostconfig
-			info.Inner_AddHostInfo()     // 添加 hostinfo
+			info.ClusterName = clusterName
+
+			// 初始化原始数据
+			metaData, _ := json.Marshal(n.ObjectMeta)
+			config.KMetaData = string(metaData)
+			info.KMetaData = string(metaData)
+			spec, _ := json.Marshal(n.Spec)
+			config.KSpec = string(spec)
+			info.KSpec = string(spec)
+			status, _ := json.Marshal(n.Status)
+			config.KStatus = string(status)
+			info.KStatus = string(status)
+
+			config.Add() // 添加 hostconfig
+			info.Add()   // 添加 hostinfo
 
 		}
 		logs.Info("########## Sync HostConfig && HostInfo, cluster: %s >>> end <<< ##########, size: %d", clusterName, len(nodes.Items))
-	}
-}
-
-func (this *K8sSyncService) SyncHostInfo() {
-	nodes, err := this.Clientgo.GetNodes()
-	clusterName := this.Cluster.Name
-
-	if err != nil {
-		logs.Error("Sync node err: %s", err.Error())
-	} else {
-		logs.Info("########## Sync cluster: %s HostInfo >>> strat <<< ##########, size: %d", clusterName, len(nodes.Items))
-		for _, n := range nodes.Items {
-			name := n.ObjectMeta.Name
-			nodeId := n.Status.NodeInfo.SystemUUID
-			// 同步 hostinfo
-			info := new(models.HostInfo)
-			info.HostName = name
-			info.Id = nodeId
-			if n.Status.Addresses[0].Type == "InternalIP" {
-				info.InternalAddr = n.Status.Addresses[0].Address
-			} else {
-				info.InternalAddr = n.Status.Addresses[1].Address
-			}
-			capacity := n.Status.Capacity
-			c, _ := capacity.Cpu().AsInt64()
-			info.CpuCore = c
-			m, _ := capacity.Memory().AsInt64()
-			info.Mem = fmt.Sprintf("%.2f", m/1024/1024/1024)
-			d, _ := capacity.StorageEphemeral().AsInt64()
-			info.Disk = utils.UnitConvert(d)
-			nStatusNodeinfo := n.Status.NodeInfo
-			info.OS = nStatusNodeinfo.OSImage
-			info.Kernel = nStatusNodeinfo.KernelVersion
-			info.Architecture = nStatusNodeinfo.Architecture
-			info.DockerRuntime = nStatusNodeinfo.ContainerRuntimeVersion
-			info.KubeletVer = nStatusNodeinfo.KubeletVersion
-			info.Kubeproxy = nStatusNodeinfo.KubeProxyVersion
-			info.KubernetesVer = nStatusNodeinfo.KubeletVersion
-			info.Inner_AddHostInfo()
-		}
-		logs.Info("########## Sync cluster: %s HostInfo >>> end <<< ##########, size: %d", clusterName, len(nodes.Items))
 	}
 }
 
@@ -265,8 +240,8 @@ func (this *K8sSyncService) SyncHostImageConfig() {
 func (this *K8sSyncService) SyncNameSpace() {
 	clusterName := this.Cluster.Name
 	clusterId := this.Cluster.Id
-
-	nameSpaces, err := this.Clientgo.GetNameSpaces()
+	nameSpaceService := NameSpaceService{NameSpaceInterface: this.Clientgo.ClientSet.CoreV1().Namespaces()}
+	nameSpaces, err := nameSpaceService.List()
 	if err != nil {
 		logs.Error("Sync namspace err: %s", err.Error())
 	} else {
@@ -274,18 +249,26 @@ func (this *K8sSyncService) SyncNameSpace() {
 		CheckObject.SyncCheckPoint = this.SyncCheckPoint
 		CheckObject.ClusterId = clusterId
 		logs.Info("########## Sync NameSpace, Cluster: %s >>> strat <<< ##########, size: %d", clusterName, len(nameSpaces.Items))
-		for _, ns := range nameSpaces.Items {
-			nsName := ns.ObjectMeta.Name
-			ob := new(models.NameSpace)
-			nId := string(ns.UID)
+		for _, o := range nameSpaces.Items {
+			nsName := o.ObjectMeta.Name
+			ns := new(models.NameSpace)
+			nId := string(o.UID)
 			nsId := nId
-			ob.Id = nsId
-			ob.Name = nsName
-			ob.ClusterName = clusterName
-			ob.AccountName = models.Account_Admin
-			ob.ClusterId = clusterId
-			ob.SyncCheckPoint = this.SyncCheckPoint
-			ob.Add(true)
+			ns.Id = nsId
+			ns.Name = nsName
+			ns.ClusterName = clusterName
+			ns.AccountName = models.Account_Admin
+			ns.ClusterId = clusterId
+			ns.SyncCheckPoint = this.SyncCheckPoint
+			// 初始化原始数据
+			metaData, _ := json.Marshal(o.ObjectMeta)
+			ns.KMetaData = string(metaData)
+			spec, _ := json.Marshal(o.Spec)
+			ns.KSpec = string(spec)
+			status, _ := json.Marshal(o.Status)
+			ns.KStatus = string(status)
+
+			ns.Add(true)
 		}
 		// 清除脏数据
 		size := len(nameSpaces.Items)
@@ -300,7 +283,8 @@ func (this *K8sSyncService) SyncNameSpace() {
 
 func (this *K8sSyncService) SyncNamespacePod() {
 	clusterName := this.Cluster.Name
-	nameSpaces, err := this.Clientgo.GetNameSpaces()
+	nameSpaceService := NameSpaceService{NameSpaceInterface: this.Clientgo.ClientSet.CoreV1().Namespaces()}
+	nameSpaces, err := nameSpaceService.List()
 	if err != nil {
 		logs.Error("Sync namspace err: %s", err.Error())
 	} else {
@@ -309,24 +293,30 @@ func (this *K8sSyncService) SyncNamespacePod() {
 		CheckObject.ClusterName = clusterName
 		for _, ns := range nameSpaces.Items {
 			nsName := ns.Name
-			pods, err := this.Clientgo.GetPodsByNameSpace(nsName)
+			podService := PodService{PodInterface: this.Clientgo.ClientSet.CoreV1().Pods(nsName)}
+			pods, err := podService.List()
 			if err != nil {
 				logs.Error("Sync namespace: %s pods err: %s", nsName, err.Error())
 			} else {
 				logs.Info("########## Sync Pod, NameSpace: %s >>> strat <<< ##########, size: %d, NSName %s", nsName, len(pods.Items), nsName)
-				for _, pod := range pods.Items {
+				for _, o := range pods.Items {
 					// 同步 pod
-					podob := new(models.Pod)
-					podob.Id = string(pod.UID)
-					podob.Name = pod.ObjectMeta.Name
-					podob.NameSpaceName = nsName
-					podob.HostIp = pod.Status.HostIP
-					podob.HostName = pod.Spec.NodeName
-					podob.PodIp = pod.Status.PodIP
-					podob.Status = string(pod.Status.Phase)
-					podob.ClusterName = clusterName
-					podob.SyncCheckPoint = this.SyncCheckPoint
-					podob.Add()
+					pod := new(models.Pod)
+					pod.Id = string(o.UID)
+					pod.Name = o.ObjectMeta.Name
+					pod.NameSpaceName = nsName
+					pod.HostName = o.Spec.NodeName
+					pod.ClusterName = clusterName
+					pod.SyncCheckPoint = this.SyncCheckPoint
+					// 初始化原始数据
+					metaData, _ := json.Marshal(ns.ObjectMeta)
+					pod.KMetaData = string(metaData)
+					spec, _ := json.Marshal(ns.Spec)
+					pod.KSpec = string(spec)
+					status, _ := json.Marshal(ns.Status)
+					pod.KStatus = string(status)
+
+					pod.Add()
 				}
 				logs.Info("########## Sync Pod, NameSpace: %s >>> end <<< ##########, size: %d, NSName %s", nsName, len(pods.Items), nsName)
 			}
@@ -343,7 +333,8 @@ func (this *K8sSyncService) SyncNamespacePod() {
 
 func (this *K8sSyncService) SyncPodContainerConfigAndInfo() {
 	clusterName := this.Cluster.Name
-	nameSpaces, err := this.Clientgo.GetNameSpaces()
+	nameSpaceService := NameSpaceService{NameSpaceInterface: this.Clientgo.ClientSet.CoreV1().Namespaces()}
+	nameSpaces, err := nameSpaceService.List()
 	if err != nil {
 		logs.Error("Sync namspace err: %s", err.Error())
 	} else {
@@ -357,7 +348,8 @@ func (this *K8sSyncService) SyncPodContainerConfigAndInfo() {
 
 		for _, ns := range nameSpaces.Items {
 			nsName := ns.Name
-			pods, err := this.Clientgo.GetPodsByNameSpace(nsName)
+			podService := PodService{PodInterface: this.Clientgo.ClientSet.CoreV1().Pods(nsName)}
+			pods, err := podService.List()
 			if err != nil {
 				logs.Error("Sync namespace: %s pods err: %s", nsName, err.Error())
 			} else {

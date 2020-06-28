@@ -67,6 +67,11 @@ func (this *ClusterController) AddCluster() {
 		if result = css.TestClient(params); result.Code == http.StatusOK {
 			if result = cluster.Add(isForce); result.Code == http.StatusOK {
 				logs.Info("Add Cluster success, MasterUrl: %s", cluster.MasterUrls)
+				if result.Code == http.StatusOK {
+					// 启动watch
+					k8sWatchService := k8s.K8sWatchService{Cluster: &cluster}
+					k8sWatchService.WatchCluster()
+				}
 			}
 		}
 	case models.Api_Auth_Type_KubeConfig:
@@ -91,6 +96,13 @@ func (this *ClusterController) AddCluster() {
 					// 添加集群记录
 					cluster.FileName = fpath
 					result = cluster.Add(isForce)
+
+					if result.Code == http.StatusOK {
+						// 启动watch
+						k8sWatchService := k8s.K8sWatchService{Cluster: &cluster}
+						k8sWatchService.WatchCluster()
+					}
+
 				}
 			}
 		} else {
@@ -175,7 +187,7 @@ func (this *ClusterController) DeleteCluster() {
 	cluster := new(models.Cluster)
 	cluster.Id = id
 	clusterList = append(clusterList, cluster)
-	k8sClearService := k8s.K8sClearService{ClusterList: clusterList}
+	k8sClearService := k8s.K8sClearService{ClusterList: clusterList, DropCluster: true}
 	go k8sClearService.ClearAll()
 	this.Data["json"] = models.Result{Code: http.StatusOK}
 	this.ServeJSON(false)

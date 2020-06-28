@@ -131,7 +131,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		taskLog.Task = string(taskRawInfo)
 		taskLog.Account = securityCheck.Job.Account
 		taskLog.Level = models.Log_level_Info
-		taskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Batch: %v, Status: %s",
+		taskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Batch: %v, KStatus: %s",
 			task.Id, task.Type, task.Batch, task.Status)
 		taskLog.Add()
 	}
@@ -183,7 +183,7 @@ func (this *SecurityCheckService) genBenchmarkTask(securityCheck *models.Securit
 	taskLog.Task = string(taskRawInfo)
 	taskLog.Account = securityCheck.Job.Account
 	taskLog.Level = models.Log_level_Info
-	taskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Batch: %v, Status: %s",
+	taskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Batch: %v, KStatus: %s",
 		task.Id, task.Type, task.Batch, task.Status)
 	return task
 }

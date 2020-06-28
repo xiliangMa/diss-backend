@@ -2,6 +2,7 @@ package sysinit
 
 import (
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/k8s"
 	"github.com/xiliangMa/diss-backend/service/task"
 	"github.com/xiliangMa/diss-backend/sysinit/db"
 )
@@ -19,6 +20,14 @@ func init() {
 
 	//init logger
 	InitLogger()
+
+	// sync All Cluster
+	//k8STaskHandler := task.K8sTaskHandler{}
+	//k8STaskHandler.SyncAll()
+
+	// watch all cluster
+	k8sWatchService := k8s.K8sWatchService{}
+	k8sWatchService.WatchAll()
 
 	// init task
 	InitTask()

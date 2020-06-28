@@ -30,6 +30,7 @@ type ClusterInterface interface {
 	Update() Result
 	List(from, limit int) Result
 	ListByAccount(from, limit int) Result
+	GetRequiredSyncList() Result
 }
 
 func (this *Cluster) Add(isForce bool) Result {
@@ -83,6 +84,38 @@ func (this *Cluster) Add(isForce bool) Result {
 	}
 
 	ResultData.Data = this
+	return ResultData
+}
+
+func (this *Cluster) GetRequiredSyncList() Result {
+	o := orm.NewOrm()
+	orm.DefaultTimeLoc = time.Local
+	o.Using(utils.DS_Default)
+	var ClusterList []*Cluster
+	var ResultData Result
+	var err error
+	var total int64
+	cond := orm.NewCondition()
+	cond = cond.Or("sync_status", Cluster_Sync_Status_Fail).Or("sync_status", Cluster_Sync_Status_NotSynced)
+	_, err = o.QueryTable(utils.Cluster).SetCond(cond).All(&ClusterList)
+	total, _ = o.QueryTable(utils.Cluster).SetCond(cond).Count()
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetClusterErr
+		logs.Error("Get Cluster List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	data := make(map[string]interface{})
+	data["total"] = total
+	data["items"] = ClusterList
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
 	return ResultData
 }
 
