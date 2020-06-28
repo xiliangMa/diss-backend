@@ -21,7 +21,7 @@ type CmdHistory struct {
 	CreateTime    time.Time `orm:"null;" description:"(更新时间)"`
 	Type          string    `orm:"default(Host);size(32)" description:"(类型 Host Container)"`
 	StartTime     string    `orm:"-;default(null)" description:"(开始时间)"`
-	EndTime       string    `orm:"-";default(null) description:"(结束时间)"`
+	EndTime       string    `orm:"-;default(null)" description:"(结束时间)"`
 }
 
 type CmdHistoryList struct {
