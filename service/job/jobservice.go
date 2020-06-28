@@ -95,7 +95,6 @@ func (this *JobService) SetTPLType(targetType, resType string) (seccheck *models
 	return seccheck
 }
 
-
 //判断通过此job生成的task中是否有运行的
 func (this *JobService) CheckRuningTask() models.Result {
 	var result models.Result
