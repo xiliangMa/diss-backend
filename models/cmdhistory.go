@@ -11,15 +11,17 @@ import (
 )
 
 type CmdHistory struct {
-	Id          string    `orm:"pk;size(64)" description:"(id)"`
-	HostId      string    `orm:"size(64)" description:"(主机id)"`
-	ContainerId string    `orm:"size(256)" description:"(容器id)"`
-	User        string    `orm:"size(32)" description:"(用户)"`
-	Command     string    `orm:"" description:"(命令)"`
-	CreateTime  time.Time `orm:"null;" description:"(更新时间)"`
-	Type        string    `orm:"default(Host);size(32)" description:"(类型 Host Container)"`
-	StartTime   string    `orm:"-;default(null)" description:"(开始时间)"`
-	EndTime     string    `orm:"-";default(null) description:"(结束时间)"`
+	Id            string    `orm:"pk;size(64)" description:"(id)"`
+	HostId        string    `orm:"size(64)" description:"(主机id)"`
+	HostName      string    `orm:"size(64)" description:"(主机名)"`
+	ContainerId   string    `orm:"size(256)" description:"(容器id)"`
+	ContainerName string    `orm:"size(256)" description:"(容器名)"`
+	User          string    `orm:"size(32)" description:"(用户)"`
+	Command       string    `orm:"" description:"(命令)"`
+	CreateTime    time.Time `orm:"null;" description:"(更新时间)"`
+	Type          string    `orm:"default(Host);size(32)" description:"(类型 Host Container)"`
+	StartTime     string    `orm:"-;default(null)" description:"(开始时间)"`
+	EndTime       string    `orm:"-";default(null) description:"(结束时间)"`
 }
 
 type CmdHistoryList struct {
@@ -33,14 +35,16 @@ type CmdHistoryInterface interface {
 }
 
 func (this *CmdHistory) Add() Result {
-	insetSql := `INSERT INTO cmd_history VALUES(?, ?, ?, ? , ?, ?, ?)`
+	insetSql := `INSERT INTO cmd_history VALUES(?, ?, ?, ? , ?, ?, ?, ?, ?)`
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
 
 	_, err := o.Raw(insetSql, this.Id,
 		this.HostId,
+		this.HostName,
 		this.ContainerId,
+		this.ContainerName,
 		this.User,
 		this.Command,
 		this.CreateTime,
@@ -96,8 +100,14 @@ func (this *CmdHistory) List(from, limit int) Result {
 	if this.HostId != "" {
 		filter = filter + `host_id = '` + this.HostId + `' and `
 	}
+	if this.HostName != "" {
+		filter = filter + `host_name like '%` + this.HostName + `%' and `
+	}
 	if this.ContainerId != "" {
 		filter = filter + `container_id = '` + this.ContainerId + `' and `
+	}
+	if this.ContainerId != "" {
+		filter = filter + `container_name like '%` + this.ContainerName + `%' and `
 	}
 	if this.Command != "" {
 		filter = filter + `command like '%` + this.Command + `%' and `
