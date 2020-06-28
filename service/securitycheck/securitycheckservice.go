@@ -77,21 +77,21 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 	}
 
 	taskpre := "系统任务-"
+	if securityCheck.Job == nil {
+		return
+	}
 	if securityCheck.Job.JobLevel == models.Job_Level_User {
 		taskpre = "用户任务-"
 	}
 
-	if securityCheck.DockerBenchMarkCheck {
-
-		if securityCheck.Job.JobLevel == models.Job_Level_System || securityCheck.Job.SystemTemplate.Type == models.TMP_Type_BM_Docker {
-			this.genBenchmarkTask(securityCheck, TMP_Type_BM_Docker_DT, taskpre)
-		}
-
-		if securityCheck.Job.JobLevel == models.Job_Level_System || securityCheck.Job.SystemTemplate.Type == models.TMP_Type_BM_K8S {
-			this.genBenchmarkTask(securityCheck, TMP_Type_BM_K8S_DT, taskpre)
-		}
-
+	if securityCheck.Job.SystemTemplate.Type == models.TMP_Type_BM_Docker {
+		this.genBenchmarkTask(securityCheck, TMP_Type_BM_Docker_DT, taskpre)
 	}
+
+	if securityCheck.Job.SystemTemplate.Type == models.TMP_Type_BM_K8S {
+		this.genBenchmarkTask(securityCheck, TMP_Type_BM_K8S_DT, taskpre)
+	}
+
 	if securityCheck.VirusScan {
 		//病毒
 		task := new(models.Task)
