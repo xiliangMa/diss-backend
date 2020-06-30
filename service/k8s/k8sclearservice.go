@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"fmt"
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"os"
@@ -70,7 +71,12 @@ func (this *K8sClearService) ClearCluster(cluster *models.Cluster) {
 	msg := fmt.Sprintf("Clear Cluster, Cluster: %s ", cluster.Name)
 	logs.Info(msg)
 	if cluster.AuthType == models.Api_Auth_Type_KubeConfig {
-		os.Remove(cluster.FileName)
+		uploadPath := beego.AppConfig.String("system::UploadPath")
+		file := fmt.Sprintf("%+v%+v", uploadPath, cluster.FileName)
+		err := os.Remove(file)
+		if err != nil {
+			logs.Error("Remove kubeconfig fail, file: %s, err：%s", file, err.Error())
+		}
 	}
 	cluster.Delete()
 }
