@@ -45,6 +45,21 @@ func (this *NatsSubService) Save() error {
 			//logs.Info("Nats ############################ Agent Heater Beat data, >>> HostId: %s, Type: %s <<<", heartBeat.SystemId, models.Resource_HeartBeat)
 			//metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			//this.ReceiveData(metricsResult)
+		case models.Resource_CmdHistory_LatestTime:
+			cmdHistory := models.CmdHistory{}
+			s, _ := json.Marshal(ms.Data)
+			if err := json.Unmarshal(s, &cmdHistory); err != nil {
+				logs.Error("Paraces %s error %s", ms.Tag, err)
+				return err
+			}
+			msg := fmt.Sprintf("Nats ############################ Agent Fetch LatestTime data, >>> HostId: %s, Type: %s <<<", cmdHistory.HostId, models.Resource_CmdHistory_LatestTime)
+			if cmdHistory.Type == models.Cmd_History_Type_Container {
+				msg = fmt.Sprintf("Nats ############################ Agent Fetch LatestTime data, >>> HostId: %s, ContainerId: %s, Type: %s <<<", cmdHistory.HostId, cmdHistory.ContainerId, models.Resource_CmdHistory_LatestTime)
+			}
+			logs.Info(msg)
+			result := cmdHistory.GetLatestTime()
+			metricsResult := models.WsData{Code: result.Code, Type: models.Type_Control, Tag: models.Resource_CmdHistory_LatestTime, RCType: models.Resource_Control_Type_Get, Data: result.Data}
+			this.ReceiveData(metricsResult)
 		case models.Resource_HostInfoDynamic:
 			// k8s 主机更新主机的外网ip
 			hostInfo := models.HostInfo{}
@@ -312,13 +327,10 @@ func (this *NatsSubService) Save() error {
 			if size != 0 {
 				logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Resource_HostCmdHistory, size)
 				// 删除该主机下所有的记录 type = 0
-				cmdHistoryList.List[0].Delete()
+				//cmdHistoryList.List[0].Delete()
 			}
 
 			for _, cmdHistory := range cmdHistoryList.List {
-				//if result := cmdHistory.Add(); result.Code != http.StatusOK {
-				//	return errors.New(result.Message)
-				//}
 				cmdHistory.Add()
 			}
 			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
@@ -335,12 +347,9 @@ func (this *NatsSubService) Save() error {
 			if size != 0 {
 				logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Resource_ContainerCmdHistory, size)
 				// 删除该主机下所有的记录 type = 1
-				cmdHistoryList.List[0].Delete()
+				//cmdHistoryList.List[0].Delete()
 			}
 			for _, cmdHistory := range cmdHistoryList.List {
-				//if result := cmdHistory.Add(); result.Code != http.StatusOK {
-				//	return errors.New(result.Message)
-				//}
 				cmdHistory.Add()
 			}
 			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}

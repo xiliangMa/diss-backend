@@ -32,6 +32,7 @@ type CmdHistoryInterface interface {
 	Add() Result
 	List() Result
 	Delete() Result
+	GetLatestTime() Result
 }
 
 func (this *CmdHistory) Add() Result {
@@ -148,5 +149,48 @@ func (this *CmdHistory) List(from, limit int) Result {
 	if total == 0 {
 		ResultData.Data = nil
 	}
+	return ResultData
+}
+
+func (this *CmdHistory) GetLatestTime() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Security_Log)
+	var ResultData Result
+	var cmdHistory *CmdHistory
+
+	sql := `SELECT * FROM ` + utils.CmdHistory
+	filter := ""
+
+	if this.Type != "" {
+		filter = filter + ` type = '` + this.Type + `' and `
+	}
+
+	if this.HostId != "" {
+		filter = filter + `host_id = '` + this.HostId + `' and `
+	}
+
+	if filter != "" {
+		sql = sql + " where " + filter
+	}
+	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
+	resultSql := sql
+
+	limitSql := " ORDER BY create_time DESC limit " + strconv.Itoa(1) + " OFFSET " + strconv.Itoa(0)
+	resultSql = resultSql + limitSql
+
+	err := o.Raw(resultSql).QueryRow(&cmdHistory)
+
+	if err != nil {
+		ResultData.Code = utils.GetLatestTimeForCmdHistoryErr
+		ResultData.Message = string(utils.GetLatestTimeForCmdHistoryErr)
+		logs.Error("Get LatestTimeForCmdHistoryErr failed, code: %d, err: %s", utils.GetLatestTimeForCmdHistoryErr, err.Error())
+		return ResultData
+	}
+	data := make(map[string]interface{})
+	data["items"] = cmdHistory
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+
 	return ResultData
 }

@@ -86,6 +86,7 @@ var (
 	HostExistInJobErr               = 91
 	ContainerExistInJobErr          = 92
 	GetSYSJobErr                    = 93
+	GetLatestTimeForCmdHistoryErr   = 94
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001
