@@ -32,14 +32,14 @@ func (this *GroupsController) GetGroupsList() {
 	this.ServeJSON(false)
 }
 
-// @Title AddGroup
-// @Description Add Group
+// @Title UpdateGroup
+// @Description Update Group
 // @Param token header string true "authToken"
 // @Param id path string "" true "id"
 // @Param body body models.Groups false "分组信息"
 // @Success 200 {object} models.Result
 // @router /:id [put]
-func (this *GroupsController) AddGroup() {
+func (this *GroupsController) UpdateGroup() {
 	id := this.GetString(":id")
 	group := new(models.Groups)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &group)
@@ -48,13 +48,13 @@ func (this *GroupsController) AddGroup() {
 	this.ServeJSON(false)
 }
 
-// @Title UpdateGroup
-// @Description Update Group
+// @Title AddGroup
+// @Description Add Group
 // @Param token header string true "authToken"
 // @Param body body models.Groups false "分组信息"
 // @Success 200 {object} models.Result
 // @router /add [post]
-func (this *GroupsController) UpdateGroup() {
+func (this *GroupsController) AddGroup() {
 	groups := new(models.Groups)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &groups)
 	this.Data["json"] = groups.Add()

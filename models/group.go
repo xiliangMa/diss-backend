@@ -42,8 +42,8 @@ func (this *Groups) Add() Result {
 		logs.Error("Add Group failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
-	cond := orm.NewCondition()
-	cond = cond.And("id", this.Id)
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
 	return this.List(0, 0)
 }
 
