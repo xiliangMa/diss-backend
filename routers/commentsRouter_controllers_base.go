@@ -99,6 +99,15 @@ func init() {
 
     beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:HostController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:HostController"],
         beego.ControllerComments{
+            Method: "DeleteHost",
+            Router: `/:hostId`,
+            AllowHTTPMethods: []string{"delete"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:HostController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:HostController"],
+        beego.ControllerComments{
             Method: "GetHostPsList",
             Router: `/:hostId/ps`,
             AllowHTTPMethods: []string{"post"},

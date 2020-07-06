@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
+	"net/http"
 )
 
 // 主机接口列表
@@ -63,5 +64,25 @@ func (this *HostController) UpdateHost() {
 	json.Unmarshal(this.Ctx.Input.RequestBody, &hostConfig)
 	hostConfig.Id = hostId
 	this.Data["json"] = hostConfig.Update()
+	this.ServeJSON(false)
+}
+
+// @Title DeleteHost
+// @Description Delete Host
+// @Param token header string true "authToken"
+// @Param hostId path string "" true "hostId"
+// @Success 200 {object} models.Result
+// @router /:hostId [delete]
+func (this *HostController) DeleteHost() {
+	hostId := this.GetString(":hostId")
+	hc := new(models.HostConfig)
+	hi := new(models.HostInfo)
+	hc.Id = hostId
+	hi.Id = hostId
+	result := hi.Delete()
+	if result.Code == http.StatusOK {
+		result = hc.Delete()
+	}
+	this.Data["json"] = result
 	this.ServeJSON(false)
 }
