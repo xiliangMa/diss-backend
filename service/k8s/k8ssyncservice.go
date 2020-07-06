@@ -114,7 +114,7 @@ func (this *K8sSyncService) SyncCluster() models.Result {
 		this.SyncNamespacePod()
 
 		// 同步 pod 内的 containerconfig && containerinfo
-		this.SyncPodContainerConfigAndInfo()
+		//this.SyncPodContainerConfigAndInfo()
 
 		logs.Info("Sync end...., cluster name: %s ", clusterName)
 		// 更新同步时间、状态
