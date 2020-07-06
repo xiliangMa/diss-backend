@@ -122,6 +122,11 @@ func init() {
 				&ck8s.PodController{},
 			),
 		),
+		beego.NSNamespace("/v1/k8s/services",
+			beego.NSInclude(
+				&ck8s.ServiceController{},
+			),
+		),
 		beego.NSNamespace("/v1/system",
 			beego.NSInclude(
 				&csystem.SystemController{},

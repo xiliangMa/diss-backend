@@ -8,7 +8,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
-	"net/http"
 )
 
 type PodService struct {
@@ -55,23 +54,24 @@ Done:
 				case watch.Added:
 					pod.Add()
 				case watch.Modified:
-					result := pod.List(0, 0)
-					if result.Code == http.StatusOK {
-						data := result.Data.(map[string]interface{})
-						if data != nil {
-							items := data["items"].([]*models.Pod)
-							if items != nil && len(items) == 1 {
-								dbPod := items[0]
-								dbPod.Name = name
-								dbPod.HostName = nodeName
-								dbPod.ClusterName = clusterName
-								dbPod.KMetaData = string(KMetaData)
-								dbPod.KSpec = string(KSpec)
-								dbPod.KStatus = string(KStatus)
-								dbPod.Update()
-							}
-						}
-					}
+					pod.Add()
+					//result := pod.List(0, 0)
+					//if result.Code == http.StatusOK {
+					//	data := result.Data.(map[string]interface{})
+					//	if data != nil {
+					//		items := data["items"].([]*models.Pod)
+					//		if items != nil && len(items) == 1 {
+					//			dbPod := items[0]
+					//			dbPod.Name = name
+					//			dbPod.HostName = nodeName
+					//			dbPod.ClusterName = clusterName
+					//			dbPod.KMetaData = string(KMetaData)
+					//			dbPod.KSpec = string(KSpec)
+					//			dbPod.KStatus = string(KStatus)
+					//			dbPod.Update()
+					//		}
+					//	}
+					//}
 				case watch.Deleted:
 					pod.Delete()
 				case watch.Bookmark:

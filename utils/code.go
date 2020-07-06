@@ -87,6 +87,10 @@ var (
 	ContainerExistInJobErr          = 92
 	GetSYSJobErr                    = 93
 	GetLatestTimeForCmdHistoryErr   = 94
+	GetServiceErr                   = 95
+	AddServiceErr                   = 96
+	EditServiceErr                  = 97
+	DeleteServiceErr                = 98
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001

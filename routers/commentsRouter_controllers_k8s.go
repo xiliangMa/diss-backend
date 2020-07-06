@@ -97,4 +97,13 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/k8s:ServiceController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/k8s:ServiceController"],
+		beego.ControllerComments{
+			Method:           "GetServicesList",
+			Router:           `/`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
 }

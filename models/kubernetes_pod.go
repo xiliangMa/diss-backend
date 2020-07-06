@@ -9,7 +9,7 @@ import (
 
 type Pod struct {
 	Id             string `orm:"pk;" description:"(pod id)"`
-	Name           string `orm:"unique;size(128)" description:"(Pod名)"`
+	Name           string `orm:"size(128)" description:"(Pod名)"`
 	AccountName    string `orm:"size(32)" description:"(租户)"`
 	GroupId        string `orm:"size(64);default(null)" description:"(租户id)"`
 	GroupName      string `orm:"size(32);default(null)" description:"(租户名)"`
@@ -37,7 +37,6 @@ func (this *Pod) Add() Result {
 	var podList []*Pod
 	var err error
 	cond := orm.NewCondition()
-	cond = cond.And("id", this.Id)
 	if this.Name != "" {
 		cond = cond.And("id", this.Id)
 	}
@@ -52,7 +51,6 @@ func (this *Pod) Add() Result {
 
 	if len(podList) != 0 {
 		updatePod := podList[0]
-		// agent 或者 k8s 数据更新 （因为有diss-backend的关系数据，防止覆盖diss-backend的数据，需要替换更新）
 		updatePod.Name = this.Name
 		updatePod.KMetaData = this.KMetaData
 		updatePod.KSpec = this.KSpec

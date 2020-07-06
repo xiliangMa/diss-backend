@@ -54,17 +54,21 @@ func (this *K8sWatchService) WatchCluster() models.Result {
 			}
 		}()
 
-		// Watch Namespace
+		// Namespace
 		nameSpaceService := NameSpaceService{Cluster: this.Cluster, NameSpaceInterface: clientGo.ClientSet.CoreV1().Namespaces()}
 		go nameSpaceService.Wtach()
 
-		// Pod Namespace
+		// Pod
 		podService := PodService{Cluster: this.Cluster, PodInterface: clientGo.ClientSet.CoreV1().Pods("")}
 		go podService.Wtach()
 
-		// Node Namespace
+		// Node
 		nodeService := NodeService{Cluster: this.Cluster, NodeInterface: clientGo.ClientSet.CoreV1().Nodes()}
 		go nodeService.Wtach()
+
+		// Service
+		svcService := SVCService{Cluster: this.Cluster, ServiceInterface: clientGo.ClientSet.CoreV1().Services("")}
+		go svcService.Wtach()
 
 	}
 
