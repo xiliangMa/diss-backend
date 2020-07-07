@@ -43,6 +43,7 @@ Done:
 				ns := models.NameSpace{}
 				ns.Id = id
 				ns.Name = name
+				ns.AccountName = models.Account_Admin
 				ns.ClusterId = clusterId
 				ns.ClusterName = clusterName
 				ns.KMetaData = string(KMetaData)
