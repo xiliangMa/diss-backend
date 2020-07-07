@@ -149,6 +149,7 @@ var (
 	LicenseCommitErr                = 1219
 	CreateClientByBearerTokenErr    = 1220
 	ClusterNotAvailableOrNoHostErr  = 1221
+	CreateK8sClientErr              = 1222
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300

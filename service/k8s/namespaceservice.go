@@ -32,7 +32,9 @@ Done:
 			if event.Object != nil || ok {
 				object := event.Object.(*v1.Namespace)
 				id := string(object.UID)
+				name := object.Name
 				clusterId := this.Cluster.Id
+				clusterName := this.Cluster.Name
 
 				KMetaData, _ := json.Marshal(object.ObjectMeta)
 				KSpec, _ := json.Marshal(object.Spec)
@@ -40,7 +42,9 @@ Done:
 
 				ns := models.NameSpace{}
 				ns.Id = id
+				ns.Name = name
 				ns.ClusterId = clusterId
+				ns.ClusterName = clusterName
 				ns.KMetaData = string(KMetaData)
 				ns.KSpec = string(KSpec)
 				ns.KStatus = string(KStatus)

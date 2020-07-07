@@ -3,6 +3,7 @@ package k8s
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
 
@@ -35,6 +36,8 @@ func (this *K8sWatchService) WatchAll() {
 
 func (this *K8sWatchService) WatchCluster() models.Result {
 	var resultData models.Result
+	resultData.Code = http.StatusOK
+
 	clusterName := this.Cluster.Name
 	clusterId := this.Cluster.Id
 	clientGo := this.CreateK8sClient()
@@ -70,7 +73,17 @@ func (this *K8sWatchService) WatchCluster() models.Result {
 		svcService := SVCService{Cluster: this.Cluster, ServiceInterface: clientGo.ClientSet.CoreV1().Services("")}
 		go svcService.Wtach()
 
+	} else {
+		resultData.Code = utils.CreateK8sClientErr
+		resultData.Message = clientGo.ErrMessage
 	}
+
+	if resultData.Code == http.StatusOK {
+		this.Cluster.SyncStatus = models.Cluster_Sync_Status_Synced
+	} else {
+		this.Cluster.SyncStatus = models.Cluster_Sync_Status_Fail
+	}
+	this.Cluster.Update()
 
 	return resultData
 }

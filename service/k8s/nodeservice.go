@@ -10,6 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
+	"strings"
 )
 
 type NodeService struct {
@@ -33,7 +34,7 @@ Done:
 		case event, ok := <-nodeWatch.ResultChan():
 			if event.Object != nil || ok {
 				object := event.Object.(*v1.Node)
-				id := string(object.Status.NodeInfo.SystemUUID)
+				id := strings.ToLower(object.Status.NodeInfo.SystemUUID)
 				name := object.ObjectMeta.Name
 				os := object.Status.NodeInfo.OSImage
 				clusterId := this.Cluster.Id
