@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
-	"net/http"
+	"github.com/xiliangMa/diss-backend/service"
 )
 
 // 主机接口列表
@@ -76,13 +76,8 @@ func (this *HostController) UpdateHost() {
 func (this *HostController) DeleteHost() {
 	hostId := this.GetString(":hostId")
 	hc := new(models.HostConfig)
-	hi := new(models.HostInfo)
 	hc.Id = hostId
-	hi.Id = hostId
-	result := hi.Delete()
-	if result.Code == http.StatusOK {
-		result = hc.Delete()
-	}
-	this.Data["json"] = result
+	hs := service.HostService{Host: hc}
+	this.Data["json"] = hs.Delete()
 	this.ServeJSON(false)
 }
