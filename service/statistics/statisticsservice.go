@@ -55,3 +55,14 @@ func (this *StatisticsService) GetHostBnechMarkSummaryStatistics(hostId string) 
 	bml.HostId = hostId
 	return bml.GetHostMarkSummary()
 }
+
+func (this *StatisticsService) GetGetOnlineProportionStatistics() models.Result {
+	var ResultData models.Result
+	data := make(map[string]interface{})
+	// Online / Offline
+	hostConfig := new(models.HostConfig)
+	data["OnlineCount"], data["OfflineCount"] = hostConfig.GetOnlineProportion()
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	return ResultData
+}

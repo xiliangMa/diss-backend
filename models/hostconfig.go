@@ -201,6 +201,15 @@ func (this *HostConfig) GetBnechMarkProportion() (int64, int64) {
 	return dockerBenchMarkCount, k8sBenchMarkCount
 }
 
+// Online / Offline
+func (this *HostConfig) GetOnlineProportion() (int64, int64) {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	all, _ := o.QueryTable(utils.HostConfig).Count()
+	onlineCount, _ := o.QueryTable(utils.HostConfig).Filter("status", Host_Status_Normal).Count()
+	return onlineCount, all - onlineCount
+}
+
 func (this *HostConfig) Delete() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)

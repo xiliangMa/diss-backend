@@ -52,4 +52,13 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"],
+		beego.ControllerComments{
+			Method:           "GetGetOnlineProportionStatistics",
+			Router:           `/onlineproportion`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
 }

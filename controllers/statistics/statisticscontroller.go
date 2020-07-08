@@ -31,7 +31,6 @@ func (this *StatisticsController) GetBnechMarkProportionStatistics() {
 	statisticsService := ss.StatisticsService{nil, nil, nil}
 	this.Data["json"] = statisticsService.GetBnechMarkProportionStatistics()
 	this.ServeJSON(false)
-
 }
 
 // @Title GetBnechMarkSummaryStatistics
@@ -67,5 +66,16 @@ func (this *StatisticsController) GetIntrudeDetectLogStatistics() {
 func (this *StatisticsController) GetHostBnechMarkSummaryStatistics() {
 	statisticsService := ss.StatisticsService{nil, nil, nil}
 	this.Data["json"] = statisticsService.GetHostBnechMarkSummaryStatistics(this.GetString(":hostId"))
+	this.ServeJSON(false)
+}
+
+// @Title GetGetOnlineProportionStatistics
+// @Description Get BnechMark Proportion Statistics (主机在线占比：Online / Offline)
+// @Param token header string true "authToken"
+// @Success 200 {object} models.Result
+// @router /onlineproportion [get]
+func (this *StatisticsController) GetGetOnlineProportionStatistics() {
+	statisticsService := ss.StatisticsService{nil, nil, nil}
+	this.Data["json"] = statisticsService.GetGetOnlineProportionStatistics()
 	this.ServeJSON(false)
 }
