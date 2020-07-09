@@ -15,7 +15,7 @@ func Test_SubTime(t *testing.T) {
 func Test_GetTimeFromNow(t *testing.T) {
 	now := time.Now().Format("2006-01-02T15:04:05Z")
 	//nowStr, _ := time.Parse(time.RFC3339, now.String())
-	timepoint := time.Now().Add(time.Hour * -36).Format("2006-01-02T15:04:05Z")
+	timepoint := time.Now().Add(time.Hour * -1).Format("2006-01-02T15:04:05Z")
 
 	t.Log("\n Now:", now, "\n", "Timepoint:", timepoint)
 }

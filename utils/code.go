@@ -91,6 +91,7 @@ var (
 	AddServiceErr                   = 96
 	EditServiceErr                  = 97
 	DeleteServiceErr                = 98
+	GetLatestTimeForDockerEventErr  = 99
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001

@@ -25,6 +25,7 @@ func (this *NatsSubService) Save() error {
 		logs.Error("Paraces WsData error %s", err)
 		return err
 	}
+
 	if ms.Data == nil {
 		return nil
 	}
@@ -59,6 +60,18 @@ func (this *NatsSubService) Save() error {
 			logs.Info(msg)
 			result := cmdHistory.GetLatestTime()
 			metricsResult := models.WsData{Code: result.Code, Type: models.Type_Control, Tag: models.Resource_CmdHistory_LatestTime, RCType: models.Resource_Control_Type_Get, Data: result.Data}
+			this.ReceiveData(metricsResult)
+		case models.Resource_DockerEvent_LatestTime:
+			dockerEvent := models.DockerEvent{}
+			s, _ := json.Marshal(ms.Data)
+			if err := json.Unmarshal(s, &dockerEvent); err != nil {
+				logs.Error("Paraces %s error %s", ms.Tag, err)
+				return err
+			}
+			msg := fmt.Sprintf("Nats ############################ Agent Fetch LatestTime data, >>> HostId: %s, Type: %s <<<", dockerEvent.HostId, models.Resource_DockerEvent_LatestTime)
+			logs.Info(msg)
+			result := dockerEvent.GetLatestTime()
+			metricsResult := models.WsData{Code: result.Code, Type: models.Type_Control, Tag: models.Resource_DockerEvent_LatestTime, RCType: models.Resource_Control_Type_Get, Data: result.Data}
 			this.ReceiveData(metricsResult)
 		case models.Resource_HostInfoDynamic:
 			// k8s 主机更新主机的外网ip
@@ -356,19 +369,14 @@ func (this *NatsSubService) Save() error {
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_DockerEvent:
-			dockerEventList := []models.DockerEvent{}
+			dockerEvent := models.DockerEvent{}
 			s, _ := json.Marshal(ms.Data)
-			if err := json.Unmarshal(s, &dockerEventList); err != nil {
+			if err := json.Unmarshal(s, &dockerEvent); err != nil {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
-			size := len(dockerEventList)
-			if size != 0 {
-				logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", dockerEventList[0].HostId, models.Resource_DockerEvent, size)
-			}
-			for _, dcokerEvent := range dockerEventList {
-				dcokerEvent.Add()
-			}
+			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s<<<", dockerEvent.HostId, models.Resource_DockerEvent)
+			dockerEvent.Add()
 			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil

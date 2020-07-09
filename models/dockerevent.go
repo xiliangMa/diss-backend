@@ -12,15 +12,15 @@ import (
 )
 
 type DockerEvent struct {
-	Id        string `orm:"pk;size(128)" description:"(容器id)"`
+	Id        string `orm:"pk;size(256)" description:"(容器id)"`
 	HostId    string `orm:"size(256)" description:"(主机Id agent采集数据)"`
 	HostName  string `orm:"size(256)" description:"(主机Name agent采集数据)"`
 	From      string `orm:"size(256)" description:"(镜像来源)"`
-	Type      string `orm:"size(32)" description:"(类型)"`
-	Action    string `orm:"size(32)" description:"(执行操作)"`
+	Type      string `orm:"size(256)" description:"(类型)"`
+	Action    string `orm:"size(256)" description:"(执行操作)"`
 	Actor     string `orm:"" description:"(操作明细)"`
-	Status    string `orm:"size(32)" description:"(状态)"`
-	Scope     string `orm:"size(64)" description:"(范围)"`
+	Status    string `orm:"size(256)" description:"(状态)"`
+	Scope     string `orm:"size(256)" description:"(范围)"`
 	Time      int64  `orm:"" description:"(时间)"`
 	TimeNano  int64  `orm:"" description:"(精确时间)"`
 	StartTime string `orm:"-" description:"(开始时间, 注意时间格式为 local 时间)"`
@@ -30,6 +30,7 @@ type DockerEvent struct {
 type DockerEventInterface interface {
 	List(from, limit int) Result
 	Add() Result
+	GetLatestTime() Result
 }
 
 func (this *DockerEvent) List(from, limit int) Result {
@@ -107,7 +108,7 @@ func (this *DockerEvent) List(from, limit int) Result {
 }
 
 func (this *DockerEvent) Add() Result {
-	insetSql := `INSERT INTO docker_event VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	insetSql := `INSERT INTO docker_event VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
@@ -115,6 +116,7 @@ func (this *DockerEvent) Add() Result {
 	_, err := o.Raw(insetSql,
 		this.Id,
 		this.HostId,
+		this.HostName,
 		this.From,
 		this.Type,
 		this.Action,
@@ -133,5 +135,44 @@ func (this *DockerEvent) Add() Result {
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
+	return ResultData
+}
+
+func (this *DockerEvent) GetLatestTime() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Security_Log)
+	var ResultData Result
+	var DockerEvent *DockerEvent
+
+	sql := `SELECT * FROM ` + utils.DockerEvent
+	filter := ""
+
+	if this.HostId != "" {
+		filter = filter + `host_id = '` + this.HostId + `' and `
+	}
+
+	if filter != "" {
+		sql = sql + " where " + filter
+	}
+	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
+	resultSql := sql
+
+	limitSql := " ORDER BY time DESC limit " + strconv.Itoa(1) + " OFFSET " + strconv.Itoa(0)
+	resultSql = resultSql + limitSql
+
+	err := o.Raw(resultSql).QueryRow(&DockerEvent)
+
+	if err != nil {
+		ResultData.Code = utils.GetLatestTimeForDockerEventErr
+		ResultData.Message = string(utils.GetLatestTimeForDockerEventErr)
+		logs.Error("Get LatestTimeForDockerEventErr failed, code: %d, err: %s", utils.GetLatestTimeForDockerEventErr, err.Error())
+		return ResultData
+	}
+	data := make(map[string]interface{})
+	data["items"] = DockerEvent
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+
 	return ResultData
 }

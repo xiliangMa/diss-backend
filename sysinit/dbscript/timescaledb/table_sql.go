@@ -21,15 +21,15 @@ var (
 	ALTER TABLE "public"."cmd_history" ADD CONSTRAINT "cmd_history_pkey" PRIMARY KEY ("id");`
 
 	Tab_Create_DockerEvent = `CREATE TABLE "public"."docker_event" (
-	  "id" varchar(128) COLLATE "pg_catalog"."default" NOT NULL,
+	  "id" varchar(256) COLLATE "pg_catalog"."default" NOT NULL,
 	  "host_id" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "host_name" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "from" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
-	  "type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
-	  "action" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "type" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "action" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "actor" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
-	  "status" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
-	  "scope" varchar(64) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "status" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "scope" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "time" int8 NOT NULL DEFAULT 0,
 	  "time_nano" int8 NOT NULL DEFAULT 0
 	)
