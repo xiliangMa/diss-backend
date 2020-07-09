@@ -72,4 +72,22 @@ var (
 	-- Primary Key structure for table task_log
 	-- ----------------------------
 	ALTER TABLE "public"."task_log" ADD CONSTRAINT "task_log_pkey" PRIMARY KEY ("id");`
+
+	Tab_Create_WarningInfo = `CREATE TABLE "public"."warning_info" (
+	  "id" varchar(128) COLLATE "pg_catalog"."default" NOT NULL,
+	  "name" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "host_name" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "level" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "status" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "create_time" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "update_time" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying
+	)
+	;
+	ALTER TABLE "public"."warning_info" OWNER TO "postgres";
+	
+	-- ----------------------------
+	-- Primary Key structure for table warning_info
+	-- ----------------------------
+	ALTER TABLE "public"."warning_info" ADD CONSTRAINT "warning_info_pkey" PRIMARY KEY ("id");`
 )

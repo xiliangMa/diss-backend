@@ -34,6 +34,7 @@ var (
 	CmdHistory  = "cmd_history"
 	DockerEvent = "docker_event"
 	UserEvent   = "user_event"
+	WarningInfo = "warning_info"
 
 	//Diss_api
 	Accounts                    = "accounts"

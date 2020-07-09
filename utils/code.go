@@ -159,6 +159,8 @@ var (
 	AddDockerEventErr      = 1304
 	AddUserEventErr        = 1305
 	GetUserEventListErr    = 1306
+	GetWarningInfoListErr  = 1307
+	AddWarningInfoListErr  = 1308
 
 	// diss_api 1400-1500
 	GetAccountsErr                        = 1400
