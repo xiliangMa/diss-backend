@@ -14,6 +14,7 @@ import (
 type DockerEvent struct {
 	Id        string `orm:"pk;size(128)" description:"(容器id)"`
 	HostId    string `orm:"size(256)" description:"(主机Id agent采集数据)"`
+	HostName  string `orm:"size(256)" description:"(主机Name agent采集数据)"`
 	From      string `orm:"size(256)" description:"(镜像来源)"`
 	Type      string `orm:"size(32)" description:"(类型)"`
 	Action    string `orm:"size(32)" description:"(执行操作)"`
@@ -47,6 +48,9 @@ func (this *DockerEvent) List(from, limit int) Result {
 	}
 	if this.HostId != "" {
 		filter = filter + `host_id = '` + this.HostId + `' and `
+	}
+	if this.HostName != "" {
+		filter = filter + `docker_event."host_name" like '%` + this.HostName + `%' and `
 	}
 	if this.From != "" {
 		filter = filter + `docker_event."from" like '%` + this.From + `%' and `

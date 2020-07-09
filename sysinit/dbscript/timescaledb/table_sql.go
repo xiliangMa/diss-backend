@@ -23,6 +23,7 @@ var (
 	Tab_Create_DockerEvent = `CREATE TABLE "public"."docker_event" (
 	  "id" varchar(128) COLLATE "pg_catalog"."default" NOT NULL,
 	  "host_id" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "host_name" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "from" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "action" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
