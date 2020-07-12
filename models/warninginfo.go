@@ -22,6 +22,8 @@ type WarningInfo struct {
 	UpdateTime string `orm:"size(128)" description:"(更新时间)"`
 	StartTime  string `orm:"-" description:"(开始时间, 注意时间格式为 local 时间)"`
 	EndTime    string `orm:"-" description:"(结束时间, 注意时间格式为 local 时间)"`
+	Proposal   string `orm:"" description:"(建议)"`
+	Analysis   string `orm:"" description:"(关联分析)"`
 }
 
 type WarningInfoInterface interface {
@@ -99,7 +101,7 @@ func (this *WarningInfo) List(from, limit int) Result {
 }
 
 func (this *WarningInfo) Add() Result {
-	insetSql := `INSERT INTO ` + utils.WarningInfo + ` VALUES(?, ?, ?, ?, ?, ?, ?, ?)`
+	insetSql := `INSERT INTO ` + utils.WarningInfo + ` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
@@ -112,7 +114,9 @@ func (this *WarningInfo) Add() Result {
 		this.Level,
 		this.Status,
 		this.CreateTime,
-		this.UpdateTime).Exec()
+		this.UpdateTime,
+		this.Proposal,
+		this.Analysis).Exec()
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
