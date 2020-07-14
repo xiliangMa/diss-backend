@@ -154,8 +154,8 @@ func (this *Pod) Delete() Result {
 
 	if err != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.DeleteNameSpaceErr
-		logs.Error("Delete NameSpace failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.DeletePodErr
+		logs.Error("Delete Pod failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK

@@ -117,6 +117,10 @@ var (
 	ClusterNoExistErr                = 1011
 	ClusterNotActiveOrNotvailableErr = 1012
 	ClusterIsSyncingOrIsClearingErr  = 1013
+	GetDeploymentErr                 = 1014
+	AddDeploymentErr                 = 1015
+	EditDeploymentErr                = 1016
+	DeleteDeploymentErr              = 1017
 
 	//task job 1100-1200
 	AddTaskErr        = 1100

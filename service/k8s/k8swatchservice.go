@@ -65,6 +65,10 @@ func (this *K8sWatchService) WatchCluster() models.Result {
 		podService := PodService{Cluster: this.Cluster, PodInterface: clientGo.ClientSet.CoreV1().Pods("")}
 		go podService.Wtach()
 
+		// Deployengt
+		deployService := DeploymentService{Cluster: this.Cluster, DeploymentInterface: clientGo.ClientSet.AppsV1().Deployments("")}
+		go deployService.Wtach()
+
 		// Node
 		nodeService := NodeService{Cluster: this.Cluster, NodeInterface: clientGo.ClientSet.CoreV1().Nodes()}
 		go nodeService.Wtach()
