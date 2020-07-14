@@ -128,6 +128,11 @@ func init() {
 				&ck8s.ServiceController{},
 			),
 		),
+		beego.NSNamespace("/v1/k8s/deployment",
+			beego.NSInclude(
+				&ck8s.DeploymentController{},
+			),
+		),
 		beego.NSNamespace("/v1/system",
 			beego.NSInclude(
 				&csystem.SystemController{},
