@@ -177,8 +177,11 @@ func (this *LicenseConfig) Get() Result {
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
+	if this.Type != "" {
+		cond = cond.And("type", this.Type)
+	}
 
-	_, err := o.QueryTable(utils.LicenseConfig).SetCond(cond).RelatedSel().All(&licConfigData)
+	_, err := o.QueryTable(utils.LicenseConfig).SetCond(cond).OrderBy("-ActiveAt").RelatedSel().All(&licConfigData)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetLogConfigErr

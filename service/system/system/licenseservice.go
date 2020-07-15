@@ -3,17 +3,157 @@ package system
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"path"
+	"time"
 )
 
-func License_RSA_Decrypt(licenseByte []byte, isUpdate bool) models.Result {
+type LicenseService struct {
+	LicenseByte []byte
+	IsUpdate    bool
+}
+
+func (this *LicenseService) LicenseActive() models.Result {
+
+	result := models.Result{}
+	result.Code = http.StatusOK
+	licenseObject := new(models.LicenseConfig)
+	licenseService := LicenseService{}
+
+	result = licenseService.licenseRSADecrypt(this.LicenseByte)
+	plainText := result.Data.([]byte)
+	err := json.Unmarshal(plainText, &licenseObject)
+	if err != nil {
+		result.Code = utils.LicenseUnmarshalErr
+		logs.Error("License import fail, Unmarshal license err,  %s", err)
+	}
+
+	licenseObject.ActiveAt = time.Now()
+
+	message := ""
+	if this.IsUpdate {
+		result = licenseObject.Update()
+		message = fmt.Sprintf("Force update license file success, License: %s", string(plainText))
+		logs.Info(message)
+	} else {
+		result = licenseObject.Add()
+		message = fmt.Sprintf("License import success, License：", string(plainText))
+		logs.Info(message)
+	}
+	//添加license 历史
+	liceseHistory := models.LicenseHistory{}
+	liceseHistory.LicenseJson = string(plainText)
+	liceseHistory.Add()
+
+	return result
+}
+
+func (this *LicenseService) CheckLicenseFile(h *multipart.FileHeader) (models.Result, string) {
+	licenseService := LicenseService{}
+	var fpath = licenseService.GetLicenseFilePath()
+	var result models.Result
+	fName := h.Filename
+	ext := path.Ext(fName)
+	stanardLicFilename := models.LicType_StandardLicense + models.LicFile_Extension
+
+	//创建目录
+	licenseService.createLicenseConfigDir(fpath)
+
+	// 后缀名不符合上传要求
+	if code := licenseService.checkLicenseFilePost(ext, fName); code != http.StatusOK {
+		result.Code = code
+		result.Message = "CheckLicenseFilePostErr"
+		return result, fpath
+	}
+
+	// 检查文件是否存在
+	if code := licenseService.checkLicenseFileIsExist(fpath, stanardLicFilename); code != http.StatusOK {
+		result.Code = code
+		result.Message = "CheckLicenseFileIsExistErr"
+		return result, fpath
+	}
+
+	fpath = fpath + stanardLicFilename
+	result.Code = http.StatusOK
+	return result, fpath
+}
+
+func (this *LicenseService) CheckLicenseType() (res models.Result) {
+	licenseService := LicenseService{}
+	var fpath = licenseService.GetLicenseFilePath()
+	var result models.Result
+
+	if licenseService.checkLicenseFileIsExist(fpath, models.LicType_StandardLicense+models.LicFile_Extension) != http.StatusOK {
+		//取正式版授权
+		result.Message = "Standard License"
+		result.Data = models.LicType_StandardLicense
+	} else if licenseService.checkLicenseFileIsExist(fpath, models.LicType_TrialLicense+models.LicFile_Extension) != http.StatusOK {
+		//取测试版授权
+		result.Message = "Trail License"
+		result.Data = models.LicType_TrialLicense
+	} else {
+		//无有效的授权文件
+		result.Message = "No License File Found"
+		result.Code = utils.NoLicenseFileErr
+	}
+	// todo 到授权中心验证授权文件的有效性
+
+	return result
+}
+
+func (this *LicenseService) InitTrialLicense() models.Result {
+	var result models.Result
+	licenseService := LicenseService{}
+	var fpath = licenseService.GetLicenseFilePath()
+	licenseFileType := licenseService.CheckLicenseType()
+	if licenseFileType.Data == utils.NoLicenseFileErr {
+		// 没有发现授权文件
+		return licenseFileType
+	}
+
+	licenseByte, err := ioutil.ReadFile(fpath + models.LicType_TrialLicense + models.LicFile_Extension)
+	if err != nil {
+		result.Code = utils.ImportLicenseFileErr
+		result.Message = err.Error()
+		logs.Error("Read license file fail: %s", err)
+		return result
+	} else {
+		licenseService := LicenseService{}
+		licConfig := new(models.LicenseConfig)
+		licConfig.Type = models.LicType_TrialLicense
+		licData := licConfig.Get()
+		if licData.Code == http.StatusOK {
+			if licData.Data == nil {
+				licenseService.IsUpdate = false
+			} else {
+				licenseService.IsUpdate = true
+			}
+			licenseService.LicenseByte = licenseByte
+			result = licenseService.LicenseActive()
+
+			if result.Code != http.StatusOK {
+				return result
+			}
+		}
+	}
+
+	logs.Info("Import trial license file ok. ")
+	return result
+}
+
+func (this *LicenseService) GetLicenseFilePath() string {
+	return beego.AppConfig.String("license::LicensePath")
+}
+
+func (this *LicenseService) licenseRSADecrypt(licenseByte []byte) models.Result {
 	result := models.Result{}
 	result.Code = http.StatusOK
 
@@ -24,78 +164,11 @@ func License_RSA_Decrypt(licenseByte []byte, isUpdate bool) models.Result {
 	}
 	plainText := utils.RSA_Decrypt(decodeBytes, "conf/private.pem")
 
-	licenseObject := new(models.LicenseConfig)
-	err = json.Unmarshal(plainText, &licenseObject)
-	if err != nil {
-		result.Code = utils.LicenseUnmarshalErr
-		logs.Error("License import fail, Unmarshal license err,  %s", err)
-	} else {
-		if isUpdate {
-			result = licenseObject.Update()
-			//添加license 历史
-			liceseHistory := models.LicenseHistory{}
-			liceseHistory.LicenseJson = string(plainText)
-			liceseHistory.Add()
-			logs.Info("Force update license file success, License: %s", string(plainText))
-		} else {
-			result = licenseObject.Add()
-			//添加license 历史
-			liceseHistory := models.LicenseHistory{}
-			liceseHistory.LicenseJson = string(plainText)
-			liceseHistory.Add()
-			logs.Info("License import success, License：", string(plainText))
-		}
-
-	}
+	result.Data = plainText
 	return result
 }
 
-func CheckLicenseFilePost(ext, fName string) int {
-	var AllowExtMap map[string]bool = map[string]bool{
-		".lic": true,
-	}
-	if _, ok := AllowExtMap[ext]; !ok {
-		return utils.CheckLicenseFilePostErr
-	}
-	return http.StatusOK
-}
-
-func CheckLicenseFileIsExist(fpath, fName string) int {
-	if _, err := os.Stat(fpath + fName); err == nil {
-		return utils.CheckLicenseFileIsExistErr
-	}
-	return http.StatusOK
-}
-
-func CheckLicenseFile(h *multipart.FileHeader) (models.Result, string) {
-	var fpath = getLicenseFilePath()
-	var result models.Result
-	fName := h.Filename
-	ext := path.Ext(fName)
-
-	//创建目录
-	CreateLicenseConfigDir(fpath)
-
-	// 后缀名不符合上传要求
-	if code := CheckLicenseFilePost(ext, fName); code != http.StatusOK {
-		result.Code = code
-		result.Message = "CheckLicenseFilePostErr"
-		return result, fpath
-	}
-
-	// 检查文件是否存在
-	if code := CheckLicenseFileIsExist(fpath, fName); code != http.StatusOK {
-		result.Code = code
-		result.Message = "CheckLicenseFileIsExistErr"
-		return result, fpath
-	}
-
-	fpath = fpath + h.Filename
-	result.Code = http.StatusOK
-	return result, fpath
-}
-
-func CreateLicenseConfigDir(fpath string) {
+func (this *LicenseService) createLicenseConfigDir(fpath string) {
 	_, err := os.Stat(fpath)
 	if os.IsNotExist(err) {
 		logs.Info("Create License Dir success, path: %s", fpath)
@@ -103,6 +176,19 @@ func CreateLicenseConfigDir(fpath string) {
 	}
 }
 
-func getLicenseFilePath() string {
-	return beego.AppConfig.String("license::LicensePath")
+func (this *LicenseService) checkLicenseFileIsExist(fpath, fName string) int {
+	if _, err := os.Stat(fpath + fName); err == nil {
+		return utils.CheckLicenseFileIsExistErr
+	}
+	return http.StatusOK
+}
+
+func (this *LicenseService) checkLicenseFilePost(ext, fName string) int {
+	var AllowExtMap map[string]bool = map[string]bool{
+		models.LicFile_Extension: true,
+	}
+	if _, ok := AllowExtMap[ext]; !ok {
+		return utils.CheckLicenseFilePostErr
+	}
+	return http.StatusOK
 }

@@ -2,14 +2,19 @@ package system
 
 import (
 	"encoding/json"
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
-	css "github.com/xiliangMa/diss-backend/service/system/system"
+	sssystem "github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
 	"io/ioutil"
 	"net/http"
 	"os"
 )
+
+type LicenseController struct {
+	beego.Controller
+}
 
 // @Title Import License File
 // @Description ImportLicense
@@ -18,12 +23,13 @@ import (
 // @Param isForce formData bool false true "force"
 // @Success 200 {object} models.Result
 // @router /system/license/import [post]
-func (this *IntegrationController) AddLicenseFile() {
-	// to do 生成功能需要移动到许可证管理系统
+func (this *LicenseController) AddLicenseFile() {
 	key := "licenseFile"
 	isForce, _ := this.GetBool("isForce", true)
 	f, h, _ := this.GetFile(key)
-	result, fpath := css.CheckLicenseFile(h)
+
+	licenseService := sssystem.LicenseService{}
+	result, fpath := licenseService.CheckLicenseFile(h)
 	licenseByte := []byte{}
 
 	defer f.Close()
@@ -48,7 +54,9 @@ func (this *IntegrationController) AddLicenseFile() {
 			result.Message = err.Error()
 			logs.Error("Read license file fail: %s", err)
 		} else {
-			result = css.License_RSA_Decrypt(licenseByte, true)
+			licenseService.LicenseByte = licenseByte
+			licenseService.IsUpdate = true
+			result = licenseService.LicenseActive()
 		}
 	} else {
 		if result.Code == http.StatusOK {
@@ -65,7 +73,9 @@ func (this *IntegrationController) AddLicenseFile() {
 					result.Message = err.Error()
 					logs.Error("Read license file fail: %s", err)
 				} else {
-					result = css.License_RSA_Decrypt(licenseByte, false)
+					licenseService.LicenseByte = licenseByte
+					licenseService.IsUpdate = false
+					result = licenseService.LicenseActive()
 				}
 			}
 		}
@@ -81,13 +91,22 @@ func (this *IntegrationController) AddLicenseFile() {
 // @Param id query string false "id"
 // @Success 200 {object} models.Result
 // @router /system/license [get]
-func (this *IntegrationController) GetLicense() {
+func (this *LicenseController) GetLicense() {
 	licConfig := new(models.LicenseConfig)
 	configId := this.GetString("id")
 	licConfig.Id = configId
 	json.Unmarshal(this.Ctx.Input.RequestBody, &licConfig)
 
-	this.Data["json"] = licConfig.Get()
+	licenseService := sssystem.LicenseService{}
+	result := licenseService.CheckLicenseType()
+
+	if result.Code != utils.NoLicenseFileErr {
+		licConfig.Type = result.Data.(string)
+		licData := licConfig.Get()
+		result.Data = licData.Data
+	}
+
+	this.Data["json"] = result
 	this.ServeJSON(false)
 }
 
@@ -98,7 +117,7 @@ func (this *IntegrationController) GetLicense() {
 // @Param limit query int 50 false "limit"
 // @Success 200 {object} models.Result
 // @router /system/licensehistory [get]
-func (this *IntegrationController) GetLicenseHistory() {
+func (this *LicenseController) GetLicenseHistory() {
 	licHistory := new(models.LicenseHistory)
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")

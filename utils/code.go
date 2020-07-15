@@ -151,6 +151,8 @@ var (
 	CreateClientByBearerTokenErr    = 1220
 	ClusterNotAvailableOrNoHostErr  = 1221
 	CreateK8sClientErr              = 1222
+	GetLicenseFileErr               = 1223
+	NoLicenseFileErr                = 1224
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300

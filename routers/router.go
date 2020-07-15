@@ -132,6 +132,7 @@ func init() {
 			beego.NSInclude(
 				&csystem.SystemController{},
 				&csystem.IntegrationController{},
+				&csystem.LicenseController{},
 				&csystem.FeedsController{},
 			),
 		),

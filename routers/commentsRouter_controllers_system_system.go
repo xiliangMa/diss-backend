@@ -18,33 +18,6 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"],
 		beego.ControllerComments{
-			Method:           "GetLicense",
-			Router:           `/system/license`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams:     param.Make(),
-			Filters:          nil,
-			Params:           nil})
-
-	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"],
-		beego.ControllerComments{
-			Method:           "AddLicenseFile",
-			Router:           `/system/license/import`,
-			AllowHTTPMethods: []string{"post"},
-			MethodParams:     param.Make(),
-			Filters:          nil,
-			Params:           nil})
-
-	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"],
-		beego.ControllerComments{
-			Method:           "GetLicenseHistory",
-			Router:           `/system/licensehistory`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams:     param.Make(),
-			Filters:          nil,
-			Params:           nil})
-
-	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:IntegrationController"],
-		beego.ControllerComments{
 			Method:           "AddLogConfig",
 			Router:           `/system/logconfig`,
 			AllowHTTPMethods: []string{"post"},
@@ -65,6 +38,33 @@ func init() {
 		beego.ControllerComments{
 			Method:           "GetLogConfig",
 			Router:           `/system/logconfig`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"],
+		beego.ControllerComments{
+			Method:           "GetLicense",
+			Router:           `/system/license`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"],
+		beego.ControllerComments{
+			Method:           "AddLicenseFile",
+			Router:           `/system/license/import`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"],
+		beego.ControllerComments{
+			Method:           "GetLicenseHistory",
+			Router:           `/system/licensehistory`,
 			AllowHTTPMethods: []string{"get"},
 			MethodParams:     param.Make(),
 			Filters:          nil,

@@ -149,5 +149,11 @@ var (
 	SysLog_IDSLog            = "IntrudeDetectLog"  // 入侵检测日志
 	SysLog_SecAuditLog       = "SecurityAuditLog"  // 安全审计日志
 
+	// license type
+	LicType_TrialLicense    = "TrialLicense"
+	LicType_StandardLicense = "StandardLicense"
+
+	LicFile_Extension = ".lic"
+
 	Null_Time = "0001-01-01 00:00:00 +0000 UTC"
 )
