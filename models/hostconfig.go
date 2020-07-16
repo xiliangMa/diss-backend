@@ -188,7 +188,12 @@ func (this *HostConfig) UpdateDynamic() Result {
 func (this *HostConfig) Count() int64 {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	count, _ := o.QueryTable(utils.HostConfig).Count()
+
+	cond := orm.NewCondition()
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	count, _ := o.QueryTable(utils.HostConfig).SetCond(cond).Count()
 	return count
 }
 

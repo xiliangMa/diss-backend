@@ -18,25 +18,27 @@ type WSDeliverService struct {
 func (this *WSDeliverService) DeliverTaskToNats() {
 	logs.Info("################ Deliver Task <<<start>>> ################")
 	for _, task := range this.CurrentBatchTaskList {
-		result := models.WsData{Type: models.Type_Control, Tag: models.Resource_Task, Data: task, RCType: models.Resource_Control_Type_Post}
-		data, _ := json.Marshal(result)
-		subject := ""
-		if task.Host != nil {
-			subject = task.Host.Id
+		hostCount := task.Host.Count()
+		if hostCount > 0 {
+			result := models.WsData{Type: models.Type_Control, Tag: models.Resource_Task, Data: task, RCType: models.Resource_Control_Type_Post}
+			data, _ := json.Marshal(result)
+			subject := ""
+			if task.Host != nil {
+				subject = task.Host.Id
+			}
+			if task.Container != nil {
+				subject = task.Container.HostName
+			}
+			err := models.Nats.Conn.Publish(subject, data)
+			if err == nil {
+				logs.Info("Deliver Task to Nats Success, Subject: %s Id: %s, data: %v", subject, task.Id, result)
+			} else {
+				//更新 task 状态
+				task.Status = models.Task_Status_Deliver_Failed
+				task.Update()
+				logs.Error("Deliver Task to Nats Fail,  Subject: %s Id: %s, err: %s", subject, task.Id, err.Error())
+			}
 		}
-		if task.Container != nil {
-			subject = task.Container.HostName
-		}
-		err := models.Nats.Conn.Publish(subject, data)
-		if err == nil {
-			logs.Info("Deliver Task to Nats Success, Subject: %s Id: %s, data: %v", subject, task.Id, result)
-		} else {
-			//更新 task 状态
-			task.Status = models.Task_Status_Deliver_Failed
-			task.Update()
-			logs.Error("Deliver Task to Nats Fail,  Subject: %s Id: %s, err: %s", subject, task.Id, err.Error())
-		}
-
 	}
 	logs.Info("################ Deliver Task <<<end>>> ################")
 }
