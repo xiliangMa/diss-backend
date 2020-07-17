@@ -96,9 +96,9 @@ func (this *IntrudeDetectLog) List(from, limit int) Result {
 	var total int64
 	if this.TargeType == IDLT_Docker {
 		containerId = string([]byte(this.ContainerId)[:12])
-		total, err = o.Raw("select * from docker_ids where container_id = ? and created_at > ? and created_at < ? limit ? OFFSET ?", containerId, st.Unix(), tt.Unix(), limit, from).QueryRows(&dcokerIdsList)
+		total, err = o.Raw("select * from docker_ids where container_id = ? and created_at > ? and created_at < ? order by created_at desc limit ? OFFSET ?", containerId, st.Unix(), tt.Unix(), limit, from).QueryRows(&dcokerIdsList)
 	} else {
-		total, err = o.Raw("select * from docker_ids where host_id = ? and container_id = ? and created_at > ? and created_at < ? limit ? OFFSET ?", this.HostId, containerId, st.Unix(), tt.Unix(), limit, from).QueryRows(&dcokerIdsList)
+		total, err = o.Raw("select * from docker_ids where host_id = ? and container_id = ? and created_at > ? and created_at < ? order by created_at desc limit ? OFFSET ?", this.HostId, containerId, st.Unix(), tt.Unix(), limit, from).QueryRows(&dcokerIdsList)
 	}
 
 	if err != nil {
