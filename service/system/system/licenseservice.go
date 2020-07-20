@@ -114,7 +114,7 @@ func (this *LicenseService) InitTrialLicense() models.Result {
 	licenseService := LicenseService{}
 	var fpath = licenseService.GetLicenseFilePath()
 	licenseFileType := licenseService.CheckLicenseType()
-	if licenseFileType.Data == utils.NoLicenseFileErr {
+	if licenseFileType.Code == utils.NoLicenseFileErr {
 		// 没有发现授权文件
 		return licenseFileType
 	}
