@@ -25,7 +25,7 @@ func (this *SVCService) Wtach() {
 		panic(err)
 	}
 	// 开启 watch 事件
-Done:
+Retry:
 	for {
 		select {
 		case event, ok := <-serviceWatch.ResultChan():
@@ -79,7 +79,7 @@ Done:
 			} else {
 				// 如果 watch 异常退回重新 watch
 				logs.Error("serviceWatch chan has been close!!!!")
-				break Done
+				break Retry
 			}
 		}
 	}
