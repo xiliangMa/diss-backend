@@ -13,6 +13,7 @@ import (
 type PodService struct {
 	PodInterface corev1.PodInterface
 	Cluster      *models.Cluster
+	Close        chan bool
 }
 
 func (this *PodService) List() (*v1.PodList, error) {
@@ -28,6 +29,9 @@ func (this *PodService) Wtach() {
 Retry:
 	for {
 		select {
+		case <-this.Close:
+			logs.Info("Close podWatch, cluster: %s", this.Cluster.Name)
+			return
 		case event, ok := <-podWatch.ResultChan():
 			if event.Object != nil || ok {
 				object := event.Object.(*v1.Pod)

@@ -16,6 +16,7 @@ import (
 type NodeService struct {
 	NodeInterface corev1.NodeInterface
 	Cluster       *models.Cluster
+	Close         chan bool
 }
 
 func (this *NodeService) List() (*v1.NodeList, error) {
@@ -31,6 +32,9 @@ func (this *NodeService) Wtach() {
 Retry:
 	for {
 		select {
+		case <-this.Close:
+			logs.Info("Close nodeWatch, cluster: %s", this.Cluster.Name)
+			return
 		case event, ok := <-nodeWatch.ResultChan():
 			if event.Object != nil || ok {
 				object := event.Object.(*v1.Node)

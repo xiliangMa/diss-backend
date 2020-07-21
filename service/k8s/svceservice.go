@@ -13,6 +13,7 @@ import (
 type SVCService struct {
 	ServiceInterface corev1.ServiceInterface
 	Cluster          *models.Cluster
+	Close            chan bool
 }
 
 func (this *SVCService) List() (*v1.ServiceList, error) {
@@ -28,6 +29,9 @@ func (this *SVCService) Wtach() {
 Retry:
 	for {
 		select {
+		case <-this.Close:
+			logs.Info("Close serviceWatch, cluster: %s", this.Cluster.Name)
+			return
 		case event, ok := <-serviceWatch.ResultChan():
 			if event.Object != nil || ok {
 				object := event.Object.(*v1.Service)

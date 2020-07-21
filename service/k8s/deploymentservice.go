@@ -13,6 +13,7 @@ import (
 type DeploymentService struct {
 	DeploymentInterface appsv1.DeploymentInterface
 	Cluster             *models.Cluster
+	Close               chan bool
 }
 
 func (this *DeploymentService) List() (*v1.DeploymentList, error) {
@@ -28,6 +29,9 @@ func (this *DeploymentService) Wtach() {
 Done:
 	for {
 		select {
+		case <-this.Close:
+			logs.Info("Close deploymentWatch, cluster: %s", this.Cluster.Name)
+			return
 		case event, ok := <-deployWatch.ResultChan():
 			if event.Object != nil || ok {
 				object := event.Object.(*v1.Deployment)
@@ -65,7 +69,7 @@ Done:
 				}
 			} else {
 				// 如果 watch 异常退回重新 watch
-				logs.Error("namespacesWatch chan has been close!!!!")
+				logs.Error("deploymentWatch chan has been close!!!!")
 				break Done
 			}
 		}

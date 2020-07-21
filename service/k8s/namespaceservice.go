@@ -13,6 +13,7 @@ import (
 type NameSpaceService struct {
 	NameSpaceInterface corev1.NamespaceInterface
 	Cluster            *models.Cluster
+	Close              chan bool
 }
 
 func (this *NameSpaceService) List() (*v1.NamespaceList, error) {
@@ -28,6 +29,9 @@ func (this *NameSpaceService) Wtach() {
 Retry:
 	for {
 		select {
+		case <-this.Close:
+			logs.Info("Close namespaceWatch, cluster: %s", this.Cluster.Name)
+			return
 		case event, ok := <-nswatch.ResultChan():
 			if event.Object != nil || ok {
 				object := event.Object.(*v1.Namespace)
@@ -66,7 +70,7 @@ Retry:
 				}
 			} else {
 				// 如果 watch 异常退回重新 watch
-				logs.Error("namespacesWatch chan has been close!!!!")
+				logs.Error("namespaceWatch chan has been close!!!!")
 				break Retry
 			}
 		}

@@ -25,10 +25,6 @@ func init() {
 	//k8STaskHandler := task.K8sTaskHandler{}
 	//k8STaskHandler.SyncAll()
 
-	// watch all cluster
-	k8sWatchService := k8s.K8sWatchService{}
-	k8sWatchService.WatchAll()
-
 	// init task
 	InitTask()
 
@@ -49,4 +45,10 @@ func init() {
 	models.WSHub = models.NewHub()
 	go models.WSHub.Run()
 
+	// 3. GRManager
+	models.GRM = models.NewGoRoutineManager()
+
+	// watch all cluster
+	k8sWatchService := k8s.K8sWatchService{}
+	k8sWatchService.WatchAll()
 }

@@ -137,7 +137,7 @@ func (this *Service) Delete() Result {
 		cond = cond.And("cluster_name", this.ClusterName)
 	}
 	if this.ClusterId != "" {
-		cond = cond.And("id", this.ClusterId)
+		cond = cond.And("cluster_id", this.ClusterId)
 	}
 	_, err := o.QueryTable(utils.Service).SetCond(cond).Delete()
 
