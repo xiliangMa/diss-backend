@@ -41,6 +41,12 @@ func (this *K8sClearService) ClearAll() {
 			// 清除pod
 			this.ClearPod(cluster)
 
+			// 清除service
+			this.ClearService(cluster)
+
+			// 清除deployment
+			this.ClearDeployment(cluster)
+
 			// 清除ns
 			this.ClearNs(cluster)
 
@@ -99,6 +105,24 @@ func (this *K8sClearService) ClearNs(cluster *models.Cluster) {
 	ns := models.NameSpace{}
 	ns.ClusterId = cluster.Id
 	ns.Delete()
+}
+
+func (this *K8sClearService) ClearDeployment(cluster *models.Cluster) {
+	msg := fmt.Sprintf("Clear Deployment, Cluster: %s ", cluster.Name)
+	logs.Info(msg)
+
+	deploy := models.Deployment{}
+	deploy.ClusterName = cluster.Name
+	deploy.Delete()
+}
+
+func (this *K8sClearService) ClearService(cluster *models.Cluster) {
+	msg := fmt.Sprintf("Clear Service, Cluster: %s ", cluster.Name)
+	logs.Info(msg)
+
+	svc := models.Service{}
+	svc.ClusterId = cluster.Id
+	svc.Delete()
 }
 
 func (this *K8sClearService) ClearPod(cluster *models.Cluster) {

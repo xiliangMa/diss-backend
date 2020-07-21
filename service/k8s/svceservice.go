@@ -34,6 +34,7 @@ Retry:
 				id := string(object.UID)
 				name := object.Name
 				clusterName := this.Cluster.Name
+				clusterId := this.Cluster.Id
 
 				KMetaData, _ := json.Marshal(object.ObjectMeta)
 				KSpec, _ := json.Marshal(object.Spec)
@@ -43,6 +44,7 @@ Retry:
 				service.Id = id
 				service.Name = name
 				service.ClusterName = clusterName
+				service.ClusterId = clusterId
 				service.KMetaData = string(KMetaData)
 				service.KSpec = string(KSpec)
 				service.KStatus = string(KStatus)
