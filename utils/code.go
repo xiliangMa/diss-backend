@@ -178,6 +178,7 @@ var (
 	GetImagePackageVulnerabilitiesListErr = 1405
 	GetFeedListErr                        = 1406
 	NotFoundUserAccessCredentialsErr      = 1407
+	GetImagePackageVulnerabilityInfoErr   = 1408
 
 	// config_timedata 1500-1599
 	ConnectSyslogErr     = 1500
