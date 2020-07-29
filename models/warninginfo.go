@@ -14,8 +14,10 @@ import (
 type WarningInfo struct {
 	Id         string `orm:"pk;size(128)" description:"(Id)"`
 	Name       string `orm:"size(256)" description:"(告警名称)"`
+	HostId     string `orm:"size(256)" description:"(主机Id agent采集数据)"`
 	HostName   string `orm:"size(256)" description:"(主机Name agent采集数据)"`
-	Type       string `orm:"size(32)" description:"(类型)"`
+	Type       string `orm:"size(32)" description:"(类型 如：基线检测、病毒检查、入侵检测、镜像安全等)"`
+	Info       string `orm:"" description:"(告警详情，json，请自定义内部结构)"`
 	Level      string `orm:"size(32)" description:"(告警级别)"`
 	Status     string `orm:"size(32)" description:"(状态)"`
 	CreateTime string `orm:"size(128)" description:"(发生时间)"`
@@ -101,12 +103,12 @@ func (this *WarningInfo) List(from, limit int) Result {
 }
 
 func (this *WarningInfo) Add() Result {
-	insetSql := `INSERT INTO ` + utils.WarningInfo + ` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	insertSql := `INSERT INTO ` + utils.WarningInfo + ` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
 
-	_, err := o.Raw(insetSql,
+	_, err := o.Raw(insertSql,
 		this.Id,
 		this.Name,
 		this.HostName,
@@ -116,7 +118,9 @@ func (this *WarningInfo) Add() Result {
 		this.CreateTime,
 		this.UpdateTime,
 		this.Proposal,
-		this.Analysis).Exec()
+		this.Analysis,
+		this.Info,
+		this.HostId).Exec()
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()

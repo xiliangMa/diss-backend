@@ -380,6 +380,19 @@ func (this *NatsSubService) Save() error {
 			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
+		case models.Resource_WarningInfo:
+			warningInfo := models.WarningInfo{}
+			s, _ := json.Marshal(ms.Data)
+			if err := json.Unmarshal(s, &warningInfo); err != nil {
+				logs.Error("Parse %s error %s", ms.Tag, err)
+				return err
+			}
+			logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", warningInfo.HostId, models.Resource_WarningInfo+"-"+warningInfo.Type)
+			if result := warningInfo.Add(); result.Code != http.StatusOK {
+				return errors.New(result.Message)
+			}
+			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			this.ReceiveData(metricsResult)
 		}
 	case models.Type_Control:
 		switch ms.Tag {
