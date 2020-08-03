@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/utils"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
@@ -85,7 +86,19 @@ Retry:
 				}
 			} else {
 				// 如果 watch 异常退回重新 watch
-				logs.Error("podWatch chan has been close!!!!")
+				logs.Warn("podWatch chan has been close!!!!")
+
+				watchType := this.Cluster.Id + `_` + utils.Pod
+				delete(models.GRM.GoRoutineMap, watchType)
+				logs.Info("Remove podWatch from global GRM object.")
+
+				k8sWatchService := K8sWatchService{Cluster: this.Cluster}
+				clientGo := k8sWatchService.CreateK8sClient()
+				podService := PodService{Cluster: this.Cluster, PodInterface: clientGo.ClientSet.CoreV1().Pods(""), Close: make(chan bool)}
+				models.GRM.GoRoutineMap[watchType] = podService
+
+				logs.Info("Retry pod watch.")
+				podService.Wtach()
 				break Retry
 			}
 		}

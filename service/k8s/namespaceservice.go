@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/utils"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
@@ -31,6 +32,7 @@ Retry:
 		select {
 		case <-this.Close:
 			logs.Info("Close namespaceWatch, cluster: %s", this.Cluster.Name)
+			nswatch.Stop()
 			return
 		case event, ok := <-nswatch.ResultChan():
 			if event.Object != nil || ok {
@@ -70,7 +72,19 @@ Retry:
 				}
 			} else {
 				// 如果 watch 异常退回重新 watch
-				logs.Error("namespaceWatch chan has been close!!!!")
+				logs.Warn("namespaceWatch chan has been close!!!!")
+
+				watchType := this.Cluster.Id + `_` + utils.NameSpace
+				delete(models.GRM.GoRoutineMap, watchType)
+				logs.Info("Remove namespaceWatch from global GRM object.")
+
+				k8sWatchService := K8sWatchService{Cluster: this.Cluster}
+				clientGo := k8sWatchService.CreateK8sClient()
+				nameSpaceService := NameSpaceService{Cluster: this.Cluster, NameSpaceInterface: clientGo.ClientSet.CoreV1().Namespaces(), Close: make(chan bool)}
+				models.GRM.GoRoutineMap[watchType] = nameSpaceService
+
+				logs.Info("Retry nameSpace watch.")
+				go nameSpaceService.Wtach()
 				break Retry
 			}
 		}

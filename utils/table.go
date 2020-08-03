@@ -27,7 +27,7 @@ var (
 	LicenseModule    = "license_module"
 	LicenseHistory   = "license_history"
 	Service          = "service"
-	Deployment       = "Deployment"
+	Deployment       = "deployment"
 
 	//security_log timescaledb
 	DcokerIds   = "docker_ids"

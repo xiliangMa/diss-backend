@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/utils"
 	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
@@ -26,11 +27,12 @@ func (this *DeploymentService) Wtach() {
 		panic(err)
 	}
 	// 开启 watch 事件
-Done:
+Retry:
 	for {
 		select {
 		case <-this.Close:
 			logs.Info("Close deploymentWatch, cluster: %s", this.Cluster.Name)
+			deployWatch.Stop()
 			return
 		case event, ok := <-deployWatch.ResultChan():
 			if event.Object != nil || ok {
@@ -69,8 +71,20 @@ Done:
 				}
 			} else {
 				// 如果 watch 异常退回重新 watch
-				logs.Error("deploymentWatch chan has been close!!!!")
-				break Done
+				logs.Warn("deploymentWatch chan has been close!!!!")
+
+				watchType := this.Cluster.Id + `_` + utils.Deployment
+				delete(models.GRM.GoRoutineMap, watchType)
+				logs.Info("Remove deploymentWatch from global GRM object.")
+
+				k8sWatchService := K8sWatchService{Cluster: this.Cluster}
+				clientGo := k8sWatchService.CreateK8sClient()
+				deployService := DeploymentService{Cluster: this.Cluster, DeploymentInterface: clientGo.ClientSet.AppsV1().Deployments(""), Close: make(chan bool)}
+				models.GRM.GoRoutineMap[watchType] = deployService
+
+				logs.Info("Retry deployment watch.")
+				go deployService.Wtach()
+				break Retry
 			}
 		}
 	}

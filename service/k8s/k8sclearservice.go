@@ -114,6 +114,7 @@ func (this *K8sClearService) ClearNs() {
 
 func (this *K8sClearService) ClearDeployment() {
 	watchType := this.CurrentCluster.Id + `_` + utils.Deployment
+
 	if models.GRM != nil && models.GRM.GoRoutineMap != nil && models.GRM.GoRoutineMap[watchType] != nil {
 		models.GRM.GoRoutineMap[watchType].(DeploymentService).Close <- true
 	}
@@ -127,6 +128,7 @@ func (this *K8sClearService) ClearDeployment() {
 
 func (this *K8sClearService) ClearService() {
 	watchType := this.CurrentCluster.Id + `_` + utils.Service
+
 	if models.GRM != nil && models.GRM.GoRoutineMap != nil && models.GRM.GoRoutineMap[watchType] != nil {
 		models.GRM.GoRoutineMap[watchType].(SVCService).Close <- true
 	}
@@ -140,9 +142,11 @@ func (this *K8sClearService) ClearService() {
 
 func (this *K8sClearService) ClearPod() {
 	watchType := this.CurrentCluster.Id + `_` + utils.Pod
+
 	if models.GRM != nil && models.GRM.GoRoutineMap != nil && models.GRM.GoRoutineMap[watchType] != nil {
 		models.GRM.GoRoutineMap[watchType].(PodService).Close <- true
 	}
+
 	msg := fmt.Sprintf("Clear Pod, Cluster: %s ", this.CurrentCluster.Name)
 	logs.Info(msg)
 
@@ -166,6 +170,7 @@ func (this *K8sClearService) ClearContainer() {
 
 func (this *K8sClearService) ClearNode() {
 	watchType := this.CurrentCluster.Id + `_` + utils.Host
+
 	if models.GRM != nil && models.GRM.GoRoutineMap != nil && models.GRM.GoRoutineMap[watchType] != nil {
 		models.GRM.GoRoutineMap[watchType].(NodeService).Close <- true
 	}
