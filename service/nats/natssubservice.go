@@ -381,18 +381,41 @@ func (this *NatsSubService) Save() error {
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_WarningInfo:
-			warningInfo := models.WarningInfo{}
-			s, _ := json.Marshal(ms.Data)
-			if err := json.Unmarshal(s, &warningInfo); err != nil {
-				logs.Error("Parse %s error %s", ms.Tag, err)
-				return err
+			sysConfig := models.SysConfig{}
+			sysConfig.Key = models.Resource_WarningInfo
+			warningInfoConfig := sysConfig.Get()
+
+			if warningInfoConfig != nil {
+				// WarningInfo 配置项开启时执行数据的上报
+				if warningInfoConfig.Value != "" {
+					sysConfigJson := map[string]bool{}
+					err := json.Unmarshal([]byte(warningInfoConfig.Value), &sysConfigJson)
+					if err != nil {
+						logs.Error("Parse %s Config error %s", models.Resource_WarningInfo, err)
+						return err
+					}
+					if sysConfigJson[models.Enable] == true {
+						warningInfo := models.WarningInfo{}
+						s, _ := json.Marshal(ms.Data)
+						if err := json.Unmarshal(s, &warningInfo); err != nil {
+							logs.Error("Parse %s error %s", ms.Tag, err)
+							return err
+						}
+						logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", warningInfo.HostId, models.Resource_WarningInfo+"-"+warningInfo.Type)
+						if result := warningInfo.Add(); result.Code != http.StatusOK {
+							return errors.New(result.Message)
+						}
+						metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+						this.ReceiveData(metricsResult)
+					}
+				}
+			} else {
+				// 建立配置项，并设置默认值 Enable: false
+				warninginfoConfig := map[string]bool{models.Enable: false}
+				warninginfoConfigJson, _ := json.Marshal(warninginfoConfig)
+				sysConfig.Value = string(warninginfoConfigJson)
+				sysConfig.Add()
 			}
-			logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", warningInfo.HostId, models.Resource_WarningInfo+"-"+warningInfo.Type)
-			if result := warningInfo.Add(); result.Code != http.StatusOK {
-				return errors.New(result.Message)
-			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
-			this.ReceiveData(metricsResult)
 		}
 	case models.Type_Control:
 		switch ms.Tag {
