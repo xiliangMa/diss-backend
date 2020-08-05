@@ -28,6 +28,7 @@ var (
 	LicenseHistory   = "license_history"
 	Service          = "service"
 	Deployment       = "deployment"
+	NetworkPolicy    = "network_policy"
 
 	//security_log timescaledb
 	DcokerIds   = "docker_ids"

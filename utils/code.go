@@ -121,6 +121,10 @@ var (
 	AddDeploymentErr                 = 1015
 	EditDeploymentErr                = 1016
 	DeleteDeploymentErr              = 1017
+	GetNetworkPolicyErr              = 1018
+	AddNetworkPolicyErr              = 1019
+	EditNetworkPolicyErr             = 1020
+	DeleteNetworkPolicyErr           = 1021
 
 	//task job 1100-1200
 	AddTaskErr        = 1100

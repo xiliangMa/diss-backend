@@ -133,6 +133,11 @@ func init() {
 				&ck8s.DeploymentController{},
 			),
 		),
+		beego.NSNamespace("/v1/k8s/networkpolicy",
+			beego.NSInclude(
+				&ck8s.NetworkPolicyController{},
+			),
+		),
 		beego.NSNamespace("/v1/system",
 			beego.NSInclude(
 				&csystem.SystemController{},

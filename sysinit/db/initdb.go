@@ -79,7 +79,8 @@ func (this *DefaultDB) InitDB() {
 
 func (this *DefaultDB) registerModel() {
 	// k8s
-	orm.RegisterModel(new(models.Cluster), new(models.NameSpace), new(models.Pod), new(models.Service), new(models.Deployment))
+	orm.RegisterModel(new(models.Cluster), new(models.NameSpace), new(models.Pod), new(models.Service),
+		new(models.Deployment), new(models.NetworkPolicy))
 	// securitylog
 	orm.RegisterModel(new(models.BenchMarkLog))
 	// task
