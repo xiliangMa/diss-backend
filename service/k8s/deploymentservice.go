@@ -71,18 +71,18 @@ Retry:
 				}
 			} else {
 				// 如果 watch 异常退回重新 watch
-				logs.Warn("deploymentWatch chan has been close!!!!")
+				logs.Warn("deploymentWatch chan has been close!!!!, cluster: %s", this.Cluster.Name)
 
 				watchType := this.Cluster.Id + `_` + utils.Deployment
 				delete(models.GRM.GoRoutineMap, watchType)
-				logs.Info("Remove deploymentWatch from global GRM object.")
+				logs.Info("Remove deploymentWatch from global GRM object, cluster: %s", this.Cluster.Name)
 
 				k8sWatchService := K8sWatchService{Cluster: this.Cluster}
 				clientGo := k8sWatchService.CreateK8sClient()
 				deployService := DeploymentService{Cluster: this.Cluster, DeploymentInterface: clientGo.ClientSet.AppsV1().Deployments(""), Close: make(chan bool)}
 				models.GRM.GoRoutineMap[watchType] = deployService
 
-				logs.Info("Retry deployment watch.")
+				logs.Info("Retry deployment watch, cluster: %s", this.Cluster.Name)
 				go deployService.Wtach()
 				break Retry
 			}
