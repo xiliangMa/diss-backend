@@ -54,6 +54,9 @@ func (this *K8sClearService) ClearAll() {
 			// 清除node
 			this.ClearNode()
 
+			// 清除networkpolicy
+			this.ClearNetworkPolicy()
+
 			// 清除集群
 			if this.DropCluster {
 				this.ClearCluster()
@@ -110,6 +113,20 @@ func (this *K8sClearService) ClearNs() {
 	ns := models.NameSpace{}
 	ns.ClusterId = this.CurrentCluster.Id
 	ns.Delete()
+}
+
+func (this *K8sClearService) ClearNetworkPolicy() {
+	watchType := this.CurrentCluster.Id + `_` + utils.NetworkPolicy
+
+	if models.GRM != nil && models.GRM.GoRoutineMap != nil && models.GRM.GoRoutineMap[watchType] != nil {
+		models.GRM.GoRoutineMap[watchType].(NetworkPolicyService).Close <- true
+	}
+	msg := fmt.Sprintf("Clear NetworkPolicy, Cluster: %s ", this.CurrentCluster.Name)
+	logs.Info(msg)
+
+	netpol := models.NetworkPolicy{}
+	netpol.ClusterName = this.CurrentCluster.Name
+	netpol.Delete()
 }
 
 func (this *K8sClearService) ClearDeployment() {

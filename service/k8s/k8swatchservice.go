@@ -87,6 +87,12 @@ func (this *K8sWatchService) WatchCluster() models.Result {
 		models.GRM.GoRoutineMap[watchType] = svcService
 		go svcService.Wtach()
 
+		// Service
+		netpolService := NetworkPolicyService{Cluster: this.Cluster, NetworkPolicyInterface: clientGo.ClientSet.NetworkingV1().NetworkPolicies(""), Close: make(chan bool)}
+		watchType = this.Cluster.Id + `_` + utils.NetworkPolicy
+		models.GRM.GoRoutineMap[watchType] = netpolService
+		go netpolService.Wtach()
+
 	} else {
 		resultData.Code = utils.CreateK8sClientErr
 		resultData.Message = clientGo.ErrMessage

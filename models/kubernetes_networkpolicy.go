@@ -3,7 +3,6 @@ package models
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -16,7 +15,6 @@ type NetworkPolicy struct {
 	NameSpaceName string `orm:"size(255);default(null);" description:"(命名空间)"`
 	KMetaData     string `orm:"" description:"(源数据)"`
 	KSpec         string `orm:"" description:"(Spec数据)"`
-	KStatus       string `orm:"" description:"(状态数据)"`
 }
 
 type NetworkPolicyInterface interface {
@@ -31,8 +29,6 @@ func (this *NetworkPolicy) Add() Result {
 	o.Using(utils.DS_Default)
 	var ResultData Result
 	var err error
-	id, _ := uuid.NewV4()
-	this.Id = id.String()
 	_, err = o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
