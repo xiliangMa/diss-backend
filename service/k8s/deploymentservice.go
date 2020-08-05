@@ -46,24 +46,24 @@ Retry:
 				KSpec, _ := json.Marshal(object.Spec)
 				KStatus, _ := json.Marshal(object.Status)
 
-				ns := models.Deployment{}
-				ns.Id = id
-				ns.Name = name
-				ns.AccountName = models.Account_Admin
-				ns.ClusterName = clusterName
-				ns.KMetaData = string(KMetaData)
-				ns.KSpec = string(KSpec)
-				ns.KStatus = string(KStatus)
+				deploy := models.Deployment{}
+				deploy.Id = id
+				deploy.Name = name
+				deploy.AccountName = models.Account_Admin
+				deploy.ClusterName = clusterName
+				deploy.KMetaData = string(KMetaData)
+				deploy.KSpec = string(KSpec)
+				deploy.KStatus = string(KStatus)
 
 				logs.Info("Watch >>> Deployment: %s <<<, >>> Cluster: %s <<<,  >>> NameSpace: %s <<<, >>> EventType: %s <<<", id, clusterId, name, event.Type)
 				switch event.Type {
 				case watch.Added:
-					ns.Add()
+					deploy.Add()
 				case watch.Modified:
-					ns.Delete()
-					ns.Add()
+					deploy.Delete()
+					deploy.Add()
 				case watch.Deleted:
-					ns.Delete()
+					deploy.Delete()
 				case watch.Bookmark:
 					//todo
 				case watch.Error:
@@ -71,18 +71,25 @@ Retry:
 				}
 			} else {
 				// 如果 watch 异常退回重新 watch
-				logs.Warn("deploymentWatch chan has been close!!!!, cluster: %s", this.Cluster.Name)
+				logs.Warn("DeploymentWatch chan has been close!!!!, cluster: %s", this.Cluster.Name)
 
+				// 清除全局 GRM（携程对象）
 				watchType := this.Cluster.Id + `_` + utils.Deployment
 				delete(models.GRM.GoRoutineMap, watchType)
-				logs.Info("Remove deploymentWatch from global GRM object, cluster: %s", this.Cluster.Name)
+				logs.Info("Remove DeploymentWatch from global GRM object, cluster: %s", this.Cluster.Name)
 
+				// 清除数据库数据
+				deploy := models.Deployment{}
+				deploy.ClusterName = this.Cluster.Name
+				deploy.Delete()
+
+				// 重启 watch 携程
 				k8sWatchService := K8sWatchService{Cluster: this.Cluster}
 				clientGo := k8sWatchService.CreateK8sClient()
 				deployService := DeploymentService{Cluster: this.Cluster, DeploymentInterface: clientGo.ClientSet.AppsV1().Deployments(""), Close: make(chan bool)}
 				models.GRM.GoRoutineMap[watchType] = deployService
 
-				logs.Info("Retry deployment watch, cluster: %s", this.Cluster.Name)
+				logs.Info("Retry DeploymentWatch, cluster: %s", this.Cluster.Name)
 				go deployService.Wtach()
 				break Retry
 			}

@@ -86,18 +86,25 @@ Retry:
 				}
 			} else {
 				// 如果 watch 异常退回重新 watch
-				logs.Warn("podWatch chan has been close!!!!, cluster: %s", this.Cluster.Name)
+				logs.Warn("PodWatch chan has been close!!!!, cluster: %s", this.Cluster.Name)
 
+				// 清除全局 GRM（携程对象）
 				watchType := this.Cluster.Id + `_` + utils.Pod
 				delete(models.GRM.GoRoutineMap, watchType)
-				logs.Info("Remove podWatch from global GRM object, cluster: %s", this.Cluster.Name)
+				logs.Info("Remove PodWatch from global GRM object, cluster: %s", this.Cluster.Name)
 
+				// 清除数据库数据
+				pod := models.Pod{}
+				pod.ClusterName = this.Cluster.Name
+				pod.Delete()
+
+				// 重启 watch 携程
 				k8sWatchService := K8sWatchService{Cluster: this.Cluster}
 				clientGo := k8sWatchService.CreateK8sClient()
 				podService := PodService{Cluster: this.Cluster, PodInterface: clientGo.ClientSet.CoreV1().Pods(""), Close: make(chan bool)}
 				models.GRM.GoRoutineMap[watchType] = podService
 
-				logs.Info("Retry pod watch, cluster: %s", this.Cluster.Name)
+				logs.Info("Retry PodWatch, cluster: %s", this.Cluster.Name)
 				podService.Wtach()
 				break Retry
 			}

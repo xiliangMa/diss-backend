@@ -86,18 +86,25 @@ Retry:
 				}
 			} else {
 				// 如果 watch 异常退回重新 watch
-				logs.Warn("serviceWatch chan has been close!!!! cluster: %s", this.Cluster.Name)
+				logs.Warn("ServiceWatch chan has been close!!!! cluster: %s", this.Cluster.Name)
 
+				// 清除全局 GRM（携程对象）
 				watchType := this.Cluster.Id + `_` + utils.Service
 				delete(models.GRM.GoRoutineMap, watchType)
-				logs.Info("Remove serviceWatch from global GRM object, cluster: %s", this.Cluster.Name)
+				logs.Info("Remove ServiceWatch from global GRM object, cluster: %s", this.Cluster.Name)
 
+				// 清除数据库数据
+				svc := models.Service{}
+				svc.ClusterName = this.Cluster.Name
+				svc.Delete()
+
+				// 重启 watch 携程
 				k8sWatchService := K8sWatchService{Cluster: this.Cluster}
 				clientGo := k8sWatchService.CreateK8sClient()
 				svcService := SVCService{Cluster: this.Cluster, ServiceInterface: clientGo.ClientSet.CoreV1().Services(""), Close: make(chan bool)}
 				models.GRM.GoRoutineMap[watchType] = svcService
 
-				logs.Info("Retry service watch, cluster: %s", this.Cluster.Name)
+				logs.Info("Retry ServiceWatch, cluster: %s", this.Cluster.Name)
 				go svcService.Wtach()
 
 				break Retry

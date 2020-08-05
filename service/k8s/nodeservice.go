@@ -118,19 +118,29 @@ Retry:
 				}
 			} else {
 				// 如果 watch 异常退回重新 watch
-				logs.Warn("nodeWatch chan has been close!!!!, cluster: %s", this.Cluster.Name)
+				logs.Warn("NodeWatch chan has been close!!!!, cluster: %s", this.Cluster.Name)
 
+				// 清除全局 GRM（携程对象）
 				watchType := this.Cluster.Id + `_` + utils.Host
 				delete(models.GRM.GoRoutineMap, watchType)
-				logs.Info("Remove nodeWatch from global GRM object, cluster: %s", this.Cluster.Name)
+				logs.Info("Remove NodeWatch from global GRM object, cluster: %s", this.Cluster.Name)
 
+				// 清除数据库数据
+				hc := models.HostConfig{}
+				hc.ClusterName = this.Cluster.Name
+				hc.Delete()
+
+				hi := models.HostInfo{}
+				hi.ClusterName = this.Cluster.Name
+				hi.Delete()
+
+				// 重启 watch 携程
 				k8sWatchService := K8sWatchService{Cluster: this.Cluster}
 				clientGo := k8sWatchService.CreateK8sClient()
-
 				nodeService := NodeService{Cluster: this.Cluster, NodeInterface: clientGo.ClientSet.CoreV1().Nodes(), Close: make(chan bool)}
 				models.GRM.GoRoutineMap[watchType] = nodeService
 
-				logs.Info("Retry node watch, cluster: %s", this.Cluster.Name)
+				logs.Info("Retry NodeWatch, cluster: %s", this.Cluster.Name)
 				go nodeService.Wtach()
 				break Retry
 			}

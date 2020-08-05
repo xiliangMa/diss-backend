@@ -71,16 +71,23 @@ Retry:
 				// 如果 watch 异常退回重新 watch
 				logs.Warn("NetworkPolicyWatch chan has been close!!!!, cluster: %s", this.Cluster.Name)
 
+				// 清除全局 GRM（携程对象）
 				watchType := this.Cluster.Id + `_` + utils.NetworkPolicy
 				delete(models.GRM.GoRoutineMap, watchType)
 				logs.Info("Remove NetworkPolicyWatch from global GRM object, cluster: %s", this.Cluster.Name)
 
+				// 清除数据库数据
+				netpol := models.NetworkPolicy{}
+				netpol.ClusterName = this.Cluster.Name
+				netpol.Delete()
+
+				// 重启 watch 携程
 				k8sWatchService := K8sWatchService{Cluster: this.Cluster}
 				clientGo := k8sWatchService.CreateK8sClient()
 				deployService := NetworkPolicyService{Cluster: this.Cluster, NetworkPolicyInterface: clientGo.ClientSet.NetworkingV1().NetworkPolicies(""), Close: make(chan bool)}
 				models.GRM.GoRoutineMap[watchType] = deployService
 
-				logs.Info("Retry NetworkPolicy watch, cluster: %s", this.Cluster.Name)
+				logs.Info("Retry NetworkPolicyWatch, cluster: %s", this.Cluster.Name)
 				go deployService.Wtach()
 				break Retry
 			}
