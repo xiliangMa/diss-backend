@@ -15,6 +15,7 @@ type NetworkPolicyService struct {
 	NetworkPolicyInterface networkingv1.NetworkPolicyInterface
 	Cluster                *models.Cluster
 	Close                  chan bool
+	NetworkPolicy          *models.NetworkPolicy
 }
 
 func (this *NetworkPolicyService) List() (*v1.NetworkPolicyList, error) {
@@ -93,4 +94,31 @@ Retry:
 			}
 		}
 	}
+}
+
+func (this *NetworkPolicyService) Create() (*v1.NetworkPolicy, error) {
+	netpol := v1.NetworkPolicy{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "test",
+			Namespace: "test",
+		},
+		Spec: v1.NetworkPolicySpec{
+			PodSelector: metav1.LabelSelector{
+				MatchLabels: map[string]string{"app": "nginx"}},
+			Ingress: []v1.NetworkPolicyIngressRule{
+				v1.NetworkPolicyIngressRule{
+					From: []v1.NetworkPolicyPeer{
+						v1.NetworkPolicyPeer{
+							PodSelector: &metav1.LabelSelector{
+								MatchLabels: map[string]string{"access": "true"}}},
+					},
+				},
+			},
+		},
+	}
+	return this.NetworkPolicyInterface.Create(&netpol)
+}
+
+func (this *NetworkPolicyService) Delete() error {
+	return this.NetworkPolicyInterface.Delete(this.NetworkPolicy.Name, nil)
 }
