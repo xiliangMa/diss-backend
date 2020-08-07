@@ -133,3 +133,25 @@ func (this *WarningInfo) Add() Result {
 	ResultData.Data = this
 	return ResultData
 }
+
+func (this *WarningInfo) Update() Result {
+	updateSql := `UPDATE ` + utils.WarningInfo + ` SET status=? WHERE id=?`
+	o := orm.NewOrm()
+	o.Using(utils.DS_Security_Log)
+	var ResultData Result
+
+	_, err := o.Raw(updateSql,
+		this.Status,
+		this.Id).Exec()
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.UpdateWarningInfoErr
+		logs.Error("Update WarningInfo failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}

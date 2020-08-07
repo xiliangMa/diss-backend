@@ -182,6 +182,7 @@ var (
 	GetUserEventListErr    = 1306
 	GetWarningInfoListErr  = 1307
 	AddWarningInfoListErr  = 1308
+	UpdateWarningInfoErr   = 1309
 
 	// diss_api 1400-1500
 	GetAccountsErr                        = 1400

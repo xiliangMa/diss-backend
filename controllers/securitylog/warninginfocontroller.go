@@ -28,3 +28,20 @@ func (this *WarningInfoController) GetWarningInfoList() {
 	this.Data["json"] = warningInfo.List(from, limit)
 	this.ServeJSON(false)
 }
+
+// @Title UpdateWarningInfo
+// @Description Update WarningInfo
+// @Param token header string true "authToken"
+// @Param id path string "" true "id"
+// @Param body body models.WarningInfo false "WarningInfo"
+// @Success 200 {object} models.Result
+// @router /warninginfo/:id [put]
+func (this *WarningInfoController) UpdateWarningInfo() {
+	id := this.GetString(":id")
+	warningInfo := new(models.WarningInfo)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &warningInfo)
+	warningInfo.Id = id
+	result := warningInfo.Update()
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
