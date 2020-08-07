@@ -11,7 +11,7 @@ import (
 )
 
 type SVCService struct {
-	ClientGo ClientGo
+	ClientGo models.ClientGo
 	Cluster  *models.Cluster
 	Close    chan bool
 }

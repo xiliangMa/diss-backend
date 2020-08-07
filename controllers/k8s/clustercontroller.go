@@ -53,7 +53,7 @@ func (this *ClusterController) AddCluster() {
 		cluster.BearerToken = bearerToken
 	}
 
-	params := k8s.ApiParams{}
+	params := models.ApiParams{}
 	params.AuthType = authType
 	params.BearerToken = bearerToken
 	params.MasterUrl = masterUrl

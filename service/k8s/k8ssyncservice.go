@@ -15,7 +15,7 @@ import (
 type K8sSyncService struct {
 	Cluster        *models.Cluster
 	SyncCheckPoint int64
-	Clientgo       ClientGo
+	Clientgo       models.ClientGo
 }
 
 func NewK8sSyncService(syncCheckPoint int64, cluster *models.Cluster) *K8sSyncService {
@@ -32,14 +32,14 @@ func (this *K8sSyncService) Sync() models.Result {
 	return this.SyncCluster()
 }
 
-func (this *K8sSyncService) CreateK8sClient() ClientGo {
+func (this *K8sSyncService) CreateK8sClient() models.ClientGo {
 	// 构建k8s客户端
-	params := new(ApiParams)
+	params := new(models.ApiParams)
 	params.AuthType = this.Cluster.AuthType
 	params.BearerToken = this.Cluster.BearerToken
 	params.MasterUrl = this.Cluster.MasterUrls
 	params.KubeConfigPath = this.Cluster.FileName
-	return CreateK8sClient(params)
+	return models.CreateK8sClient(params)
 }
 
 func (this *K8sSyncService) check() models.Result {

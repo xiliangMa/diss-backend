@@ -4,7 +4,6 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/service/k8s"
 	"github.com/xiliangMa/diss-backend/utils"
 	"mime/multipart"
 	"net/http"
@@ -58,11 +57,11 @@ func Check(h *multipart.FileHeader) (models.Result, string) {
 	return result, fpath
 }
 
-func TestClient(params k8s.ApiParams) models.Result {
+func TestClient(params models.ApiParams) models.Result {
 	ResultData := models.Result{}
 	ResultData.Code = http.StatusOK
 	// 检测连接是否可用
-	clientgo := k8s.CreateK8sClient(&params)
+	clientgo := models.CreateK8sClient(&params)
 	if clientgo.ErrMessage != "" {
 		switch params.AuthType {
 		case models.Api_Auth_Type_BearerToken:

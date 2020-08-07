@@ -114,12 +114,12 @@ func ClearCluster(clusterList []*models.Cluster) {
 	k8sClearService.ClearAll()
 }
 
-func (this *K8sWatchService) CreateK8sClient() ClientGo {
+func (this *K8sWatchService) CreateK8sClient() models.ClientGo {
 	// 构建k8s客户端
-	params := new(ApiParams)
+	params := new(models.ApiParams)
 	params.AuthType = this.Cluster.AuthType
 	params.BearerToken = this.Cluster.BearerToken
 	params.MasterUrl = this.Cluster.MasterUrls
 	params.KubeConfigPath = this.Cluster.FileName
-	return CreateK8sClient(params)
+	return models.CreateK8sClient(params)
 }
