@@ -8,21 +8,20 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
-	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
 type SVCService struct {
-	ServiceInterface corev1.ServiceInterface
-	Cluster          *models.Cluster
-	Close            chan bool
+	ClientGo ClientGo
+	Cluster  *models.Cluster
+	Close    chan bool
 }
 
 func (this *SVCService) List() (*v1.ServiceList, error) {
-	return this.ServiceInterface.List(metav1.ListOptions{})
+	return this.ClientGo.ClientSet.CoreV1().Services("").List(metav1.ListOptions{})
 }
 
 func (this *SVCService) Wtach() {
-	serviceWatch, err := this.ServiceInterface.Watch(metav1.ListOptions{})
+	serviceWatch, err := this.ClientGo.ClientSet.CoreV1().Services("").Watch(metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -61,22 +60,6 @@ Retry:
 					service.Add()
 				case watch.Modified:
 					service.Add()
-					//result := service.List(0, 0)
-					//if result.Code == http.StatusOK {
-					//	data := result.Data.(map[string]interface{})
-					//	if data != nil {
-					//		items := data["items"].([]*models.Service)
-					//		if items != nil && len(items) == 1 {
-					//			dbservice := items[0]
-					//			dbservice.Name = name
-					//			dbservice.ClusterName = clusterName
-					//			dbservice.KMetaData = string(KMetaData)
-					//			dbservice.KSpec = string(KSpec)
-					//			dbservice.KStatus = string(KStatus)
-					//			dbservice.Update()
-					//		}
-					//	}
-					//}
 				case watch.Deleted:
 					service.Delete()
 				case watch.Bookmark:
@@ -99,9 +82,7 @@ Retry:
 				svc.Delete()
 
 				// 重启 watch 携程
-				k8sWatchService := K8sWatchService{Cluster: this.Cluster}
-				clientGo := k8sWatchService.CreateK8sClient()
-				svcService := SVCService{Cluster: this.Cluster, ServiceInterface: clientGo.ClientSet.CoreV1().Services(""), Close: make(chan bool)}
+				svcService := SVCService{Cluster: this.Cluster, ClientGo: this.ClientGo, Close: make(chan bool)}
 				models.GRM.GoRoutineMap[watchType] = svcService
 
 				logs.Info("Retry ServiceWatch, cluster: %s", this.Cluster.Name)

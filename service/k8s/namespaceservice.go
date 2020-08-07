@@ -8,21 +8,20 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
-	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
 type NameSpaceService struct {
-	NameSpaceInterface corev1.NamespaceInterface
-	Cluster            *models.Cluster
-	Close              chan bool
+	ClientGo ClientGo
+	Cluster  *models.Cluster
+	Close    chan bool
 }
 
 func (this *NameSpaceService) List() (*v1.NamespaceList, error) {
-	return this.NameSpaceInterface.List(metav1.ListOptions{})
+	return this.ClientGo.ClientSet.CoreV1().Namespaces().List(metav1.ListOptions{})
 }
 
 func (this *NameSpaceService) Wtach() {
-	nswatch, err := this.NameSpaceInterface.Watch(metav1.ListOptions{})
+	nswatch, err := this.ClientGo.ClientSet.CoreV1().Namespaces().Watch(metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -85,9 +84,7 @@ Retry:
 				ns.Delete()
 
 				// 重启 watch 携程
-				k8sWatchService := K8sWatchService{Cluster: this.Cluster}
-				clientGo := k8sWatchService.CreateK8sClient()
-				nameSpaceService := NameSpaceService{Cluster: this.Cluster, NameSpaceInterface: clientGo.ClientSet.CoreV1().Namespaces(), Close: make(chan bool)}
+				nameSpaceService := NameSpaceService{Cluster: this.Cluster, ClientGo: this.ClientGo, Close: make(chan bool)}
 				models.GRM.GoRoutineMap[watchType] = nameSpaceService
 
 				logs.Info("Retry NamespaceWatch, cluster: %s", this.Cluster.Name)

@@ -8,22 +8,25 @@ import (
 	"k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
-	networkingv1 "k8s.io/client-go/kubernetes/typed/networking/v1"
 )
 
 type NetworkPolicyService struct {
-	NetworkPolicyInterface networkingv1.NetworkPolicyInterface
-	Cluster                *models.Cluster
-	Close                  chan bool
-	NetworkPolicy          *models.NetworkPolicy
+	ClientGo      ClientGo
+	Cluster       *models.Cluster
+	Close         chan bool
+	NetworkPolicy *models.NetworkPolicy
 }
 
 func (this *NetworkPolicyService) List() (*v1.NetworkPolicyList, error) {
-	return this.NetworkPolicyInterface.List(metav1.ListOptions{})
+	return this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies("").List(metav1.ListOptions{})
 }
 
 func (this *NetworkPolicyService) Wtach() {
-	netpolWatch, err := this.NetworkPolicyInterface.Watch(metav1.ListOptions{})
+	ns := ""
+	if this.NetworkPolicy != nil {
+		ns = this.NetworkPolicy.NameSpaceName
+	}
+	netpolWatch, err := this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies(ns).Watch(metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -83,9 +86,7 @@ Retry:
 				netpol.Delete()
 
 				// 重启 watch 携程
-				k8sWatchService := K8sWatchService{Cluster: this.Cluster}
-				clientGo := k8sWatchService.CreateK8sClient()
-				deployService := NetworkPolicyService{Cluster: this.Cluster, NetworkPolicyInterface: clientGo.ClientSet.NetworkingV1().NetworkPolicies(""), Close: make(chan bool)}
+				deployService := NetworkPolicyService{Cluster: this.Cluster, ClientGo: this.ClientGo, Close: make(chan bool)}
 				models.GRM.GoRoutineMap[watchType] = deployService
 
 				logs.Info("Retry NetworkPolicyWatch, cluster: %s", this.Cluster.Name)
@@ -116,9 +117,9 @@ func (this *NetworkPolicyService) Create() (*v1.NetworkPolicy, error) {
 			},
 		},
 	}
-	return this.NetworkPolicyInterface.Create(&netpol)
+	return this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies(this.NetworkPolicy.NameSpaceName).Create(&netpol)
 }
 
 func (this *NetworkPolicyService) Delete() error {
-	return this.NetworkPolicyInterface.Delete(this.NetworkPolicy.Name, nil)
+	return this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies(this.NetworkPolicy.NameSpaceName).Delete(this.NetworkPolicy.Name, nil)
 }

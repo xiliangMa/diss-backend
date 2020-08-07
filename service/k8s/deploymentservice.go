@@ -8,21 +8,20 @@ import (
 	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
-	appsv1 "k8s.io/client-go/kubernetes/typed/apps/v1"
 )
 
 type DeploymentService struct {
-	DeploymentInterface appsv1.DeploymentInterface
-	Cluster             *models.Cluster
-	Close               chan bool
+	ClientGo ClientGo
+	Cluster  *models.Cluster
+	Close    chan bool
 }
 
 func (this *DeploymentService) List() (*v1.DeploymentList, error) {
-	return this.DeploymentInterface.List(metav1.ListOptions{})
+	return this.ClientGo.ClientSet.AppsV1().Deployments("").List(metav1.ListOptions{})
 }
 
 func (this *DeploymentService) Wtach() {
-	deployWatch, err := this.DeploymentInterface.Watch(metav1.ListOptions{})
+	deployWatch, err := this.ClientGo.ClientSet.AppsV1().Deployments("").Watch(metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -84,9 +83,7 @@ Retry:
 				deploy.Delete()
 
 				// 重启 watch 携程
-				k8sWatchService := K8sWatchService{Cluster: this.Cluster}
-				clientGo := k8sWatchService.CreateK8sClient()
-				deployService := DeploymentService{Cluster: this.Cluster, DeploymentInterface: clientGo.ClientSet.AppsV1().Deployments(""), Close: make(chan bool)}
+				deployService := DeploymentService{Cluster: this.Cluster, ClientGo: this.ClientGo, Close: make(chan bool)}
 				models.GRM.GoRoutineMap[watchType] = deployService
 
 				logs.Info("Retry DeploymentWatch, cluster: %s", this.Cluster.Name)

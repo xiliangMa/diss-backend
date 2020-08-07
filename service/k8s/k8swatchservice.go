@@ -58,37 +58,37 @@ func (this *K8sWatchService) WatchCluster() models.Result {
 		}()
 		watchType := ""
 		// Namespace
-		nameSpaceService := NameSpaceService{Cluster: this.Cluster, NameSpaceInterface: clientGo.ClientSet.CoreV1().Namespaces(), Close: make(chan bool)}
+		nameSpaceService := NameSpaceService{Cluster: this.Cluster, ClientGo: clientGo, Close: make(chan bool)}
 		watchType = this.Cluster.Id + `_` + utils.NameSpace
 		models.GRM.GoRoutineMap[watchType] = nameSpaceService
 		go nameSpaceService.Wtach()
 
 		// Pod
-		podService := PodService{Cluster: this.Cluster, PodInterface: clientGo.ClientSet.CoreV1().Pods(""), Close: make(chan bool)}
+		podService := PodService{Cluster: this.Cluster, ClientGo: clientGo, Close: make(chan bool)}
 		watchType = this.Cluster.Id + `_` + utils.Pod
 		models.GRM.GoRoutineMap[watchType] = podService
 		go podService.Wtach()
 
 		// Deployengt
-		deployService := DeploymentService{Cluster: this.Cluster, DeploymentInterface: clientGo.ClientSet.AppsV1().Deployments(""), Close: make(chan bool)}
+		deployService := DeploymentService{Cluster: this.Cluster, ClientGo: clientGo, Close: make(chan bool)}
 		watchType = this.Cluster.Id + `_` + utils.Deployment
 		models.GRM.GoRoutineMap[watchType] = deployService
 		go deployService.Wtach()
 
 		// Node
-		nodeService := NodeService{Cluster: this.Cluster, NodeInterface: clientGo.ClientSet.CoreV1().Nodes(), Close: make(chan bool)}
+		nodeService := NodeService{Cluster: this.Cluster, ClientGo: clientGo, Close: make(chan bool)}
 		watchType = this.Cluster.Id + `_` + utils.Host
 		models.GRM.GoRoutineMap[watchType] = nodeService
 		go nodeService.Wtach()
 
 		// Service
-		svcService := SVCService{Cluster: this.Cluster, ServiceInterface: clientGo.ClientSet.CoreV1().Services(""), Close: make(chan bool)}
+		svcService := SVCService{Cluster: this.Cluster, ClientGo: clientGo, Close: make(chan bool)}
 		watchType = this.Cluster.Id + `_` + utils.Service
 		models.GRM.GoRoutineMap[watchType] = svcService
 		go svcService.Wtach()
 
 		// Service
-		netpolService := NetworkPolicyService{Cluster: this.Cluster, NetworkPolicyInterface: clientGo.ClientSet.NetworkingV1().NetworkPolicies(""), Close: make(chan bool)}
+		netpolService := NetworkPolicyService{Cluster: this.Cluster, ClientGo: clientGo, Close: make(chan bool)}
 		watchType = this.Cluster.Id + `_` + utils.NetworkPolicy
 		models.GRM.GoRoutineMap[watchType] = netpolService
 		go netpolService.Wtach()

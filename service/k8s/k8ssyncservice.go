@@ -134,7 +134,7 @@ func (this *K8sSyncService) SyncCluster() models.Result {
 }
 
 func (this *K8sSyncService) SyncHostConfigAndInfo() {
-	nodeService := NodeService{NodeInterface: this.Clientgo.ClientSet.CoreV1().Nodes()}
+	nodeService := NodeService{ClientGo: this.Clientgo}
 	nodes, err := nodeService.List()
 	clusterName := this.Cluster.Name
 	clusterId := this.Cluster.Id
@@ -240,7 +240,7 @@ func (this *K8sSyncService) SyncHostImageConfig() {
 func (this *K8sSyncService) SyncNameSpace() {
 	clusterName := this.Cluster.Name
 	clusterId := this.Cluster.Id
-	nameSpaceService := NameSpaceService{NameSpaceInterface: this.Clientgo.ClientSet.CoreV1().Namespaces()}
+	nameSpaceService := NameSpaceService{ClientGo: this.Clientgo}
 	nameSpaces, err := nameSpaceService.List()
 	if err != nil {
 		logs.Error("Sync namspace err: %s", err.Error())
@@ -283,7 +283,7 @@ func (this *K8sSyncService) SyncNameSpace() {
 
 func (this *K8sSyncService) SyncNamespacePod() {
 	clusterName := this.Cluster.Name
-	nameSpaceService := NameSpaceService{NameSpaceInterface: this.Clientgo.ClientSet.CoreV1().Namespaces()}
+	nameSpaceService := NameSpaceService{ClientGo: this.Clientgo}
 	nameSpaces, err := nameSpaceService.List()
 	if err != nil {
 		logs.Error("Sync namspace err: %s", err.Error())
@@ -293,7 +293,7 @@ func (this *K8sSyncService) SyncNamespacePod() {
 		CheckObject.ClusterName = clusterName
 		for _, ns := range nameSpaces.Items {
 			nsName := ns.Name
-			podService := PodService{PodInterface: this.Clientgo.ClientSet.CoreV1().Pods(nsName)}
+			podService := PodService{ClientGo: this.Clientgo}
 			pods, err := podService.List()
 			if err != nil {
 				logs.Error("Sync namespace: %s pods err: %s", nsName, err.Error())
@@ -333,7 +333,7 @@ func (this *K8sSyncService) SyncNamespacePod() {
 
 func (this *K8sSyncService) SyncPodContainerConfigAndInfo() {
 	clusterName := this.Cluster.Name
-	nameSpaceService := NameSpaceService{NameSpaceInterface: this.Clientgo.ClientSet.CoreV1().Namespaces()}
+	nameSpaceService := NameSpaceService{ClientGo: this.Clientgo}
 	nameSpaces, err := nameSpaceService.List()
 	if err != nil {
 		logs.Error("Sync namspace err: %s", err.Error())
@@ -348,7 +348,7 @@ func (this *K8sSyncService) SyncPodContainerConfigAndInfo() {
 
 		for _, ns := range nameSpaces.Items {
 			nsName := ns.Name
-			podService := PodService{PodInterface: this.Clientgo.ClientSet.CoreV1().Pods(nsName)}
+			podService := PodService{ClientGo: this.Clientgo}
 			pods, err := podService.List()
 			if err != nil {
 				logs.Error("Sync namespace: %s pods err: %s", nsName, err.Error())

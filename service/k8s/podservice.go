@@ -8,21 +8,24 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
-	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
 type PodService struct {
-	PodInterface corev1.PodInterface
-	Cluster      *models.Cluster
-	Close        chan bool
+	ClientGo ClientGo
+	Cluster  *models.Cluster
+	Close    chan bool
 }
 
 func (this *PodService) List() (*v1.PodList, error) {
-	return this.PodInterface.List(metav1.ListOptions{})
+	ns := ""
+	if this.Cluster != nil {
+		ns = this.Cluster.Name
+	}
+	return this.ClientGo.ClientSet.CoreV1().Pods(ns).List(metav1.ListOptions{})
 }
 
 func (this *PodService) Wtach() {
-	podWatch, err := this.PodInterface.Watch(metav1.ListOptions{})
+	podWatch, err := this.ClientGo.ClientSet.CoreV1().Pods("").Watch(metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -60,23 +63,6 @@ Retry:
 					pod.Add()
 				case watch.Modified:
 					pod.Add()
-					//result := pod.List(0, 0)
-					//if result.Code == http.StatusOK {
-					//	data := result.Data.(map[string]interface{})
-					//	if data != nil {
-					//		items := data["items"].([]*models.Pod)
-					//		if items != nil && len(items) == 1 {
-					//			dbPod := items[0]
-					//			dbPod.Name = name
-					//			dbPod.HostName = nodeName
-					//			dbPod.ClusterName = clusterName
-					//			dbPod.KMetaData = string(KMetaData)
-					//			dbPod.KSpec = string(KSpec)
-					//			dbPod.KStatus = string(KStatus)
-					//			dbPod.Update()
-					//		}
-					//	}
-					//}
 				case watch.Deleted:
 					pod.Delete()
 				case watch.Bookmark:
@@ -99,9 +85,7 @@ Retry:
 				pod.Delete()
 
 				// 重启 watch 携程
-				k8sWatchService := K8sWatchService{Cluster: this.Cluster}
-				clientGo := k8sWatchService.CreateK8sClient()
-				podService := PodService{Cluster: this.Cluster, PodInterface: clientGo.ClientSet.CoreV1().Pods(""), Close: make(chan bool)}
+				podService := PodService{Cluster: this.Cluster, ClientGo: this.ClientGo, Close: make(chan bool)}
 				models.GRM.GoRoutineMap[watchType] = podService
 
 				logs.Info("Retry PodWatch, cluster: %s", this.Cluster.Name)

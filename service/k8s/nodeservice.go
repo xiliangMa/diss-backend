@@ -9,22 +9,21 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
-	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"strings"
 )
 
 type NodeService struct {
-	NodeInterface corev1.NodeInterface
-	Cluster       *models.Cluster
-	Close         chan bool
+	ClientGo ClientGo
+	Cluster  *models.Cluster
+	Close    chan bool
 }
 
 func (this *NodeService) List() (*v1.NodeList, error) {
-	return this.NodeInterface.List(metav1.ListOptions{})
+	return this.ClientGo.ClientSet.CoreV1().Nodes().List(metav1.ListOptions{})
 }
 
 func (this *NodeService) Wtach() {
-	nodeWatch, err := this.NodeInterface.Watch(metav1.ListOptions{})
+	nodeWatch, err := this.ClientGo.ClientSet.CoreV1().Nodes().Watch(metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -135,9 +134,7 @@ Retry:
 				hi.Delete()
 
 				// 重启 watch 携程
-				k8sWatchService := K8sWatchService{Cluster: this.Cluster}
-				clientGo := k8sWatchService.CreateK8sClient()
-				nodeService := NodeService{Cluster: this.Cluster, NodeInterface: clientGo.ClientSet.CoreV1().Nodes(), Close: make(chan bool)}
+				nodeService := NodeService{Cluster: this.Cluster, ClientGo: this.ClientGo, Close: make(chan bool)}
 				models.GRM.GoRoutineMap[watchType] = nodeService
 
 				logs.Info("Retry NodeWatch, cluster: %s", this.Cluster.Name)
