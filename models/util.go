@@ -124,7 +124,8 @@ var (
 	Account_Admin = "admin"
 
 	// nats subject (diss-backend 主题， agent 则以主机id区分标识)
-	Subject_Common = "Common"
+	Subject_Common     = "Common"
+	Subject_Image_Safe = "IMAGE_SAFE"
 
 	// 日志级别
 	Log_level_Debug = "Debug"

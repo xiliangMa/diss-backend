@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
+	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
@@ -107,6 +108,10 @@ func (this *WarningInfo) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
+	if this.Id == "" {
+		uid, _ := uuid.NewV4()
+		this.Id = uid.String()
+	}
 
 	_, err := o.Raw(insertSql,
 		this.Id,

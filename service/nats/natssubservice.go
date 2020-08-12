@@ -577,12 +577,30 @@ func (this *NatsSubService) ReceiveData(result models.WsData) {
 }
 
 func RunClientSub(clientSubject string) {
-	serverSubject := models.Subject_Common + `-` + clientSubject
 	natsManager := models.Nats
 	if natsManager != nil && natsManager.Conn != nil {
+		serverSubject := models.Subject_Common + `-` + clientSubject
 		natsManager.Conn.Subscribe(serverSubject, func(m *stan.Msg) {
 			natsSubService := NatsSubService{Conn: natsManager.Conn, Message: m.Data, ClientSubject: clientSubject}
 			natsSubService.Save()
 		}, stan.DurableName(serverSubject))
+	}
+}
+
+func RunClientSub_Image_Safe() {
+	natsManager := models.Nats
+	if natsManager != nil && natsManager.Conn != nil {
+		registries := models.Registries{}
+		registryList := registries.List()
+
+		for _, registry := range registryList {
+			libname := registry.Registry
+			imageSafeSubject := libname + `_` + models.Subject_Image_Safe
+			logs.Warn(imageSafeSubject)
+			natsManager.Conn.Subscribe(imageSafeSubject, func(m *stan.Msg) {
+				natsSubService := NatsSubService{Conn: natsManager.Conn, Message: m.Data, ClientSubject: libname}
+				natsSubService.Save()
+			}, stan.DurableName(imageSafeSubject))
+		}
 	}
 }

@@ -89,7 +89,7 @@ func (this *DefaultDB) registerModel() {
 	orm.RegisterModel(new(models.SystemTemplate), new(models.SystemTemplateGroup),
 		new(models.ContainerConfig), new(models.ContainerInfo), new(models.ContainerPs),
 		new(models.HostConfig), new(models.HostInfo), new(models.HostPs), new(models.ImageConfig),
-		new(models.ImageInfo), new(models.Groups))
+		new(models.ImageInfo), new(models.Groups), new(models.SysConfig))
 	// logconfig and timeEdgepoint
 	orm.RegisterModel(new(models.LogConfig), new(models.TimeEdgePoint))
 	// license

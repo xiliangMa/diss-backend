@@ -194,4 +194,5 @@ var (
 	GetFeedListErr                        = 1406
 	NotFoundUserAccessCredentialsErr      = 1407
 	GetImagePackageVulnerabilityInfoErr   = 1408
+	GetRegistriesErr                      = 1409
 )

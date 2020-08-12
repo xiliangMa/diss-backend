@@ -3,6 +3,7 @@ package sysinit
 import (
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/k8s"
+	"github.com/xiliangMa/diss-backend/service/nats"
 	"github.com/xiliangMa/diss-backend/service/task"
 	"github.com/xiliangMa/diss-backend/sysinit/db"
 )
@@ -40,6 +41,7 @@ func init() {
 	// ================= 初始化全局变量
 	// 1. NatsManager
 	models.Nats = models.NewNatsManager()
+	nats.RunClientSub_Image_Safe()
 
 	// 2. WSManager
 	models.WSHub = models.NewHub()

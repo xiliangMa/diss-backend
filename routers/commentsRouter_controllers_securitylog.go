@@ -79,4 +79,13 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/securitylog:WarningInfoController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/securitylog:WarningInfoController"],
+		beego.ControllerComments{
+			Method:           "UpdateWarningInfo",
+			Router:           `/warninginfo/:id`,
+			AllowHTTPMethods: []string{"put"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
 }
