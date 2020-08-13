@@ -50,6 +50,10 @@ func init() {
 	// 3. GRManager
 	models.GRM = models.NewGoRoutineManager()
 
+	// 4. KCHub
+	models.KCHub = models.NewKubernetesClientManager()
+	models.InitClientHub()
+
 	// watch all cluster
 	k8sWatchService := k8s.K8sWatchService{}
 	k8sWatchService.WatchAll()

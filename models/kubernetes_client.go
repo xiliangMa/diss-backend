@@ -2,12 +2,14 @@ package models
 
 import (
 	"flag"
+	"github.com/astaxie/beego/logs"
 	"k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"math/rand"
+	"net/http"
 )
 
 type KubernetesClientManager struct {
@@ -66,4 +68,33 @@ func CreateK8sClient(params *ApiParams) ClientGo {
 
 func (clientgo *ClientGo) GetNodes() (*v1.NodeList, error) {
 	return clientgo.ClientSet.CoreV1().Nodes().List(v12.ListOptions{})
+}
+
+func InitClientHub() {
+	// 获取所有集群
+	cluster := new(Cluster)
+	result := cluster.List(0, 0)
+
+	if result.Code == http.StatusOK && result.Data != nil {
+		data := result.Data.(map[string]interface{})
+		clusterList := data["items"].([]*Cluster)
+		for _, c := range clusterList {
+			// 构建k8s客户端
+			clientGo := CreateK8sClient(BuildApiParams(c))
+			if clientGo.ErrMessage == "" {
+				// 加入缓存
+				KCHub.ClientHub[c.Id] = clientGo
+				logs.Info("Init ClientHub add cluster： %s success.", c.Name)
+			}
+		}
+	}
+}
+
+func BuildApiParams(c *Cluster) *ApiParams {
+	params := new(ApiParams)
+	params.AuthType = c.AuthType
+	params.BearerToken = c.BearerToken
+	params.MasterUrl = c.MasterUrls
+	params.KubeConfigPath = c.FileName
+	return params
 }

@@ -40,7 +40,11 @@ func (this *K8sWatchService) WatchCluster() models.Result {
 
 	clusterName := this.Cluster.Name
 	clusterId := this.Cluster.Id
-	clientGo := this.CreateK8sClient()
+	clientGo := models.ClientGo{}
+	if _, ok := models.KCHub.ClientHub[clusterId]; !ok {
+		clientGo = models.CreateK8sClient(models.BuildApiParams(this.Cluster))
+	}
+	clientGo = models.KCHub.ClientHub[clusterId]
 
 	if clientGo.ErrMessage == "" {
 		this.Cluster.SyncStatus = models.Cluster_Sync_Status_InProcess
@@ -87,7 +91,7 @@ func (this *K8sWatchService) WatchCluster() models.Result {
 		models.GRM.GoRoutineMap[watchType] = svcService
 		go svcService.Wtach()
 
-		// Service
+		// NetworkPolicy
 		netpolService := NetworkPolicyService{Cluster: this.Cluster, ClientGo: clientGo, Close: make(chan bool)}
 		watchType = this.Cluster.Id + `_` + utils.NetworkPolicy
 		models.GRM.GoRoutineMap[watchType] = netpolService
@@ -112,14 +116,4 @@ func ClearCluster(clusterList []*models.Cluster) {
 	// 清除集群数据
 	k8sClearService := K8sClearService{ClusterList: clusterList, DropCluster: false}
 	k8sClearService.ClearAll()
-}
-
-func (this *K8sWatchService) CreateK8sClient() models.ClientGo {
-	// 构建k8s客户端
-	params := new(models.ApiParams)
-	params.AuthType = this.Cluster.AuthType
-	params.BearerToken = this.Cluster.BearerToken
-	params.MasterUrl = this.Cluster.MasterUrls
-	params.KubeConfigPath = this.Cluster.FileName
-	return models.CreateK8sClient(params)
 }

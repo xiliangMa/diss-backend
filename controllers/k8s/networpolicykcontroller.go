@@ -3,7 +3,10 @@ package k8s
 import (
 	"encoding/json"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/k8s"
+	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
 
@@ -69,6 +72,34 @@ func (this *NetworkPolicyController) DeleteNetworkPolicy() {
 	id := this.GetString(":id")
 	NetworkPolicy := new(models.NetworkPolicy)
 	NetworkPolicy.Id = id
+	clientGo := models.ClientGo{}
+	if data := NetworkPolicy.List(0, 0).Data; data != nil {
+		items := data.(map[string]interface{})["items"].([]*models.NetworkPolicy)
+		NetworkPolicy = items[0]
+		if _, ok := models.KCHub.ClientHub[NetworkPolicy.ClusterId]; ok {
+			clientGo = models.KCHub.ClientHub[NetworkPolicy.ClusterId]
+		} else {
+			cluster := new(models.Cluster)
+			if data := cluster.List(0, 0).Data; data != nil {
+				items := data.(map[string]interface{})["items"].([]*models.Cluster)
+				cluster = items[0]
+				clientGo = models.CreateK8sClient(models.BuildApiParams(cluster))
+			}
+		}
+
+		if clientGo.ErrMessage != "" {
+			logs.Error("Delete network policy fail from kubernetes, err: %s", clientGo.ErrMessage)
+			this.Data["json"] = models.Result{Code: utils.DeleteNetworkPolicyErr}
+			this.ServeJSON(false)
+		}
+		netpolService := k8s.NetworkPolicyService{ClientGo: clientGo, NetworkPolicy: NetworkPolicy}
+		err := netpolService.Delete()
+		if err != nil {
+			logs.Error("Delete network policy fail from kubernetes, err: %s", err)
+			this.Data["json"] = models.Result{Code: utils.DeleteNetworkPolicyErr}
+			this.ServeJSON(false)
+		}
+	}
 	NetworkPolicy.Delete()
 	this.Data["json"] = models.Result{Code: http.StatusOK}
 	this.ServeJSON(false)

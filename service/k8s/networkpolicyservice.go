@@ -54,6 +54,8 @@ Retry:
 				netpol.Name = name
 				netpol.AccountName = models.Account_Admin
 				netpol.ClusterName = clusterName
+				netpol.NameSpaceName = object.Namespace
+				netpol.ClusterId = clusterId
 				netpol.KMetaData = string(KMetaData)
 				netpol.KSpec = string(KSpec)
 
