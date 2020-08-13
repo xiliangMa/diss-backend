@@ -161,6 +161,16 @@ var (
 	CreateK8sClientErr              = 1222
 	GetLicenseFileErr               = 1223
 	NoLicenseFileErr                = 1224
+	ConnectSyslogErr                = 1225
+	AddLogConfigErr                 = 1226
+	GetLogConfigErr                 = 1227
+	EditLogConfigErr                = 1228
+	AddTimeEdgePointErr             = 1229
+	GetTimeEdgePointErr             = 1230
+	EditTimeEdgePointErr            = 1231
+	AddSysConfigErr                 = 1232
+	GetSysConfigErr                 = 1233
+	EditSysConfigErr                = 1234
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300
@@ -172,6 +182,7 @@ var (
 	GetUserEventListErr    = 1306
 	GetWarningInfoListErr  = 1307
 	AddWarningInfoListErr  = 1308
+	UpdateWarningInfoErr   = 1309
 
 	// diss_api 1400-1500
 	GetAccountsErr                        = 1400
@@ -183,13 +194,4 @@ var (
 	GetFeedListErr                        = 1406
 	NotFoundUserAccessCredentialsErr      = 1407
 	GetImagePackageVulnerabilityInfoErr   = 1408
-
-	// config_timedata 1500-1599
-	ConnectSyslogErr     = 1500
-	AddLogConfigErr      = 1501
-	GetLogConfigErr      = 1502
-	EditLogConfigErr     = 1503
-	AddTimeEdgePointErr  = 1530
-	GetTimeEdgePointErr  = 1531
-	EditTimeEdgePointErr = 1532
 )

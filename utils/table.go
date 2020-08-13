@@ -29,6 +29,7 @@ var (
 	Service          = "service"
 	Deployment       = "deployment"
 	NetworkPolicy    = "network_policy"
+	SysConfig        = "sys_config"
 
 	//security_log timescaledb
 	DcokerIds   = "docker_ids"
