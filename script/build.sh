@@ -21,7 +21,13 @@ echo "=========== 2. build  diss-backen bin ==========="
 mkdir -p "$BUILD_DIR/bin"
 echo "build path: $(cd $BUILD_DIR; pwd)"
 cd "$PROJECT_DIR" || exit
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o "$BUILD_DIR/bin/diss-backend"
+if [ $1 == 'arm' ]
+then
+  CGO_ENABLED=0 GOOS=linux GOARCH=arm go build -o "$BUILD_DIR/bin/diss-backend"
+else
+  CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o "$BUILD_DIR/bin/diss-backend"
+fi
+
 
 
 #### 准备 build 文件
@@ -29,7 +35,12 @@ echo "=========== 3. cp files for docker build ==========="
 cd $PROJECT_DIR
 cp -r conf swagger "$BUILD_DIR"
 cp entrypoint.sh script/install.sh "$BUILD_DIR"
-cp docker-compose-prod.yml "$BUILD_DIR/docker-compose.yml"
+if [ $1 == 'arm' ]
+then
+  cp docker-compose-prod.yml "$BUILD_DIR/docker-compose.yml"
+else
+  cp docker-compose-prod-arm.yml "$BUILD_DIR/docker-compose.yml"
+fi
 
 #### 停止容器
 echo "=========== 4. stop diss-backend and db ==========="
@@ -54,7 +65,12 @@ fi
 # build 镜像
 echo "=========== 6. build diss-backend images ==========="
 cd $PROJECT_DIR
-docker-compose build --no-cache
+if [ $1 == 'arm' ]
+then
+  docker-compose -f docker-compose-arm.yml build --no-cache
+else
+  docker-compose build --no-cache
+fi
 
 cd $BUILD_DIR
 tar -cvf diss-backend.tar.gz ./*

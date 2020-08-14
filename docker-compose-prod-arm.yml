@@ -2,11 +2,8 @@ version: '3'
 services:
   diss-backend:
     restart: always
-    container_name: diss-backend
-    build:
-      context: .
-      dockerfile: Dockerfile-arm
-    image: registry.cn-qingdao.aliyuncs.com/diss/diss-backend
+    container_name: diss-backend-arm
+    image: registry.cn-qingdao.aliyuncs.com/diss/diss-backend-arm
     ports:
       - "8080:8080"
       - "10443:10443"
@@ -32,7 +29,7 @@ services:
   diss-db:
     restart: unless-stopped
     container_name: diss-db
-    image: postgres:9.6
+    image: arm64v8/postgres:9.6
     env_file:
       - ./conf/diss-backend-db-postgres.env
     ports:
@@ -43,7 +40,7 @@ services:
   diss-nats-streaming:
     restart: unless-stopped
     container_name: diss-nats-streaming
-    image: registry.cn-qingdao.aliyuncs.com/diss/nats-streaming:latest
+    image: arm64v8/nats-streaming:latest
     ports:
       - 8222:8222
       - 4222:4222
