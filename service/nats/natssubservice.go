@@ -647,7 +647,9 @@ func RunClientSub_Image_Safe() {
 		for _, registry := range registryList {
 			libname := registry.Registry
 			imageSafeSubject := libname + `_` + models.Subject_Image_Safe
-			logs.Info("Subscribe image registry :", imageSafeSubject)
+
+			logs.Info("init nats subscribe:", imageSafeSubject)
+
 			natsManager.Conn.Subscribe(imageSafeSubject, func(m *stan.Msg) {
 				natsSubService := NatsSubService{Conn: natsManager.Conn, Message: m.Data, ClientSubject: libname}
 				natsSubService.Save()
@@ -680,4 +682,20 @@ func RunClientSub_IDL() {
 		}
 
 	}
+}
+func AddClientSub_Image_Safe(libname string) models.Result {
+	natsManager := models.Nats
+	result := models.Result{}
+	if natsManager != nil && natsManager.Conn != nil {
+		imageSafeSubject := libname + `_` + models.Subject_Image_Safe
+		logs.Info("add nats subscribe:", imageSafeSubject)
+		natsManager.Conn.Subscribe(imageSafeSubject, func(m *stan.Msg) {
+			natsSubService := NatsSubService{Conn: natsManager.Conn, Message: m.Data, ClientSubject: libname}
+			natsSubService.Save()
+		}, stan.DurableName(imageSafeSubject))
+	}
+
+	result.Code = http.StatusOK
+	result.Message = "Add nats subscribe topic:" + libname
+	return result
 }

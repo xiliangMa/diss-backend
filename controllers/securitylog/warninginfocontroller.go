@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/nats"
 )
 
 // Warning Info api list
@@ -42,6 +43,19 @@ func (this *WarningInfoController) UpdateWarningInfo() {
 	json.Unmarshal(this.Ctx.Input.RequestBody, &warningInfo)
 	warningInfo.Id = id
 	result := warningInfo.Update()
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
+// @Title AddClientSub_Image_Safe
+// @Description Add Nats Subscribe topic for Image_Safe
+// @Param token header string true "authToken"
+// @Param libname path string "" true "Registry Name"
+// @Success 200 {object} models.Result
+// @router /warninginfo/addsub_image/:libname [post]
+func (this *WarningInfoController) AddClientSub_Image_Safe() {
+	libname := this.GetString(":libname")
+	result := nats.AddClientSub_Image_Safe(libname)
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }
