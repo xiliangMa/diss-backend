@@ -244,3 +244,8 @@ func (this *SecurityCheckService) DeliverTask(isPrepare bool) models.Result {
 
 	return ResultData
 }
+
+
+func (this *SecurityCheckService) ClusterCheck()  {
+
+}

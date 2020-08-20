@@ -7,6 +7,7 @@ import (
 	"github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/k8s"
+	"github.com/xiliangMa/diss-backend/service/securitycheck"
 	css "github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -206,6 +207,29 @@ func (this *ClusterController) SyncCluster() {
 	cluster.Id = id
 	syncCheckPoint := time.Now().Unix()
 	K8sSyncService := k8s.NewK8sSyncService(syncCheckPoint, cluster)
+	this.Data["json"] = K8sSyncService.Sync()
+	this.ServeJSON(false)
+}
+
+
+// @Title ClusterSecurityCheck
+// @Description ClusterSecurityCheck
+// @Param token header string true "authToken"
+// @Param docker query bool false "docker cis"
+// @Param kubernetes query bool false "kubernetes cis"
+// @Param id path string "" true "Id"
+// @Success 200 {object} models.Result
+// @router /:id/securitycheck [post]
+func (this *ClusterController) ClusterSecurityCheck() {
+	id := this.GetString(":id")
+	docker := this.GetString("docker")
+	kubernetes := this.GetString("kubernetes")
+	cluster := new(models.Cluster)
+	cluster.Id = id
+	batch := time.Now().Unix()
+	securityCheckService := securitycheck.SecurityCheckService{SecurityCheckList: checkList, Batch: batch}
+	this.Data["json"] = securityCheckService.DeliverTask(true)
+	this.ServeJSON(false)
 	this.Data["json"] = K8sSyncService.Sync()
 	this.ServeJSON(false)
 }
