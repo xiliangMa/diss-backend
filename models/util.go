@@ -133,6 +133,10 @@ var (
 	Log_level_Warn  = "Warn"
 	Log_level_Error = "Error"
 
+	// kubernetes 相关
+	Kubernetes_Object_Spec     = "Spec"
+	Kubernetes_Object_MetaData = "MetaData"
+
 	// diss-api
 	//漏洞安全等级
 	Vulnerabilities_Severity_Medium     = "Medium"

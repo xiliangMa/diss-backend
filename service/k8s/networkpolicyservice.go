@@ -52,7 +52,6 @@ Retry:
 				netpol := models.NetworkPolicy{}
 				netpol.Id = id
 				netpol.Name = name
-				netpol.AccountName = models.Account_Admin
 				netpol.ClusterName = clusterName
 				netpol.NameSpaceName = object.Namespace
 				netpol.ClusterId = clusterId
@@ -100,25 +99,26 @@ Retry:
 }
 
 func (this *NetworkPolicyService) Create() (*v1.NetworkPolicy, error) {
-	netpol := v1.NetworkPolicy{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "test",
-			Namespace: "test",
-		},
-		Spec: v1.NetworkPolicySpec{
-			PodSelector: metav1.LabelSelector{
-				MatchLabels: map[string]string{"app": "nginx"}},
-			Ingress: []v1.NetworkPolicyIngressRule{
-				v1.NetworkPolicyIngressRule{
-					From: []v1.NetworkPolicyPeer{
-						v1.NetworkPolicyPeer{
-							PodSelector: &metav1.LabelSelector{
-								MatchLabels: map[string]string{"access": "true"}}},
-					},
-				},
-			},
-		},
+
+	// ============ ObjectMeta ============
+	objectMeta := metav1.ObjectMeta{}
+	err := json.Unmarshal([]byte(this.NetworkPolicy.KMetaData), &objectMeta)
+	if err != nil {
+		logs.Error("Paraces: %s, error: %s  ", models.Kubernetes_Object_MetaData, err)
+		return nil, err
 	}
+
+	// ============ Spec ============
+	spec := v1.NetworkPolicySpec{}
+	err = json.Unmarshal([]byte(this.NetworkPolicy.KSpec), &spec)
+	if err != nil {
+		logs.Error("Paraces: %s, error: %s  ", models.Kubernetes_Object_Spec, err)
+		return nil, err
+	}
+
+	netpol := v1.NetworkPolicy{ObjectMeta: objectMeta, Spec: spec}
+	netpol.ObjectMeta.ResourceVersion = ""
+
 	return this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies(this.NetworkPolicy.NameSpaceName).Create(&netpol)
 }
 

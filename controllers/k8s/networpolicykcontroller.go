@@ -42,8 +42,16 @@ func (this *NetworkPolicyController) GetNetworkPolicysList() {
 func (this *NetworkPolicyController) AddNetworkPolicy() {
 	NetworkPolicy := new(models.NetworkPolicy)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &NetworkPolicy)
-	this.Data["json"] = NetworkPolicy.Add()
-	this.ServeJSON(false)
+	netpolService := k8s.NetworkPolicyService{NetworkPolicy: NetworkPolicy, ClientGo: models.KCHub.ClientHub[NetworkPolicy.ClusterId]}
+	_, err := netpolService.Create()
+	if err != nil {
+		this.Data["json"] = models.Result{Code: utils.AddNetworkPolicyErr}
+		this.ServeJSON(false)
+	} else {
+		this.Data["json"] = models.Result{Code: http.StatusOK}
+		this.ServeJSON(false)
+	}
+
 }
 
 // @Title UpdateNetworkPolicy
