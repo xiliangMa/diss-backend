@@ -596,7 +596,7 @@ func RunClientSub_Image_Safe() {
 		for _, registry := range registryList {
 			libname := registry.Registry
 			imageSafeSubject := libname + `_` + models.Subject_Image_Safe
-			logs.Warn(imageSafeSubject)
+			logs.Info("Subscribe image registry :", imageSafeSubject)
 			natsManager.Conn.Subscribe(imageSafeSubject, func(m *stan.Msg) {
 				natsSubService := NatsSubService{Conn: natsManager.Conn, Message: m.Data, ClientSubject: libname}
 				natsSubService.Save()

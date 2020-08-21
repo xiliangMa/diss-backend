@@ -17,6 +17,8 @@ type WarningInfo struct {
 	Name       string `orm:"size(256)" description:"(告警名称)"`
 	HostId     string `orm:"size(256)" description:"(主机Id agent采集数据)"`
 	HostName   string `orm:"size(256)" description:"(主机Name agent采集数据)"`
+	Cluster    string `orm:"size(256)" description:"(集群名)"`
+	Account    string `orm:"size(256)" description:"(租户)"`
 	Type       string `orm:"size(32)" description:"(类型 如：基线检测、病毒检查、入侵检测、镜像安全等)"`
 	Info       string `orm:"" description:"(告警详情，json，请自定义内部结构)"`
 	Level      string `orm:"size(32)" description:"(告警级别)"`
@@ -79,7 +81,7 @@ func (this *WarningInfo) List(from, limit int) Result {
 	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
 	resultSql := sql
 	if from >= 0 && limit > 0 {
-		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
+		limitSql := " order by create_time desc limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
 		resultSql = resultSql + limitSql
 	}
 	_, err = o.Raw(resultSql).QueryRows(&WarningInfoList)
