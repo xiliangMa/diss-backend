@@ -5,7 +5,7 @@ services:
     container_name: diss-backend
     build:
       context: .
-      dockerfile: Dockerfile-arm
+      dockerfile: Dockerfile
     image: registry.cn-qingdao.aliyuncs.com/diss/diss-backend
     ports:
       - "8080:8080"
