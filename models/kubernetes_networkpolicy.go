@@ -29,8 +29,26 @@ func (this *NetworkPolicy) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
+	NetworkPolicy := new(NetworkPolicy)
 	var err error
-	_, err = o.Insert(this)
+	cond := orm.NewCondition()
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	if this.Name != "" {
+		cond = cond.And("name", this.Name)
+	}
+	if this.ClusterId != "" {
+		cond = cond.And("cluster_id", this.ClusterId)
+	}
+	o.QueryTable(utils.NetworkPolicy).SetCond(cond).One(NetworkPolicy)
+	if NetworkPolicy != nil && NetworkPolicy.Id != "" {
+		this.AccountName = NetworkPolicy.AccountName
+		_, err = o.Update(this)
+	} else {
+		_, err = o.Insert(this)
+	}
+
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddNetworkPolicyErr

@@ -43,12 +43,14 @@ func (this *NetworkPolicyController) AddNetworkPolicy() {
 	NetworkPolicy := new(models.NetworkPolicy)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &NetworkPolicy)
 	netpolService := k8s.NetworkPolicyService{NetworkPolicy: NetworkPolicy, ClientGo: models.KCHub.ClientHub[NetworkPolicy.ClusterId]}
-	_, err := netpolService.Create()
+	object, err := netpolService.Create()
 	if err != nil {
-		this.Data["json"] = models.Result{Code: utils.AddNetworkPolicyErr}
+		logs.Error("Add NetworkPolicy fail, err: %s", err)
+		this.Data["json"] = models.Result{Code: utils.AddNetworkPolicyErr, Message: err.Error()}
 		this.ServeJSON(false)
 	} else {
-		this.Data["json"] = models.Result{Code: http.StatusOK}
+		NetworkPolicy.Id = string(object.UID)
+		this.Data["json"] = NetworkPolicy.Add()
 		this.ServeJSON(false)
 	}
 

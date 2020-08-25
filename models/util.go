@@ -23,6 +23,7 @@ var (
 	Pod_Container_Statue_Waiting    = "Waiting"
 	Api_Auth_Type_KubeConfig        = "KubeConfig"
 	Api_Auth_Type_BearerToken       = "BearerToken"
+	Cluster_Data_AccountName        = "Kubernetes"
 
 	Cmd_History_Type_Host      = "Host"
 	Cmd_History_Type_Container = "Container"

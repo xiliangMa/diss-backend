@@ -53,6 +53,7 @@ Retry:
 				netpol.Id = id
 				netpol.Name = name
 				netpol.ClusterName = clusterName
+				netpol.AccountName = models.Cluster_Data_AccountName
 				netpol.NameSpaceName = object.Namespace
 				netpol.ClusterId = clusterId
 				netpol.KMetaData = string(KMetaData)
