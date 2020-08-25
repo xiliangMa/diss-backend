@@ -1,7 +1,10 @@
 package models
 
 var (
-	All = "All"
+	// Global
+	All          = "All"
+	Result_Items = "items"
+	Result_Total = "total"
 
 	// k8s
 	Cluster_Sync_Status_NotSynced   = "NotSynced"

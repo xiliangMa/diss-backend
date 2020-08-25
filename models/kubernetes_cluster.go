@@ -25,6 +25,15 @@ type Cluster struct {
 	UpdateTime  time.Time `orm:"auto_now;type(datetime)" description:"(更新时间)"`
 }
 
+type ClusterCheck struct {
+	Id           string `description:"(集群id)"`
+	DockerCIS    bool   `description:"(Docker CIS)"`
+	KubenetesCIS bool   `description:"(kubernetes CIS)"`
+	VirusScan    bool   `description:"(病毒检查)"`
+	LeakScan     bool   `description:"(漏洞检查)"`
+	Batch        int64  `description:"(批次)"`
+}
+
 type ClusterInterface interface {
 	Add() Result
 	Update() Result

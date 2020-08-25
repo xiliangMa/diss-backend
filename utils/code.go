@@ -125,6 +125,7 @@ var (
 	AddNetworkPolicyErr              = 1019
 	EditNetworkPolicyErr             = 1020
 	DeleteNetworkPolicyErr           = 1021
+	GetHostListForClusterErr         = 1022
 
 	//task job 1100-1200
 	AddTaskErr        = 1100

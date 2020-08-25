@@ -13,6 +13,7 @@ import (
 
 type SecurityCheckService struct {
 	*models.SecurityCheckList
+	ClusterCheckObject   *models.ClusterCheck
 	DefaultTMP           map[string]*models.SystemTemplate
 	DefaultJob           map[string]*models.Job
 	Batch                int64
@@ -56,10 +57,10 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 
 	// 检测是否是系统Job
 	if securityCheck.Job == nil {
-		if securityCheck.DockerBenchMarkCheck {
+		if securityCheck.DockerCIS {
 			securityCheck.Job = Job_Type_BM_Docker
 		}
-		if securityCheck.KubeBenchMarkCheck {
+		if securityCheck.KubenetesCIS {
 			securityCheck.Job = Job_Type_BM_K8S
 		}
 
@@ -114,6 +115,11 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		} else {
 			task.Type = securityCheck.Job.Type
 		}
+
+		// 集群ID
+		if this.ClusterCheckObject != nil {
+			task.ClusterId = this.ClusterCheckObject.Id
+		}
 		task.Name = taskpre + task.Id
 		task.Host = securityCheck.Host
 		task.Container = securityCheck.Container
@@ -149,6 +155,10 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		task.Account = securityCheck.Job.Account
 		task.Job = securityCheck.Job
 		task.Spec = securityCheck.Job.Spec
+		if this.ClusterCheckObject != nil {
+			task.ClusterId = this.ClusterCheckObject.Id
+		}
+
 		//添加task记录
 		task.Add()
 	}
@@ -177,7 +187,11 @@ func (this *SecurityCheckService) genBenchmarkTask(securityCheck *models.Securit
 	task.Account = securityCheck.Job.Account
 	task.Job = securityCheck.Job
 	task.Spec = securityCheck.Job.Spec
+	if this.ClusterCheckObject != nil {
+		task.ClusterId = this.ClusterCheckObject.Id
+	}
 	task.Add()
+
 	taskLog := models.TaskLog{}
 	taskRawInfo, _ := json.Marshal(task)
 	taskLog.Task = string(taskRawInfo)
@@ -245,7 +259,70 @@ func (this *SecurityCheckService) DeliverTask(isPrepare bool) models.Result {
 	return ResultData
 }
 
+func (this *SecurityCheckService) ClusterCheck() models.Result {
+	result := models.Result{Code: http.StatusOK}
+	this.PrePareDefaultJob()
+	this.PrePareDefaultTMP()
 
-func (this *SecurityCheckService) ClusterCheck()  {
+	// 获取集群内主机
+	host := models.HostConfig{ClusterId: this.ClusterCheckObject.Id}
+	hostResult := host.List(0, 0)
+	if hostResult.Code != http.StatusOK {
+		result.Code = utils.GetHostListForClusterErr
+		return result
+	}
+	hostList := hostResult.Data.(map[string]interface{})[models.Result_Items].([]*models.HostConfig)
+
+	// 生成task
+	for _, host := range hostList {
+		if this.ClusterCheckObject.KubenetesCIS {
+			securityCheck := models.SecurityCheck{
+				KubenetesCIS: this.ClusterCheckObject.KubenetesCIS,
+				Host:         host,
+				Type:         models.SC_Type_Host,
+			}
+			this.PrePareTask(&securityCheck)
+		}
+		if this.ClusterCheckObject.DockerCIS {
+			securityCheck := models.SecurityCheck{
+				DockerCIS: this.ClusterCheckObject.DockerCIS,
+				Host:      host,
+				Type:      models.SC_Type_Host,
+			}
+			this.PrePareTask(&securityCheck)
+		}
+		if this.ClusterCheckObject.VirusScan {
+			securityCheck := models.SecurityCheck{
+				VirusScan: this.ClusterCheckObject.VirusScan,
+				Host:      host,
+				Type:      models.SC_Type_Host,
+			}
+			this.PrePareTask(&securityCheck)
+		}
+		if this.ClusterCheckObject.LeakScan {
+			securityCheck := models.SecurityCheck{
+				LeakScan: this.ClusterCheckObject.LeakScan,
+				Host:     host,
+				Type:     models.SC_Type_Host,
+			}
+			this.PrePareTask(&securityCheck)
+		}
+	}
+
+	// 下发
+	wsDelive := ws.WSDeliverService{
+		Hub:                  models.WSHub,
+		Bath:                 this.Batch,
+		CurrentBatchTaskList: this.CurrentBatchTaskList,
+	}
+	go wsDelive.DeliverTaskToNats()
+
+	data := make(map[string]interface{})
+	data[models.Result_Items] = this.ClusterCheckObject
+	data[models.Result_Total] = 0
+
+	result.Data = data
+	// 返回批次
+	return result
 
 }

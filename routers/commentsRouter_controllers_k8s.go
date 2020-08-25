@@ -52,6 +52,15 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/k8s:ClusterController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/k8s:ClusterController"],
+		beego.ControllerComments{
+			Method:           "ClusterSecurityCheck",
+			Router:           `/securitycheck`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
 	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/k8s:DeploymentController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/k8s:DeploymentController"],
 		beego.ControllerComments{
 			Method:           "GetDeploymentList",

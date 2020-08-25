@@ -86,7 +86,7 @@ func (this *JobService) SetTPLType(targetType, resType string) (seccheck *models
 	seccheck.Type = resType
 	switch targetType {
 	case models.TMP_Type_BM_Docker, models.TMP_Type_BM_K8S:
-		seccheck.DockerBenchMarkCheck = true
+		seccheck.DockerCIS = true
 	case models.TMP_Type_DockerVS, models.TMP_Type_HostVS:
 		seccheck.VirusScan = true
 	case models.TMP_Type_LS:

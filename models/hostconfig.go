@@ -119,6 +119,9 @@ func (this *HostConfig) List(from, limit int) Result {
 	if this.AccountName != "" && this.AccountName != Account_Admin {
 		cond = cond.And("account_name", this.AccountName)
 	}
+	if this.ClusterId != "" {
+		cond = cond.And("cluster_id", this.ClusterId)
+	}
 	_, err = o.QueryTable(utils.HostConfig).SetCond(cond).Limit(limit, from).OrderBy("-host_name").RelatedSel().All(&HostConfigList)
 	if err != nil {
 		ResultData.Message = err.Error()

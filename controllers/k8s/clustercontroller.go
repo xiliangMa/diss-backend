@@ -211,25 +211,18 @@ func (this *ClusterController) SyncCluster() {
 	this.ServeJSON(false)
 }
 
-
 // @Title ClusterSecurityCheck
 // @Description ClusterSecurityCheck
 // @Param token header string true "authToken"
-// @Param docker query bool false "docker cis"
-// @Param kubernetes query bool false "kubernetes cis"
-// @Param id path string "" true "Id"
+// @Param body body models.ClusterCheck true "集群检查"
 // @Success 200 {object} models.Result
-// @router /:id/securitycheck [post]
+// @router /securitycheck [post]
 func (this *ClusterController) ClusterSecurityCheck() {
-	id := this.GetString(":id")
-	docker := this.GetString("docker")
-	kubernetes := this.GetString("kubernetes")
-	cluster := new(models.Cluster)
-	cluster.Id = id
+	clusterCheck := new(models.ClusterCheck)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &clusterCheck)
 	batch := time.Now().Unix()
-	securityCheckService := securitycheck.SecurityCheckService{SecurityCheckList: checkList, Batch: batch}
-	this.Data["json"] = securityCheckService.DeliverTask(true)
-	this.ServeJSON(false)
-	this.Data["json"] = K8sSyncService.Sync()
+	clusterCheck.Batch = batch
+	securityCheckService := securitycheck.SecurityCheckService{ClusterCheckObject: clusterCheck, Batch: batch}
+	this.Data["json"] = securityCheckService.ClusterCheck()
 	this.ServeJSON(false)
 }

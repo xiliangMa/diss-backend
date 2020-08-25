@@ -23,6 +23,7 @@ type Task struct {
 	CreateTime     time.Time        `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
 	UpdateTime     time.Time        `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
 	Job            *Job             `orm:"rel(fk);null;" description:"(job)"`
+	ClusterId      string           `orm:"size(256)" description:"(集群Id)"`
 }
 
 type TaskLogInterface interface {
@@ -81,6 +82,9 @@ func (this *Task) List(from, limit int) Result {
 	}
 	if this.Name != "" {
 		cond = cond.And("name__contains", this.Name)
+	}
+	if this.ClusterId != "" {
+		cond = cond.And("cluster_id", this.ClusterId)
 	}
 	if this.Status != "" && this.Status != All {
 		cond = cond.And("status", this.Status)
