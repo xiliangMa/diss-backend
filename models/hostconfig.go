@@ -227,6 +227,9 @@ func (this *HostConfig) Delete() Result {
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
+	if this.ClusterName != "" {
+		cond = cond.And("cluster_name", this.ClusterName)
+	}
 	if this.ClusterId != "" {
 		cond = cond.And("cluster_id", this.ClusterId)
 	}

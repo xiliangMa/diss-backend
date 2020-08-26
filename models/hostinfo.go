@@ -194,6 +194,9 @@ func (this *HostInfo) Delete() Result {
 	if this.ClusterId != "" {
 		cond = cond.And("cluster_id", this.ClusterId)
 	}
+	if this.ClusterName != "" {
+		cond = cond.And("cluster_name", this.ClusterName)
+	}
 	_, err := o.QueryTable(utils.HostInfo).SetCond(cond).Delete()
 
 	if err != nil {
