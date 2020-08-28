@@ -50,9 +50,10 @@ func init() {
 	// 3. GRManager
 	models.GRM = models.NewGoRoutineManager()
 
-	// 4. KCHub
-	models.KCHub = models.NewKubernetesClientManager()
+	// 4. KCM
+	models.KCM = models.NewKubernetesClientManager()
 	models.InitClientHub()
+	models.InitDymaicClientHub()
 
 	// watch all cluster
 	k8sWatchService := k8s.K8sWatchService{}

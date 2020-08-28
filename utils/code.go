@@ -126,6 +126,10 @@ var (
 	EditNetworkPolicyErr             = 1020
 	DeleteNetworkPolicyErr           = 1021
 	GetHostListForClusterErr         = 1022
+	GetSsopeYmlErr                   = 1023
+	AnalysisSsopeYmlErr              = 1024
+	InstallSsopeErr                  = 1025
+	CretaeResourceError              = 1026
 
 	//task job 1100-1200
 	AddTaskErr        = 1100

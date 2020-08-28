@@ -190,3 +190,8 @@ func IsEnableNats() bool {
 	}
 	return enable
 }
+
+func GetScopeYml() string {
+	scopeYml := beego.AppConfig.String("k8s::ScopeYml")
+	return scopeYml
+}
