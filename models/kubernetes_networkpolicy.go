@@ -74,6 +74,15 @@ func (this *NetworkPolicy) List(from, limit int) Result {
 	if this.Name != "" {
 		cond = cond.And("name__icontains", this.Name)
 	}
+	if this.ClusterId != "" {
+		cond = cond.And("cluster_id", this.ClusterId)
+	}
+	if this.ClusterName != "" {
+		cond = cond.And("cluster_name", this.ClusterName)
+	}
+	if this.NameSpaceName != "" {
+		cond = cond.And("name_space_name", this.NameSpaceName)
+	}
 	_, err = o.QueryTable(utils.NetworkPolicy).SetCond(cond).Limit(limit, from).All(&NetworkPolicyList)
 
 	if err != nil {
