@@ -7,6 +7,7 @@ import (
 	"github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/k8s"
+	"github.com/xiliangMa/diss-backend/service/scope"
 	"github.com/xiliangMa/diss-backend/service/securitycheck"
 	css "github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -224,5 +225,29 @@ func (this *ClusterController) ClusterSecurityCheck() {
 	clusterCheck.Batch = batch
 	securityCheckService := securitycheck.SecurityCheckService{ClusterCheckObject: clusterCheck, Batch: batch}
 	this.Data["json"] = securityCheckService.ClusterCheck()
+	this.ServeJSON(false)
+}
+
+// @Title Scope
+// @Description Scope
+// @Param token header string true "authToken"
+// @Param id path string "" true "Id"
+// @Param isActive query bool false true "是否激活"
+// @Success 200 {object} models.Result
+// @router /:id/scope [post]
+func (this *ClusterController) Scope() {
+	id := this.GetString(":id")
+	isActive, _ := this.GetBool("isActive")
+	cluster := models.Cluster{Id: id}
+	result := cluster.List(0, 0)
+	if result.Code != http.StatusOK && result.Data != nil {
+		this.Data["json"] = result
+		this.ServeJSON(false)
+	}
+
+	data := result.Data.(map[string]interface{})
+	clusterList := data["items"].([]*models.Cluster)
+	scopeService := scope.ScopeService{Cluster: clusterList[0], IsActive: isActive}
+	this.Data["json"] = scopeService.ActiveOrDisableScope()
 	this.ServeJSON(false)
 }

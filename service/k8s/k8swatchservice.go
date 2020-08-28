@@ -41,10 +41,10 @@ func (this *K8sWatchService) WatchCluster() models.Result {
 	clusterName := this.Cluster.Name
 	clusterId := this.Cluster.Id
 	clientGo := models.ClientGo{}
-	if _, ok := models.KCHub.ClientHub[clusterId]; !ok {
-		models.KCHub.ClientHub[clusterId] = models.CreateK8sClient(models.BuildApiParams(this.Cluster))
+	if _, ok := models.KCM.ClientHub[clusterId]; !ok {
+		models.KCM.ClientHub[clusterId] = models.CreateK8sClient(models.BuildApiParams(this.Cluster))
 	}
-	clientGo = models.KCHub.ClientHub[clusterId]
+	clientGo = models.KCM.ClientHub[clusterId]
 
 	if clientGo.ErrMessage == "" {
 		this.Cluster.SyncStatus = models.Cluster_Sync_Status_InProcess

@@ -42,7 +42,7 @@ func (this *NetworkPolicyController) GetNetworkPolicysList() {
 func (this *NetworkPolicyController) AddNetworkPolicy() {
 	NetworkPolicy := new(models.NetworkPolicy)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &NetworkPolicy)
-	netpolService := k8s.NetworkPolicyService{NetworkPolicy: NetworkPolicy, ClientGo: models.KCHub.ClientHub[NetworkPolicy.ClusterId]}
+	netpolService := k8s.NetworkPolicyService{NetworkPolicy: NetworkPolicy, ClientGo: models.KCM.ClientHub[NetworkPolicy.ClusterId]}
 	object, err := netpolService.Create()
 	if err != nil {
 		logs.Error("Add NetworkPolicy fail, err: %s", err)
@@ -86,8 +86,8 @@ func (this *NetworkPolicyController) DeleteNetworkPolicy() {
 	if data := NetworkPolicy.List(0, 0).Data; data != nil {
 		items := data.(map[string]interface{})["items"].([]*models.NetworkPolicy)
 		NetworkPolicy = items[0]
-		if _, ok := models.KCHub.ClientHub[NetworkPolicy.ClusterId]; ok {
-			clientGo = models.KCHub.ClientHub[NetworkPolicy.ClusterId]
+		if _, ok := models.KCM.ClientHub[NetworkPolicy.ClusterId]; ok {
+			clientGo = models.KCM.ClientHub[NetworkPolicy.ClusterId]
 		} else {
 			cluster := new(models.Cluster)
 			if data := cluster.List(0, 0).Data; data != nil {
