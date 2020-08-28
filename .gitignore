@@ -17,11 +17,13 @@ lastupdate.tmp
 mem*
 build/*
 
-#kubeconfig
-conf/kubeconfig/*
-
 #upload
-upload/*
+#upload/*
+upload/audit/*
+upload/kubernetes/*
+upload/license/*
+upload/logo/*
+
 
 #license_srv
 license_srv/*
