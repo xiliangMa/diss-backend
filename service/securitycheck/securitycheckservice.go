@@ -28,9 +28,72 @@ func (this *SecurityCheckService) PrePare() {
 	for _, securityCheck := range this.SecurityCheckList.CheckList {
 		switch securityCheck.Type {
 		case models.SC_Type_Host:
-			this.PrePareTask(securityCheck)
+			if securityCheck.KubenetesCIS {
+				securityCheck := models.SecurityCheck{
+					KubenetesCIS: securityCheck.KubenetesCIS,
+					Host:         securityCheck.Host,
+					Type:         models.SC_Type_Host,
+				}
+				this.PrePareTask(&securityCheck)
+			}
+			if securityCheck.DockerCIS {
+				securityCheck := models.SecurityCheck{
+					DockerCIS: securityCheck.DockerCIS,
+					Host:      securityCheck.Host,
+					Type:      models.SC_Type_Host,
+				}
+				this.PrePareTask(&securityCheck)
+			}
+			if securityCheck.VirusScan {
+				securityCheck := models.SecurityCheck{
+					VirusScan: securityCheck.VirusScan,
+					Host:      securityCheck.Host,
+					Type:      models.SC_Type_Host,
+				}
+				this.PrePareTask(&securityCheck)
+			}
+			if securityCheck.LeakScan {
+				securityCheck := models.SecurityCheck{
+					LeakScan: securityCheck.LeakScan,
+					Host:     securityCheck.Host,
+					Type:     models.SC_Type_Host,
+				}
+				this.PrePareTask(&securityCheck)
+			}
+
 		case models.Sc_Type_Container:
-			this.PrePareTask(securityCheck)
+			if securityCheck.KubenetesCIS {
+				securityCheck := models.SecurityCheck{
+					KubenetesCIS: securityCheck.KubenetesCIS,
+					Container:    securityCheck.Container,
+					Type:         models.SC_Type_Host,
+				}
+				this.PrePareTask(&securityCheck)
+			}
+			if securityCheck.DockerCIS {
+				securityCheck := models.SecurityCheck{
+					DockerCIS: securityCheck.DockerCIS,
+					Container: securityCheck.Container,
+					Type:      models.SC_Type_Host,
+				}
+				this.PrePareTask(&securityCheck)
+			}
+			if securityCheck.VirusScan {
+				securityCheck := models.SecurityCheck{
+					VirusScan: securityCheck.VirusScan,
+					Container: securityCheck.Container,
+					Type:      models.SC_Type_Host,
+				}
+				this.PrePareTask(&securityCheck)
+			}
+			if securityCheck.LeakScan {
+				securityCheck := models.SecurityCheck{
+					LeakScan:  securityCheck.LeakScan,
+					Container: securityCheck.Container,
+					Type:      models.SC_Type_Host,
+				}
+				this.PrePareTask(&securityCheck)
+			}
 		}
 	}
 	logs.Info("PrePare task end ......")
