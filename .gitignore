@@ -21,7 +21,7 @@ build/*
 #upload/*
 upload/audit/*
 upload/kubernetes/*
-upload/license/*
+#upload/license/*
 upload/logo/*
 
 

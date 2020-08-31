@@ -19,6 +19,7 @@ services:
     depends_on:
       - diss-db
     volumes:
+      - ./TrialLicense.lic:/opt/diss-backend/upload/license/TrialLicense.lic
       - /var/lib/diss/diss-backend/upload:/opt/diss-backend/upload
       - /var/log/diss-backend:/opt/diss-backend/logs
       - ./conf:/opt/diss-backend/conf
