@@ -76,12 +76,18 @@ var (
 	Tab_Create_WarningInfo = `CREATE TABLE "public"."warning_info" (
 	  "id" varchar(128) COLLATE "pg_catalog"."default" NOT NULL,
 	  "name" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "host_id" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "host_name" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "cluster" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "account" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "info" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
 	  "level" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "status" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "create_time" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
-	  "update_time" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying
+	  "update_time" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "proposal" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
+	  "analysis" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text
 	)
 	;
 	ALTER TABLE "public"."warning_info" OWNER TO "postgres";
