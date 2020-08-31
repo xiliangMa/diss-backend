@@ -106,7 +106,7 @@ func (this *WarningInfo) List(from, limit int) Result {
 }
 
 func (this *WarningInfo) Add() Result {
-	insertSql := `INSERT INTO ` + utils.WarningInfo + ` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	insertSql := `INSERT INTO ` + utils.WarningInfo + ` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
@@ -118,16 +118,18 @@ func (this *WarningInfo) Add() Result {
 	_, err := o.Raw(insertSql,
 		this.Id,
 		this.Name,
+		this.HostId,
 		this.HostName,
+		this.Cluster,
+		this.Account,
 		this.Type,
+		this.Info,
 		this.Level,
 		this.Status,
 		this.CreateTime,
 		this.UpdateTime,
 		this.Proposal,
-		this.Analysis,
-		this.Info,
-		this.HostId).Exec()
+		this.Analysis).Exec()
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
