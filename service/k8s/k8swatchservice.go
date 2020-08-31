@@ -42,7 +42,7 @@ func (this *K8sWatchService) WatchCluster() models.Result {
 	clusterId := this.Cluster.Id
 	clientGo := models.ClientGo{}
 	if _, ok := models.KCHub.ClientHub[clusterId]; !ok {
-		clientGo = models.CreateK8sClient(models.BuildApiParams(this.Cluster))
+		models.KCHub.ClientHub[clusterId] = models.CreateK8sClient(models.BuildApiParams(this.Cluster))
 	}
 	clientGo = models.KCHub.ClientHub[clusterId]
 
