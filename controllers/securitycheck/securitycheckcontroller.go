@@ -29,6 +29,6 @@ func (this *SecurityCheckController) SecurityCheck() {
 	json.Unmarshal(this.Ctx.Input.RequestBody, &checkList)
 	batch := time.Now().Unix()
 	securityCheckService := securitycheck.SecurityCheckService{SecurityCheckList: checkList, Batch: batch}
-	this.Data["json"] = securityCheckService.DeliverTask(true)
+	this.Data["json"] = securityCheckService.DeliverTask()
 	this.ServeJSON(false)
 }

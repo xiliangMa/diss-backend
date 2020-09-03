@@ -35,10 +35,9 @@ func (this *JobService) ActiveJob() models.Result {
 
 		if len(this.securityCheckList) > 0 {
 			// 通过checklist生成task
-			securityCheckService := this.GenTask()
-
+			securityCheckService := this.InitsecurityCheckService()
 			// 下发task，更新job状态
-			ResultData = securityCheckService.DeliverTask(false)
+			ResultData = securityCheckService.DeliverTask()
 			job.Status = models.Job_Status_Active
 			job.Update()
 		}
@@ -47,12 +46,12 @@ func (this *JobService) ActiveJob() models.Result {
 	return ResultData
 }
 
-func (this *JobService) GenTask() securitycheck.SecurityCheckService {
+func (this *JobService) InitsecurityCheckService() securitycheck.SecurityCheckService {
 
 	batch := time.Now().Unix()
 	SecCheckListModel := models.SecurityCheckList{CheckList: this.securityCheckList}
 	securityCheckService := securitycheck.SecurityCheckService{SecurityCheckList: &SecCheckListModel, Batch: batch}
-	securityCheckService.PrePare()
+
 	return securityCheckService
 }
 

@@ -26,6 +26,7 @@ func (this *SecurityCheckService) PrePare() {
 	this.PrePareDefaultTMP()
 	logs.Info("PrePare task start ......")
 	for _, securityCheck := range this.SecurityCheckList.CheckList {
+		job := securityCheck.Job
 		switch securityCheck.Type {
 		case models.SC_Type_Host:
 			if securityCheck.KubenetesCIS {
@@ -33,6 +34,9 @@ func (this *SecurityCheckService) PrePare() {
 					KubenetesCIS: securityCheck.KubenetesCIS,
 					Host:         securityCheck.Host,
 					Type:         models.SC_Type_Host,
+				}
+				if job != nil {
+					securityCheck.Job = job
 				}
 				this.PrePareTask(&securityCheck)
 			}
@@ -42,6 +46,9 @@ func (this *SecurityCheckService) PrePare() {
 					Host:      securityCheck.Host,
 					Type:      models.SC_Type_Host,
 				}
+				if job != nil {
+					securityCheck.Job = job
+				}
 				this.PrePareTask(&securityCheck)
 			}
 			if securityCheck.VirusScan {
@@ -50,6 +57,9 @@ func (this *SecurityCheckService) PrePare() {
 					Host:      securityCheck.Host,
 					Type:      models.SC_Type_Host,
 				}
+				if job != nil {
+					securityCheck.Job = job
+				}
 				this.PrePareTask(&securityCheck)
 			}
 			if securityCheck.LeakScan {
@@ -57,6 +67,9 @@ func (this *SecurityCheckService) PrePare() {
 					LeakScan: securityCheck.LeakScan,
 					Host:     securityCheck.Host,
 					Type:     models.SC_Type_Host,
+				}
+				if job != nil {
+					securityCheck.Job = job
 				}
 				this.PrePareTask(&securityCheck)
 			}
@@ -68,6 +81,9 @@ func (this *SecurityCheckService) PrePare() {
 					Container:    securityCheck.Container,
 					Type:         models.SC_Type_Host,
 				}
+				if job != nil {
+					securityCheck.Job = job
+				}
 				this.PrePareTask(&securityCheck)
 			}
 			if securityCheck.DockerCIS {
@@ -75,6 +91,9 @@ func (this *SecurityCheckService) PrePare() {
 					DockerCIS: securityCheck.DockerCIS,
 					Container: securityCheck.Container,
 					Type:      models.SC_Type_Host,
+				}
+				if job != nil {
+					securityCheck.Job = job
 				}
 				this.PrePareTask(&securityCheck)
 			}
@@ -84,6 +103,9 @@ func (this *SecurityCheckService) PrePare() {
 					Container: securityCheck.Container,
 					Type:      models.SC_Type_Host,
 				}
+				if job != nil {
+					securityCheck.Job = job
+				}
 				this.PrePareTask(&securityCheck)
 			}
 			if securityCheck.LeakScan {
@@ -92,9 +114,13 @@ func (this *SecurityCheckService) PrePare() {
 					Container: securityCheck.Container,
 					Type:      models.SC_Type_Host,
 				}
+				if job != nil {
+					securityCheck.Job = job
+				}
 				this.PrePareTask(&securityCheck)
 			}
 		}
+
 	}
 	logs.Info("PrePare task end ......")
 
@@ -140,10 +166,10 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		//}
 	}
 
-	taskpre := "系统任务-"
 	if securityCheck.Job == nil {
 		return
 	}
+	taskpre := "系统任务-"
 	if securityCheck.Job.JobLevel == models.Job_Level_User {
 		taskpre = "用户任务-"
 	}
@@ -195,14 +221,8 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		task.Add()
 
 		//添加任务日志
-		taskLog := models.TaskLog{}
-		taskRawInfo, _ := json.Marshal(task)
-		taskLog.Task = string(taskRawInfo)
-		taskLog.Account = securityCheck.Job.Account
-		taskLog.Level = models.Log_level_Info
-		taskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Batch: %v, KStatus: %s",
-			task.Id, task.Type, task.Batch, task.Status)
-		taskLog.Add()
+		this.saveTaskLog(task, securityCheck)
+
 	}
 	if securityCheck.LeakScan {
 		//漏洞
@@ -221,9 +241,10 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		if this.ClusterCheckObject != nil {
 			task.ClusterId = this.ClusterCheckObject.Id
 		}
+		task.Add()
 
 		//添加task记录
-		task.Add()
+		this.saveTaskLog(task, securityCheck)
 	}
 }
 
@@ -253,8 +274,14 @@ func (this *SecurityCheckService) genBenchmarkTask(securityCheck *models.Securit
 	if this.ClusterCheckObject != nil {
 		task.ClusterId = this.ClusterCheckObject.Id
 	}
-	task.Add()
 
+	task.Add()
+	this.saveTaskLog(task, securityCheck)
+
+	return task
+}
+
+func (this *SecurityCheckService) saveTaskLog(task *models.Task, securityCheck *models.SecurityCheck) {
 	taskLog := models.TaskLog{}
 	taskRawInfo, _ := json.Marshal(task)
 	taskLog.Task = string(taskRawInfo)
@@ -262,7 +289,7 @@ func (this *SecurityCheckService) genBenchmarkTask(securityCheck *models.Securit
 	taskLog.Level = models.Log_level_Info
 	taskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Batch: %v, KStatus: %s",
 		task.Id, task.Type, task.Batch, task.Status)
-	return task
+	taskLog.Add()
 }
 
 func (this *SecurityCheckService) PrePareDefaultTMP() map[string]*models.SystemTemplate {
@@ -295,12 +322,10 @@ func (this *SecurityCheckService) GetCurrentBatchTask() []*models.Task {
 	return this.CurrentBatchTaskList
 }
 
-func (this *SecurityCheckService) DeliverTask(isPrepare bool) models.Result {
+func (this *SecurityCheckService) DeliverTask() models.Result {
 	var ResultData models.Result
 
-	if isPrepare {
-		this.PrePare()
-	}
+	this.PrePare()
 
 	wsDelive := ws.WSDeliverService{
 		Hub:                  models.WSHub,
