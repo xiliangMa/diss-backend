@@ -26,17 +26,15 @@ func (this *SecurityCheckService) PrePare() {
 	this.PrePareDefaultTMP()
 	logs.Info("PrePare task start ......")
 	for _, securityCheck := range this.SecurityCheckList.CheckList {
-		job := securityCheck.Job
 		switch securityCheck.Type {
 		case models.SC_Type_Host:
+			job := securityCheck.Job
 			if securityCheck.KubenetesCIS {
 				securityCheck := models.SecurityCheck{
 					KubenetesCIS: securityCheck.KubenetesCIS,
 					Host:         securityCheck.Host,
 					Type:         models.SC_Type_Host,
-				}
-				if job != nil {
-					securityCheck.Job = job
+					Job:          job,
 				}
 				this.PrePareTask(&securityCheck)
 			}
@@ -45,9 +43,7 @@ func (this *SecurityCheckService) PrePare() {
 					DockerCIS: securityCheck.DockerCIS,
 					Host:      securityCheck.Host,
 					Type:      models.SC_Type_Host,
-				}
-				if job != nil {
-					securityCheck.Job = job
+					Job:       job,
 				}
 				this.PrePareTask(&securityCheck)
 			}
@@ -56,9 +52,7 @@ func (this *SecurityCheckService) PrePare() {
 					VirusScan: securityCheck.VirusScan,
 					Host:      securityCheck.Host,
 					Type:      models.SC_Type_Host,
-				}
-				if job != nil {
-					securityCheck.Job = job
+					Job:       job,
 				}
 				this.PrePareTask(&securityCheck)
 			}
@@ -67,22 +61,19 @@ func (this *SecurityCheckService) PrePare() {
 					LeakScan: securityCheck.LeakScan,
 					Host:     securityCheck.Host,
 					Type:     models.SC_Type_Host,
-				}
-				if job != nil {
-					securityCheck.Job = job
+					Job:      job,
 				}
 				this.PrePareTask(&securityCheck)
 			}
 
 		case models.Sc_Type_Container:
+			job := securityCheck.Job
 			if securityCheck.KubenetesCIS {
 				securityCheck := models.SecurityCheck{
 					KubenetesCIS: securityCheck.KubenetesCIS,
 					Container:    securityCheck.Container,
 					Type:         models.SC_Type_Host,
-				}
-				if job != nil {
-					securityCheck.Job = job
+					Job:          job,
 				}
 				this.PrePareTask(&securityCheck)
 			}
@@ -91,9 +82,7 @@ func (this *SecurityCheckService) PrePare() {
 					DockerCIS: securityCheck.DockerCIS,
 					Container: securityCheck.Container,
 					Type:      models.SC_Type_Host,
-				}
-				if job != nil {
-					securityCheck.Job = job
+					Job:       job,
 				}
 				this.PrePareTask(&securityCheck)
 			}
@@ -102,9 +91,7 @@ func (this *SecurityCheckService) PrePare() {
 					VirusScan: securityCheck.VirusScan,
 					Container: securityCheck.Container,
 					Type:      models.SC_Type_Host,
-				}
-				if job != nil {
-					securityCheck.Job = job
+					Job:       job,
 				}
 				this.PrePareTask(&securityCheck)
 			}
@@ -113,9 +100,7 @@ func (this *SecurityCheckService) PrePare() {
 					LeakScan:  securityCheck.LeakScan,
 					Container: securityCheck.Container,
 					Type:      models.SC_Type_Host,
-				}
-				if job != nil {
-					securityCheck.Job = job
+					Job:       job,
 				}
 				this.PrePareTask(&securityCheck)
 			}
