@@ -18,8 +18,8 @@ type Task struct {
 	Status         string           `orm:"null;" description:"(状态: 未开始、执行中、完成、暂停)"`
 	Batch          int64            `orm:"default(0);" description:"(任务批次)"`
 	SystemTemplate *SystemTemplate  `orm:"rel(fk);null;" description:"(系统模板)"`
-	Host           *HostConfig      `orm:"rel(fk);null;" description:"(主机)"`
-	Container      *ContainerConfig `orm:"rel(fk);null;" description:"(容器)"`
+	Host           *HostConfig      `orm:"rel(fk);null;on_delete(set_null)"description:"(主机)"`
+	Container      *ContainerConfig `orm:"rel(fk);null;on_delete(set_null)" description:"(容器)"`
 	CreateTime     time.Time        `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
 	UpdateTime     time.Time        `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
 	Job            *Job             `orm:"rel(fk);null;" description:"(job)"`
