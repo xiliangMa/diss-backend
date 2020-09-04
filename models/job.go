@@ -53,6 +53,10 @@ func (this *Job) List(from, limit int) Result {
 	if this.Name != "" {
 		cond = cond.And("name__icontains", this.Name)
 	}
+	if this.JobLevel == "" {
+		cond = cond.And("job_level", Job_Level_User)
+	}
+
 	_, err = o.QueryTable(utils.Job).SetCond(cond).RelatedSel().Limit(limit, from).OrderBy("-create_time").All(&JobList)
 
 	for _, job := range JobList {
