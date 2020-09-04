@@ -43,6 +43,7 @@ Retry:
 				os := object.Status.NodeInfo.OSImage
 				clusterId := this.Cluster.Id
 				clusterName := this.Cluster.Name
+				cType := this.Cluster.Type
 
 				KMetaData, _ := json.Marshal(object.ObjectMeta)
 				KSpec, _ := json.Marshal(object.Spec)
@@ -98,6 +99,31 @@ Retry:
 				hi.KSpec = string(KSpec)
 				hc.KStatus = string(KStatus)
 				hi.KStatus = string(KStatus)
+
+				// 公用数据
+				hc.KubernetesVer = nStatusNodeinfo.KubeletVersion
+				hi.KubernetesVer = nStatusNodeinfo.KubeletVersion
+
+				switch cType {
+				case models.Cluster_Type_Rancher:
+					_, controlOK := object.Labels[models.Clster_Node_Label_Control_Rancher]
+					_, workerOK := object.Labels[models.Clster_Node_Label_Worker]
+					if controlOK && workerOK {
+						hc.NodeRole = models.Clster_Node_Roler_All
+					} else if controlOK {
+						hc.NodeRole = models.Clster_Node_Roler_Master
+					} else if workerOK {
+						hc.NodeRole = models.Clster_Node_Roler_Worker
+					}
+					// kubernetes openshift
+				default:
+					_, masterOK := object.Labels[models.Clster_Node_Label_Master]
+					if masterOK {
+						hc.NodeRole = models.Clster_Node_Roler_Master
+					} else {
+						hc.NodeRole = models.Clster_Node_Roler_Worker
+					}
+				}
 
 				logs.Info("Watch >>> Node: %s <<<, >>> Cluster: %s <<<, >>> EventType: %s <<<", id, clusterId, event.Type)
 				switch event.Type {

@@ -33,6 +33,8 @@ type HostConfig struct {
 	KMetaData         string    `orm:"" description:"(源数据)"`
 	KSpec             string    `orm:"" description:"(Spec数据)"`
 	KStatus           string    `orm:"" description:"(状态数据)"`
+	KubernetesVer     string    `orm:"size(64)" description:"(kubernetes 版本)"`
+	NodeRole          string    `orm:"size(64)" description:"(集群主机角色)"`
 }
 
 type HostConfigInterface interface {
