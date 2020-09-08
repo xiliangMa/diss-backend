@@ -63,10 +63,19 @@ Retry:
 				netpol.EgressPolicy = models.Network_Policy_Type_Value_Allow
 				if object.Spec.Ingress == nil {
 					netpol.IngressPolicy = models.Network_Policy_Type_Value_Refuse
+				} else {
+					if object.Spec.Ingress[0].From == nil && object.Spec.Ingress[0].Ports == nil {
+						netpol.IngressPolicy = models.Network_Policy_Type_Value_AllowAll
+					}
 				}
 				if object.Spec.Egress == nil {
 					netpol.EgressPolicy = models.Network_Policy_Type_Value_Refuse
+				} else {
+					if object.Spec.Egress[0].To == nil && object.Spec.Egress[0].Ports == nil {
+						netpol.EgressPolicy = models.Network_Policy_Type_Value_AllowAll
+					}
 				}
+
 				logs.Info("Watch >>> NetworkPolicy: %s <<<, >>> Cluster: %s <<<,  >>> NameSpace: %s <<<, >>> EventType: %s <<<", id, clusterId, name, event.Type)
 				switch event.Type {
 				case watch.Added:
