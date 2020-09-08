@@ -13,6 +13,8 @@ type NetworkPolicy struct {
 	AccountName   string `orm:"size(32)" description:"(租户)"`
 	ClusterId     string `orm:"size(256)" description:"(集群Id)"`
 	ClusterName   string `orm:"size(32)" description:"(集群名)"`
+	IngressPolicy string `orm:"size(32)" description:"(入站策略 Allow Refuse 默认)"`
+	EgressPolicy  string `orm:"size(32)" description:"(出站策略 Allow Refuse 默认)"`
 	NameSpaceName string `orm:"size(255);default(null);" description:"(命名空间)"`
 	KMetaData     string `orm:"" description:"(源数据)"`
 	KSpec         string `orm:"" description:"(Spec数据)"`

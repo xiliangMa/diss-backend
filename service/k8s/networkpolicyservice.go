@@ -59,6 +59,14 @@ Retry:
 				netpol.KMetaData = string(KMetaData)
 				netpol.KSpec = string(KSpec)
 
+				netpol.IngressPolicy = models.Network_Policy_Type_Value_Allow
+				netpol.EgressPolicy = models.Network_Policy_Type_Value_Allow
+				if object.Spec.Ingress == nil {
+					netpol.IngressPolicy = models.Network_Policy_Type_Value_Refuse
+				}
+				if object.Spec.Egress == nil {
+					netpol.EgressPolicy = models.Network_Policy_Type_Value_Refuse
+				}
 				logs.Info("Watch >>> NetworkPolicy: %s <<<, >>> Cluster: %s <<<,  >>> NameSpace: %s <<<, >>> EventType: %s <<<", id, clusterId, name, event.Type)
 				switch event.Type {
 				case watch.Added:

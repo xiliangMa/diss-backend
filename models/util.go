@@ -33,6 +33,10 @@ var (
 	Clster_Node_Roler_All             = "All"
 	Clster_Node_Roler_Worker          = "Worker"
 	Clster_Node_Roler_Master          = "Master"
+	Network_Policy_Type_Value_Allow   = "Allow"
+	Network_Policy_Type_Value_Refuse  = "Refuse"
+	Network_Policy_Type_Ingress       = "Ingress"
+	Network_Policy_Type_Egress        = "Egress"
 
 	Cmd_History_Type_Host      = "Host"
 	Cmd_History_Type_Container = "Container"
