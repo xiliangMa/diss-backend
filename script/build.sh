@@ -28,8 +28,12 @@ CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o "$BUILD_DIR/bin/diss-backend"
 echo "=========== 3. cp files for docker build ==========="
 cd $PROJECT_DIR
 cp -r conf swagger "$BUILD_DIR"
-cp entrypoint.sh script/install.sh upload/license/TrialLicense.lic "$BUILD_DIR"
+cp entrypoint.sh script/install.sh "$BUILD_DIR"
 cp docker-compose-prod.yml "$BUILD_DIR/docker-compose.yml"
+mkdir -p "$BUILD_DIR/upload/plugin/scope"
+mkdir -p "$BUILD_DIR/upload/plugin/license"
+cp ./upload/plugin/scope/diss-scope.yml "$BUILD_DIR/upload/plugin/scope"
+cp ./upload/license/TrialLicense.lic "$BUILD_DIR/upload/license/TrialLicense.lic"
 
 #### 停止容器
 echo "=========== 4. stop diss-backend and db ==========="
