@@ -24,6 +24,7 @@ type Task struct {
 	UpdateTime     time.Time        `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
 	Job            *Job             `orm:"rel(fk);null;" description:"(job)"`
 	ClusterId      string           `orm:"size(256)" description:"(集群Id)"`
+	IsOne          bool             `orm:"-" description:"(是否取单条记录)"`
 }
 
 type TaskLogInterface interface {
@@ -89,7 +90,14 @@ func (this *Task) List(from, limit int) Result {
 	if this.Status != "" && this.Status != All {
 		cond = cond.And("status", this.Status)
 	}
+	if this.Job != nil && this.Job.Id != "" {
+		cond = cond.And("job__id", this.Job.Id)
+		if this.IsOne {
+			limit = 1
+		}
+	}
 	_, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().Limit(limit, from).OrderBy("-update_time").All(&TaskList)
+
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetTaskErr
