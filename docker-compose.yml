@@ -19,7 +19,7 @@ services:
     depends_on:
       - diss-db
     volumes:
-      -  ./upload/plugin/scope/diss-scope.yml:/opt/diss-backend/upload/plugin/scope/diss-scope.yml
+      - ./upload/plugin/scope/diss-scope.yml:/opt/diss-backend/upload/plugin/scope/diss-scope.yml
       - ./upload/license/licenseTrialLicense.lic:/opt/diss-backend/upload/license/TrialLicense.lic
       - /var/lib/diss/diss-backend/upload:/opt/diss-backend/upload
       - /var/log/diss-backend:/opt/diss-backend/logs

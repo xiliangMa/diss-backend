@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/scope"
 	"github.com/xiliangMa/diss-backend/utils"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -63,6 +64,8 @@ Retry:
 					ns.Delete()
 					ns.Add(true)
 				case watch.Deleted:
+					scopeService := scope.ScopeService{Namespace: object, Cluster: this.Cluster}
+					scopeService.CheckScopeIsDisable()
 					ns.Delete()
 				case watch.Bookmark:
 					//todo

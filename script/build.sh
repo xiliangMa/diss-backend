@@ -31,7 +31,7 @@ cp -r conf swagger "$BUILD_DIR"
 cp entrypoint.sh script/install.sh "$BUILD_DIR"
 cp docker-compose-prod.yml "$BUILD_DIR/docker-compose.yml"
 mkdir -p "$BUILD_DIR/upload/plugin/scope"
-mkdir -p "$BUILD_DIR/upload/plugin/license"
+mkdir -p "$BUILD_DIR/upload/license"
 cp ./upload/plugin/scope/diss-scope.yml "$BUILD_DIR/upload/plugin/scope"
 cp ./upload/license/TrialLicense.lic "$BUILD_DIR/upload/license/TrialLicense.lic"
 

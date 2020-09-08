@@ -19,6 +19,8 @@ type Cluster struct {
 	Type        string    `orm:"size(32);default(Kubernetes)" description:"(类型 Kubernetes Openshift Rancher)"`
 	IsSync      bool      `orm:"default(false)" description:"(是否同步)"`
 	Label       string    `orm:"size(64);default(null)" description:"(标签)"`
+	ScopeUrl    string    `orm:"size(512);default()" description:"(scope访问地址)"`
+	SocpeStatus string    `orm:"size(64);default()" description:"(scope 操作状态)"`
 	AccountName string    `orm:"-" description:"(租户)"`
 	SyncStatus  string    `orm:"default(NotSynced)" description:"(同步状态 NotSynced 未同步 Synced 成功 InProcess 同步中 Fail 失败 Clearing 清理中)"`
 	CreateTime  time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`

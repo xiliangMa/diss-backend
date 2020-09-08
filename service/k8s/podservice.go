@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/scope"
 	"github.com/xiliangMa/diss-backend/utils"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -58,12 +59,19 @@ Retry:
 				pod.KStatus = string(KStatus)
 
 				logs.Info("Watch >>> Pod: %s <<<, >>> Cluster: %s <<<, >>> EventType: %s <<<", id, clusterName, event.Type)
+
+				// 根据 scope app 状态动态组件 集群 scope url
+				scopeService := scope.ScopeService{Pod: object, Cluster: this.Cluster}
+
 				switch event.Type {
 				case watch.Added:
+					scopeService.UpdatetClusterScopeUrlAndStatus(false)
 					pod.Add()
 				case watch.Modified:
+					scopeService.UpdatetClusterScopeUrlAndStatus(false)
 					pod.Add()
 				case watch.Deleted:
+					scopeService.UpdatetClusterScopeUrlAndStatus(true)
 					pod.Delete()
 				case watch.Bookmark:
 					//todo

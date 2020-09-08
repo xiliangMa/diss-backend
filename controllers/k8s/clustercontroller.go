@@ -243,11 +243,33 @@ func (this *ClusterController) Scope() {
 	if result.Code != http.StatusOK && result.Data != nil {
 		this.Data["json"] = result
 		this.ServeJSON(false)
+		return
 	}
 
 	data := result.Data.(map[string]interface{})
 	clusterList := data["items"].([]*models.Cluster)
-	scopeService := scope.ScopeService{Cluster: clusterList[0], IsActive: isActive}
-	this.Data["json"] = scopeService.ActiveOrDisableScope()
+	dbCluster := clusterList[0]
+	scopeService := scope.ScopeService{Cluster: dbCluster, IsActive: isActive}
+	result = scopeService.ActiveOrDisableScope()
+	if result.Code != http.StatusOK {
+		if !isActive {
+			dbCluster.SocpeStatus = models.Cluster_Scope_Operator_Status_DisableFail
+			logs.Info("Disable Scope fail, ClusterName: %s, Err: %s.", dbCluster.Name, result.Message)
+		} else {
+			dbCluster.SocpeStatus = models.Cluster_Scope_Operator_Status_ActiveFial
+			logs.Info("Active Scope fail, ClusterName: %s, Err: %s.", dbCluster.Name, result.Message)
+		}
+		this.Data["json"] = result
+		this.ServeJSON(false)
+		return
+	}
+	if !isActive {
+		logs.Info("Disable Scope success, ClusterName: %s", dbCluster.Name)
+	} else {
+		dbCluster.SocpeStatus = models.Cluster_Scope_Operator_Status_Activing
+		logs.Info("Active Scope success, ClusterName: %s", dbCluster.Name)
+	}
+	result = dbCluster.Update()
+	this.Data["json"] = result
 	this.ServeJSON(false)
 }

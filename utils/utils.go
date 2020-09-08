@@ -195,3 +195,13 @@ func GetScopeYml() string {
 	scopeYml := beego.AppConfig.String("k8s::ScopeYml")
 	return scopeYml
 }
+
+func GetScopeNameSpace() string {
+	scopeNameSpace := beego.AppConfig.String("k8s::ScopeNameSpace")
+	return scopeNameSpace
+}
+
+func GetScopeAppName() string {
+	scopeAppName := beego.AppConfig.String("k8s::ScopeAppName")
+	return scopeAppName
+}
