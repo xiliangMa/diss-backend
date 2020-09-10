@@ -41,7 +41,7 @@ var (
 	Cluster_Scope_InternalUrl                 = "InternalUrl"
 	Cluster_Scope_PublicUrl                   = "PublicUrl"
 	Cluster_Scope_UrlPort                     = "32666"
-	Cluster_Scope_Operator_Status_ActiveFial  = "ActiveFial"
+	Cluster_Scope_Operator_Status_ActiveFail  = "ActiveFail"
 	Cluster_Scope_Operator_Status_Actived     = "Actived"
 	Cluster_Scope_Operator_Status_Activing    = "Activing"
 	Cluster_Scope_Operator_Status_DisableFail = "DisableFail"

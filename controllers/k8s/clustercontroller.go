@@ -256,7 +256,7 @@ func (this *ClusterController) Scope() {
 			dbCluster.SocpeStatus = models.Cluster_Scope_Operator_Status_DisableFail
 			logs.Info("Disable Scope fail, ClusterName: %s, Err: %s.", dbCluster.Name, result.Message)
 		} else {
-			dbCluster.SocpeStatus = models.Cluster_Scope_Operator_Status_ActiveFial
+			dbCluster.SocpeStatus = models.Cluster_Scope_Operator_Status_ActiveFail
 			logs.Info("Active Scope fail, ClusterName: %s, Err: %s.", dbCluster.Name, result.Message)
 		}
 		this.Data["json"] = result
