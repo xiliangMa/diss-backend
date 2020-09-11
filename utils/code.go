@@ -131,6 +131,7 @@ var (
 	AnalysisSsopeYmlErr              = 1024
 	InstallSsopeErr                  = 1025
 	CretaeResourceError              = 1026
+	NetworkPolicyExistErr            = 1027
 
 	//task job 1100-1200
 	AddTaskErr        = 1100

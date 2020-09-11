@@ -43,6 +43,7 @@ func (this *NetworkPolicy) Add() Result {
 	if this.ClusterId != "" {
 		cond = cond.And("cluster_id", this.ClusterId)
 	}
+
 	o.QueryTable(utils.NetworkPolicy).SetCond(cond).One(NetworkPolicy)
 	if NetworkPolicy != nil && NetworkPolicy.Id != "" {
 		this.AccountName = NetworkPolicy.AccountName

@@ -49,7 +49,7 @@ Retry:
 				KMetaData, _ := json.Marshal(object.ObjectMeta)
 				KSpec, _ := json.Marshal(object.Spec)
 
-				netpol := models.NetworkPolicy{}
+				netpol := new(models.NetworkPolicy)
 				netpol.Id = id
 				netpol.Name = name
 				netpol.ClusterName = clusterName

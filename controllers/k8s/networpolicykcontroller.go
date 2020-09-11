@@ -8,6 +8,7 @@ import (
 	"github.com/xiliangMa/diss-backend/service/k8s"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strings"
 )
 
 // NetworkPolicy 接口
@@ -40,17 +41,27 @@ func (this *NetworkPolicyController) GetNetworkPolicysList() {
 // @Success 200 {object} models.Result
 // @router /add [post]
 func (this *NetworkPolicyController) AddNetworkPolicy() {
+	result := models.Result{Code: http.StatusOK}
 	NetworkPolicy := new(models.NetworkPolicy)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &NetworkPolicy)
 	netpolService := k8s.NetworkPolicyService{NetworkPolicy: NetworkPolicy, ClientGo: models.KCM.ClientHub[NetworkPolicy.ClusterId]}
 	object, err := netpolService.Create()
 	if err != nil {
+		result = models.Result{Code: utils.AddNetworkPolicyErr, Message: err.Error()}
+		if strings.Contains(err.Error(), "already exists") {
+			result.Code = utils.NetworkPolicyExistErr
+		}
 		logs.Error("Add NetworkPolicy fail, err: %s", err)
-		this.Data["json"] = models.Result{Code: utils.AddNetworkPolicyErr, Message: err.Error()}
+		this.Data["json"] = result
 		this.ServeJSON(false)
+		return
 	} else {
 		NetworkPolicy.Id = string(object.UID)
-		this.Data["json"] = NetworkPolicy.Add()
+		result = NetworkPolicy.Add()
+		if result.Message != "" && strings.Contains(result.Message, "violates unique") {
+			result = NetworkPolicy.Update()
+		}
+		this.Data["json"] = result
 		this.ServeJSON(false)
 	}
 

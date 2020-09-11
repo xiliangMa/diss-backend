@@ -70,25 +70,28 @@ func (this *ScopeService) UpdatetClusterScopeUrlAndStatus(isDelete bool) models.
 			scopeUrlJson := make(map[string]string)
 			data := result.Data.(map[string]interface{})
 			hiList := data[models.Result_Items].([]*models.HostInfo)
-			if hiList[0].InternalAddr != "" {
-				scopeUrlJson[models.Cluster_Scope_InternalUrl] = `http://` + hiList[0].InternalAddr + `:` + models.Cluster_Scope_UrlPort
-			}
-			if hiList[0].PublicAddr != "" {
-				scopeUrlJson[models.Cluster_Scope_PublicUrl] = `http://` + hiList[0].PublicAddr + `:` + models.Cluster_Scope_UrlPort
-			}
-			scopeUrlStr, _ := json.Marshal(scopeUrlJson)
-			this.Cluster.ScopeUrl = string(scopeUrlStr)
-
-			// 更新状态
-			// 注意： 删除scope时由于只判断 pod 状态不能确定scope是否被删除完成。
-			// 需要判断 ns 是否存在，具体看 nsWatch 的代码
-			if podStatus == models.Pod_Container_Statue_Running {
-				this.Cluster.SocpeStatus = models.Cluster_Scope_Operator_Status_Actived
-				if isDelete {
-					this.Cluster.SocpeStatus = models.Cluster_Scope_Operator_Status_Disableing
+			if hiList != nil && len(hiList) > 0 {
+				if hiList[0].InternalAddr != "" {
+					scopeUrlJson[models.Cluster_Scope_InternalUrl] = `http://` + hiList[0].InternalAddr + `:` + models.Cluster_Scope_UrlPort
 				}
-				result = this.Cluster.Update()
+				if hiList[0].PublicAddr != "" {
+					scopeUrlJson[models.Cluster_Scope_PublicUrl] = `http://` + hiList[0].PublicAddr + `:` + models.Cluster_Scope_UrlPort
+				}
+				scopeUrlStr, _ := json.Marshal(scopeUrlJson)
+				this.Cluster.ScopeUrl = string(scopeUrlStr)
+
+				// 更新状态
+				// 注意： 删除scope时由于只判断 pod 状态不能确定scope是否被删除完成。
+				// 需要判断 ns 是否存在，具体看 nsWatch 的代码
+				if podStatus == models.Pod_Container_Statue_Running {
+					this.Cluster.SocpeStatus = models.Cluster_Scope_Operator_Status_Actived
+					if isDelete {
+						this.Cluster.SocpeStatus = models.Cluster_Scope_Operator_Status_Disableing
+					}
+					result = this.Cluster.Update()
+				}
 			}
+
 		}
 	}
 	return result
