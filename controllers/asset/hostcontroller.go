@@ -226,7 +226,8 @@ func (this *HostController) GetHostBenchMarkLogList() {
 	benchMarkLog := new(models.BenchMarkLog)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &benchMarkLog)
 	benchMarkLog.HostId = hostId
-	this.Data["json"] = benchMarkLog.List(from, limit, false)
+	benchMarkLog.IsInfo = false
+	this.Data["json"] = benchMarkLog.List(from, limit)
 	this.ServeJSON(false)
 
 }
@@ -247,7 +248,8 @@ func (this *HostController) GetHostBenchMarkLogInfo() {
 	benchMarkLog.Id = bmlId
 	//var securityLogService = ssl.SecurityLogService{benchMarkLog, nil}
 	//this.Data["json"] = securityLogService.GetHostBenchMarkLogInfo()
-	this.Data["json"] = benchMarkLog.List(0, 0, true)
+	benchMarkLog.IsInfo = true
+	this.Data["json"] = benchMarkLog.List(0, 0)
 	this.ServeJSON(false)
 
 }

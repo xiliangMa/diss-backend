@@ -52,7 +52,7 @@ func (this *K8sClearService) ClearAll() {
 			this.ClearNs()
 
 			// 清除node
-			this.ClearNode()
+			//this.ClearNode()
 
 			// 清除networkpolicy
 			//this.ClearNetworkPolicy()

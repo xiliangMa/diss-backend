@@ -48,7 +48,8 @@ func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 		TEPinDB := TEPointObj.Get()
 		if len(TEPinDB) > 0 {
 			benchMarkLog.UpdateTime = TEPinDB[0].TimePointA
-			loglist := benchMarkLog.List(from, limit, false)
+			benchMarkLog.IsInfo = false
+			loglist := benchMarkLog.List(from, limit)
 
 			if loglist.Code == 200 && loglist.Data != nil {
 				mapdata := loglist.Data.(map[string]interface{})

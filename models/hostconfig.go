@@ -35,6 +35,8 @@ type HostConfig struct {
 	KStatus           string    `orm:"" description:"(状态数据)"`
 	KubernetesVer     string    `orm:"size(64)" description:"(kubernetes 版本)"`
 	NodeRole          string    `orm:"size(64)" description:"(集群主机角色)"`
+	DockerCISCount    string    `orm:"null;" description:"(docker基线结果个数)"`
+	KubeCISCount      string    `orm:"null;" description:"(k8s基线结果个数)"`
 }
 
 type HostConfigInterface interface {
@@ -45,6 +47,7 @@ type HostConfigInterface interface {
 	UpdateDynamic() Result
 	Count() int64
 	GetBnechMarkProportion() (int64, int64)
+	Get() *HostConfig
 }
 
 func (this *HostConfig) Add() error {
@@ -91,6 +94,24 @@ func (this *HostConfig) Add() error {
 	}
 
 	return nil
+}
+
+func (this *HostConfig) Get() *HostConfig {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	HostConfig := new(HostConfig)
+	var err error
+	cond := orm.NewCondition()
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+
+	err = o.QueryTable(utils.HostConfig).SetCond(cond).RelatedSel().One(HostConfig)
+	if err != nil {
+		logs.Error("GetHostConfig failed, code: %d, err: %s", err.Error(), utils.GetHostConfigErr)
+		return nil
+	}
+	return HostConfig
 }
 
 func (this *HostConfig) List(from, limit int) Result {

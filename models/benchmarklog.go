@@ -25,6 +25,7 @@ type BenchMarkLog struct {
 	RawLog        string `orm:"" description:"(结果原始内容)"`
 	Type          string `orm:"" description:"(分类)"`
 	Result        string `orm:"" description:"(测试结果)"`
+	IsInfo        bool   `orm:"-" description:"(是否取日志原始内容)"`
 }
 
 type BenchMarkLogInterface interface {
@@ -57,7 +58,7 @@ func (this *BenchMarkLog) Add() Result {
 	return ResultData
 }
 
-func (this *BenchMarkLog) List(from, limit int, isInfo bool) Result {
+func (this *BenchMarkLog) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var BenchMarkLogList []*BenchMarkLog = nil
@@ -81,6 +82,10 @@ func (this *BenchMarkLog) List(from, limit int, isInfo bool) Result {
 		cond = cond.And("level", this.Level)
 	}
 
+	if this.Type != "" {
+		cond = cond.And("type", this.Type)
+	}
+
 	if this.Result != "" && this.Result != BML_Result_ALL {
 		cond = cond.And("result", this.Result)
 	}
@@ -89,18 +94,20 @@ func (this *BenchMarkLog) List(from, limit int, isInfo bool) Result {
 		cond = cond.And("bench_mark_name", this.BenchMarkName)
 	}
 
+	if this.UpdateTime == "" {
+		cond = cond.And("update_time__gte", this.UpdateTime)
+	}
+
+	isInfo := this.IsInfo
 	if isInfo {
 
 		_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Limit(limit, from).OrderBy("-update_time").All(&BenchMarkLogList)
 
 	} else {
 		fields := []string{"id", "bench_mark_name", "level", "project_name", "host_name", "host_id", "internal_addr", "public_addr", "o_s", "update_time", "fail_count", "warn_count", "pass_count", "info_count", "type", "result"}
-		if this.UpdateTime == "" {
-			_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Limit(limit, from).OrderBy("-update_time").
-				All(&BenchMarkLogList, fields...)
-		} else {
-			_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Filter("update_time__gte", this.UpdateTime).Limit(limit, from).OrderBy("-update_time").All(&BenchMarkLogList, fields...)
-		}
+
+		_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Limit(limit, from).OrderBy("-update_time").
+			All(&BenchMarkLogList, fields...)
 	}
 
 	if err != nil {

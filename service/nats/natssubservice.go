@@ -288,6 +288,21 @@ func (this *NatsSubService) Save() error {
 			if result := benchMarkLog.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
 			}
+			// hostconfig填充最新的基线结果个数
+			host := models.HostConfig{}
+			host.Id = benchMarkLog.HostId
+			hostConfig := host.Get()
+			if hostConfig != nil {
+				dockerCISCount := map[string]int{}
+				dockerCISCount["InfoCount"] = benchMarkLog.InfoCount
+				dockerCISCount["WarnCount"] = benchMarkLog.WarnCount
+				dockerCISCount["PassCount"] = benchMarkLog.PassCount
+				benchCountJson, _ := json.Marshal(dockerCISCount)
+				hostConfig.DockerCISCount = string(benchCountJson)
+
+				hostConfig.Update()
+			}
+
 			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			// 上报es
@@ -314,6 +329,21 @@ func (this *NatsSubService) Save() error {
 			logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", benchMarkLog.HostId, models.Resource_KubernetesBenchMark)
 			if result := benchMarkLog.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
+			}
+			// hostconfig填充最新的基线结果个数
+			host := models.HostConfig{}
+			host.Id = benchMarkLog.HostId
+			hostConfig := host.Get()
+			if hostConfig != nil {
+				kubeCISCount := map[string]int{}
+				kubeCISCount["FailCount"] = benchMarkLog.FailCount
+				kubeCISCount["InfoCount"] = benchMarkLog.InfoCount
+				kubeCISCount["WarnCount"] = benchMarkLog.WarnCount
+				kubeCISCount["PassCount"] = benchMarkLog.PassCount
+				benchCountJson, _ := json.Marshal(kubeCISCount)
+				hostConfig.KubeCISCount = string(benchCountJson)
+
+				hostConfig.Update()
 			}
 			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
