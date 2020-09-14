@@ -294,6 +294,7 @@ func (this *NatsSubService) Save() error {
 			hostConfig := host.Get()
 			if hostConfig != nil {
 				dockerCISCount := map[string]int{}
+				dockerCISCount["NoteCount"] = benchMarkLog.NoteCount
 				dockerCISCount["InfoCount"] = benchMarkLog.InfoCount
 				dockerCISCount["WarnCount"] = benchMarkLog.WarnCount
 				dockerCISCount["PassCount"] = benchMarkLog.PassCount
