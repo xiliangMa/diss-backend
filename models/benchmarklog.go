@@ -18,10 +18,11 @@ type BenchMarkLog struct {
 	PublicAddr    string `orm:"" description:"(主机ip 外)"`
 	OS            string `orm:"" description:"(系统)"`
 	UpdateTime    string `orm:"" description:"(更新时间)"`
-	FailCount     int    `orm:"" description:"(检查失败个数)"`
-	WarnCount     int    `orm:"" description:"(检查警告个数)"`
-	PassCount     int    `orm:"" description:"(检查通过个数)"`
-	InfoCount     int    `orm:"" description:"(检查提示个数)"`
+	FailCount     int    `orm:"" description:"(检查失败个数, kubeCIS)"`
+	WarnCount     int    `orm:"" description:"(检查警告个数, dockerCIS和kubeCIS)"`
+	PassCount     int    `orm:"" description:"(检查通过个数, dockerCIS和kubeCIS)"`
+	InfoCount     int    `orm:"" description:"(检查提示个数, dockerCIS和kubeCIS)"`
+	NoteCount     int    `orm:"" description:"(检查Note个数, dockerCIS)"`
 	RawLog        string `orm:"" description:"(结果原始内容)"`
 	Type          string `orm:"" description:"(分类)"`
 	Result        string `orm:"" description:"(测试结果)"`
