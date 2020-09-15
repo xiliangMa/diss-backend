@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego/logs"
+	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/ws"
@@ -28,6 +29,8 @@ func (this *SecurityCheckService) PrePare() {
 	for _, securityCheck := range this.SecurityCheckList.CheckList {
 		switch securityCheck.Type {
 		case models.SC_Type_Host:
+			// 初始化 Host
+			GetCheckHost(securityCheck)
 			job := securityCheck.Job
 			if securityCheck.KubenetesCIS {
 				securityCheck := models.SecurityCheck{
@@ -67,6 +70,7 @@ func (this *SecurityCheckService) PrePare() {
 			}
 
 		case models.Sc_Type_Container:
+			GetCheckContainer(securityCheck)
 			job := securityCheck.Job
 			if securityCheck.KubenetesCIS {
 				securityCheck := models.SecurityCheck{
@@ -231,6 +235,38 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		//添加task记录
 		this.saveTaskLog(task, securityCheck)
 	}
+}
+
+func GetCheckHost(securityCheck *models.SecurityCheck) (*models.SecurityCheck, error) {
+	hostId := securityCheck.Host.Id
+	if hostId == "" {
+		return nil, errors.Errorf("HostId is not null")
+	}
+
+	// 获取主机
+	host := models.HostConfig{Id: hostId}
+	checkHost := host.Get()
+	if checkHost == nil {
+		return nil, errors.Errorf("Host not found")
+	}
+	securityCheck.Host = checkHost
+	return securityCheck, nil
+}
+
+func GetCheckContainer(securityCheck *models.SecurityCheck) (*models.SecurityCheck, error) {
+	containerId := securityCheck.Container.Id
+	if containerId == "" {
+		return nil, errors.Errorf("ContainerId is not null")
+	}
+
+	// 获取主机
+	container := models.ContainerConfig{Id: containerId}
+	checkContainer := container.Get()
+	if checkContainer == nil {
+		return nil, errors.Errorf("Container not found")
+	}
+	securityCheck.Container = checkContainer
+	return securityCheck, nil
 }
 
 func (this *SecurityCheckService) genBenchmarkTask(securityCheck *models.SecurityCheck, Default_Template *models.SystemTemplate, taskpre string) *models.Task {

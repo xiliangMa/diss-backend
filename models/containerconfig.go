@@ -31,7 +31,7 @@ type ContainerConfigInterface interface {
 	Add() Result
 	Delete() Result
 	Edit() Result
-	Get() Result
+	Get() *ContainerConfig
 	List(from, limit int, groupSearch bool) Result
 	Count() int64
 	EmptyDirtyDataForAgent() error
@@ -75,6 +75,26 @@ func (this *ContainerConfig) Add() Result {
 	ResultData.Data = this
 	return ResultData
 }
+
+
+func (this *ContainerConfig) Get() *ContainerConfig {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	containerConfig := new(ContainerConfig)
+	var err error
+	cond := orm.NewCondition()
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+
+	err = o.QueryTable(utils.ContainerConfig).SetCond(cond).RelatedSel().One(containerConfig)
+	if err != nil {
+		logs.Error("GetContainerConfig failed, code: %d, err: %s", err.Error(), utils.GetContainerConfigErr)
+		return nil
+	}
+	return containerConfig
+}
+
 
 func (this *ContainerConfig) List(from, limit int, groupSearch bool) Result {
 	o := orm.NewOrm()
