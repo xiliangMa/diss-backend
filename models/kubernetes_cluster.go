@@ -29,6 +29,7 @@ type Cluster struct {
 
 type ClusterCheck struct {
 	Id           string `description:"(集群id)"`
+	Name         string `description:"(集群名)"`
 	DockerCIS    bool   `description:"(Docker CIS)"`
 	KubenetesCIS bool   `description:"(kubernetes CIS)"`
 	VirusScan    bool   `description:"(病毒检查)"`

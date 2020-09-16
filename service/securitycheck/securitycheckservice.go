@@ -374,10 +374,19 @@ func (this *SecurityCheckService) ClusterCheck() models.Result {
 	this.PrePareDefaultTMP()
 
 	// 获取集群内主机
-	host := models.HostConfig{ClusterId: this.ClusterCheckObject.Id}
+	host := models.HostConfig{ClusterId: this.ClusterCheckObject.Id, ClusterName: this.ClusterCheckObject.Name}
+	msg := ""
 	hostResult := host.List(0, 0)
 	if hostResult.Code != http.StatusOK {
 		result.Code = utils.GetHostListForClusterErr
+		msg = "GetHostListForClusterErr"
+		result.Message = msg
+		return result
+	}
+	if hostResult.Data == nil {
+		result.Code = utils.NotFoundHostForClusterErr
+		msg = "NotFoundHostForClusterErr"
+		result.Message = msg
 		return result
 	}
 	hostList := hostResult.Data.(map[string]interface{})[models.Result_Items].([]*models.HostConfig)

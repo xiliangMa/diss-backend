@@ -145,6 +145,9 @@ func (this *HostConfig) List(from, limit int) Result {
 	if this.ClusterId != "" {
 		cond = cond.And("cluster_id", this.ClusterId)
 	}
+	if this.ClusterName != "" {
+		cond = cond.And("cluster_name", this.ClusterName)
+	}
 	_, err = o.QueryTable(utils.HostConfig).SetCond(cond).Limit(limit, from).OrderBy("-host_name").RelatedSel().All(&HostConfigList)
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -157,12 +160,11 @@ func (this *HostConfig) List(from, limit int) Result {
 	data := make(map[string]interface{})
 	data["items"] = HostConfigList
 	data["total"] = total
+	ResultData.Data = data
 	if total == 0 {
 		ResultData.Data = nil
 	}
-
 	ResultData.Code = http.StatusOK
-	ResultData.Data = data
 	return ResultData
 }
 

@@ -76,7 +76,6 @@ func (this *ContainerConfig) Add() Result {
 	return ResultData
 }
 
-
 func (this *ContainerConfig) Get() *ContainerConfig {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
@@ -94,7 +93,6 @@ func (this *ContainerConfig) Get() *ContainerConfig {
 	}
 	return containerConfig
 }
-
 
 func (this *ContainerConfig) List(from, limit int, groupSearch bool) Result {
 	o := orm.NewOrm()
