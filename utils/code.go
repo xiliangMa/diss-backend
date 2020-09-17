@@ -93,6 +93,7 @@ var (
 	DeleteServiceErr                = 98
 	GetLatestTimeForDockerEventErr  = 99
 	OpenFileErr                     = 100
+	UserAndPwdNotNull               = 101
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001

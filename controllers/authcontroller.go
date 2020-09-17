@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/auth"
+	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
 
@@ -21,7 +22,16 @@ type AuthController struct {
 func (this *AuthController) Login() {
 	name := this.GetString("name")
 	pwd := this.GetString("pwd")
+
 	var ResultData models.Result
+	if name == "" || pwd == "" {
+		ResultData.Message = "UserAndPwdNotNull"
+		ResultData.Code = utils.UserAndPwdNotNull
+		this.Data["json"] = ResultData
+		this.ServeJSON(false)
+		return
+
+	}
 	jwtService := auth.JwtService{}
 	result, code := jwtService.GreateToken(name, pwd)
 	ResultData.Code = code
