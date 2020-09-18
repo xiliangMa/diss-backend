@@ -150,15 +150,6 @@ Retry:
 				delete(models.GRM.GoRoutineMap, watchType)
 				logs.Info("Remove NodeWatch from global GRM object, cluster: %s", this.Cluster.Name)
 
-				// 清除数据库数据
-				hc := models.HostConfig{}
-				hc.ClusterName = this.Cluster.Name
-				hc.Delete()
-
-				hi := models.HostInfo{}
-				hi.ClusterName = this.Cluster.Name
-				hi.Delete()
-
 				// 重启 watch 携程
 				nodeService := NodeService{Cluster: this.Cluster, ClientGo: this.ClientGo, Close: make(chan bool)}
 				models.GRM.GoRoutineMap[watchType] = nodeService
