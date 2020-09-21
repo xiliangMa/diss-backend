@@ -25,6 +25,7 @@ type Task struct {
 	Job            *Job             `orm:"rel(fk);null;" description:"(job)"`
 	ClusterId      string           `orm:"size(256)" description:"(集群Id)"`
 	IsOne          bool             `orm:"-" description:"(是否取单条记录)"`
+	RunCount       int64            `orm:"" description:"(运行次数)"`
 }
 
 type TaskLogInterface interface {
