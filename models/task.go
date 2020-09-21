@@ -26,6 +26,7 @@ type Task struct {
 	ClusterId      string           `orm:"size(256)" description:"(集群Id)"`
 	IsOne          bool             `orm:"-" description:"(是否取单条记录)"`
 	RunCount       int64            `orm:"" description:"(运行次数)"`
+	Action         string           `orm:"size(256)" description:"(操作类型标记)"`
 }
 
 type TaskLogInterface interface {

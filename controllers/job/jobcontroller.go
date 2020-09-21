@@ -57,6 +57,41 @@ func (this *JobController) DeleteJob() {
 	this.ServeJSON(false)
 }
 
+// @Title DeactiveJob
+// @Description Deactive Job
+// @Param token header string true "authToken"
+// @Param id path string "" true "id"
+// @Success 200 {object} models.Result
+// @router /:id/deactive [put]
+func (this *JobController) DeactiveJob() {
+	id := this.GetString(":id")
+	job := new(models.Job)
+	job.Id = id
+
+	jobService := new(jobservice.JobService)
+	jobService.JobParam = job
+	// 检查是否有在运行的task，如果有运行的直接返回错误
+	result := jobService.CheckRuningTask()
+	if result.Code != http.StatusOK {
+		this.Data["json"] = result
+		this.ServeJSON(false)
+		return
+	}
+	// 设置Job的状态为Deactiving，确定其下的task删除完成后再设置Deactived
+	jobService.JobParam.Status = models.Job_Status_Deactiving
+	result = jobService.ChangeStatus()
+	if result.Code != http.StatusOK {
+		this.Data["json"] = result
+		this.ServeJSON(false)
+		return
+	}
+
+	// 下发删除Job下的关联的task
+	result = jobService.DeactiveTasks()
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
 // @Title AddJob
 // @Description Add Job
 // @Param token header string true "authToken"
@@ -94,7 +129,7 @@ func (this *JobController) UpdateJob() {
 // @Param id path string "" true "id"
 // @Param account query string "admin" false "租户"
 // @Success 200 {object} models.Result
-// @router /active/:id [put]
+// @router /:id/active [put]
 func (this *JobController) ActiveJob() {
 	id := this.GetString(":id")
 	Job := new(models.Job)

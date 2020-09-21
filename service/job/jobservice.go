@@ -23,9 +23,9 @@ func (this *JobService) ActiveJob() models.Result {
 
 	if job != nil && job.Id != "" {
 		// job 处于禁用状态，不执行生成，返回错误信息
-		if job.Status == models.Job_Status_Disable {
+		if job.Status == models.Job_Status_Deactiving {
 			ResultData.Code = utils.JobIsDisabledErr
-			msg := fmt.Sprintf("Id:%s, Job:%s is Disabled", job.Id, job.Name)
+			msg := fmt.Sprintf("Id: %s, Job: %s is Deactiving , pls wait it finish or deactive again", job.Id, job.Name)
 			logs.Error(msg)
 			ResultData.Message = msg
 			return ResultData
@@ -150,5 +150,38 @@ func (this *JobService) RemoveAssocTasks() models.Result {
 		return result
 	}
 	result.Code = http.StatusOK
+	return result
+}
+
+func (this *JobService) DeactiveTasks() models.Result {
+	var result models.Result
+
+	// 删除Pending和Unavailable状态task
+	job := this.JobParam
+	if job.Id != "" {
+		jobObj := job.Get()
+		for _, task := range jobObj.Task {
+			taskService := new(taskservice.TaskService)
+			taskService.Task = task
+
+			if task.Status == models.Task_Status_Pending || task.Status == models.Task_Status_Unavailable {
+				task.Action = models.Task_Action_Deactive
+				result = taskService.RemoveTask()
+			}
+		}
+	}
+
+	result.Code = http.StatusOK
+	return result
+}
+
+func (this *JobService) ChangeStatus() models.Result {
+	result := models.Result{Code: http.StatusOK}
+
+	job := this.JobParam
+	jobObj := job.Get()
+	jobObj.Status = this.JobParam.Status
+	result = jobObj.Update()
+
 	return result
 }

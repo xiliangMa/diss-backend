@@ -97,9 +97,9 @@ var (
 	TMP_Status_Enable  = "Enable"
 	TMP_Status_Disable = "Disable"
 
-	Job_Status_Enable  = "Enable"
-	Job_Status_Active  = "Active"
-	Job_Status_Disable = "Disable"
+	Job_Status_Active     = "Active"
+	Job_Status_Deactiving = "Deactiving"
+	Job_Status_Deactived  = "Deactived"
 
 	//安全检查类型
 	SC_Type_Host      = "host"
@@ -115,6 +115,10 @@ var (
 	Task_Status_Deliver_Failed = "DeliverFailed"
 	Task_Status_Received       = "Received"
 	Task_Status_Receive_Failed = "ReceiveFailed"
+	Task_Status_Unavailable    = "Unavailable"
+
+	//任务操作
+	Task_Action_Deactive = "Deactive"
 
 	//任务类型
 	Job_Type_Once     = "Once"

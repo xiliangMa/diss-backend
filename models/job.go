@@ -64,6 +64,8 @@ func (this *Job) List(from, limit int) Result {
 		o.LoadRelated(job, "ContainerConfig")
 		o.LoadRelated(job, "Task")
 	}
+
+
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetJobErr
@@ -209,7 +211,7 @@ func (this *Job) Update() Result {
 		return ResultData
 	}
 
-	if this.Status != Job_Status_Active {
+	if this.Status != Job_Status_Deactived && this.Status != Job_Status_Active {
 		result := this.fillRelationData(o)
 		if result.Code != 0 && result.Code != utils.ContainerExistInJobErr && result.Code != utils.HostExistInJobErr {
 			return result

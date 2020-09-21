@@ -539,6 +539,7 @@ func (this *NatsSubService) Save() error {
 					logs.Error("Paraces: %s type: %s error: %s  ", ms.Tag, ms.RCType, err)
 					return err
 				}
+
 				if result := task.Delete(); result.Code != http.StatusOK {
 					metricsResult.Code = result.Code
 					metricsResult.Msg = result.Message
@@ -554,6 +555,12 @@ func (this *NatsSubService) Save() error {
 					taskLog.Add()
 					return errors.New(result.Message)
 				} else {
+					if task.Action == models.Task_Action_Deactive {
+						jobService := new(JobService)
+						jobService.Task = &task
+						jobService.SetJobDeactiveStatus()
+					}
+
 					msg := ""
 					if task.Host == nil {
 						msg = fmt.Sprintf("Delete task success, >>> HostName: %s, Type: %s, task id: %s<<<", task.Container.HostName, models.Resource_Task, task.Id)
