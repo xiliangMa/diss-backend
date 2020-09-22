@@ -39,7 +39,11 @@ func (this *WSMetricsService) Save() error {
 			client := &models.Client{Hub: models.WSHub, Conn: this.Conn, Send: make(chan []byte, 256), ClientIp: ip[0], SystemId: heartBeat.SystemId}
 			//更新主机心跳（更新时间
 			host := models.HostConfig{Id: heartBeat.SystemId}
-			data := host.List(0, 0).Data.(map[string]interface{})
+			listData := host.List(0, 0).Data
+			if listData == nil {
+				return nil
+			}
+			data := listData.(map[string]interface{})
 			items := data["items"].([]*models.HostConfig)
 			if len(items) != 0 {
 				currentHost := items[0]
