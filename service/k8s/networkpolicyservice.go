@@ -43,6 +43,7 @@ Retry:
 				object := event.Object.(*v1.NetworkPolicy)
 				id := string(object.UID)
 				name := object.Name
+				ns := object.Namespace
 				clusterId := this.Cluster.Id
 				clusterName := this.Cluster.Name
 
@@ -54,7 +55,7 @@ Retry:
 				netpol.Name = name
 				netpol.ClusterName = clusterName
 				netpol.AccountName = models.Cluster_Data_AccountName
-				netpol.NameSpaceName = object.Namespace
+				netpol.NameSpaceName = ns
 				netpol.ClusterId = clusterId
 				netpol.KMetaData = string(KMetaData)
 				netpol.KSpec = string(KSpec)
@@ -76,7 +77,7 @@ Retry:
 					}
 				}
 
-				logs.Info("Watch >>> NetworkPolicy: %s <<<, >>> Cluster: %s <<<,  >>> NameSpace: %s <<<, >>> EventType: %s <<<", id, clusterId, name, event.Type)
+				logs.Info("Watch >>> NetworkPolicy: %s <<<, >>> Cluster: %s <<<,  >>> NameSpace: %s <<<, >>> EventType: %s <<<", id, clusterId, ns, event.Type)
 				switch event.Type {
 				case watch.Added:
 					netpol.Add()
@@ -138,6 +139,30 @@ func (this *NetworkPolicyService) Create() (*v1.NetworkPolicy, error) {
 	netpol.ObjectMeta.ResourceVersion = ""
 
 	return this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies(this.NetworkPolicy.NameSpaceName).Create(&netpol)
+}
+
+func (this *NetworkPolicyService) Update() (*v1.NetworkPolicy, error) {
+
+	// ============ ObjectMeta ============
+	objectMeta := metav1.ObjectMeta{}
+	err := json.Unmarshal([]byte(this.NetworkPolicy.KMetaData), &objectMeta)
+	if err != nil {
+		logs.Error("Paraces: %s, error: %s  ", models.Kubernetes_Object_MetaData, err)
+		return nil, err
+	}
+
+	// ============ Spec ============
+	spec := v1.NetworkPolicySpec{}
+	err = json.Unmarshal([]byte(this.NetworkPolicy.KSpec), &spec)
+	if err != nil {
+		logs.Error("Paraces: %s, error: %s  ", models.Kubernetes_Object_Spec, err)
+		return nil, err
+	}
+
+	netpol := v1.NetworkPolicy{ObjectMeta: objectMeta, Spec: spec}
+	netpol.ObjectMeta.ResourceVersion = ""
+
+	return this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies(this.NetworkPolicy.NameSpaceName).Update(&netpol)
 }
 
 func (this *NetworkPolicyService) Delete() error {
