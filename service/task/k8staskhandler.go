@@ -12,6 +12,9 @@ type K8sTaskHandler struct {
 	K8sSyncService *k8s.K8sSyncService
 }
 
+/***
+ ** 已经废弃
+ */
 func (this *K8sTaskHandler) SyncAll() {
 	var cluster models.Cluster
 	result := cluster.List(0, 0)
