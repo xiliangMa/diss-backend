@@ -134,6 +134,7 @@ var (
 	CretaeResourceError              = 1026
 	NetworkPolicyExistErr            = 1027
 	NotFoundHostForClusterErr        = 1028
+	UpdateNetworkPolicyErr           = 1029
 
 	//task job 1100-1200
 	AddTaskErr        = 1100

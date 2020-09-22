@@ -79,8 +79,18 @@ func (this *NetworkPolicyController) UpdateNetworkPolicy() {
 	NetworkPolicy := new(models.NetworkPolicy)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &NetworkPolicy)
 	NetworkPolicy.Id = id
-	this.Data["json"] = NetworkPolicy.Update()
-	this.ServeJSON(false)
+	result := models.Result{Code: http.StatusOK}
+	netpolService := k8s.NetworkPolicyService{NetworkPolicy: NetworkPolicy, ClientGo: models.KCM.ClientHub[NetworkPolicy.ClusterId]}
+	_, err := netpolService.Update()
+	if err != nil {
+		result = models.Result{Code: utils.UpdateNetworkPolicyErr, Message: err.Error()}
+		logs.Error("Update NetworkPolicy fail, err: %s", err)
+		this.Data["json"] = result
+		this.ServeJSON(false)
+	} else {
+		this.Data["json"] = result
+		this.ServeJSON(false)
+	}
 }
 
 // @Title DeleteNetworkPolicy
