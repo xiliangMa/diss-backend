@@ -61,7 +61,7 @@ cd $PROJECT_DIR
 docker-compose build --no-cache
 
 cd $BUILD_DIR
-tar -cvf diss-backend.tar.gz ./*
+tar -zcvf diss-backend.tar.gz ./*
 
 echo "=========== 7. remove none images ==========="
 NONE_IMAGES_ID=`docker images -f "dangling=true" -q`
