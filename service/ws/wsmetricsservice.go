@@ -37,6 +37,16 @@ func (this *WSMetricsService) Save() error {
 			}
 			ip := strings.Split(this.Conn.RemoteAddr().String(), ":")
 			client := &models.Client{Hub: models.WSHub, Conn: this.Conn, Send: make(chan []byte, 256), ClientIp: ip[0], SystemId: heartBeat.SystemId}
+
+			// 开启 nats 订阅
+			if models.WSHub != nil {
+				if _, ok := models.WSHub.DissClient[client.SystemId]; !ok {
+					nats.RunClientSub(client.SystemId)
+					logs.Info("Run nats client sub success , HostId: %s", client.SystemId)
+				}
+			}
+			client.Hub.Register <- client
+
 			//更新主机心跳（更新时间
 			host := models.HostConfig{Id: heartBeat.SystemId}
 			listData := host.List(0, 0).Data
@@ -51,15 +61,6 @@ func (this *WSMetricsService) Save() error {
 				currentHost.IsEnableHeartBeat = true
 				currentHost.Update()
 			}
-			// 开启 nats 订阅
-			if models.WSHub != nil {
-				if _, ok := models.WSHub.DissClient[client.SystemId]; !ok {
-					nats.RunClientSub(client.SystemId)
-					logs.Info("Run nats client sub success , HostId: %s", client.SystemId)
-				}
-			}
-
-			client.Hub.Register <- client
 			logs.Info("############################ Agent Heater Beat data, >>> HostId: %s, Type: %s <<<", heartBeat.SystemId, models.Resource_HeartBeat)
 			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
