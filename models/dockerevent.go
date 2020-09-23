@@ -60,7 +60,7 @@ func (this *DockerEvent) List(from, limit int) Result {
 		filter = filter + `status = '` + this.Status + `' and `
 	}
 	if this.Actor != "" {
-		filter = filter + `actor like '%` + this.Action + `%' and `
+		filter = filter + `actor like '%` + this.Actor + `%' and `
 	}
 	if this.Action != "" {
 		filter = filter + `action = '` + this.Action + `' and `
