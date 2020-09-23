@@ -168,7 +168,7 @@ func (this *BenchMarkLog) GetHostMarkSummary() Result {
 	o.Using(utils.DS_Default)
 	// host 基线统计
 	hostMarkSummary := new(MarkSummary)
-	o.Raw(utils.GetHostMarkSummarySql()).QueryRow(&hostMarkSummary)
+	o.Raw(utils.GetHostMarkSummarySql(this.HostId)).QueryRow(&hostMarkSummary)
 	data := make(map[string]interface{})
 	data[BMLT_Host_All] = hostMarkSummary
 	ResultData.Code = http.StatusOK

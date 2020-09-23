@@ -109,13 +109,14 @@ func GetMarkSummarySql(BMLT string) string {
 	return sql
 }
 
-func GetHostMarkSummarySql() string {
+func GetHostMarkSummarySql(hostId string) string {
 	sql := "select " +
 		"sum(fail_count) as fail_count, " +
 		"sum(warn_count) as warn_count, " +
 		"sum(info_count) as info_count, " +
 		"sum(pass_count) as pass_count " +
-		"from bench_mark_log"
+		"from bench_mark_log " +
+		"where host_id ='" + hostId + "'"
 	return sql
 }
 
