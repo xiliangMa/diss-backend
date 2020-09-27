@@ -27,6 +27,7 @@ type BenchMarkLog struct {
 	Type          string `orm:"" description:"(分类)"`
 	Result        string `orm:"" description:"(测试结果)"`
 	IsInfo        bool   `orm:"-" description:"(是否取日志原始内容)"`
+	TaskId        string `orm:"size(64)" description:"(任务ID)"`
 }
 
 type BenchMarkLogInterface interface {
@@ -97,6 +98,10 @@ func (this *BenchMarkLog) List(from, limit int) Result {
 
 	if this.UpdateTime == "" {
 		cond = cond.And("update_time__gte", this.UpdateTime)
+	}
+
+	if this.TaskId != "" {
+		cond = cond.And("task_id", this.TaskId)
 	}
 
 	isInfo := this.IsInfo
