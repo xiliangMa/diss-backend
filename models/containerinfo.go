@@ -162,6 +162,9 @@ func (this *ContainerInfo) Delete() Result {
 	if this.HostId != "" {
 		cond = cond.And("host_id", this.HostId)
 	}
+	if this.PodId != "" {
+		cond = cond.And("pod_id", this.PodId)
+	}
 
 	_, err := o.QueryTable(utils.ContainerInfo).SetCond(cond).Delete()
 

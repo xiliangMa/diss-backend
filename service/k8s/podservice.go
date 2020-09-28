@@ -39,6 +39,7 @@ Retry:
 			return
 		case event, ok := <-podWatch.ResultChan():
 			if event.Object != nil || ok {
+				isDelete := false
 				object := event.Object.(*v1.Pod)
 				id := string(object.UID)
 				name := object.Name
@@ -65,19 +66,22 @@ Retry:
 
 				switch event.Type {
 				case watch.Added:
-					scopeService.UpdatetClusterScopeUrlAndStatus(false)
 					pod.Add()
 				case watch.Modified:
-					scopeService.UpdatetClusterScopeUrlAndStatus(false)
 					pod.Add()
 				case watch.Deleted:
-					scopeService.UpdatetClusterScopeUrlAndStatus(true)
+					isDelete = true
 					pod.Delete()
 				case watch.Bookmark:
 					//todo
 				case watch.Error:
 					//todo
 				}
+				// 动态初始化 socpe url
+				scopeService.UpdatetClusterScopeUrlAndStatus(isDelete)
+				// 同步pod下container到数据库
+				containerService := ContainerService{Cluster: this.Cluster, Pod: object}
+				containerService.InitContainer(event.Type)
 			} else {
 				// 如果 watch 异常退回重新 watch
 				logs.Warn("PodWatch chan has been close!!!!, cluster: %s", this.Cluster.Name)
@@ -86,6 +90,10 @@ Retry:
 				watchType := this.Cluster.Id + `_` + utils.Pod
 				delete(models.GRM.GoRoutineMap, watchType)
 				logs.Info("Remove PodWatch from global GRM object, cluster: %s", this.Cluster.Name)
+
+				// 清除 pod 下 container 数据
+				k8sClearService := K8sClearService{CurrentCluster: this.Cluster}
+				k8sClearService.ClearContainer()
 
 				// 清除数据库数据
 				pod := models.Pod{}

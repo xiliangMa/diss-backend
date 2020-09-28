@@ -197,6 +197,9 @@ func (this *ContainerConfig) Delete() Result {
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
+	if this.PodId != "" {
+		cond = cond.And("pod_id", this.PodId)
+	}
 	if this.ClusterName != "" {
 		cond = cond.And("cluster_name", this.ClusterName)
 	}
