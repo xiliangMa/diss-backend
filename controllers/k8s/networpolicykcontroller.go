@@ -88,6 +88,8 @@ func (this *NetworkPolicyController) UpdateNetworkPolicy() {
 		this.Data["json"] = result
 		this.ServeJSON(false)
 	} else {
+		// 更新租户
+		result := NetworkPolicy.Update()
 		this.Data["json"] = result
 		this.ServeJSON(false)
 	}

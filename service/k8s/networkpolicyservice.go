@@ -82,7 +82,6 @@ Retry:
 				case watch.Added:
 					netpol.Add()
 				case watch.Modified:
-					netpol.Delete()
 					netpol.Add()
 				case watch.Deleted:
 					netpol.Delete()
