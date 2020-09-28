@@ -51,13 +51,11 @@ func (this *K8sClearService) ClearAll() {
 			// 清除ns
 			this.ClearNs()
 
-			// 清除node
+			// 清除node // 清除networkpolicy
 			if this.DropCluster {
 				this.ClearNode()
+				this.ClearNetworkPolicy()
 			}
-
-			// 清除networkpolicy
-			//this.ClearNetworkPolicy()
 
 			// 清除集群
 			if this.DropCluster {
