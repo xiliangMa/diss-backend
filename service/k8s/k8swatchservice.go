@@ -17,6 +17,7 @@ type K8sWatchService struct {
  */
 func (this *K8sWatchService) WatchAll() {
 	var cluster models.Cluster
+	cluster.Status = models.Cluster_Status_Active
 	result := cluster.List(0, 0)
 
 	if result.Code == http.StatusOK && result.Data != nil {
