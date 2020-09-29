@@ -108,7 +108,7 @@ func (this *HostInfo) List() Result {
 	var ResultData Result
 	cond := orm.NewCondition()
 	if this.HostName != "" {
-		cond = cond.And("host_name__contains", this.HostName)
+		cond = cond.And("host_name", this.HostName)
 	}
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
