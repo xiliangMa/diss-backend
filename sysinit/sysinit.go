@@ -22,13 +22,6 @@ func init() {
 	//init logger
 	InitLogger()
 
-	// sync All Cluster
-	//k8STaskHandler := task.K8sTaskHandler{}
-	//k8STaskHandler.SyncAll()
-
-	// init task
-	InitTask()
-
 	// init global logConfig
 	InitGlobalLogConfig()
 
@@ -58,4 +51,7 @@ func init() {
 	// watch all cluster
 	k8sWatchService := k8s.K8sWatchService{}
 	k8sWatchService.WatchAll()
+
+	// init task
+	InitTask()
 }

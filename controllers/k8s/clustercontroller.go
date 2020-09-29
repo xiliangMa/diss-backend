@@ -195,23 +195,6 @@ func (this *ClusterController) DeleteCluster() {
 	this.ServeJSON(false)
 }
 
-// @Title SyncCluster
-// @Description Sync Cluster
-// @Param token header string true "authToken"
-// @Param id path string "" true "Id"
-// @Success 200 {object} models.Result
-// @router /:id/sync [post]
-func (this *ClusterController) SyncCluster() {
-	id := this.GetString(":id")
-	cluster := new(models.Cluster)
-	json.Unmarshal(this.Ctx.Input.RequestBody, &cluster)
-	cluster.Id = id
-	syncCheckPoint := time.Now().Unix()
-	K8sSyncService := k8s.NewK8sSyncService(syncCheckPoint, cluster)
-	this.Data["json"] = K8sSyncService.Sync()
-	this.ServeJSON(false)
-}
-
 // @Title ClusterSecurityCheck
 // @Description ClusterSecurityCheck
 // @Param token header string true "authToken"

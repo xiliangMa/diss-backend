@@ -12,25 +12,10 @@ func InitTask() {
 	go func() {
 		th := task.NewTaskHandler()
 		InitSystemCheckTask(th)
+		InitClusterStatusCheckTask(th)
 		th.Start()
 		select {}
 	}()
-}
-
-/**
- * k8s sync task
- */
-func InitK8sSyncTask(th *task.TaskHandler) {
-	k8sSyncTaskId, _ := uuid.NewV4()
-	syncSpec := beego.AppConfig.String("k8s::SyncSpec")
-	k8STaskHandler := task.K8sTaskHandler{}
-	logs.Info("Start K8S Sync TaskHandler SyncSpec: %s", syncSpec)
-	if err := th.AddByFunc(k8sSyncTaskId.String(), syncSpec, k8STaskHandler.SyncRequiredCluster); err != nil {
-		logs.Error("Start K8S Sync TaskHandler fail, err: %s", err)
-		os.Exit(-1)
-	} else {
-		// to do 添加任务到数据库管理
-	}
 }
 
 /**
@@ -43,6 +28,19 @@ func InitSystemCheckTask(th *task.TaskHandler) {
 	logs.Info("Start System Check TaskHandler, SystemCheckSpec: %s", systemCheckSpec)
 	if err := th.AddByFunc(systemCheckTaskId.String(), systemCheckSpec, new(task.SystemCheckHandler).SystemCheck); err != nil {
 		logs.Error("Start System Check TaskHandler fail, err: %s", err)
+		os.Exit(-1)
+	}
+}
+
+/**
+ * 集群状态检查
+ */
+func InitClusterStatusCheckTask(th *task.TaskHandler) {
+	clusterStatusCheckTaskId, _ := uuid.NewV4()
+	clusterStatusCheckSpec := beego.AppConfig.String("system::ClusterStatusCheckSpec")
+	logs.Info("Start Cluster Check TaskHandler, clusterStatusCheckSpec: %s", clusterStatusCheckSpec)
+	if err := th.AddByFunc(clusterStatusCheckTaskId.String(), clusterStatusCheckSpec, new(task.K8sTaskHandler).CheckClusterStatusTask); err != nil {
+		logs.Error("Start Cluster Check TaskHandler fail, err: %s", err)
 		os.Exit(-1)
 	}
 }
