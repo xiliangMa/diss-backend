@@ -3,6 +3,7 @@ package task
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/k8s"
 	"net/http"
 )
 
@@ -33,12 +34,17 @@ func (this *K8sTaskHandler) CheckClusterStatusTask() {
 	// 检测链接状态
 	//如果链接不可用， 设置集群状态为不可用
 	for _, cluster := range clusterList {
+		deleteClusterList := []*models.Cluster{}
 		// 获取集群连接client
 		client := models.CreateK8sClient(models.BuildApiParams(cluster))
 		if client.ErrMessage != "" {
 			if cluster.Status != models.Cluster_Status_Unavailable {
 				cluster.Status = models.Cluster_Status_Unavailable
 				cluster.Update()
+				// 清除集群数据
+				deleteClusterList = append(deleteClusterList, cluster)
+				k8sClearService := k8s.K8sClearService{ClusterList: deleteClusterList, DropCluster: false}
+				go k8sClearService.ClearAll()
 			}
 			logs.Error("Cluster Unavailable, please check your cluster.")
 			if _, ok := models.KCM.ClientHub[cluster.Id]; ok {
@@ -51,6 +57,10 @@ func (this *K8sTaskHandler) CheckClusterStatusTask() {
 			if cluster.Status != models.Cluster_Status_Unavailable {
 				cluster.Status = models.Cluster_Status_Unavailable
 				cluster.Update()
+				// 清除集群数据
+				deleteClusterList = append(deleteClusterList, cluster)
+				k8sClearService := k8s.K8sClearService{ClusterList: deleteClusterList, DropCluster: false}
+				go k8sClearService.ClearAll()
 			}
 			logs.Error("Cluster Unavailable, please check your cluster.")
 			if _, ok := models.KCM.ClientHub[cluster.Id]; ok {
@@ -62,6 +72,9 @@ func (this *K8sTaskHandler) CheckClusterStatusTask() {
 		if cluster.Status != models.Cluster_Status_Active {
 			cluster.Status = models.Cluster_Status_Active
 			cluster.Update()
+			// watch 集群数据
+			k8sWatchService := k8s.K8sWatchService{Cluster: cluster}
+			k8sWatchService.WatchCluster()
 		}
 
 	}
