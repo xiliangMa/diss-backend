@@ -110,7 +110,7 @@ func (this *LicenseService) CheckLicenseType() (res models.Result) {
 }
 
 func (this *LicenseService) InitTrialLicense() models.Result {
-	var result models.Result
+	result := models.Result{Code: http.StatusOK}
 	licenseService := LicenseService{}
 	var fpath = licenseService.GetLicenseFilePath()
 	licenseFileType := licenseService.CheckLicenseType()
@@ -131,13 +131,13 @@ func (this *LicenseService) InitTrialLicense() models.Result {
 		licConfig.Type = models.LicType_TrialLicense
 		licData := licConfig.Get()
 		if licData.Code == http.StatusOK {
-			if licData.Data == nil {
-				licenseService.IsUpdate = false
-			} else {
-				licenseService.IsUpdate = true
+			if licData.Data != nil {
+				licList := licData.Data.([]*models.LicenseConfig)
+				if len(licList) < 1 {
+					licenseService.LicenseByte = licenseByte
+					result = licenseService.LicenseActive()
+				}
 			}
-			licenseService.LicenseByte = licenseByte
-			result = licenseService.LicenseActive()
 
 			if result.Code != http.StatusOK {
 				return result
