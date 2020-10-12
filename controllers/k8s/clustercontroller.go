@@ -173,7 +173,8 @@ func (this *ClusterController) UpdateCluster() {
 	cluster := new(models.Cluster)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &cluster)
 	cluster.Id = id
-	this.Data["json"] = cluster.Update()
+	clusterService := k8s.ClusterService{Cluster: cluster}
+	this.Data["json"] = clusterService.UpdateCluster()
 	this.ServeJSON(false)
 }
 

@@ -67,6 +67,7 @@ func (this *HostConfig) Add() error {
 	if len(hostConfigList) != 0 {
 		updateHostConfig := hostConfigList[0]
 		// agent 或者 k8s 数据更新 （因为有diss-backend的关系数据，防止覆盖diss-backend的数据，需要替换更新）
+		updateHostConfig.ClusterName = this.ClusterName
 		updateHostConfig.HostName = this.HostName
 		updateHostConfig.IsInK8s = this.IsInK8s
 		updateHostConfig.OS = this.OS

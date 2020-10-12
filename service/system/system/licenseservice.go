@@ -110,7 +110,7 @@ func (this *LicenseService) CheckLicenseType() (res models.Result) {
 }
 
 func (this *LicenseService) InitTrialLicense() models.Result {
-	var result models.Result
+	result := models.Result{Code: http.StatusOK}
 	licenseService := LicenseService{}
 	var fpath = licenseService.GetLicenseFilePath()
 	licenseFileType := licenseService.CheckLicenseType()

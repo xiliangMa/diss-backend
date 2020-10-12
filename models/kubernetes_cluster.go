@@ -38,11 +38,30 @@ type ClusterCheck struct {
 }
 
 type ClusterInterface interface {
+	Get() *Cluster
 	Add() Result
 	Update() Result
 	List(from, limit int) Result
 	ListByAccount(from, limit int) Result
 	GetRequiredSyncList() Result
+}
+
+func (this *Cluster) Get() *Cluster {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	C := new(Cluster)
+
+	cond := orm.NewCondition()
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+
+	err := o.QueryTable(utils.Cluster).SetCond(cond).One(C)
+	if err != nil {
+		logs.Error("Get cluster failed, code: %d, err: %s", utils.GetClusterErr, err.Error())
+		return nil
+	}
+	return C
 }
 
 func (this *Cluster) Add(isForce bool) Result {

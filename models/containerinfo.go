@@ -67,10 +67,8 @@ func (this *ContainerInfo) Add() Result {
 	}
 
 	if len(ContainerInfogList) != 0 {
-		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接删除在添加）
-		if result := this.Delete(); result.Code != http.StatusOK {
-			return result
-		}
+		// 更新前需要将绑定关系提取
+		return this.Update()
 	}
 	_, err = o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {

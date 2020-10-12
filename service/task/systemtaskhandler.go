@@ -4,6 +4,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
+	"net/http"
 	"time"
 )
 
@@ -13,6 +14,9 @@ type SystemCheckHandler struct {
 func (this *SystemCheckHandler) SystemCheck() {
 	// host 相关状态检查
 	data := new(models.HostConfig).List(0, 0)
+	if data.Code != http.StatusOK || data.Data == nil {
+		return
+	}
 	items := data.Data.(map[string]interface{})["items"]
 	for _, host := range items.([]*models.HostConfig) {
 		now := time.Now().UTC()

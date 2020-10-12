@@ -63,6 +63,7 @@ func (this *HostInfo) Add() error {
 	if len(hostInfoList) != 0 {
 		// agent 或者 k8s 数据更新 （因为有diss-backend的关系数据，防止覆盖diss-backend的数据，需要替换更新）
 		updateHostInfo := hostInfoList[0]
+		updateHostInfo.ClusterName = this.ClusterName
 		updateHostInfo.HostName = this.HostName
 		updateHostInfo.OS = this.OS
 		updateHostInfo.ClusterId = this.ClusterId
