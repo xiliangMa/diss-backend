@@ -6,14 +6,18 @@ data:
   DS_Diss_Api_DB_Name: postgres
   DS_Diss_Api_Host: 114.67.110.120
   DS_Diss_Api_Port: "2345"
-  DS_Diss_Api_Pwd: mysecretpassword
   DS_Diss_Api_User: postgres
   DS_Security_Log_DB_Name: postgres
   DS_Security_Log_Host: 114.67.110.120
   DS_Security_Log_Port: "5432"
-  DS_Security_Log_Pwd: password
   DS_Security_Log_User: postgres
-  Password: changeme
+  Nats_Client_Id: diss-server
+  Nats_Cluster_Id: diss-cluster
+  Nats_Enable: "true"
+  Nats_Ip: diss-nats-streaming
+  Nats_Port: "4222"
+  Nats_Prefix: nats://
+  Nats_User: diss
   RunMode: prod
   UserName: elastic
 kind: ConfigMap
@@ -22,3 +26,4 @@ metadata:
   labels:
     io.kompose.service: diss-backend-conf-diss-backend-env
   name: conf-diss-backend-env
+  namespace: diss

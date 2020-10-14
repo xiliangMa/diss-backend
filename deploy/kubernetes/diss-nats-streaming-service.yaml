@@ -6,17 +6,17 @@ metadata:
     kompose.version: 1.21.0 ()
   creationTimestamp: null
   labels:
-    io.kompose.service: diss-backend
-  name: diss-backend
+    io.kompose.service: diss-nats-streaming
+  name: diss-nats-streaming
   namespace: diss
 spec:
   ports:
-  - name: "10443"
-    port: 10443
-    targetPort: 10443
-    nodePort: 30444
-  type: NodePort
+  - name: "8222"
+    port: 8222
+  - name: "4222"
+    port: 4222
+    targetPort: 4222
   selector:
-    io.kompose.service: diss-backend
+    io.kompose.service: diss-nats-streaming
 status:
   loadBalancer: {}

@@ -1,0 +1,133 @@
+apiVersion: v1
+data:
+  app.conf: |-
+    AppName = diss-backend
+    HttPport = 8080
+    RunMode = prod
+    AutoRender = false
+    CopyRequestBody = true
+    EnableDocs = true
+    EnableHTTPS = true
+    HTTPSAddr = "0.0.0.0"
+    HTTPSPort = 10443
+    HTTPSCertFile = "conf/ca.crt"
+    HTTPSKeyFile = "conf/server.key"
+    EnableAdmin = true
+    AdminAddr = "0.0.0.0"
+    AdminPort = "8889"
+
+    # mysql
+    [default-mysql]
+        Alias = "default"
+        Name = "diss"
+        User = "diss"
+        Port = 3306
+        Charset = "utf8"
+        Host = "localhost"
+        Pwd = "diss"
+        Force = false
+
+    # postgres
+    [default]
+        Alias = "default"
+        DBName = "diss"
+        User = "diss"
+        Port = 5432
+        Charset = "utf8"
+        Host = "localhost"
+        Pwd = "diss"
+        Force = false
+
+    # postgres
+    [security_log]
+        Alias = "security_log"
+        DBName = "postgres"
+        User = "postgres"
+        Port = 5431
+        Charset = "utf8"
+        Host = "111.229.167.6"
+        Pwd = "diss"
+        Force = false
+
+    # postgres
+    [diss_api]
+        Alias = "diss_api"
+        DBName = "postgres"
+        User = "postgres"
+        Port = 2345
+        Charset = "utf8"
+        Host = "114.67.110.120"
+        Pwd = "mysecretpassword"
+        Force = false
+
+    # filename 保存的文件名
+    # maxlines 每个文件保存的最大行数，默认值 1000000
+    # maxsize 每个文件保存的最大尺寸，默认值是 1 << 28, //256 MB
+    # daily 是否按照每天 logrotate，默认是 true
+    # maxdays 文件最多保存多少天，默认保存 7 天
+    # rotate 是否开启 logrotate，默认是 true
+    # level 日志保存的时候的级别，默认是 Trace 级别
+    # perm 日志文件权限
+
+    [logs]
+        FileName = "logs/diss-backend.log"
+        MaxDays = 10
+        MaxLines = 10000000
+        MaxSize = 268435456
+        Daily = true
+        Level = 7
+        Color = true
+
+    [system]
+        AdminUser = admin
+        AdminPwd = abc123
+        Expire = 1
+        LogoUrl = "logo"
+        LogoPath = "upload/logo/"
+        NewLogoName = "newcon.png"
+        UploadPath = "/opt/diss-backend/"
+        SystemCheckSpec = "0/15 * * * * ?"
+        #分钟
+        ClusterStatusCheckSpec = "0/15 * * * * ?"
+        AgentHeartBeatTime = 1
+
+    # ESAddress = 1.1.1.1,1.1.1.2
+    [es]
+        Address = http://114.67.110.120:9200,
+        UserName = elastic
+        Password = changeme
+
+    # 索引名
+    [security_log]
+        BenchMarkIndex = security_log
+
+    [k8s]
+        KubeConfigPath = "upload/kubernetes/kubeconfig/"
+        SyncSpec = "0 */1 * * * ?"
+        ScopeYml = "upload/plugin/scope/diss-scope.yml"
+        ScopeNameSpace = "weave"
+        ScopeAppName = "weave-scope-app"
+
+    [nats]
+        Prefix = "nats://"
+        Ip = "111.229.167.6"
+        Port = 4222
+        ClusterId = "diss-cluster"
+        ClientId = "diss-server"
+        Enable = true
+        User = diss
+        Pwd = diss
+
+    [syslog]
+        SyslogServer = "111.229.167.6:514"
+        SyslogSyncSpec = "0 */10 * * * ?"
+
+    [license]
+        LicensePath = "upload/license/"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: diss-backend-conf-diss-backend-app
+  name: conf-diss-backend-app
+  namespace: diss

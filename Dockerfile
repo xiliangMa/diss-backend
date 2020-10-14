@@ -5,7 +5,7 @@ EXPOSE 8088
 EXPOSE 10443
 WORKDIR /build
 COPY entrypoint.sh .
-COPY bin/diss-backend .
+COPY build/bin/diss-backend .
 COPY conf ./conf
 COPY swagger ./swagger
 COPY upload ./upload

@@ -2,12 +2,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert -f docker-compose-prod.yml
-    kompose.version: 1.21.0 (992df58d8)
+    kompose.cmd: kompose convert -f ../../docker-compose-prod.yml
+    kompose.version: 1.21.0 ()
   creationTimestamp: null
   labels:
     io.kompose.service: diss-db
   name: diss-db
+  namespace: diss
 spec:
   replicas: 1
   selector:
@@ -18,8 +19,8 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f docker-compose-prod.yml
-        kompose.version: 1.21.0 (992df58d8)
+        kompose.cmd: kompose convert -f ../../docker-compose-prod.yml
+        kompose.version: 1.21.0 ()
       creationTimestamp: null
       labels:
         io.kompose.service: diss-db
@@ -33,33 +34,34 @@ spec:
               name: conf-diss-backend-db-postgres-env
         - name: POSTGRES_PASSWORD
           valueFrom:
-            configMapKeyRef:
+            secretKeyRef:
               key: POSTGRES_PASSWORD
-              name: conf-diss-backend-db-postgres-env
+              name: conf-diss-backend-db-postgres-env-secret
         - name: POSTGRES_ROOT_PASSWORD
           valueFrom:
-            configMapKeyRef:
+            secretKeyRef:
               key: POSTGRES_ROOT_PASSWORD
-              name: conf-diss-backend-db-postgres-env
+              name: conf-diss-backend-db-postgres-env-secret
         - name: POSTGRES_USER
           valueFrom:
             configMapKeyRef:
               key: POSTGRES_USER
               name: conf-diss-backend-db-postgres-env
         image: postgres:9.6
-        imagePullPolicy: ""
+        imagePullPolicy: IfNotPresent
         name: diss-db
         ports:
         - containerPort: 5432
         resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
         volumeMounts:
-        - mountPath: /var/lib/postgresql/data
-          name: diss-db-claim0
+          - mountPath: /var/lib/diss/postgres
+            name: diss-db-data
+            subPath: data
       restartPolicy: Always
       serviceAccountName: ""
       volumes:
-      - name: diss-db-claim0
-        hostPath:
-          path: /tmp/diss/postgres
-          type: DirectoryOrCreate
+      - name: diss-db-data
+        emptyDir: {}
 status: {}
