@@ -433,6 +433,15 @@ func (this *NatsSubService) Save() error {
 							return err
 						}
 						logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", warningInfo.HostId, models.Resource_WarningInfo+"-"+warningInfo.Type)
+						if warningInfo.HostId != "" {
+							if warningInfo.Type == models.WarningInfo_File || warningInfo.Type == models.WarningInfo_Other || warningInfo.Type == models.WarningInfo_Process || warningInfo.Type == models.WarningInfo_Container {
+								hostParam := models.HostConfig{Id: warningInfo.Id}
+								hostconfig := hostParam.Get()
+								warningInfo.Cluster = hostconfig.ClusterName
+								warningInfo.Account = "admin"
+							}
+						}
+
 						if result := warningInfo.Add(); result.Code != http.StatusOK {
 							return errors.New(result.Message)
 						}
@@ -633,5 +642,28 @@ func RunClientSub_Image_Safe() {
 				natsSubService.Save()
 			}, stan.DurableName(imageSafeSubject))
 		}
+	}
+}
+
+func RunClientSub_IDL() {
+	natsManager := models.Nats
+	if natsManager != nil && natsManager.Conn != nil {
+		host := models.HostConfig{}
+		hostList := host.List(0, 0)
+
+		hostListData := hostList.Data.(map[string]interface{})["items"]
+
+		if hostListData != nil {
+			for _, host := range hostListData.([]*models.HostConfig) {
+				hostid := host.Id
+				IDLSubject := hostid + `_` + models.Subject_IntrudeDetect
+				logs.Info("Subscribe Intrude Detect :", IDLSubject)
+				natsManager.Conn.Subscribe(IDLSubject, func(m *stan.Msg) {
+					natsSubService := NatsSubService{Conn: natsManager.Conn, Message: m.Data, ClientSubject: hostid}
+					natsSubService.Save()
+				}, stan.DurableName(IDLSubject))
+			}
+		}
+
 	}
 }

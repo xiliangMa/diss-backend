@@ -149,8 +149,15 @@ var (
 	Account_Admin = "admin"
 
 	// nats subject (diss-backend 主题， agent 则以主机id区分标识)
-	Subject_Common     = "Common"
-	Subject_Image_Safe = "IMAGE_SAFE"
+	Subject_Common        = "Common"
+	Subject_Image_Safe    = "IMAGE_SAFE"
+	Subject_IntrudeDetect = "INTRUDE_DETECT"
+
+	// 告警信息类型
+	WarningInfo_File      = "ALERT_TYPE_FILE"
+	WarningInfo_Other     = "ALERT_TYPE_OTHER"
+	WarningInfo_Process   = "ALERT_TYPE_PROCESS"
+	WarningInfo_Container = "ALERT_TYPE_CONTAINER"
 
 	// 日志级别
 	Log_level_Debug = "Debug"

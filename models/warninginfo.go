@@ -115,6 +115,9 @@ func (this *WarningInfo) Add() Result {
 		this.Id = uid.String()
 	}
 
+	if this.CreateTime == "" {
+		this.CreateTime = time.Now().Format("2006-01-02T15:04:05Z")
+	}
 	_, err := o.Raw(insertSql,
 		this.Id,
 		this.Name,
