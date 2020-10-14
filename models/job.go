@@ -63,8 +63,13 @@ func (this *Job) List(from, limit int) Result {
 		o.LoadRelated(job, "HostConfig")
 		o.LoadRelated(job, "ContainerConfig")
 		o.LoadRelated(job, "Task")
-	}
 
+		if job.Task != nil {
+			for _, task := range job.Task {
+				task.Host = task.Host.Get()
+			}
+		}
+	}
 
 	if err != nil {
 		ResultData.Message = err.Error()
