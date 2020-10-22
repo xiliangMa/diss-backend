@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	uuid "github.com/satori/go.uuid"
@@ -52,13 +51,22 @@ func (this *WarningInfo) List(from, limit int) Result {
 		filter = filter + `id = '` + this.Id + `' and `
 	}
 	if this.HostName != "" {
-		filter = filter + `docker_event."host_name" like '%` + this.HostName + `%' and `
+		filter = filter + `host_name like '%` + this.HostName + `%' and `
+	}
+	if this.HostId != "" {
+		filter = filter + `host_id like '%` + this.HostId + `%' and `
 	}
 	if this.Status != "" {
 		filter = filter + `status = '` + this.Status + `' and `
 	}
 	if this.Name != "" {
 		filter = filter + `name like '%` + this.Name + `%' and `
+	}
+	if this.Account != "" {
+		filter = filter + `account like '%` + this.Account + `%' and `
+	}
+	if this.Cluster != "" {
+		filter = filter + `cluster = '` + this.Cluster + `' and `
 	}
 	if this.Type != "" {
 		filter = filter + `type = '` + this.Type + `' and `
@@ -70,7 +78,8 @@ func (this *WarningInfo) List(from, limit int) Result {
 	if this.StartTime != "" && this.EndTime != "" {
 		startTime, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.Local)
 		endTime, _ := time.ParseInLocation("2006-01-02T15:04:05", this.EndTime, time.Local)
-		filter = filter + `time BETWEEN ` + fmt.Sprintf("%v", startTime.Unix()) + ` and '` + fmt.Sprintf("%v", endTime.Unix()) + `' and `
+		//filter = filter + `create_time BETWEEN  '` + fmt.Sprintf("%v", startTime.Unix()) + `' and '` + fmt.Sprintf("%v", endTime.Unix()) + `' and `
+		filter = filter + `create_time BETWEEN  '` + startTime.Format("2006-01-02T15:04:05") + `' and '` + endTime.Format("2006-01-02T15:04:05") + `' and `
 	}
 
 	if filter != "" {
