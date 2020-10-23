@@ -639,7 +639,9 @@ func RunClientSub_Image_Safe() {
 	if natsManager != nil && natsManager.Conn != nil {
 		registries := models.Registries{}
 		registryList := registries.List()
-
+		if registryList == nil || len(registryList) == 0 {
+			return
+		}
 		for _, registry := range registryList {
 			libname := registry.Registry
 			imageSafeSubject := libname + `_` + models.Subject_Image_Safe
@@ -657,6 +659,9 @@ func RunClientSub_IDL() {
 	if natsManager != nil && natsManager.Conn != nil {
 		host := models.HostConfig{}
 		hostList := host.List(0, 0)
+		if hostList.Code != http.StatusOK || hostList.Data == nil {
+			return
+		}
 
 		hostListData := hostList.Data.(map[string]interface{})["items"]
 
