@@ -435,7 +435,7 @@ func (this *NatsSubService) Save() error {
 						logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", warningInfo.HostId, models.Resource_WarningInfo+"-"+warningInfo.Type)
 						if warningInfo.HostId != "" {
 							if warningInfo.Type == models.WarningInfo_File || warningInfo.Type == models.WarningInfo_Other || warningInfo.Type == models.WarningInfo_Process || warningInfo.Type == models.WarningInfo_Container {
-								hostParam := models.HostConfig{Id: warningInfo.Id}
+								hostParam := models.HostConfig{Id: warningInfo.HostId}
 								hostconfig := hostParam.Get()
 								warningInfo.Cluster = hostconfig.ClusterName
 								warningInfo.Account = "admin"
