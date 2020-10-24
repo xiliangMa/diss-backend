@@ -15,6 +15,7 @@ import (
 type JobService struct {
 	JobParam          *models.Job
 	securityCheckList []*models.SecurityCheck
+	TaskStatusFilter   string
 }
 
 func (this *JobService) ActiveJob() models.Result {
@@ -107,18 +108,10 @@ func (this *JobService) SetTPLType(targetType, resType string) (seccheck *models
 //判断通过此job生成的task中是否有运行的
 func (this *JobService) CheckRuningTask() models.Result {
 	var result models.Result
-	var runingTasks []*models.Task
-	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
-	job := this.JobParam.Get()
-	if job.Id != "" {
-		o.LoadRelated(job, "Task")
-		for _, task := range job.Task {
-			if task.Status == models.Task_Status_Running {
-				runingTasks = append(runingTasks, task)
-			}
-		}
-	}
+
+	this.TaskStatusFilter = models.Task_Status_Running
+	runingTasks := this.GetTasksOfJobByStatus()
+
 	if len(runingTasks) > 0 {
 		result.Code = utils.TaskIsRunningWarn
 		msg := fmt.Sprintf("Some Task is Running, code: %d", result.Code)
@@ -128,6 +121,22 @@ func (this *JobService) CheckRuningTask() models.Result {
 	}
 	result.Code = http.StatusOK
 	return result
+}
+
+func (this *JobService) GetTasksOfJobByStatus() []*models.Task {
+	var tasks []*models.Task
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	job := this.JobParam.Get()
+	if job.Id != "" {
+		o.LoadRelated(job, "Task")
+		for _, task := range job.Task {
+			if task.Status == this.TaskStatusFilter {
+				tasks = append(tasks, task)
+			}
+		}
+	}
+	return tasks
 }
 
 func (this *JobService) RemoveAssocTasks() models.Result {
@@ -167,6 +176,7 @@ func (this *JobService) DeactiveTasks() models.Result {
 	var result models.Result
 
 	// 删除Pending和Unavailable状态task
+	taskCount := 0
 	job := this.JobParam
 	if job.Id != "" {
 		jobObj := job.Get()
@@ -175,6 +185,7 @@ func (this *JobService) DeactiveTasks() models.Result {
 			taskService.Task = task
 
 			if task.Status == models.Task_Status_Pending || task.Status == models.Task_Status_Unavailable {
+				taskCount++
 				task.Action = models.Task_Action_Deactive
 				result = taskService.RemoveTask()
 			}
@@ -182,6 +193,7 @@ func (this *JobService) DeactiveTasks() models.Result {
 	}
 
 	result.Code = http.StatusOK
+	result.Data = taskCount
 	return result
 }
 

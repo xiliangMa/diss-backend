@@ -88,6 +88,11 @@ func (this *JobController) DeactiveJob() {
 
 	// 下发删除Job下的关联的task
 	result = jobService.DeactiveTasks()
+	if result.Data == 0 {
+		// 如果没有需要删除的task，直接设置状态为已禁用
+		jobService.JobParam.Status = models.Job_Status_Deactived
+		result = jobService.ChangeStatus()
+	}
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }
