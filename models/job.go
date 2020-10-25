@@ -26,6 +26,7 @@ type Job struct {
 	HostConfig          []*HostConfig        `orm:"reverse(many);null" description:"(主机列表)"`
 	ContainerConfig     []*ContainerConfig   `orm:"reverse(many);null" description:"(容器列表)"`
 	JobLevel            string               `orm:"default(System)" description:"(任务级别)"`
+	IsUpdateHost        bool                 `orm:"-" description:"(是否联动更新相关host信息)"`
 }
 
 type JobInterface interface {
@@ -218,7 +219,7 @@ func (this *Job) Update() Result {
 		return ResultData
 	}
 
-	if this.Status != Job_Status_Deactived && this.Status != Job_Status_Active {
+	if this.IsUpdateHost {
 		result := this.fillRelationData(o)
 		if result.Code != 0 && result.Code != utils.ContainerExistInJobErr && result.Code != utils.HostExistInJobErr {
 			return result

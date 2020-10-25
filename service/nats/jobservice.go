@@ -21,6 +21,7 @@ func (this *JobService) SetJobDeactiveStatus() models.Result {
 		job := this.Task.Job
 		jobObj := job.Get()
 		jobObj.Status = models.Job_Status_Deactived
+		jobObj.IsUpdateHost = false
 		result = jobObj.Update()
 	}
 

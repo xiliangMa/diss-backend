@@ -15,7 +15,7 @@ import (
 type JobService struct {
 	JobParam          *models.Job
 	securityCheckList []*models.SecurityCheck
-	TaskStatusFilter   string
+	TaskStatusFilter  string
 }
 
 func (this *JobService) ActiveJob() models.Result {
@@ -50,6 +50,7 @@ func (this *JobService) ActiveJob() models.Result {
 				return ResultData
 			}
 			job.Status = models.Job_Status_Active
+			job.IsUpdateHost = false
 			job.Update()
 		}
 	}
@@ -203,6 +204,7 @@ func (this *JobService) ChangeStatus() models.Result {
 	job := this.JobParam
 	jobObj := job.Get()
 	jobObj.Status = this.JobParam.Status
+	jobObj.IsUpdateHost = false
 	result = jobObj.Update()
 
 	return result

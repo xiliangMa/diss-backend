@@ -123,6 +123,7 @@ func (this *JobController) UpdateJob() {
 	Job := new(models.Job)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &Job)
 	Job.Id = id
+	Job.IsUpdateHost = true
 	result := Job.Update()
 	this.Data["json"] = result
 	this.ServeJSON(false)
