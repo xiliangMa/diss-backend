@@ -30,7 +30,14 @@ func (this *JobService) ActiveJob() models.Result {
 			ResultData.Message = msg
 			return ResultData
 		}
-		// 通过job内容 构建checklist
+
+		// 通过job内容，先将json配置字段清空后 构建checklist
+		job.SystemTemplate.CheckControlPlaneJson = ""
+		job.SystemTemplate.CheckEtcdJson = ""
+		job.SystemTemplate.CheckManagedServicesJson = ""
+		job.SystemTemplate.CheckMasterJson = ""
+		job.SystemTemplate.CheckNodeJson = ""
+		job.SystemTemplate.CheckPoliciesJson = ""
 		this.securityCheckList = this.BuildCheckList(job)
 
 		if len(this.securityCheckList) > 0 {

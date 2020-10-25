@@ -32,6 +32,17 @@ func (this *SecurityCheckService) PrePare() {
 			// 初始化 Host
 			GetCheckHost(securityCheck)
 			job := securityCheck.Job
+
+			// 清空不需要的json配置字段
+			if job != nil {
+				job.SystemTemplate.CheckControlPlaneJson = ""
+				job.SystemTemplate.CheckEtcdJson = ""
+				job.SystemTemplate.CheckManagedServicesJson = ""
+				job.SystemTemplate.CheckMasterJson = ""
+				job.SystemTemplate.CheckNodeJson = ""
+				job.SystemTemplate.CheckPoliciesJson = ""
+			}
+
 			if securityCheck.KubenetesCIS {
 				securityCheck := models.SecurityCheck{
 					KubenetesCIS: securityCheck.KubenetesCIS,

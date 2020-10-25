@@ -3,23 +3,33 @@ package models
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
+	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
 
 type SystemTemplate struct {
-	Id                  string                 `orm:"pk;" description:"(id)"`
-	Account             string                 `orm:"default(admin)" description:"(租户)"`
-	Name                string                 `orm:"" description:"(名称)"`
-	Description         string                 `orm:"" description:"(描述)"`
-	Type                string                 `orm:"" description:"(类型)"`
-	Version             string                 `orm:"null" description:"(版本)"`
-	Commands            string                 `orm:"null;" description:"(操作命令)"`
-	Status              string                 `orm:"default(Enable);" description:"(类型 Enable Disable)"`
-	IsDefault           bool                   `orm:"default(false);" description:"(默认系统策略)"`
-	SystemTemplateGroup []*SystemTemplateGroup `orm:"rel(m2m);" description:"(策略组)"`
-	Job                 []*Job                 `orm:"reverse(many);null" description:"(job)"`
-	Task                []*Task                `orm:"reverse(many);null" description:"(task)"`
+	Id                       string                 `orm:"pk;" description:"(id)"`
+	Account                  string                 `orm:"default(admin)" description:"(租户)"`
+	Name                     string                 `orm:"" description:"(名称)"`
+	Description              string                 `orm:"" description:"(描述)"`
+	Type                     string                 `orm:"" description:"(类型)"`
+	Version                  string                 `orm:"null" description:"(版本)"`
+	Commands                 string                 `orm:"null;" description:"(操作命令)"`
+	Status                   string                 `orm:"default(Enable);" description:"(类型 Enable Disable)"`
+	IsDefault                bool                   `orm:"default(false);" description:"(默认系统策略)"`
+	SystemTemplateGroup      []*SystemTemplateGroup `orm:"rel(m2m);" description:"(策略组)"`
+	Job                      []*Job                 `orm:"reverse(many);null" description:"(job)"`
+	Task                     []*Task                `orm:"reverse(many);null" description:"(task)"`
+	ConfigMode               string                 `orm:"null;" description:"(配置形式，有target和checks两种)"`
+	DefaultTargets           string                 `orm:"null;" description:"(默认的target枚举)"`
+	CheckMasterJson          string                 `orm:"null;" description:"(Master target的json内容)"`
+	CheckNodeJson            string                 `orm:"null;" description:"(Node target的json内容)"`
+	CheckControlPlaneJson    string                 `orm:"null;" description:"(ControlPlane target的json内容)"`
+	CheckEtcdJson            string                 `orm:"null;" description:"(Etcd target的json内容)"`
+	CheckPoliciesJson        string                 `orm:"null;" description:"(Polices target的json内容)"`
+	CheckManagedServicesJson string                 `orm:"null;" description:"(ManagedServices target的json内容)"`
+	CheckIds                 string                 `orm:"null;" description:"(选中的检查项Id列表)"`
 }
 
 type SystemTemplateGroup struct {
@@ -183,7 +193,12 @@ func (this *SystemTemplateGroup) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
+	this.IsDefault = false
 
+	if this.Id == "" {
+		uid, _ := uuid.NewV4()
+		this.Id = uid.String()
+	}
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()

@@ -108,9 +108,19 @@ func (this *DefaultDB) InitSystemData() {
 		logs.Error("Init DefaultDockerBench fail, err: %s", err)
 	}
 
-	_, err = o.Raw(dbscript.DefaultK8sBenchSql).Exec()
+	_, err = o.Raw(dbscript.DefaultK8sBenchCis13Sql).Exec()
 	if err != nil {
-		logs.Error("Init DefaultK8sBench fail, err: %s", err)
+		logs.Error("Init DefaultK8sBench - 1.3 fail, err: %s", err)
+	}
+
+	_, err = o.Raw(dbscript.DefaultK8sBenchCis14Sql).Exec()
+	if err != nil {
+		logs.Error("Init DefaultK8sBench - 1.4 fail, err: %s", err)
+	}
+
+	_, err = o.Raw(dbscript.DefaultK8sBenchCis15Sql).Exec()
+	if err != nil {
+		logs.Error("Init DefaultK8sBench - 1.5 fail, err: %s", err)
 	}
 
 	_, err = o.Raw(dbscript.DefaultDockerVirusScanSql).Exec()
