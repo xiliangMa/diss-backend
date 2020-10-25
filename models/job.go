@@ -66,7 +66,9 @@ func (this *Job) List(from, limit int) Result {
 
 		if job.Task != nil {
 			for _, task := range job.Task {
-				task.Host = task.Host.Get()
+				if task.Host != nil {
+					task.Host = task.Host.Get()
+				}
 			}
 		}
 	}
