@@ -57,7 +57,10 @@ func (this *Job) List(from, limit int) Result {
 	if this.JobLevel == "" {
 		cond = cond.And("job_level", Job_Level_User)
 	}
-
+	if this.HostConfig != nil && len(this.HostConfig) > 0 {
+		hostid := this.HostConfig[0].Id
+		cond = cond.And("HostConfig__HostConfig__Id", hostid)
+	}
 	_, err = o.QueryTable(utils.Job).SetCond(cond).RelatedSel().Limit(limit, from).OrderBy("-create_time").All(&JobList)
 
 	for _, job := range JobList {
