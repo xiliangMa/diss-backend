@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 )
 
 type LicenseController struct {
@@ -81,6 +82,15 @@ func (this *LicenseController) AddLicenseFile() {
 		}
 	}
 
+	if result.Code == utils.LicenseFCodeErr {
+		//特征码无效 ，删除上传的文件
+		err := os.Remove(fpath)
+		if err != nil {
+			result.Code = utils.DeleteFileErr
+			result.Message = "Delete file Error: " + fpath
+		}
+	}
+
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }
@@ -98,13 +108,120 @@ func (this *LicenseController) GetLicense() {
 	json.Unmarshal(this.Ctx.Input.RequestBody, &licConfig)
 
 	licenseService := sssystem.LicenseService{}
-	result := licenseService.CheckLicenseType()
+	result := licenseService.GetLicenseData(licConfig)
+	if result.Data != nil {
+		licData := result.Data.([]*models.LicenseConfig)
 
-	if result.Code != utils.NoLicenseFileErr {
-		licConfig.Type = result.Data.(string)
-		licData := licConfig.Get()
-		result.Data = licData.Data
+		if len(licData) > 0 {
+			if licData[0].Type != models.LicType_TrialLicense {
+				fcode := licData[0].Id
+				featurecodeData := licenseService.VerifyFeatureCode(fcode)
+				if featurecodeData.Data == false {
+					result.Code = utils.LicenseFCodeErr
+					result.Message = "Feature Code Error"
+					result.Data = nil
+				}
+			} else {
+				fcode := licenseService.GetFeatureCode()
+				licData[0].Id = fcode
+			}
+		}
 	}
+
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
+// @Title Get Licensed Host Count
+// @Description Get Licensed Host Count
+// @Param token header string true "authToken"
+// @Success 200 {object} models.Result
+// @router /system/license/hostcount [get]
+func (this *LicenseController) GetLicensedHostCount() {
+	result := models.Result{Code: http.StatusOK}
+	hostObj := models.HostConfig{}
+	hostObj.LicCount = true
+	licenseHostCount := hostObj.Count()
+	result.Data = licenseHostCount
+
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
+// @Title Set Host License
+// @Description Set One Host License
+// @Param token header string true "authToken"
+// @Param hostId path string "" true "hostId"
+// @Param isLicense query string "" true "add or remove host license, bool"
+// @Success 200 {object} models.Result
+// @router /system/license/hostlicense/:hostId [put]
+func (this *LicenseController) SetHostLicense() {
+	result := models.Result{Code: http.StatusOK}
+	licenseService := sssystem.LicenseService{}
+
+	// 1 - 获取已授权的主机节点个数
+	licenseHostCount := licenseService.GetLicensedHostCount()
+
+	// 2 - 获取授权管理数据（源自授权文件的）
+	licConfig := new(models.LicenseConfig)
+	result = licenseService.GetLicenseData(licConfig)
+
+	if result.Code != 0 && result.Code != http.StatusOK {
+		this.Data["json"] = result
+		this.ServeJSON(false)
+		return
+	}
+	licData := result.Data.([]*models.LicenseConfig)
+	if len(licData) < 1 {
+		result.Code = utils.GetLicenseDataErr
+		result.Message = "get license data error"
+		this.Data["json"] = result
+		this.ServeJSON(false)
+		return
+	}
+
+	// 3 - 添加主机授权主机个数检查，如果是添加授权，检查是否到达允许主机个数
+	licenseStatus, _ := this.GetBool("isLicense")
+	licModule := models.LicenseModule{}
+	licModule.ModuleCode = models.LicModuleType_BenchMark
+	licBenchData := licModule.Get()
+	licenseBenchCount := licBenchData.LicenseCount
+	if licenseStatus && licenseHostCount >= licenseBenchCount {
+
+		result.Code = utils.LicenseHostCountErr
+		result.Message = "reach license count , cant add host"
+		this.Data["json"] = result
+		this.ServeJSON(false)
+		return
+	}
+
+	// 4 - ，如果是添加授权，检查是否授权过期
+	expireTime := licBenchData.LicenseExpireAt
+	curTime := time.Now()
+	if curTime.After(expireTime) {
+		result.Code = utils.LicenseExpiredErr
+		result.Message = "License Expired"
+		this.Data["json"] = result
+		this.ServeJSON(false)
+		return
+	}
+
+	// 5 - 修改主机授权状态
+	hostId := this.GetString(":hostId")
+	hostConfig := new(models.HostConfig)
+	hostConfig.Id = hostId
+	hostConfig = hostConfig.Get()
+	if hostConfig != nil {
+		hostConfig.IsLicensed = licenseStatus
+		result = hostConfig.Update()
+		if result.Code == http.StatusOK {
+			licenseHostCount++
+		}
+	} else {
+		result.Code = utils.HostExistError
+		result.Message = "Not Fonud host"
+	}
+	result.Data = licenseHostCount
 
 	this.Data["json"] = result
 	this.ServeJSON(false)
@@ -123,5 +240,40 @@ func (this *LicenseController) GetLicenseHistory() {
 	from, _ := this.GetInt("from")
 
 	this.Data["json"] = licHistory.List(from, limit)
+	this.ServeJSON(false)
+}
+
+// @Title Get FeatureCode
+// @Description GetFeatureCode
+// @Param token header string true "authToken"
+// @Success 200 {object} models.Result
+// @router /system/featurecode [get]
+func (this *LicenseController) GetFeatureCode() {
+	result := models.Result{Code: http.StatusOK}
+
+	licenseService := sssystem.LicenseService{}
+	fcode := licenseService.GetFeatureCode()
+	result.Data = fcode
+
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
+// @Title Verify Feature Code
+// @Description Verify FeatureCode
+// @Param token header string true "authToken"
+// @Param featurecode query string true "featurecode"
+// @Success 200 {object} models.Result
+// @router /system/featurecode/verify [get]
+func (this *LicenseController) VerifyFeatureCode() {
+	fcode := this.GetString("featurecode")
+	result := models.Result{}
+
+	if fcode != "" {
+		licenseService := sssystem.LicenseService{}
+		result = licenseService.VerifyFeatureCode(fcode)
+	}
+
+	this.Data["json"] = result
 	this.ServeJSON(false)
 }

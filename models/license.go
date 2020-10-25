@@ -40,13 +40,14 @@ type LicenseModule struct {
 	Id              string         `orm:"pk;" description:"(license module id)"`
 	LicenseConfig   *LicenseConfig `orm:"rel(fk)" description:"(license file)"`
 	ModuleCode      string         `orm:"" description:"(授权模块)"`
-	LicenseCount    int            `orm:"" description:"(授权模块数量)"`
+	LicenseCount    int64          `orm:"" description:"(授权模块数量)"`
 	LicenseExpireAt time.Time      `orm:"null" description:"(授权结束时间)"`
 }
 
 type LicenseHistoryInterface interface {
 	Add() Result
 	List(from, limit int) Result
+	Get() LicenseModule
 }
 
 func (this *LicenseModule) Add() Result {
@@ -87,6 +88,24 @@ func (this *LicenseModule) Remove(licid string) Result {
 	return ResultData
 }
 
+func (this *LicenseModule) Get() LicenseModule {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+
+	licModule := LicenseModule{}
+	cond := orm.NewCondition()
+	if this.Id != "" {
+		cond = cond.And("license_config_id", this.Id)
+	}
+
+	err := o.QueryTable(utils.LicenseModule).SetCond(cond).One(&licModule)
+
+	if err != nil {
+		logs.Error("Import License failed, code: %d, err: %s", utils.DeleteLicenseModuleErr, err.Error())
+	}
+
+	return licModule
+}
 func (this *LicenseConfig) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)

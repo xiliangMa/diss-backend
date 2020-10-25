@@ -193,8 +193,14 @@ var (
 	// license type
 	LicType_TrialLicense    = "TrialLicense"
 	LicType_StandardLicense = "StandardLicense"
+	LicFile_Extension       = ".lic"
 
-	LicFile_Extension = ".lic"
+	LicModuleType_BenchMark = "BenchMark"
+
+	EncryptedFileType_License     = "license"
+	EncryptedFileType_FeatureCode = "featureCode"
+
+	FeatureCode_Key = "FeatureCode"
 
 	// system config
 	Enable = "Enable"

@@ -183,6 +183,12 @@
 			"revisionTime": "2015-11-19T15:19:21Z"
 		},
 		{
+			"checksumSHA1": "H/1FGNWZtSl/t1VFQsT0+R2IKrQ=",
+			"path": "github.com/shirou/gopsutil",
+			"revision": "c0410b92ca5e440fba10e069c9a4aac3f64d3fc6",
+			"revisionTime": "2020-01-01T07:07:23Z"
+		},
+		{
 			"checksumSHA1": "tzcUwQrH1EMR+RPvTE1Ico6kqT4=",
 			"path": "github.com/smartystreets/goconvey/convey",
 			"revision": "505e419363375c0dc132d3ac02632a4ee32199ca",

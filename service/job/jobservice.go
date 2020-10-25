@@ -45,6 +45,9 @@ func (this *JobService) ActiveJob() models.Result {
 			securityCheckService := this.InitsecurityCheckService()
 			// 下发task，更新job状态
 			ResultData = securityCheckService.DeliverTask()
+			if ResultData.Code == utils.LicenseHostErr {
+				return ResultData
+			}
 			job.Status = models.Job_Status_Active
 			job.Update()
 		}

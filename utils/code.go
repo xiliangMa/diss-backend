@@ -94,6 +94,7 @@ var (
 	GetLatestTimeForDockerEventErr  = 99
 	OpenFileErr                     = 100
 	UserAndPwdNotNull               = 101
+	DeleteFileErr                   = 102
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001
@@ -181,6 +182,11 @@ var (
 	AddSysConfigErr                 = 1232
 	GetSysConfigErr                 = 1233
 	EditSysConfigErr                = 1234
+	LicenseHostCountErr             = 1235
+	GetLicenseDataErr               = 1236
+	LicenseExpiredErr               = 1237
+	LicenseFCodeErr                 = 1238
+	LicenseHostErr                  = 1239
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300

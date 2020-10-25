@@ -37,6 +37,8 @@ type HostConfig struct {
 	NodeRole          string    `orm:"size(64)" description:"(集群主机角色)"`
 	DockerCISCount    string    `orm:"null;" description:"(docker基线结果个数)"`
 	KubeCISCount      string    `orm:"null;" description:"(k8s基线结果个数)"`
+	IsLicensed        bool      `orm:"default(false);" description:"(是否已经授权)"`
+	LicCount          bool      `orm:"-" description:"(获取授权个数操作)"`
 }
 
 type HostConfigInterface interface {
@@ -221,6 +223,9 @@ func (this *HostConfig) Count() int64 {
 	cond := orm.NewCondition()
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
+	}
+	if this.LicCount {
+		cond = cond.And("IsLicensed", true)
 	}
 	count, _ := o.QueryTable(utils.HostConfig).SetCond(cond).Count()
 	return count

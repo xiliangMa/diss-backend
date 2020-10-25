@@ -45,9 +45,45 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"],
 		beego.ControllerComments{
+			Method:           "GetFeatureCode",
+			Router:           `/system/featurecode`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"],
+		beego.ControllerComments{
+			Method:           "VerifyFeatureCode",
+			Router:           `/system/featurecode/verify`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"],
+		beego.ControllerComments{
 			Method:           "GetLicense",
 			Router:           `/system/license`,
 			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"],
+		beego.ControllerComments{
+			Method:           "GetLicensedHostCount",
+			Router:           `/system/license/hostcount`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"],
+		beego.ControllerComments{
+			Method:           "SetHostLicense",
+			Router:           `/system/license/hostlicense/:hostId`,
+			AllowHTTPMethods: []string{"put"},
 			MethodParams:     param.Make(),
 			Filters:          nil,
 			Params:           nil})

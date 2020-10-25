@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
+	"github.com/shirou/gopsutil/host"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"io/ioutil"
@@ -19,6 +20,7 @@ import (
 type LicenseService struct {
 	LicenseByte []byte
 	IsUpdate    bool
+	FileType    string
 }
 
 func (this *LicenseService) LicenseActive() models.Result {
@@ -27,8 +29,9 @@ func (this *LicenseService) LicenseActive() models.Result {
 	result.Code = http.StatusOK
 	licenseObject := new(models.LicenseConfig)
 	licenseService := LicenseService{}
+	licenseService.FileType = models.EncryptedFileType_License
+	result = licenseService.LicenseRSADecrypt(this.LicenseByte)
 
-	result = licenseService.licenseRSADecrypt(this.LicenseByte)
 	plainText := result.Data.([]byte)
 	err := json.Unmarshal(plainText, &licenseObject)
 	if err != nil {
@@ -36,9 +39,26 @@ func (this *LicenseService) LicenseActive() models.Result {
 		logs.Error("License import fail, Unmarshal license err,  %s", err)
 	}
 
+	if licenseObject.Type != models.LicType_TrialLicense {
+		result = this.VerifyFeatureCode(licenseObject.Id)
+		if result.Data == false {
+			result.Code = utils.LicenseFCodeErr
+			result.Message = "Feature Code Error"
+			result.Data = nil
+			return result
+		}
+	}
+
 	licenseObject.ActiveAt = time.Now()
 
 	message := ""
+	licInDb := licenseObject.Get()
+	if licInDb.Data != nil {
+		licData := licInDb.Data.([]*models.LicenseConfig)
+		if len(licData) > 0 {
+			this.IsUpdate = true
+		}
+	}
 	if this.IsUpdate {
 		result = licenseObject.Update()
 		message = fmt.Sprintf("Force update license file success, License: %s", string(plainText))
@@ -50,8 +70,17 @@ func (this *LicenseService) LicenseActive() models.Result {
 	}
 	//添加license 历史
 	liceseHistory := models.LicenseHistory{}
-	liceseHistory.LicenseJson = string(plainText)
+	licenseObjJson, _ := json.Marshal(licenseObject)
+	liceseHistory.LicenseJson = string(licenseObjJson)
 	liceseHistory.Add()
+
+	return result
+}
+
+func (this *LicenseService) SetHostLicense() models.Result {
+
+	result := models.Result{}
+	result.Code = http.StatusOK
 
 	return result
 }
@@ -90,6 +119,7 @@ func (this *LicenseService) CheckLicenseType() (res models.Result) {
 	licenseService := LicenseService{}
 	var fpath = licenseService.GetLicenseFilePath()
 	var result models.Result
+	result.Code = http.StatusOK
 
 	if licenseService.checkLicenseFileIsExist(fpath, models.LicType_StandardLicense+models.LicFile_Extension) != http.StatusOK {
 		//取正式版授权
@@ -126,7 +156,6 @@ func (this *LicenseService) InitTrialLicense() models.Result {
 		logs.Error("Read license file fail: %s", err)
 		return result
 	} else {
-		licenseService := LicenseService{}
 		licConfig := new(models.LicenseConfig)
 		licConfig.Type = models.LicType_TrialLicense
 		licData := licConfig.Get()
@@ -153,7 +182,26 @@ func (this *LicenseService) GetLicenseFilePath() string {
 	return beego.AppConfig.String("license::LicensePath")
 }
 
-func (this *LicenseService) licenseRSADecrypt(licenseByte []byte) models.Result {
+func (this *LicenseService) GetLicenseData(licConfig *models.LicenseConfig) models.Result {
+	result := models.Result{Code: http.StatusOK}
+	result = this.CheckLicenseType()
+
+	if result.Code != utils.NoLicenseFileErr {
+		licConfig.Type = result.Data.(string)
+		licData := licConfig.Get()
+		result.Data = licData.Data
+	}
+	return result
+}
+
+func (this *LicenseService) GetLicensedHostCount() int64 {
+	hostObj := models.HostConfig{}
+	hostObj.LicCount = true
+	licenseHostCount := hostObj.Count()
+	return licenseHostCount
+}
+
+func (this *LicenseService) LicenseRSADecrypt(licenseByte []byte) models.Result {
 	result := models.Result{}
 	result.Code = http.StatusOK
 
@@ -162,10 +210,56 @@ func (this *LicenseService) licenseRSADecrypt(licenseByte []byte) models.Result 
 		result.Code = utils.LicenseBase64DecodeErr
 		logs.Error("License import fail, license base64 decode err,  %s", err)
 	}
-	plainText := utils.RSA_Decrypt(decodeBytes, "conf/private.pem")
+	privateKey := "conf/private.pem"
+	if this.FileType == models.EncryptedFileType_FeatureCode {
+		privateKey = "conf/featurePrivate.pem"
+	}
+	plainText := utils.RSA_Decrypt(decodeBytes, privateKey)
 
 	result.Data = plainText
 	return result
+}
+
+func (this *LicenseService) VerifyFeatureCode(fcode string) models.Result {
+	result := models.Result{}
+	result.Code = http.StatusOK
+
+	hostFeatureCode := this.GetFeatureCode()
+	isVerified := hostFeatureCode == fcode
+	result.Data = isVerified
+	return result
+}
+
+func (this *LicenseService) GenerateFeatureCode() models.Result {
+	result := models.Result{}
+	result.Code = http.StatusOK
+
+	hInfo, _ := host.Info()
+	publicKey := "conf/featurePublic.pem"
+	cipherText := utils.RSA_Encrypt([]byte(hInfo.HostID), publicKey)
+	plainText := base64.StdEncoding.EncodeToString(cipherText)
+	result.Data = plainText
+	return result
+}
+
+func (this *LicenseService) GetFeatureCode() string {
+	featureCode := ""
+	sysConfig := models.SysConfig{}
+	sysConfig.Key = models.FeatureCode_Key
+	featureCodeCfg := sysConfig.Get()
+	if featureCodeCfg != nil {
+		featureCode = featureCodeCfg.Value
+	} else {
+		result := this.GenerateFeatureCode()
+		if result.Code == http.StatusOK {
+			featureCode = result.Data.(string)
+			sysConfig.Value = featureCode
+			sysConfig.Add()
+			logs.Info("Generated FeatureCode :", featureCode)
+		}
+	}
+
+	return featureCode
 }
 
 func (this *LicenseService) createLicenseConfigDir(fpath string) {

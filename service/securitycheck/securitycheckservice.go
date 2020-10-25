@@ -357,6 +357,19 @@ func (this *SecurityCheckService) GetCurrentBatchTask() []*models.Task {
 func (this *SecurityCheckService) DeliverTask() models.Result {
 	var ResultData models.Result
 
+	// 检查是否包含未授权主机，如果包含直接退出
+	checkList := this.SecurityCheckList.CheckList
+	if checkList != nil {
+		for _, checkitem := range checkList {
+			hostData := checkitem.Host.Get()
+			if !hostData.IsLicensed {
+				ResultData.Code = utils.LicenseHostErr
+				ResultData.Message = "At Least One Host NOT Licensed."
+				return ResultData
+			}
+		}
+	}
+
 	this.PrePare()
 
 	wsDelive := ws.WSDeliverService{
