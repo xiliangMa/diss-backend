@@ -87,6 +87,7 @@ func (this *CmdHistory) List(from, limit int) Result {
 	var ResultData Result
 	var err error
 	var total = 0
+	var orderSql = " order by create_time desc"
 
 	sql := `SELECT * FROM ` + utils.CmdHistory
 	countSql := `SELECT "count"(id) FROM ` + utils.CmdHistory
@@ -124,7 +125,7 @@ func (this *CmdHistory) List(from, limit int) Result {
 	}
 	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
 	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
-	resultSql := sql
+	resultSql := sql + orderSql
 	if from >= 0 && limit > 0 {
 		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
 		resultSql = resultSql + limitSql
