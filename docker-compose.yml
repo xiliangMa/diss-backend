@@ -8,9 +8,7 @@ services:
       dockerfile: Dockerfile
     image: registry.cn-qingdao.aliyuncs.com/diss/diss-backend
     ports:
-      - "8080:8080"
       - "10443:10443"
-      - "8889:8889"
     env_file:
       - conf/diss-backend.env
       - conf/diss-backend-db-postgres.env
