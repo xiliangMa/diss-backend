@@ -97,6 +97,9 @@ func (this *LicenseModule) Get() LicenseModule {
 	if this.Id != "" {
 		cond = cond.And("license_config_id", this.Id)
 	}
+	if this.ModuleCode != "" {
+		cond = cond.And("module_code", this.ModuleCode)
+	}
 
 	err := o.QueryTable(utils.LicenseModule).SetCond(cond).One(&licModule)
 

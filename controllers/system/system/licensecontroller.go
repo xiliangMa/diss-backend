@@ -180,7 +180,7 @@ func (this *LicenseController) SetHostLicense() {
 		return
 	}
 
-	// 3 - 添加主机授权主机个数检查，如果是添加授权，检查是否到达允许主机个数
+	// 3 - 主机授权个数校验， 现在校验标准是 小于 基线模块的授权个数
 	licenseStatus, _ := this.GetBool("isLicense")
 	licModule := models.LicenseModule{}
 	licModule.ModuleCode = models.LicModuleType_BenchMark

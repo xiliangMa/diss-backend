@@ -152,7 +152,7 @@ func (this *HostConfig) List(from, limit int) Result {
 		cond = cond.And("cluster_name", this.ClusterName)
 	}
 	if this.LicCount {
-		cond = cond.And( "is_licensed", true )
+		cond = cond.And("is_licensed", true)
 	}
 	_, err = o.QueryTable(utils.HostConfig).SetCond(cond).Limit(limit, from).OrderBy("-host_name").RelatedSel().All(&HostConfigList)
 	if err != nil {
