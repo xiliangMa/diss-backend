@@ -83,19 +83,20 @@ func (this *Cluster) Add(isForce bool) Result {
 		cond = cond.Or("file_name", this.FileName)
 	}
 
-	switch isForce {
-	case true: // 更新
-		o.QueryTable(utils.Cluster).SetCond(cond).One(cluster)
-		if cluster != nil {
-			cluster.Name = this.Name
-			cluster.FileName = this.FileName
-			cluster.BearerToken = this.BearerToken
-			cluster.MasterUrls = this.MasterUrls
-			cluster.Status = Cluster_Status_Active
-			cluster.IsSync = Cluster_IsSync
-			cluster.Update()
+	o.QueryTable(utils.Cluster).SetCond(cond).One(cluster)
+	if isForce && cluster.Id != "" { // 更新
+		cluster.Name = this.Name
+		cluster.FileName = this.FileName
+		cluster.BearerToken = this.BearerToken
+		cluster.MasterUrls = this.MasterUrls
+		cluster.Status = Cluster_Status_Active
+		cluster.IsSync = Cluster_IsSync
+		ResultData = cluster.Update()
+		if ResultData.Code != http.StatusOK {
+			return ResultData
 		}
-	case false: // 添加
+		this = cluster
+	} else { // 添加
 		// 根据 master_urls 或者 集群名的唯一性 判断是否重复
 		count, err := o.QueryTable(utils.Cluster).SetCond(cond).Count()
 		if count != 0 {
@@ -113,7 +114,6 @@ func (this *Cluster) Add(isForce bool) Result {
 			return ResultData
 		}
 	}
-
 	ResultData.Data = this
 	return ResultData
 }
