@@ -361,11 +361,13 @@ func (this *SecurityCheckService) DeliverTask() models.Result {
 	checkList := this.SecurityCheckList.CheckList
 	if checkList != nil {
 		for _, checkitem := range checkList {
-			hostData := checkitem.Host.Get()
-			if !hostData.IsLicensed {
-				ResultData.Code = utils.LicenseHostErr
-				ResultData.Message = "At Least One Host NOT Licensed."
-				return ResultData
+			if checkitem.Host != nil {
+				hostData := checkitem.Host.Get()
+				if hostData != nil && !hostData.IsLicensed {
+					ResultData.Code = utils.LicenseHostErr
+					ResultData.Message = "At Least One Host NOT Licensed."
+					return ResultData
+				}
 			}
 		}
 	}
