@@ -437,7 +437,9 @@ func (this *NatsSubService) Save() error {
 							if warningInfo.Type == models.WarningInfo_File || warningInfo.Type == models.WarningInfo_Other || warningInfo.Type == models.WarningInfo_Process || warningInfo.Type == models.WarningInfo_Container {
 								hostParam := models.HostConfig{Id: warningInfo.HostId}
 								hostconfig := hostParam.Get()
-								warningInfo.Cluster = hostconfig.ClusterName
+								if hostconfig != nil {
+									warningInfo.Cluster = hostconfig.ClusterName
+								}
 								warningInfo.Account = "admin"
 							}
 						}
