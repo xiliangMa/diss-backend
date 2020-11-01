@@ -509,6 +509,9 @@ func (this *NatsSubService) Save() error {
 						metricsResult.Msg = result.Message
 						msg := ""
 						if task.Host == nil {
+							if task.Container != nil {
+								this.ClientSubject = task.Container.HostName
+							}
 							msg = fmt.Sprintf("Update task KStatus: %s, fail, >>> HostName: %s, task id: %s, error: %s <<<", task.Status, task.Container.HostName, task.Id, result.Message)
 						} else {
 							msg = fmt.Sprintf("Update task KStatus: %s, fail, >>> HostId: %s, task id: %s, error: %s <<<", task.Status, task.Host.Id, task.Id, result.Message)
@@ -521,6 +524,9 @@ func (this *NatsSubService) Save() error {
 					} else {
 						msg := ""
 						if task.Host == nil {
+							if task.Container != nil {
+								this.ClientSubject = task.Container.HostName
+							}
 							msg = fmt.Sprintf("Update task Success, KStatus: %s >>> HostName: %s, Type: %s, task id: %s <<<", task.Status, task.Container.HostName, models.Resource_Task, task.Id)
 						} else {
 							msg = fmt.Sprintf("Update task Success, KStatus: %s >>> HostId: %s, Type: %s, task id: %s <<<", task.Status, task.Host.Id, models.Resource_Task, task.Id)

@@ -87,7 +87,7 @@ func (this *SecurityCheckService) PrePare() {
 				securityCheck := models.SecurityCheck{
 					KubenetesCIS: securityCheck.KubenetesCIS,
 					Container:    securityCheck.Container,
-					Type:         models.SC_Type_Host,
+					Type:         models.Sc_Type_Container,
 					Job:          job,
 				}
 				this.PrePareTask(&securityCheck)
@@ -96,7 +96,7 @@ func (this *SecurityCheckService) PrePare() {
 				securityCheck := models.SecurityCheck{
 					DockerCIS: securityCheck.DockerCIS,
 					Container: securityCheck.Container,
-					Type:      models.SC_Type_Host,
+					Type:      models.Sc_Type_Container,
 					Job:       job,
 				}
 				this.PrePareTask(&securityCheck)
@@ -105,7 +105,7 @@ func (this *SecurityCheckService) PrePare() {
 				securityCheck := models.SecurityCheck{
 					VirusScan: securityCheck.VirusScan,
 					Container: securityCheck.Container,
-					Type:      models.SC_Type_Host,
+					Type:      models.Sc_Type_Container,
 					Job:       job,
 				}
 				this.PrePareTask(&securityCheck)
@@ -114,7 +114,7 @@ func (this *SecurityCheckService) PrePare() {
 				securityCheck := models.SecurityCheck{
 					LeakScan:  securityCheck.LeakScan,
 					Container: securityCheck.Container,
-					Type:      models.SC_Type_Host,
+					Type:      models.Sc_Type_Container,
 					Job:       job,
 				}
 				this.PrePareTask(&securityCheck)
@@ -270,7 +270,7 @@ func GetCheckContainer(securityCheck *models.SecurityCheck) (*models.SecurityChe
 		return nil, errors.Errorf("ContainerId is not null")
 	}
 
-	// 获取主机
+	// 获取容器
 	container := models.ContainerConfig{Id: containerId}
 	checkContainer := container.Get()
 	if checkContainer == nil {
@@ -383,7 +383,6 @@ func (this *SecurityCheckService) DeliverTask() models.Result {
 		go wsDelive.DeliverTaskToNats()
 	} else {
 		go wsDelive.DeliverTask()
-
 	}
 
 	ResultData.Code = http.StatusOK

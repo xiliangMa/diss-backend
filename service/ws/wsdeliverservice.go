@@ -18,17 +18,23 @@ type WSDeliverService struct {
 func (this *WSDeliverService) DeliverTaskToNats() {
 	logs.Info("################ Deliver Task <<<start>>> ################")
 	for _, task := range this.CurrentBatchTaskList {
-		hostCount := task.Host.Count()
-		if hostCount > 0 {
-			result := models.WsData{Type: models.Type_Control, Tag: models.Resource_Task, Data: task, RCType: models.Resource_Control_Type_Post}
-			data, _ := json.Marshal(result)
-			subject := ""
-			if task.Host != nil {
+		subject := ""
+		// 根据是host还是container类型的任务获得topic
+		if task.Host != nil {
+			hostCount := task.Host.Count()
+			if hostCount > 0 {
 				subject = task.Host.Id
 			}
-			if task.Container != nil {
+		} else if task.Container != nil {
+			containerCount := task.Container.Count()
+			if containerCount > 0 && task.Container.HostName != "" {
 				subject = task.Container.HostName
 			}
+		}
+		if subject != "" {
+			result := models.WsData{Type: models.Type_Control, Tag: models.Resource_Task, Data: task, RCType: models.Resource_Control_Type_Post}
+			data, _ := json.Marshal(result)
+
 			err := models.Nats.Conn.Publish(subject, data)
 			if err == nil {
 				logs.Info("Deliver Task to Nats Success, Subject: %s Id: %s, data: %v", subject, task.Id, result)
