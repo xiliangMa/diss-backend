@@ -39,6 +39,16 @@ func (this *JobService) ActiveJob() models.Result {
 		job.SystemTemplate.CheckMasterJson = ""
 		job.SystemTemplate.CheckNodeJson = ""
 		job.SystemTemplate.CheckPoliciesJson = ""
+		// 检测主机资源是否已经授权，如果没有授权返回错误
+		if len(job.HostConfig) > 0 {
+			for _, host := range job.HostConfig {
+				if !host.IsLicensed {
+					ResultData.Code = utils.LicenseHostErr
+					ResultData.Message = "LicenseHostErr"
+					return ResultData
+				}
+			}
+		}
 		this.securityCheckList = this.BuildCheckList(job)
 
 		if len(this.securityCheckList) > 0 {

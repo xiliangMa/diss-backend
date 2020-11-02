@@ -38,7 +38,7 @@ type HostConfig struct {
 	DockerCISCount    string    `orm:"null;" description:"(docker基线结果个数)"`
 	KubeCISCount      string    `orm:"null;" description:"(k8s基线结果个数)"`
 	IsLicensed        bool      `orm:"default(false);" description:"(是否已经授权)"`
-	LicCount          bool      `orm:"-" description:"(获取授权个数操作)"`
+	LicCount          bool      `orm:"-" description:"(是否获取授权个数操作)"`
 }
 
 type HostConfigInterface interface {

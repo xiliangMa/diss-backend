@@ -211,18 +211,27 @@ func (this *LicenseController) SetHostLicense() {
 	hostConfig := new(models.HostConfig)
 	hostConfig.Id = hostId
 	hostConfig = hostConfig.Get()
-	if hostConfig != nil {
-		hostConfig.IsLicensed = licenseStatus
-		result = hostConfig.Update()
-		if result.Code == http.StatusOK {
-			licenseHostCount++
-		}
-	} else {
+	if hostConfig == nil {
 		result.Code = utils.HostExistError
 		result.Message = "Not Fonud host"
+		this.Data["json"] = result
+		this.ServeJSON(false)
+		return
 	}
-	result.Data = licenseHostCount
+	hostConfig.IsLicensed = licenseStatus
+	result = hostConfig.Update()
+	if result.Code != http.StatusOK {
+		result.Code = utils.LicenseHostErr
+		result.Message = "LicenseHostErr"
+		this.Data["json"] = result
+		this.ServeJSON(false)
+		return
+	}
 
+	// 再次通过数据库获取最新的授权个数
+	licenseHostCount = licenseService.GetLicensedHostCount()
+
+	result.Data = licenseHostCount
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }
