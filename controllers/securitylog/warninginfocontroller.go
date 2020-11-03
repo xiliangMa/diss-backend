@@ -52,7 +52,7 @@ func (this *WarningInfoController) UpdateWarningInfo() {
 // @Param token header string true "authToken"
 // @Param libname path string "" true "Registry Name"
 // @Success 200 {object} models.Result
-// @router /warninginfo/addsub_image/:libname [post]
+// @router /warninginfo/add_sub_imagelib/:libname [post]
 func (this *WarningInfoController) AddClientSub_Image_Safe() {
 	libname := this.GetString(":libname")
 	result := nats.AddClientSub_Image_Safe(libname)
