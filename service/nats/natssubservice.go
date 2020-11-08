@@ -10,6 +10,7 @@ import (
 	"github.com/xiliangMa/diss-backend/service/synccheck"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"time"
 )
 
 type NatsSubService struct {
@@ -416,47 +417,48 @@ func (this *NatsSubService) Save() error {
 			sysConfig.Key = models.Resource_WarningInfo
 			warningInfoConfig := sysConfig.Get()
 
-			if warningInfoConfig != nil {
-				// WarningInfo 配置项开启时执行数据的上报
-				if warningInfoConfig.Value != "" {
-					sysConfigJson := map[string]bool{}
-					err := json.Unmarshal([]byte(warningInfoConfig.Value), &sysConfigJson)
-					if err != nil {
-						logs.Error("Parse %s Config error %s", models.Resource_WarningInfo, err)
-						return err
-					}
-					if sysConfigJson[models.Enable] == true {
-						warningInfo := models.WarningInfo{}
-						s, _ := json.Marshal(ms.Data)
-						if err := json.Unmarshal(s, &warningInfo); err != nil {
-							logs.Error("Parse %s error %s", ms.Tag, err)
-							return err
-						}
-						logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", warningInfo.HostId, models.Resource_WarningInfo+"-"+warningInfo.Type)
-						if warningInfo.HostId != "" {
-							if warningInfo.Type == models.WarningInfo_File || warningInfo.Type == models.WarningInfo_Other || warningInfo.Type == models.WarningInfo_Process || warningInfo.Type == models.WarningInfo_Container {
-								hostParam := models.HostConfig{Id: warningInfo.HostId}
-								hostconfig := hostParam.Get()
-								if hostconfig != nil {
-									warningInfo.Cluster = hostconfig.ClusterName
-								}
-								warningInfo.Account = "admin"
-							}
-						}
-
-						if result := warningInfo.Add(); result.Code != http.StatusOK {
-							return errors.New(result.Message)
-						}
-						metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
-						this.ReceiveData(metricsResult)
-					}
-				}
-			} else {
-				// 建立配置项，并设置默认值 Enable: false
-				warninginfoConfig := map[string]bool{models.Enable: false}
+			if warningInfoConfig == nil {
+				// 建立配置项，并设置默认值 Enable: true
+				warninginfoConfig := map[string]bool{models.Enable: true}
 				warninginfoConfigJson, _ := json.Marshal(warninginfoConfig)
 				sysConfig.Value = string(warninginfoConfigJson)
 				sysConfig.Add()
+				time.Sleep(400)
+			}
+
+			// WarningInfo 配置项开启时执行数据的上报
+			if warningInfoConfig != nil && warningInfoConfig.Value != "" {
+				sysConfigJson := map[string]bool{}
+				err := json.Unmarshal([]byte(warningInfoConfig.Value), &sysConfigJson)
+				if err != nil {
+					logs.Error("Parse %s Config error %s", models.Resource_WarningInfo, err)
+					return err
+				}
+				if sysConfigJson[models.Enable] == true {
+					warningInfo := models.WarningInfo{}
+					s, _ := json.Marshal(ms.Data)
+					if err := json.Unmarshal(s, &warningInfo); err != nil {
+						logs.Error("Parse %s error %s", ms.Tag, err)
+						return err
+					}
+					logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", warningInfo.HostId, models.Resource_WarningInfo+"-"+warningInfo.Type)
+					if warningInfo.HostId != "" {
+						if warningInfo.Type == models.WarningInfo_File || warningInfo.Type == models.WarningInfo_Other || warningInfo.Type == models.WarningInfo_Process || warningInfo.Type == models.WarningInfo_Container {
+							hostParam := models.HostConfig{Id: warningInfo.HostId}
+							hostconfig := hostParam.Get()
+							if hostconfig != nil {
+								warningInfo.Cluster = hostconfig.ClusterName
+							}
+							warningInfo.Account = "admin"
+						}
+					}
+
+					if result := warningInfo.Add(); result.Code != http.StatusOK {
+						return errors.New(result.Message)
+					}
+					metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+					this.ReceiveData(metricsResult)
+				}
 			}
 		}
 	case models.Type_Control:
