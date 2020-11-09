@@ -40,6 +40,7 @@ func (this *DockerEvent) List(from, limit int) Result {
 	var ResultData Result
 	var err error
 	var total int64 = 0
+	var orderSql = " order by time_nano desc"
 
 	sql := ` select * from docker_event `
 	countSql := `select "count"(id) from docker_event `
@@ -81,7 +82,7 @@ func (this *DockerEvent) List(from, limit int) Result {
 	}
 	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
 	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
-	resultSql := sql
+	resultSql := sql + orderSql
 	if from >= 0 && limit > 0 {
 		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
 		resultSql = resultSql + limitSql
