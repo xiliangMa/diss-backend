@@ -91,7 +91,7 @@ func init() {
 	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/securitylog:WarningInfoController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/securitylog:WarningInfoController"],
 		beego.ControllerComments{
 			Method:           "AddClientSub_Image_Safe",
-			Router:           `/warninginfo/addsub_image/:libname`,
+			Router:           `/warninginfo/add_sub_imagelib/:libname`,
 			AllowHTTPMethods: []string{"post"},
 			MethodParams:     param.Make(),
 			Filters:          nil,

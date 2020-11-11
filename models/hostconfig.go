@@ -243,6 +243,15 @@ func (this *HostConfig) GetBnechMarkProportion() (int64, int64) {
 	return dockerBenchMarkCount, k8sBenchMarkCount
 }
 
+// 已安全容器 / 未安装安全容器
+func (this *HostConfig) GetDissCountProportion() (int64, int64) {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	safeCount, _ := o.QueryTable(utils.HostConfig).Filter("diss_status", Diss_status_Safe).Count()
+	unSafeCount, _ := o.QueryTable(utils.HostConfig).Filter("diss_status", Diss_Status_Unsafe).Count()
+	return safeCount, unSafeCount
+}
+
 // Online / Offline
 func (this *HostConfig) GetOnlineProportion() (int64, int64) {
 	o := orm.NewOrm()

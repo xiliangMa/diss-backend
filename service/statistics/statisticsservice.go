@@ -55,6 +55,16 @@ func (this *StatisticsService) GetHostBnechMarkSummaryStatistics(hostId string) 
 	bml.HostId = hostId
 	return bml.GetHostMarkSummary()
 }
+func (this *StatisticsService) GetGetDissProportionStatistics() models.Result {
+	var ResultData models.Result
+	data := make(map[string]interface{})
+	// safe / unsafe
+	hostConfig := new(models.HostConfig)
+	data["Safe"], data["UnSafe"] = hostConfig.GetDissCountProportion()
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	return ResultData
+}
 
 func (this *StatisticsService) GetGetOnlineProportionStatistics() models.Result {
 	var ResultData models.Result

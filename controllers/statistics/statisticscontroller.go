@@ -79,3 +79,14 @@ func (this *StatisticsController) GetGetOnlineProportionStatistics() {
 	this.Data["json"] = statisticsService.GetGetOnlineProportionStatistics()
 	this.ServeJSON(false)
 }
+
+// @Title GetGetDissProportionStatistics
+// @Description Get Diss Proportion Statistics (安全容器占比：Safe / Unsafe)
+// @Param token header string true "authToken"
+// @Success 200 {object} models.Result
+// @router /dissproportion [get]
+func (this *StatisticsController) GetGetDissProportionStatistics() {
+	statisticsService := ss.StatisticsService{nil, nil, nil}
+	this.Data["json"] = statisticsService.GetGetDissProportionStatistics()
+	this.ServeJSON(false)
+}
