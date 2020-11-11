@@ -99,6 +99,15 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"],
 		beego.ControllerComments{
+			Method:           "GetModuleLicenseCount",
+			Router:           `/system/license/modulecount`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:LicenseController"],
+		beego.ControllerComments{
 			Method:           "GetLicenseHistory",
 			Router:           `/system/licensehistory`,
 			AllowHTTPMethods: []string{"get"},

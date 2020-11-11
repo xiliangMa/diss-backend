@@ -159,18 +159,24 @@ func (this *LicenseService) InitTrialLicense() models.Result {
 		licConfig := new(models.LicenseConfig)
 		licConfig.Type = models.LicType_TrialLicense
 		licData := licConfig.Get()
-		if licData.Code == http.StatusOK {
-			if licData.Data != nil {
-				licList := licData.Data.([]*models.LicenseConfig)
-				if len(licList) < 1 {
-					licenseService.LicenseByte = licenseByte
-					result = licenseService.LicenseActive()
-				}
-			}
+		if licData.Code != http.StatusOK {
+			return licData
+		}
 
-			if result.Code != http.StatusOK {
-				return result
+		if licData.Data != nil {
+			return result
+		}
+
+		if licData.Data != nil {
+			licList := licData.Data.([]*models.LicenseConfig)
+			if len(licList) < 1 {
+				licenseService.LicenseByte = licenseByte
+				result = licenseService.LicenseActive()
 			}
+		}
+
+		if result.Code != http.StatusOK {
+			return result
 		}
 	}
 
@@ -198,7 +204,19 @@ func (this *LicenseService) GetLicensedHostCount() int64 {
 	hostObj := models.HostConfig{}
 	hostObj.LicCount = true
 	licenseHostCount := hostObj.Count()
+	this.UpdateLicenseCountForBenchMarkModel(licenseHostCount)
 	return licenseHostCount
+}
+
+func (this *LicenseService) UpdateLicenseCountForBenchMarkModel(count int64) models.Result {
+	result := models.Result{Code: http.StatusOK}
+	lm := models.LicenseModule{ModuleCode: models.LicModuleType_BenchMark}
+	dbLm := lm.Get()
+	if dbLm.Id != "" {
+		dbLm.IsLicensedCount = count
+		result = dbLm.Update()
+	}
+	return result
 }
 
 func (this *LicenseService) LicenseRSADecrypt(licenseByte []byte) models.Result {

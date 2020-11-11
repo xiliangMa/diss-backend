@@ -28,6 +28,8 @@ type LicenseHistory struct {
 type LinceseModuleInterface interface {
 	Add()
 	Remove(string)
+	Update(int64) Result
+	List() Result
 }
 
 type LicenseConfigInterface interface {
@@ -39,8 +41,9 @@ type LicenseConfigInterface interface {
 type LicenseModule struct {
 	Id              string         `orm:"pk;" description:"(license module id)"`
 	LicenseConfig   *LicenseConfig `orm:"rel(fk)" description:"(license file)"`
-	ModuleCode      string         `orm:"" description:"(授权模块)"`
-	LicenseCount    int64          `orm:"" description:"(授权模块数量)"`
+	ModuleCode      string         `orm:"size(128);" description:"(授权模块)"`
+	LicenseCount    int64          `orm:"size(32);default(0)" description:"(授权模块数量)"`
+	IsLicensedCount int64          `orm:"size(32);default(0)" description:"(已使用授权模块数量)"`
 	LicenseExpireAt time.Time      `orm:"null" description:"(授权结束时间)"`
 }
 
@@ -68,23 +71,55 @@ func (this *LicenseModule) Add() Result {
 	return ResultData
 }
 
-func (this *LicenseModule) Remove(licid string) Result {
+func (this *LicenseModule) Remove() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
 	cond := orm.NewCondition()
-	cond = cond.And("license_config_id", licid)
+	if this.LicenseConfig != nil && this.LicenseConfig.Id != "" {
+		cond = cond.And("license_config_id", this.LicenseConfig.Id)
+	}
 	_, err := o.QueryTable(utils.LicenseModule).SetCond(cond).Delete()
 
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteLicenseModuleErr
-		logs.Error("Import License failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error("delete LicenseModule failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
 	ResultData.Code = http.StatusOK
-	ResultData.Data = this
+	return ResultData
+}
+func (this *LicenseModule) List() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+
+	var licModuleList []*LicenseModule = nil
+	var ResultData Result
+	cond := orm.NewCondition()
+	if this.Id != "" {
+		cond = cond.And("license_config_id", this.Id)
+	}
+	if this.ModuleCode != "" {
+		cond = cond.And("module_code", this.ModuleCode)
+	}
+
+	_, err := o.QueryTable(utils.LicenseModule).SetCond(cond).All(&licModuleList)
+
+	if err != nil {
+		logs.Error("Get LicenseModule failed, code: %d, err: %s", utils.DeleteLicenseModuleErr, err.Error())
+	}
+	total, _ := o.QueryTable(utils.LicenseModule).SetCond(cond).Count()
+
+	data := make(map[string]interface{})
+	data["items"] = licModuleList
+	data["total"] = total
+	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
+	ResultData.Code = http.StatusOK
 	return ResultData
 }
 
@@ -104,19 +139,20 @@ func (this *LicenseModule) Get() LicenseModule {
 	err := o.QueryTable(utils.LicenseModule).SetCond(cond).One(&licModule)
 
 	if err != nil {
-		logs.Error("Import License failed, code: %d, err: %s", utils.DeleteLicenseModuleErr, err.Error())
+		logs.Error("Get LicenseModule failed, code: %d, err: %s", utils.DeleteLicenseModuleErr, err.Error())
 	}
 
 	return licModule
 }
+
 func (this *LicenseConfig) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	err := o.Begin()
-	tmpmodule := LicenseModule{}
-	tmpmodule.Remove(this.Id)
+	tmpmodule := LicenseModule{LicenseConfig: this}
+	tmpmodule.Remove()
 	licmodules := this.Modules
 	for _, licmodule := range licmodules {
 		uuidmodule, _ := uuid.NewV4()
@@ -161,8 +197,8 @@ func (this *LicenseConfig) Update() Result {
 	}
 
 	licmodules := this.Modules
-	tmpmodule := LicenseModule{}
-	tmpmodule.Remove(this.Id)
+	tmpmodule := LicenseModule{LicenseConfig: this}
+	tmpmodule.Remove()
 	for _, licmodule := range licmodules {
 		uuidmodule, _ := uuid.NewV4()
 		tmplicmodule := LicenseModule{Id: uuidmodule.String(), LicenseConfig: this, LicenseCount: licmodule.LicenseCount, LicenseExpireAt: licmodule.LicenseExpireAt, ModuleCode: licmodule.ModuleCode}
@@ -266,5 +302,22 @@ func (this *LicenseHistory) List(from, limit int) Result {
 	if total == 0 {
 		ResultData.Data = nil
 	}
+	return ResultData
+}
+
+func (this *LicenseModule) Update() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+
+	_, err := o.Update(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.EditHostConfigErr
+		logs.Error("Update LicenseModule: %s failed, code: %d, err: %s", this.ModuleCode, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
 	return ResultData
 }

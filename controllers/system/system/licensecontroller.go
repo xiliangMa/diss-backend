@@ -286,3 +286,16 @@ func (this *LicenseController) VerifyFeatureCode() {
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }
+
+// @Title Get module License Count(获取授权模块授权数)
+// @Description GetModuleLicenseCount
+// @Param token header string true "authToken"
+// @Param body body models.LicenseModule false "license 模块信息"
+// @Success 200 {object} models.Result
+// @router /system/license/modulecount [post]
+func (this *LicenseController) GetModuleLicenseCount() {
+	lm := new(models.LicenseModule)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &lm)
+	this.Data["json"] = lm.List()
+	this.ServeJSON(false)
+}
