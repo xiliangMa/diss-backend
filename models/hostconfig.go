@@ -239,7 +239,7 @@ func (this *HostConfig) GetBnechMarkProportion() (int64, int64) {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	dockerBenchMarkCount, _ := o.QueryTable(utils.HostConfig).Count()
-	k8sBenchMarkCount, _ := o.QueryTable(utils.HostConfig).Filter("is_in_k8s", false).Count()
+	k8sBenchMarkCount, _ := o.QueryTable(utils.HostConfig).Filter("is_in_k8s", true).Count()
 	return dockerBenchMarkCount, k8sBenchMarkCount
 }
 
