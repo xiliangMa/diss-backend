@@ -20,7 +20,7 @@ type HostInfo struct {
 	OSVer                 string `orm:"size(32)" description:"(系统版本)"`
 	Kernel                string `orm:"size(32)" description:"(内核)"`
 	Architecture          string `orm:"size(32)" description:"(架构)"`
-	Mac                   string `orm:"size(255)" description:"(mac)"`
+	Mac                   string `orm:"" description:"(mac)"`
 	DockerRuntime         string `orm:"size(128)" description:"(容器运行时)"`
 	KubernetesVer         string `orm:"size(64)" description:"(kubernetes 版本)"`
 	KubeletVer            string `orm:"size(64)" description:"(kubelet 版本)"`
