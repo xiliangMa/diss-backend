@@ -283,7 +283,7 @@ func (this *LicenseHistory) List(from, limit int) Result {
 	if this.LicenseJson != "" {
 		cond = cond.And("name__icontains", this.LicenseJson)
 	}
-	_, err = o.QueryTable(utils.LicenseHistory).SetCond(cond).Limit(limit, from).All(&licenseHistoryList)
+	_, err = o.QueryTable(utils.LicenseHistory).SetCond(cond).Limit(limit, from).OrderBy("-update_time").All(&licenseHistoryList)
 
 	if err != nil {
 		ResultData.Message = err.Error()
