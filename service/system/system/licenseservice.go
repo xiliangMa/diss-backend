@@ -163,7 +163,7 @@ func (this *LicenseService) InitTrialLicense() models.Result {
 			return licData
 		}
 
-		if licData.Data != nil {
+		if licData.Data == nil {
 			return result
 		}
 
