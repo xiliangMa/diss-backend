@@ -5,6 +5,8 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service"
+	sssystem "github.com/xiliangMa/diss-backend/service/system/system"
+	"net/http"
 )
 
 // 主机接口列表
@@ -78,6 +80,13 @@ func (this *HostController) DeleteHost() {
 	hc := new(models.HostConfig)
 	hc.Id = hostId
 	hs := service.HostService{Host: hc}
-	this.Data["json"] = hs.Delete()
+
+	result := hs.Delete()
+	if result.Code == http.StatusOK {
+		// 更新主机（基线）授权 删除主机，授权恢复
+		licenseService := sssystem.LicenseService{}
+		licenseService.GetLicensedHostCount()
+	}
+	this.Data["json"] = result
 	this.ServeJSON(false)
 }

@@ -77,14 +77,6 @@ func (this *LicenseService) LicenseActive() models.Result {
 	return result
 }
 
-func (this *LicenseService) SetHostLicense() models.Result {
-
-	result := models.Result{}
-	result.Code = http.StatusOK
-
-	return result
-}
-
 func (this *LicenseService) CheckLicenseFile(h *multipart.FileHeader) (models.Result, string) {
 	licenseService := LicenseService{}
 	var fpath = licenseService.GetLicenseFilePath()

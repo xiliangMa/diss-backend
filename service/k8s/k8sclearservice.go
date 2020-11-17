@@ -5,7 +5,9 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
+	sssystem "github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
+	"net/http"
 	"os"
 )
 
@@ -196,11 +198,18 @@ func (this *K8sClearService) ClearNode() {
 
 	hc := models.HostConfig{}
 	hc.ClusterId = this.CurrentCluster.Id
-	hc.Delete()
+	result := hc.Delete()
 
 	hi := models.HostInfo{}
 	hi.ClusterId = this.CurrentCluster.Id
 	hi.Delete()
+
+	if result.Code == http.StatusOK {
+		// 更新主机（基线）授权 删除集群并清除主机时，授权恢复
+		licenseService := sssystem.LicenseService{}
+		licenseService.GetLicensedHostCount()
+	}
+
 }
 
 // todo clear container and host task
