@@ -53,7 +53,7 @@ func (this *IntegrationController) UpdateLogConfig() {
 	logConfigObj := result.Data.(*models.LogConfig)
 	models.GlobalLogConfig[models.Log_Config_SysLog_Export] = logConfigObj
 	// 重新部署任务
-	syslogTaskHandler := task.GlobalSysLogTaskHandler
+	syslogTaskHandler := task.GlobalSysLogManager
 	syslogTaskHandler.ReGenSyncSyslogTask()
 	this.ServeJSON(false)
 }
@@ -73,6 +73,3 @@ func (this *IntegrationController) GetLogConfig() {
 	this.Data["json"] = logConfig.Get()
 	this.ServeJSON(false)
 }
-
-//// 外部传入日志记录转发
-// @Title

@@ -15,21 +15,24 @@ type LogExportGroup struct {
 	LastTime   string
 }
 
-type SyslogTaskHandler struct {
+type SyslogManager struct {
 	CurGroup    string
 	ExportTypes *map[string]LogExportGroup
 }
 
-func NewSyslogTaskHandler(exportTypes *map[string]LogExportGroup) *SyslogTaskHandler {
-	return &SyslogTaskHandler{ExportTypes: exportTypes}
+func NewSyslogTaskManager(exportTypes *map[string]LogExportGroup) *SyslogManager {
+	return &SyslogManager{ExportTypes: exportTypes}
 }
 
-var GlobalSysLogTaskHandler *SyslogTaskHandler
+var GlobalSysLogManager *SyslogManager
+var SysLogTaskHandler *TaskHandler
 
 func InitGlobalSyslogHander() {
 	exportGroups := AllExGroups()
-	GlobalSysLogTaskHandler = NewSyslogTaskHandler(exportGroups)
-	GlobalSysLogTaskHandler.ReGenSyncSyslogTask()
+	SysLogTaskHandler = NewTaskHandler()
+	GlobalSysLogManager = NewSyslogTaskManager(exportGroups)
+	GlobalSysLogManager.ReGenSyncSyslogTask()
+
 }
 
 func AllExGroups() *map[string]LogExportGroup {
@@ -42,19 +45,18 @@ func AllExGroups() *map[string]LogExportGroup {
 	return &exportGroups
 }
 
-func (this *SyslogTaskHandler) ReGenSyncSyslogTask() {
+func (this *SyslogManager) ReGenSyncSyslogTask() {
 	syslogConfig := models.GlobalLogConfig[models.Log_Config_SysLog_Export]
-	th := NewTaskHandler()
 
+	// 清除全部的syslog任务
 	for _, exGroup := range *this.ExportTypes {
 		if exGroup.TaskId != "" {
-			th.DelByID(exGroup.TaskId)
-			logs.Info("Delete logsync task type - %s \n", exGroup.TaskId)
+			SysLogTaskHandler.DelByID(exGroup.TaskId)
+			logs.Info("Delete logSync task type - %s \n", exGroup.TaskId)
 		}
 	}
 	if len(*this.ExportTypes) != 0 {
-		exgroup := map[string]LogExportGroup{}
-		this.ExportTypes = &exgroup
+		this.ExportTypes = &map[string]LogExportGroup{}
 	}
 
 	if syslogConfig.Enabled == true {
@@ -63,13 +65,13 @@ func (this *SyslogTaskHandler) ReGenSyncSyslogTask() {
 			logExGroup := (*this.ExportTypes)[exType]
 			logExGroup.TaskId = exType
 			(*this.ExportTypes)[exType] = logExGroup
-			if err := th.AddByFunc(exType, beego.AppConfig.String("syslog::SyslogSyncSpec"), system.GetSyncSyslogFunc(exType)); err != nil {
-				logs.Error("error to add syslog TaskHandler task: %s", err)
+			specSyslog := beego.AppConfig.String("syslog::SyslogSyncSpec")
+			if err := SysLogTaskHandler.AddByFunc(exType, specSyslog, system.GetSyncSyslogFunc(exType)); err != nil {
+				logs.Error("Error to add syslog TaskHandler task: %s", err)
 				os.Exit(-1)
 			}
 		}
 	}
 
-	th.Start()
-
+	SysLogTaskHandler.Start()
 }
