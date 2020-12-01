@@ -158,17 +158,40 @@ func GetSyncSyslogFunc(exType string) func() {
 				}
 			}
 
-		case models.SysLog_SecAuditLog:
-			secAuditDocker := new(models.DockerEvent)
+		case models.SysLog_ContainerSecAuditLog:
+			secDockerAuditDocker := new(models.DockerEvent)
 			TEPointObj := new(models.TimeEdgePoint)
 			TEPointObj.EdgePointCode = exType
 			TEPinDB := TEPointObj.Get()
 			if len(TEPinDB) > 0 {
-				secAuditDocker.StartTime = TEPinDB[0].TimePointA
-				loglist := secAuditDocker.List(from, limit)
+				secDockerAuditDocker.StartTime = TEPinDB[0].TimePointA
+				loglist := secDockerAuditDocker.List(from, limit)
 				if loglist.Code == 200 && loglist.Data != nil {
 					mapdata := loglist.Data.(map[string]interface{})
 					for _, logitem := range mapdata["items"].([]*models.DockerEvent) {
+						logitemJson, _ := json.Marshal(logitem)
+						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
+					}
+
+
+					TEPinDB[0].TimePointA = time.Now().Format("2006-01-02T15:04:05Z")
+					TEPinDB[0].Update()
+				}
+			}
+
+
+		case models.SysLog_CommandSecAuditLog:
+			secCommandAuditDocker := new(models.CmdHistory)
+			TEPointObj := new(models.TimeEdgePoint)
+			TEPointObj.EdgePointCode = exType
+			TEPinDB := TEPointObj.Get()
+			if len(TEPinDB) > 0 {
+				secCommandAuditDocker.StartTime = TEPinDB[0].TimePointA
+				loglist := secCommandAuditDocker.List(from, limit)
+				if loglist.Code == 200 && loglist.Data != nil {
+					mapdata := loglist.Data.(map[string]interface{})
+					for _, logitem := range mapdata["items"].([]*models.CmdHistory) {
+
 						logitemJson, _ := json.Marshal(logitem)
 						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
@@ -178,5 +201,6 @@ func GetSyncSyslogFunc(exType string) func() {
 				}
 			}
 		}
+
 	}
 }

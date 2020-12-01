@@ -127,7 +127,7 @@ func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 			TEPinDB[0].Update()
 		}
 
-	case models.SysLog_SecAuditLog:
+	case models.SysLog_ContainerSecAuditLog:
 
 	}
 

@@ -184,11 +184,12 @@ var (
 	Log_Config_SysLog_Export = "SysLogExport"
 
 	// syslog exported log type
-	SysLog_BenchScanLog      = "BenchmarkScanLog"  // 基线扫描日志
-	SysLog_ImageSecLog       = "ImageSecurityLog"  // 镜像安全日志
-	SysLog_ContainerVirusLog = "ContainerVirusLog" // 容器杀毒日志
-	SysLog_IDSLog            = "IntrudeDetectLog"  // 入侵检测日志
-	SysLog_SecAuditLog       = "SecurityAuditLog"  // 安全审计日志
+	SysLog_BenchScanLog         = "BenchmarkScanLog"          // 基线扫描日志
+	SysLog_ImageSecLog          = "ImageSecurityLog"          // 镜像安全日志
+	SysLog_ContainerVirusLog    = "ContainerVirusLog"         // 容器杀毒日志
+	SysLog_IDSLog               = "IntrudeDetectLog"          // 入侵检测日志
+	SysLog_ContainerSecAuditLog = "ContainerSecurityAuditLog" // 容器安全审计日志
+	SysLog_CommandSecAuditLog   = "CommandSecurityAuditLog"   // 命令安全审计日志
 
 	// license type
 	LicType_TrialLicense    = "TrialLicense"
