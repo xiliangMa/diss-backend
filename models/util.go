@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 var (
 	// Global
 	All          = "All"
@@ -207,4 +209,7 @@ var (
 	Enable = "Enable"
 
 	Null_Time = "0001-01-01 00:00:00 +0000 UTC"
+
+	// time and zone
+	CstZone = time.FixedZone("CST", 8*3600)
 )

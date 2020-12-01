@@ -90,7 +90,7 @@ func GetSyncSyslogFunc(exType string) func() {
 						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
 
-					TEPinDB[0].TimePointA = time.Now().Format("2006-01-02T15:04:05Z")
+					TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
 					TEPinDB[0].Update()
 				}
 			}
@@ -109,7 +109,7 @@ func GetSyncSyslogFunc(exType string) func() {
 						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
 
-					TEPinDB[0].TimePointA = time.Now().Format("2006-01-02T15:04:05Z")
+					TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
 					TEPinDB[0].Update()
 				}
 			}
@@ -131,7 +131,7 @@ func GetSyncSyslogFunc(exType string) func() {
 						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
 
-					TEPinDB[0].TimePointA = time.Now().Format("2006-01-02T15:04:05Z")
+					TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
 					TEPinDB[0].Update()
 				}
 			}
@@ -153,7 +153,7 @@ func GetSyncSyslogFunc(exType string) func() {
 						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
 
-					TEPinDB[0].TimePointA = time.Now().Format("2006-01-02T15:04:05Z")
+					TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
 					TEPinDB[0].Update()
 				}
 			}
@@ -173,12 +173,10 @@ func GetSyncSyslogFunc(exType string) func() {
 						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
 
-
-					TEPinDB[0].TimePointA = time.Now().Format("2006-01-02T15:04:05Z")
+					TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
 					TEPinDB[0].Update()
 				}
 			}
-
 
 		case models.SysLog_CommandSecAuditLog:
 			secCommandAuditDocker := new(models.CmdHistory)
@@ -196,7 +194,7 @@ func GetSyncSyslogFunc(exType string) func() {
 						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
 
-					TEPinDB[0].TimePointA = time.Now().Format("2006-01-02T15:04:05Z")
+					TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
 					TEPinDB[0].Update()
 				}
 			}
