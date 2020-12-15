@@ -156,5 +156,20 @@ func (this *DefaultDB) InitSystemData() {
 		logs.Error("Init DefaultHostVirusScanJobSql Job fail, err: %s", err)
 	}
 
+	_, err = o.Raw(dbscript.WarningInfoConfig).Exec()
+	if err != nil {
+		logs.Error("Init WarningInfo Config  fail, err: %s", err)
+	}
+
+	_, err = o.Raw(dbscript.DefaultMailServerConfig).Exec()
+	if err != nil {
+		logs.Error("Init DefaultMailServer Config fail, err: %s", err)
+	}
+
+	_, err = o.Raw(dbscript.DefaultMailLogConfig).Exec()
+	if err != nil {
+		logs.Error("Init DefaultMailLog Config fail, err: %s", err)
+	}
+
 	logs.Info("Init default data end................")
 }

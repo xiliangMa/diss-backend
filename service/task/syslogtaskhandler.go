@@ -37,12 +37,12 @@ func InitGlobalSyslogHander() {
 
 func AllExGroups() *map[string]LogExportGroup {
 	exportGroups := map[string]LogExportGroup{}
-	exportGroups[models.SysLog_ImageSecLog] = LogExportGroup{ExportName: "镜像安全日志"}
-	exportGroups[models.SysLog_BenchScanLog] = LogExportGroup{ExportName: "基线扫描日志"}
-	exportGroups[models.SysLog_IDSLog] = LogExportGroup{ExportName: "入侵检测日志"}
-	exportGroups[models.SysLog_ContainerVirusLog] = LogExportGroup{ExportName: "容器杀毒日志"}
-	exportGroups[models.SysLog_ContainerSecAuditLog] = LogExportGroup{ExportName: "容器安全审计日志"}
-	exportGroups[models.SysLog_CommandSecAuditLog] = LogExportGroup{ExportName: "命令安全审计日志"}
+	exportGroups[models.LogType_ImageSecLog] = LogExportGroup{ExportName: "镜像安全日志"}
+	exportGroups[models.LogType_BenchMarkLog] = LogExportGroup{ExportName: "基线扫描日志"}
+	exportGroups[models.LogType_IntrudeDetectLog] = LogExportGroup{ExportName: "入侵检测日志"}
+	exportGroups[models.LogType_ContainerVirusLog] = LogExportGroup{ExportName: "容器杀毒日志"}
+	exportGroups[models.LogType_ContainerSecAuditLog] = LogExportGroup{ExportName: "容器安全审计日志"}
+	exportGroups[models.LogType_CommandSecAuditLog] = LogExportGroup{ExportName: "命令安全审计日志"}
 	return &exportGroups
 }
 

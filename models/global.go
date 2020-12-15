@@ -5,4 +5,5 @@ var (
 	Nats  *NatsManager
 	GRM   *GoRoutineManager
 	KCM   *KubernetesClientManager
+	MSM   *MailServerManager
 )

@@ -164,6 +164,16 @@ var (
 	WarningInfo_Other     = "ALERT_TYPE_OTHER"
 	WarningInfo_Process   = "ALERT_TYPE_PROCESS"
 	WarningInfo_Container = "ALERT_TYPE_CONTAINER"
+	WarningInfo_Image     = "ALERT_TYPE_IMAGE"
+	WarningInfo_MailError = "ALERT_MAIL_ERROR"
+
+	// 告警信息级别
+	WarningLevel_High   = "ALERT_SEVERITY_HIGH"
+	WarningLevel_Medium = "ALERT_SEVERITY_MEDIUM"
+	WarningLevel_Low    = "ALERT_SEVERITY_LOW"
+
+	//告警信息状态
+	WarningStatus_Not_Dealed = "未处理"
 
 	// 日志级别
 	Log_level_Debug = "Debug"
@@ -182,16 +192,14 @@ var (
 	Vulnerabilities_Severity_Low        = "Low"
 	Vulnerabilities_Severity_Critical   = "Critical"
 
-	// LogConfigs
-	Log_Config_SysLog_Export = "SysLogExport"
-
-	// syslog exported log type
-	SysLog_BenchScanLog         = "BenchmarkScanLog"          // 基线扫描日志
-	SysLog_ImageSecLog          = "ImageSecurityLog"          // 镜像安全日志
-	SysLog_ContainerVirusLog    = "ContainerVirusLog"         // 容器杀毒日志
-	SysLog_IDSLog               = "IntrudeDetectLog"          // 入侵检测日志
-	SysLog_ContainerSecAuditLog = "ContainerSecurityAuditLog" // 容器安全审计日志
-	SysLog_CommandSecAuditLog   = "CommandSecurityAuditLog"   // 命令安全审计日志
+	// log type tag
+	LogToEmail_Prefix            = "日志导出"
+	LogType_BenchMarkLog         = "BenchmarkMarkLog"          // 基线扫描日志
+	LogType_ImageSecLog          = "ImageSecurityLog"          // 镜像安全日志
+	LogType_ContainerVirusLog    = "ContainerVirusLog"         // 容器杀毒日志
+	LogType_IntrudeDetectLog     = "IntrudeDetectLog"          // 入侵检测日志
+	LogType_ContainerSecAuditLog = "ContainerSecurityAuditLog" // 容器安全审计日志
+	LogType_CommandSecAuditLog   = "CommandSecurityAuditLog"   // 命令安全审计日志
 
 	// license type
 	LicType_TrialLicense    = "TrialLicense"
@@ -203,7 +211,26 @@ var (
 	EncryptedFileType_License     = "license"
 	EncryptedFileType_FeatureCode = "featureCode"
 
-	FeatureCode_Key = "FeatureCode"
+	// 系统配置类型
+	FeatureCode       = "FeatureCode"
+	EmailServerConfig = "EmailServerConfig"
+
+	// LogConfigs
+	Log_Config_SysLog_Export = "SysLogExport"
+	Log_Config_To_Mail       = "LogToMail"
+
+	MailServer_Not_Available_Msg = "邮箱服务器不可用"
+	Mail_CanNotSend_Msg          = "邮件发送不成功"
+
+	// 告警邮件字段定义
+	MailField_Subject = "Subject"
+	MailField_LogType = "LogType"
+	MailField_Body    = "Body"
+	MailField_From    = "From"
+	MailField_To      = "To"
+
+	MailServerStatus_Normal   = "Normal"
+	MailServerStatus_Abnormal = "Abnormal"
 
 	// system config
 	Enable = "Enable"

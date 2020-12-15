@@ -4,6 +4,7 @@ import (
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/k8s"
 	"github.com/xiliangMa/diss-backend/service/nats"
+	"github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/service/task"
 	"github.com/xiliangMa/diss-backend/sysinit/db"
 )
@@ -55,4 +56,9 @@ func init() {
 
 	// init task
 	InitTask()
+
+	// 5. MailServerManager
+	models.MSM = models.NewMailServerManager()
+	mailService := system.MailService{}
+	go mailService.StartMailService()
 }

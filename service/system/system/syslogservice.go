@@ -74,7 +74,7 @@ func GetSyncSyslogFunc(exType string) func() {
 		}
 
 		switch exType { //根据syslog日志的类型，对应获取不同数据，更新对应的时间边界点
-		case models.SysLog_BenchScanLog:
+		case models.LogType_BenchMarkLog:
 			benchMarkLog := models.BenchMarkLog{IsInfo: true}
 			TEPointObj := new(models.TimeEdgePoint)
 			TEPointObj.EdgePointCode = exType
@@ -94,7 +94,7 @@ func GetSyncSyslogFunc(exType string) func() {
 					TEPinDB[0].Update()
 				}
 			}
-		case models.SysLog_IDSLog:
+		case models.LogType_IntrudeDetectLog:
 			intrudeDetectLog := new(models.IntrudeDetectLog)
 			TEPointObj := new(models.TimeEdgePoint)
 			TEPointObj.EdgePointCode = exType
@@ -114,7 +114,7 @@ func GetSyncSyslogFunc(exType string) func() {
 				}
 			}
 
-		case models.SysLog_ContainerVirusLog:
+		case models.LogType_ContainerVirusLog:
 			dockerVirus := new(models.DockerVirus)
 			TEPointObj := new(models.TimeEdgePoint)
 			TEPointObj.EdgePointCode = exType
@@ -136,7 +136,7 @@ func GetSyncSyslogFunc(exType string) func() {
 				}
 			}
 
-		case models.SysLog_ImageSecLog:
+		case models.LogType_ImageSecLog:
 			imageVirus := new(models.ImageVirus)
 			TEPointObj := new(models.TimeEdgePoint)
 			TEPointObj.EdgePointCode = exType
@@ -158,7 +158,7 @@ func GetSyncSyslogFunc(exType string) func() {
 				}
 			}
 
-		case models.SysLog_ContainerSecAuditLog:
+		case models.LogType_ContainerSecAuditLog:
 			secDockerAuditDocker := new(models.DockerEvent)
 			TEPointObj := new(models.TimeEdgePoint)
 			TEPointObj.EdgePointCode = exType
@@ -178,7 +178,7 @@ func GetSyncSyslogFunc(exType string) func() {
 				}
 			}
 
-		case models.SysLog_CommandSecAuditLog:
+		case models.LogType_CommandSecAuditLog:
 			secCommandAuditDocker := new(models.CmdHistory)
 			TEPointObj := new(models.TimeEdgePoint)
 			TEPointObj.EdgePointCode = exType

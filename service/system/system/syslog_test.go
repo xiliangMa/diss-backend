@@ -26,7 +26,7 @@ import (
 
 func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 
-	exType := models.SysLog_ImageSecLog
+	exType := models.LogType_ImageSecLog
 
 	//default from and limit , for 3000 records
 	from := 0
@@ -41,7 +41,7 @@ func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 	}
 
 	switch exType { //根据syslog日志的类型，对应获取不同数据，更新对应的时间边界点
-	case models.SysLog_BenchScanLog:
+	case models.LogType_BenchMarkLog:
 		benchMarkLog := new(models.BenchMarkLog)
 		TEPointObj := new(models.TimeEdgePoint)
 		TEPointObj.EdgePointCode = exType
@@ -62,7 +62,7 @@ func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 			//TEPinDB[0].TimePointA = time.Now().Add(time.Hour * -8).Format("2006-01-02T15:04:05Z")
 			//TEPinDB[0].Update()
 		}
-	case models.SysLog_IDSLog:
+	case models.LogType_IntrudeDetectLog:
 		intrudeDetectLog := new(models.IntrudeDetectLog)
 		TEPointObj := new(models.TimeEdgePoint)
 		TEPointObj.EdgePointCode = exType
@@ -81,7 +81,7 @@ func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 			TEPinDB[0].Update()
 		}
 
-	case models.SysLog_ContainerVirusLog:
+	case models.LogType_ContainerVirusLog:
 		dockerVirus := new(models.DockerVirus)
 		TEPointObj := new(models.TimeEdgePoint)
 		TEPointObj.EdgePointCode = exType
@@ -104,7 +104,7 @@ func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 			TEPinDB[0].Update()
 		}
 
-	case models.SysLog_ImageSecLog:
+	case models.LogType_ImageSecLog:
 		imageVirus := new(models.ImageVirus)
 		TEPointObj := new(models.TimeEdgePoint)
 		TEPointObj.EdgePointCode = exType
@@ -127,7 +127,7 @@ func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 			TEPinDB[0].Update()
 		}
 
-	case models.SysLog_ContainerSecAuditLog:
+	case models.LogType_ContainerSecAuditLog:
 
 	}
 

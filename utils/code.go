@@ -98,6 +98,7 @@ var (
 	AddHostPackageErr               = 103
 	GetHostPackageErr               = 104
 	DeleteHostPackageErr            = 105
+	MailServerNotAvaiable           = 106
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001

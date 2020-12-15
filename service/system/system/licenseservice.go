@@ -255,7 +255,7 @@ func (this *LicenseService) GenerateFeatureCode() models.Result {
 func (this *LicenseService) GetFeatureCode() string {
 	featureCode := ""
 	sysConfig := models.SysConfig{}
-	sysConfig.Key = models.FeatureCode_Key
+	sysConfig.Key = models.FeatureCode
 	featureCodeCfg := sysConfig.Get()
 	if featureCodeCfg != nil {
 		featureCode = featureCodeCfg.Value

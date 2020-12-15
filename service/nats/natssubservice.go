@@ -8,9 +8,9 @@ import (
 	"github.com/nats-io/stan.go"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/synccheck"
+	"github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"time"
 	"strings"
 )
 
@@ -438,16 +438,7 @@ func (this *NatsSubService) Save() error {
 			sysConfig.Key = models.Resource_WarningInfo
 			warningInfoConfig := sysConfig.Get()
 
-			if warningInfoConfig == nil {
-				// 建立配置项，并设置默认值 Enable: true
-				warninginfoConfig := map[string]bool{models.Enable: true}
-				warninginfoConfigJson, _ := json.Marshal(warninginfoConfig)
-				sysConfig.Value = string(warninginfoConfigJson)
-				sysConfig.Add()
-				time.Sleep(400)
-			}
-
-			// WarningInfo 配置项开启时执行数据的上报
+			// WarningInfo 配置项开启时上报告警数据
 			if warningInfoConfig != nil && warningInfoConfig.Value != "" {
 				sysConfigJson := map[string]bool{}
 				err := json.Unmarshal([]byte(warningInfoConfig.Value), &sysConfigJson)
@@ -479,6 +470,17 @@ func (this *NatsSubService) Save() error {
 					}
 					metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 					this.ReceiveData(metricsResult)
+
+					// WarningInfo 通过通道推送给邮件发送协程
+					logfilter := new(system.LogToMailFilterService)
+					logfilter.CurLevelTag = warningInfo.Level
+					logfilter.WarningType = warningInfo.Type
+
+					if models.MSM != nil && models.MSM.MailServerConfig != nil && models.MSM.LogToMailConfig != nil {
+						if models.MSM.MailServerConfig.EnableSendLog && logfilter.GetLogFilterStatus() {
+							logfilter.SendToChannel(warningInfo)
+						}
+					}
 				}
 			}
 		}
@@ -712,6 +714,7 @@ func RunClientSub_IDL() {
 
 	}
 }
+
 func AddClientSub_Image_Safe(libname string) models.Result {
 	natsManager := models.Nats
 	result := models.Result{}
