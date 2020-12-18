@@ -381,6 +381,26 @@ func (this *NatsSubService) Save() error {
 			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
+		case models.Resource_HostPackage:
+			hostPackageList := models.HostPackageList{}
+			s, _ := json.Marshal(ms.Data)
+			if err := json.Unmarshal(s, &hostPackageList.List); err != nil {
+				logs.Error("Paraces %s error %s", ms.Tag, err)
+				return err
+			}
+			size := len(hostPackageList.List)
+			if size != 0 {
+				logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, ype: %s, Size: %d <<<", hostPackageList.List[0].HostId, models.Resource_HostPackage, size)
+				// 删除该主机下所有的记录
+				hostPackageList.List[0].Delete()
+			}
+
+			for _, hostPackage := range hostPackageList.List {
+				hostPackage.Add()
+			}
+			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			this.ReceiveData(metricsResult)
+			return nil
 		case models.Resource_ContainerCmdHistory:
 			cmdHistoryList := models.CmdHistoryList{}
 			s, _ := json.Marshal(ms.Data)

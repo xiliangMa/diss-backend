@@ -95,6 +95,9 @@ var (
 	OpenFileErr                     = 100
 	UserAndPwdNotNull               = 101
 	DeleteFileErr                   = 102
+	AddHostPackageErr               = 103
+	GetHostPackageErr               = 104
+	DeleteHostPackageErr            = 105
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001

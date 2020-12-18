@@ -90,3 +90,24 @@ func (this *HostController) DeleteHost() {
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }
+
+// @Title HostPackage
+// @Description Get HostPackage List
+// @Param token header string true "authToken"
+// @Param hostId path string "" true "hostId"
+// @Param body body models.HostPackage false "主机包"
+// @Param from query int 0 false "from"
+// @Param limit query int 20 false "limit"
+// @Success 200 {object} models.Result
+// @router /:hostId/packages [post]
+func (this *HostController) GetHostPackageList() {
+	hostId := this.GetString(":hostId")
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+
+	hostPackage := new(models.HostPackage)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &hostPackage)
+	hostPackage.HostId = hostId
+	this.Data["json"] = hostPackage.List(from, limit)
+	this.ServeJSON(false)
+}

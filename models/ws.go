@@ -25,6 +25,7 @@ const (
 	Resource_CmdHistory_LatestTime  = "CmdHistory_LatestTime"
 	Resource_DockerEvent_LatestTime = "DockerEvent_LatestTime"
 	Resource_WarningInfo            = "WarningInfo"
+	Resource_HostPackage            = "HostPackage"
 
 	// #################### ws 通信类型
 	Type_Metric       = "Metric"       //指标类型

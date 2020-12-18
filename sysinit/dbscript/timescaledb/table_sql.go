@@ -96,4 +96,18 @@ var (
 	-- Primary Key structure for table warning_info
 	-- ----------------------------
 	ALTER TABLE "public"."warning_info" ADD CONSTRAINT "warning_info_pkey" PRIMARY KEY ("id");`
+
+	Tab_Create_HostPackage = `CREATE TABLE "public"."host_package" (
+	  "id" varchar(128) COLLATE "pg_catalog"."default" NOT NULL,
+	  "name" varchar(512) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "host_id" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying
+	)
+	;
+	ALTER TABLE "public"."host_package" OWNER TO "postgres";
+	
+	-- ----------------------------
+	-- Primary Key structure for table host_package
+	-- ----------------------------
+	ALTER TABLE "public"."host_package" ADD CONSTRAINT "host_package_pkey" PRIMARY KEY ("id");`
 )

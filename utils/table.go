@@ -38,6 +38,7 @@ var (
 	DockerEvent = "docker_event"
 	UserEvent   = "user_event"
 	WarningInfo = "warning_info"
+	HostPackage = "host_package"
 
 	//Diss_api
 	Accounts                    = "accounts"
