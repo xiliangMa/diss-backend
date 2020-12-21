@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	uuid "github.com/satori/go.uuid"
@@ -29,7 +30,14 @@ type SystemTemplate struct {
 	CheckEtcdJson            string                 `orm:"null;" description:"(Etcd target的json内容)"`
 	CheckPoliciesJson        string                 `orm:"null;" description:"(Polices target的json内容)"`
 	CheckManagedServicesJson string                 `orm:"null;" description:"(ManagedServices target的json内容)"`
-	CheckIds                 string                 `orm:"null;" description:"(选中的检查项Id列表)"`
+	CheckIdsMaster           string                 `orm:"null;" description:"(选中的检查项Id列表-Master)"`
+	CheckIdsNode             string                 `orm:"null;" description:"(选中的检查项Id列表-Node)"`
+	CheckIdsControlPlane     string                 `orm:"null;" description:"(选中的检查项Id列表-ControlPlane)"`
+	CheckIdsEtcd             string                 `orm:"null;" description:"(选中的检查项Id列表-Etcd)"`
+	CheckIdsPolicies         string                 `orm:"null;" description:"(选中的检查项Id列表-Policies)"`
+	CheckIdsManagedServices  string                 `orm:"null;" description:"(选中的检查项Id列表-ManagedServices)"`
+	CheckIdsDocker           string                 `orm:"null;" description:"(选中的检查项Id列表-Docker)"`
+	CheckIdsDockerCheck      string                 `orm:"null;" description:"(选中的检查项Id列表-DockerCheck)"`
 }
 
 type SystemTemplateGroup struct {
@@ -57,6 +65,25 @@ type SystemTemplateGroupInterface interface {
 	List() Result
 	Delete() Result
 	Update() Result
+	Get() (SystemTemplate, error)
+}
+
+func (this *SystemTemplate) Get() (SystemTemplate, error) {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	cond := orm.NewCondition()
+	template := SystemTemplate{}
+
+	cond = cond.And("type", this.Type)
+	cond = cond.And("version", this.Version)
+	err := o.QueryTable(utils.SYSTemplate).SetCond(cond).One(&template)
+	if err != nil {
+		errMsg := fmt.Sprintf("Get SystemTemplate failed, code: %d, err: %s", utils.GetSYSTemplateErr, err.Error())
+		logs.Error(errMsg)
+		return template, err
+	}
+
+	return template, err
 }
 
 func (this *SystemTemplate) Add() Result {
@@ -64,10 +91,44 @@ func (this *SystemTemplate) Add() Result {
 	o.Using(utils.DS_Default)
 	var ResultData Result
 
+	if this.Name == "" || this.Type == "" || this.Version == "" {
+		ResultData.Code = utils.AddSYSTemplateErr
+		errMsg := fmt.Sprint("Name, Type or Version Not Input for SystemTemplate, code: %s", utils.AddSYSTemplateErr)
+		ResultData.Message = errMsg
+
+		logs.Error(errMsg)
+		return ResultData
+	}
+
+	uuidCode, _ := uuid.NewV4()
+	this.Id = uuidCode.String()
+
+	// 基线模板自动填充配置的预置json串
+	if this.Type == TMP_Type_BM_Docker || this.Type == TMP_Type_BM_K8S {
+		benchTemplate, err := this.Get()
+		if err != nil {
+			ResultData.Message = err.Error()
+			ResultData.Code = utils.GetSYSTemplateErr
+			return ResultData
+		}
+		if benchTemplate.Id != "" {
+			this.CheckMasterJson = benchTemplate.CheckMasterJson
+			this.CheckNodeJson = benchTemplate.CheckNodeJson
+			this.CheckIdsControlPlane = benchTemplate.CheckIdsControlPlane
+			this.CheckIdsEtcd = benchTemplate.CheckIdsEtcd
+			this.CheckIdsPolicies = benchTemplate.CheckIdsPolicies
+			this.CheckIdsManagedServices = benchTemplate.CheckIdsManagedServices
+			this.Commands = benchTemplate.Commands
+		}
+	}
+
+	if this.Account == "" {
+		this.Account = Account_Admin
+	}
+
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.AddSYSTemplateErr
+
 		logs.Error("Add SystemTemplate failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
