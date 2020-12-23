@@ -11,6 +11,7 @@ import (
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"time"
+	"strings"
 )
 
 type NatsSubService struct {
@@ -463,7 +464,7 @@ func (this *NatsSubService) Save() error {
 					}
 					logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", warningInfo.HostId, models.Resource_WarningInfo+"-"+warningInfo.Type)
 					if warningInfo.HostId != "" {
-						if warningInfo.Type == models.WarningInfo_File || warningInfo.Type == models.WarningInfo_Other || warningInfo.Type == models.WarningInfo_Process || warningInfo.Type == models.WarningInfo_Container {
+						if strings.HasPrefix(warningInfo.Type, "ALERT_TYPE"){
 							hostParam := models.HostConfig{Id: warningInfo.HostId}
 							hostconfig := hostParam.Get()
 							if hostconfig != nil {
