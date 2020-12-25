@@ -36,6 +36,7 @@ func init() {
 		beego.NSNamespace("/v1/statistics",
 			beego.NSInclude(
 				&cstatistics.StatisticsController{},
+				&cstatistics.PackageStatisticsController{},
 			),
 		),
 		beego.NSNamespace("/v1/asset/images",

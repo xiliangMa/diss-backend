@@ -99,7 +99,7 @@ var (
 
 	Tab_Create_HostPackage = `CREATE TABLE "public"."host_package" (
 	  "id" varchar(128) COLLATE "pg_catalog"."default" NOT NULL,
-	  "name" varchar(512) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "name" varchar COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "host_id" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying
 	)

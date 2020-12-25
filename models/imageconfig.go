@@ -153,3 +153,36 @@ func (this *ImageConfig) Delete() Result {
 	ResultData.Code = http.StatusOK
 	return ResultData
 }
+
+func (this *ImageConfig) GetDBCountByType() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	ResultData := Result{Code: http.StatusOK}
+	var dbCount []orm.Params
+	var err error
+	var total int64 = 0
+
+	cond := orm.NewCondition()
+	if this.HostId != "" {
+		cond = cond.And("host_id", this.HostId)
+	}
+
+	_, err = o.Raw(utils.GetDBCountSql(this.HostId)).Values(&dbCount)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetImageConfigErr
+		logs.Error("Get ImageConfig count group type failed, code: %d, err: %s", utils.GetImageConfigErr, err.Error())
+		return ResultData
+	}
+
+	total, _ = o.QueryTable(utils.ImageConfig).SetCond(cond).Count()
+	data := make(map[string]interface{})
+	data["total"] = total
+	data["items"] = dbCount
+
+	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
+	return ResultData
+}

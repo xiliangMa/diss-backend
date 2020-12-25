@@ -11,7 +11,7 @@ import (
 
 type HostPackage struct {
 	Id     string `orm:"pk;size(128)" description:"(id)"`
-	Name   string `orm:"size(512)" description:"(包名)"`
+	Name   string `orm:"" description:"(包名)"`
 	Type   string `orm:"size(32)" description:"(java、rpm、dpkg、jar、system)"`
 	HostId string `orm:"size(128)" description:"(主机id)"`
 }
@@ -23,6 +23,8 @@ type HostPackageList struct {
 type HostPackageInterface interface {
 	Add() Result
 	List(from, limit int) Result
+	Delete() Result
+	GetPackageCountByType() Result
 }
 
 func (this *HostPackage) Add() Result {
@@ -34,8 +36,8 @@ func (this *HostPackage) Add() Result {
 	_, err := o.Raw(insetSql,
 		this.Id,
 		this.Name,
-		this.HostId,
-		this.Type).Exec()
+		this.Type,
+		this.HostId).Exec()
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -115,6 +117,45 @@ func (this *HostPackage) List(from, limit int) Result {
 	data["items"] = hostPackageList
 
 	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
+	return ResultData
+}
+
+func (this *HostPackage) GetPackageCountByType() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Security_Log)
+	var packageCount []orm.Params
+	ResultData := Result{Code: http.StatusOK}
+	var err error
+	var total int64 = 0
+
+	sql := `SELECT count(id), type from ` + utils.HostPackage
+	countSql := `SELECT count(id) from ` + utils.HostPackage
+	groupBySql := " GROUP BY type"
+	filter := " where "
+
+	if this.HostId != "" {
+		filter = filter + ` host_id = '` + this.HostId + `' `
+		sql = sql + filter
+		countSql = countSql + filter
+	}
+	sql = sql + groupBySql
+	_, err = o.Raw(sql).Values(&packageCount)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetHostPackageErr
+		logs.Error("Get HostPackage count group type failed, code: %d, err: %s", utils.GetHostPackageErr, err.Error())
+		return ResultData
+	}
+	o.Raw(countSql).QueryRow(&total)
+
+	data := make(map[string]interface{})
+	data["total"] = total
+	data["items"] = packageCount
+
 	ResultData.Data = data
 	if total == 0 {
 		ResultData.Data = nil
