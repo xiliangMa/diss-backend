@@ -214,6 +214,8 @@ var (
 	// 系统配置类型
 	FeatureCode       = "FeatureCode"
 	EmailServerConfig = "EmailServerConfig"
+	LDAPClientConfig  = "LDAPClientConfig"
+	Login_Type_LDAP   = "LDAP"
 
 	// LogConfigs
 	Log_Config_SysLog_Export = "SysLogExport"

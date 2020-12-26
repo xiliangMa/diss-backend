@@ -98,12 +98,9 @@ func (this *SystemController) UpdateSysConfig() {
 	sysConfig.Id = id
 	result := sysConfig.Update()
 
-	if sysConfig.Key == models.EmailServerConfig {
-		models.MSM.NewMailDialer()
-	}
-	if sysConfig.Key == models.Log_Config_To_Mail {
-		models.MSM.NewLogToMail()
-	}
+	sysConfigService := css.SysConfigService{}
+	sysConfigService.SysConfig = sysConfig
+	sysConfigService.RefreshConnections()
 
 	this.Data["json"] = result
 	this.ServeJSON(false)

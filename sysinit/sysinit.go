@@ -61,4 +61,7 @@ func init() {
 	models.MSM = models.NewMailServerManager()
 	mailService := system.MailService{}
 	go mailService.StartMailService()
+
+	// 6. LDAPManager
+	models.LM = models.NewLDAPManager()
 }

@@ -98,7 +98,9 @@ var (
 	AddHostPackageErr               = 103
 	GetHostPackageErr               = 104
 	DeleteHostPackageErr            = 105
-	MailServerNotAvaiable           = 106
+	MailServerNotAvaiableErr        = 106
+	LDAPIsDisabledErr               = 107
+	LDAPLoginErr                    = 108
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001
@@ -191,6 +193,7 @@ var (
 	LicenseExpiredErr               = 1237
 	LicenseFCodeErr                 = 1238
 	LicenseHostErr                  = 1239
+	LDAPConnErr                     = 1240
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300

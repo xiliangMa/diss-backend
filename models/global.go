@@ -6,4 +6,5 @@ var (
 	GRM   *GoRoutineManager
 	KCM   *KubernetesClientManager
 	MSM   *MailServerManager
+	LM    *LDAPManager
 )

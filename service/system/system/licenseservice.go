@@ -65,7 +65,7 @@ func (this *LicenseService) LicenseActive() models.Result {
 		logs.Info(message)
 	} else {
 		result = licenseObject.Add()
-		message = fmt.Sprintf("License import success, License：", string(plainText))
+		message = fmt.Sprintf("License import success, License：%s", string(plainText))
 		logs.Info(message)
 	}
 	//添加license 历史

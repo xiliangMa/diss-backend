@@ -57,7 +57,7 @@ func (this *MailService) StartMailService() {
 				if dialer == nil {
 					//记录邮箱不可用错误告警
 					this.WarningInfoName = models.MailServer_Not_Available_Msg
-					this.WarningInfoError = fmt.Sprint("MailServer Not Available , code %s", utils.MailServerNotAvaiable)
+					this.WarningInfoError = fmt.Sprint("MailServer Not Available , code %s", utils.MailServerNotAvaiableErr)
 					warningInfo := this.FillMailWarningData()
 
 					if result := warningInfo.Add(); result.Code != http.StatusOK {

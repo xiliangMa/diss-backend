@@ -171,5 +171,10 @@ func (this *DefaultDB) InitSystemData() {
 		logs.Error("Init DefaultMailLog Config fail, err: %s", err)
 	}
 
+	_, err = o.Raw(dbscript.DefaultLDAPClientConfig).Exec()
+	if err != nil {
+		logs.Error("Init DefaultLDAPClient Config fail, err: %s", err)
+	}
+
 	logs.Info("Init default data end................")
 }

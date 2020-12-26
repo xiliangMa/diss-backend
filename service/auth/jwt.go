@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"time"
@@ -15,14 +16,42 @@ var (
 )
 
 type JwtService struct {
-	Token    *jwt.Token
-	TokenStr string
+	Token     *jwt.Token
+	TokenStr  string
+	LoginType string
 }
 
-func (this *JwtService) GreateToken(name, pwd string) (string, int) {
+func (this *JwtService) CreateToken(name, pwd string) (string, int) {
 	//检测 diss-api 用户
 	loginUser := models.UserAccessCredentials{UserName: name, Value: pwd}
-	if user := loginUser.Get(); user != nil || (name == beego.AppConfig.String("system::AdminUser") && pwd == beego.AppConfig.String("system::AdminPwd")) {
+
+	user := &models.UserAccessCredentials{}
+
+	if this.LoginType != models.Login_Type_LDAP {
+		user = loginUser.Get()
+	} else {
+		if !models.LM.Config.Enable {
+			return "LDAP is Disabled", utils.LDAPIsDisabledErr
+		}
+		ldapService := system.LDAPService{}
+		ldapService.LoginUser = models.LDAPUser{
+			UserName: name,
+			Password: pwd,
+		}
+		logined, err := ldapService.UserAuthentication()
+		if err != nil {
+			return err.Error(), utils.LDAPLoginErr
+		}
+		if logined {
+			user = &models.UserAccessCredentials{
+				UserName: ldapService.LoginUser.UserName,
+				Type:     models.Login_Type_LDAP,
+			}
+		} else {
+			user = nil
+		}
+	}
+	if user != nil || (name == beego.AppConfig.String("system::AdminUser") && pwd == beego.AppConfig.String("system::AdminPwd")) {
 		// Create token
 		this.Token = jwt.New(jwt.SigningMethodHS256)
 
