@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/securitypolicy"
 )
 
 // System Template object api list
@@ -52,7 +53,9 @@ func (this *SystemTemplateController) DeleteSystemTemplate() {
 func (this *SystemTemplateController) AddSystemTemplate() {
 	systemTemplate := new(models.SystemTemplate)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &systemTemplate)
-	result := systemTemplate.Add()
+	sysTemplateService := securitypolicy.SystemTemplateService{}
+	sysTemplateService.SystemTemplate = systemTemplate
+	result := sysTemplateService.AddSystemTemplate()
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }

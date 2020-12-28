@@ -103,25 +103,6 @@ func (this *SystemTemplate) Add() Result {
 	uuidCode, _ := uuid.NewV4()
 	this.Id = uuidCode.String()
 
-	// 基线模板自动填充配置的预置json串
-	if this.Type == TMP_Type_BM_Docker || this.Type == TMP_Type_BM_K8S {
-		benchTemplate, err := this.Get()
-		if err != nil {
-			ResultData.Message = err.Error()
-			ResultData.Code = utils.GetSYSTemplateErr
-			return ResultData
-		}
-		if benchTemplate.Id != "" {
-			this.CheckMasterJson = benchTemplate.CheckMasterJson
-			this.CheckNodeJson = benchTemplate.CheckNodeJson
-			this.CheckIdsControlPlane = benchTemplate.CheckIdsControlPlane
-			this.CheckIdsEtcd = benchTemplate.CheckIdsEtcd
-			this.CheckIdsPolicies = benchTemplate.CheckIdsPolicies
-			this.CheckIdsManagedServices = benchTemplate.CheckIdsManagedServices
-			this.Commands = benchTemplate.Commands
-		}
-	}
-
 	if this.Account == "" {
 		this.Account = Account_Admin
 	}

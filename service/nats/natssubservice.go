@@ -455,7 +455,7 @@ func (this *NatsSubService) Save() error {
 					}
 					logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", warningInfo.HostId, models.Resource_WarningInfo+"-"+warningInfo.Type)
 					if warningInfo.HostId != "" {
-						if strings.HasPrefix(warningInfo.Type, "ALERT_TYPE"){
+						if strings.HasPrefix(warningInfo.Type, "ALERT_TYPE") {
 							hostParam := models.HostConfig{Id: warningInfo.HostId}
 							hostconfig := hostParam.Get()
 							if hostconfig != nil {
