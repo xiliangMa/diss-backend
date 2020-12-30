@@ -57,3 +57,16 @@ func (this *ImageController) GetImageInfo() {
 	this.Data["json"] = imageInfo.List()
 	this.ServeJSON(false)
 }
+
+// @Title GetImageByDBType
+// @Description Get Image Info
+// @Param token header string true "authToken"
+// @Param body body models.ImageConfig false "镜像配置信息"
+// @Success 200 {object} models.Result
+// @router /dbimage [post]
+func (this *ImageController) GetImageByDBType() {
+	imageConf := new(models.ImageConfig)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &imageConf)
+	this.Data["json"] = imageConf.GetDBImageByType()
+	this.ServeJSON(false)
+}

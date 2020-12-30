@@ -19,6 +19,7 @@ type ImageConfig struct {
 	DissStatus int8      `orm:"" description:"(安全状态)"`
 	Age        string    `orm:"default(null);" description:"(运行时长)"`
 	CreateTime time.Time `orm:"null;type(datetime)" description:"(创建时间)"`
+	DBType     string    `-" description:"(数据库类型 Mysql Oracle Redis Postgres Mongodb Memcache DB2 Hbase)"`
 }
 
 type ImageConfigInterface interface {
@@ -27,6 +28,7 @@ type ImageConfigInterface interface {
 	Edit() Result
 	Get() Result
 	List(from, limit int) Result
+	GetDBImageByType() Result
 }
 
 func (this *ImageConfig) Add() Result {
@@ -180,6 +182,38 @@ func (this *ImageConfig) GetDBCountByType() Result {
 	data["total"] = total
 	data["items"] = dbCount
 
+	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
+	return ResultData
+}
+
+func (this *ImageConfig) GetDBImageByType() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var imageList []*ImageConfig
+	var ResultData Result
+	var err error
+	cond := orm.NewCondition()
+	if this.HostId != "" {
+		cond = cond.And("host_id", this.HostId)
+	}
+	if this.DBType != "" {
+		cond = cond.And("name__icontains", this.DBType)
+	}
+	_, err = o.QueryTable(utils.ImageConfig).SetCond(cond).All(&imageList)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetImageConfigErr
+		logs.Error("Get ImageConfig List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	total, _ := o.QueryTable(utils.ImageConfig).SetCond(cond).Count()
+	data := make(map[string]interface{})
+	data["total"] = total
+	data["items"] = imageList
+	ResultData.Code = http.StatusOK
 	ResultData.Data = data
 	if total == 0 {
 		ResultData.Data = nil

@@ -7,85 +7,85 @@ import (
 
 func init() {
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:PackageStatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:PackageStatisticsController"],
-        beego.ControllerComments{
-            Method: "GetDBImageStatistics",
-            Router: `/dbpackage`,
-            AllowHTTPMethods: []string{"get"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:PackageStatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:PackageStatisticsController"],
+		beego.ControllerComments{
+			Method:           "GetDBImageStatistics",
+			Router:           `/dbpackage`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:PackageStatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:PackageStatisticsController"],
-        beego.ControllerComments{
-            Method: "GetPackageStatistics",
-            Router: `/hostpackage`,
-            AllowHTTPMethods: []string{"get"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:PackageStatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:PackageStatisticsController"],
+		beego.ControllerComments{
+			Method:           "GetPackageStatistics",
+			Router:           `/hostpackage`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"],
-        beego.ControllerComments{
-            Method: "GetHostBnechMarkSummaryStatistics",
-            Router: `/:hostId/bms/host`,
-            AllowHTTPMethods: []string{"get"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"],
+		beego.ControllerComments{
+			Method:           "GetHostBnechMarkSummaryStatistics",
+			Router:           `/:hostId/bms/host`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"],
-        beego.ControllerComments{
-            Method: "GetAssetStatistics",
-            Router: `/asset`,
-            AllowHTTPMethods: []string{"get"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"],
+		beego.ControllerComments{
+			Method:           "GetAssetStatistics",
+			Router:           `/asset`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"],
-        beego.ControllerComments{
-            Method: "GetBnechMarkProportionStatistics",
-            Router: `/bmp`,
-            AllowHTTPMethods: []string{"get"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"],
+		beego.ControllerComments{
+			Method:           "GetBnechMarkProportionStatistics",
+			Router:           `/bmp`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"],
-        beego.ControllerComments{
-            Method: "GetBnechMarkSummaryStatistics",
-            Router: `/bms`,
-            AllowHTTPMethods: []string{"get"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"],
+		beego.ControllerComments{
+			Method:           "GetBnechMarkSummaryStatistics",
+			Router:           `/bms`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"],
-        beego.ControllerComments{
-            Method: "GetGetDissProportionStatistics",
-            Router: `/dissproportion`,
-            AllowHTTPMethods: []string{"get"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"],
+		beego.ControllerComments{
+			Method:           "GetGetDissProportionStatistics",
+			Router:           `/dissproportion`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"],
-        beego.ControllerComments{
-            Method: "GetIntrudeDetectLogStatistics",
-            Router: `/idl`,
-            AllowHTTPMethods: []string{"get"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"],
+		beego.ControllerComments{
+			Method:           "GetIntrudeDetectLogStatistics",
+			Router:           `/idl`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
 
-    beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"],
-        beego.ControllerComments{
-            Method: "GetGetOnlineProportionStatistics",
-            Router: `/onlineproportion`,
-            AllowHTTPMethods: []string{"get"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/statistics:StatisticsController"],
+		beego.ControllerComments{
+			Method:           "GetGetOnlineProportionStatistics",
+			Router:           `/onlineproportion`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
 
 }

@@ -239,4 +239,14 @@ var (
 
 	// time and zone
 	CstZone = time.FixedZone("CST", 8*3600)
+
+	// db image type
+	DB_Image_type_Mysql    = "Mysql"
+	DB_Image_type_Oracle   = "Oracle"
+	DB_Image_type_Redis    = "Redis"
+	DB_Image_type_Postgres = "Postgres"
+	DB_Image_type_Mongodb  = "Mongodb"
+	DB_Image_type_Memcache = "Memcache"
+	DB_Image_type_DB2      = "DB2"
+	DB_Image_type_Hbase    = "Hbase"
 )

@@ -22,11 +22,9 @@ type ImageInfo struct {
 }
 
 type ImageInfoInterface interface {
-	Add()
-	Delete()
-	Edit()
-	Get()
-	List()
+	Add() Result
+	Delete() Result
+	List() Result
 }
 
 func (this *ImageInfo) Add() Result {
@@ -70,9 +68,6 @@ func (this *ImageInfo) List() Result {
 	}
 	if this.Name != "" {
 		cond = cond.And("name", this.Name)
-	}
-	if this.HostName != "" {
-		cond = cond.And("host_name__iexact", this.HostName)
 	}
 
 	_, err = o.QueryTable(utils.ImageInfo).SetCond(cond).All(&imageList)

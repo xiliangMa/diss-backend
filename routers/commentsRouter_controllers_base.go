@@ -151,6 +151,15 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:ImageController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:ImageController"],
+		beego.ControllerComments{
+			Method:           "GetImageByDBType",
+			Router:           `/dbimage`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
 	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:UserController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:UserController"],
 		beego.ControllerComments{
 			Method:           "UserEventList",
