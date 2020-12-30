@@ -128,9 +128,9 @@ func (this *DefaultDB) InitSystemData() {
 		logs.Error("Init DefaultDockerVirusScan fail, err: %s", err)
 	}
 
-	_, err = o.Raw(dbscript.DefaultHostrVirusScanSql).Exec()
+	_, err = o.Raw(dbscript.DefaultHostVirusScanSql).Exec()
 	if err != nil {
-		logs.Error("Init DefaultHostrVirusScanSql fail, err: %s", err)
+		logs.Error("Init DefaultHostVirusScanSql fail, err: %s", err)
 	}
 
 	logs.Info("Init default system Job >>>>>>>>>>>>>>>>")
