@@ -253,4 +253,14 @@ var (
 	DB_Image_type_Memcache = "Memcache"
 	DB_Image_type_DB2      = "DB2"
 	DB_Image_type_Hbase    = "Hbase"
+
+	// ==============  anchore engine ==============
+	// 镜像漏洞等级
+	Image_vuln_Severity_Low    = "Low"
+	Image_vuln_Severity_Medium = "Medium"
+
+	// 镜像 content 类型
+	Image_Content_Type_OS        = "os"
+	Image_Vuln_Type_All          = "all"
+	Image_Metadata_Type_Manifest = "manifest"
 )
