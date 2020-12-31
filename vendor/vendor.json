@@ -3,6 +3,10 @@
 	"ignore": "test",
 	"package": [
 		{
+			"path": "github.com/anchore/client-go/pkg/external",
+			"revision": ""
+		},
+		{
 			"checksumSHA1": "KDUtjxO63r7L1aU9dT5KhQW4AdM=",
 			"path": "github.com/astaxie/beego",
 			"revision": "8152ade1b6166779b0f7d1980150f4a29dcec592",

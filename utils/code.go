@@ -101,6 +101,13 @@ var (
 	MailServerNotAvaiableErr        = 106
 	LDAPIsDisabledErr               = 107
 	LDAPLoginErr                    = 108
+	MailServerNotAvaiable           = 109
+	GetImageVulnStatisticsErr       = 110
+	GetImageVulnErr                 = 111
+	GetImageContentErr              = 112
+	GetImageMetadataErr             = 113
+	GetImageSensitivenfoErr         = 114
+	NotEnoughParametersErr          = 115
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001
