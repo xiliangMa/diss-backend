@@ -321,6 +321,18 @@ func (this *NatsSubService) Save() error {
 			//	logs.Info("Add security_log to es success, benchMarkLog.Id: %s", benchMarkLog.Id)
 			//}
 			//defer respones.Body.Close()
+
+			// DockerBenchMark 通过通道推送给邮件发送协程
+			logfilter := new(system.LogToMailFilterService)
+			logfilter.CurLevelTag = benchMarkLog.Level
+			logfilter.InfoType = models.LogType_BenchMarkLog
+			logfilter.InfoSubType = benchMarkLog.Type
+
+			if models.MSM != nil && models.MSM.MailServerConfig != nil && models.MSM.LogToMailConfig != nil {
+				if models.MSM.MailServerConfig.EnableSendLog && logfilter.GetLogFilterStatus() {
+					logfilter.SendToChannel(benchMarkLog)
+				}
+			}
 		case models.Resource_KubernetesBenchMark:
 			//index := beego.AppConfig.String("security_log::BenchMarkIndex")
 			benchMarkLog := models.BenchMarkLog{}
@@ -362,6 +374,18 @@ func (this *NatsSubService) Save() error {
 			//	logs.Info("Add security_log to es success, benchMarkLog.Id: %s", benchMarkLog.Id)
 			//}
 			//defer respones.Body.Close()
+
+			// KubernetesBenchMark 通过通道推送给邮件发送协程
+			logfilter := new(system.LogToMailFilterService)
+			logfilter.CurLevelTag = benchMarkLog.Level
+			logfilter.InfoType = models.LogType_BenchMarkLog
+			logfilter.InfoSubType = benchMarkLog.Type
+
+			if models.MSM != nil && models.MSM.MailServerConfig != nil && models.MSM.LogToMailConfig != nil {
+				if models.MSM.MailServerConfig.EnableSendLog && logfilter.GetLogFilterStatus() {
+					logfilter.SendToChannel(benchMarkLog)
+				}
+			}
 		case models.Resource_HostCmdHistory:
 			cmdHistoryList := models.CmdHistoryList{}
 			s, _ := json.Marshal(ms.Data)
@@ -381,6 +405,18 @@ func (this *NatsSubService) Save() error {
 			}
 			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
+
+			// HostCmdHistory 通过通道推送给邮件发送协程
+			logfilter := new(system.LogToMailFilterService)
+			logfilter.CurLevelTag = models.BML_Level_Medium
+			logfilter.InfoType = models.LogType_CommandSecAuditLog
+			logfilter.InfoSubType = models.Cmd_History_Type_Host
+
+			if models.MSM != nil && models.MSM.MailServerConfig != nil && models.MSM.LogToMailConfig != nil {
+				if models.MSM.MailServerConfig.EnableSendLog && logfilter.GetLogFilterStatus() {
+					logfilter.SendToChannel(cmdHistoryList)
+				}
+			}
 			return nil
 		case models.Resource_HostPackage:
 			hostPackageList := models.HostPackageList{}
@@ -420,6 +456,18 @@ func (this *NatsSubService) Save() error {
 			}
 			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
+
+			// ContainerCmdHistory 通过通道推送给邮件发送协程
+			logfilter := new(system.LogToMailFilterService)
+			logfilter.CurLevelTag = models.BML_Level_Medium
+			logfilter.InfoType = models.LogType_CommandSecAuditLog
+			logfilter.InfoSubType = models.Cmd_History_Type_Container
+
+			if models.MSM != nil && models.MSM.MailServerConfig != nil && models.MSM.LogToMailConfig != nil {
+				if models.MSM.MailServerConfig.EnableSendLog && logfilter.GetLogFilterStatus() {
+					logfilter.SendToChannel(cmdHistoryList)
+				}
+			}
 			return nil
 		case models.Resource_DockerEvent:
 			dockerEvent := models.DockerEvent{}
@@ -432,6 +480,18 @@ func (this *NatsSubService) Save() error {
 			dockerEvent.Add()
 			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
+
+			// DockerEvent 通过通道推送给邮件发送协程
+			logfilter := new(system.LogToMailFilterService)
+			logfilter.CurLevelTag = models.BML_Level_Medium
+			logfilter.InfoType = models.LogType_ContainerSecAuditLog
+			logfilter.InfoSubType = models.LogSubType_DockerEvent
+
+			if models.MSM != nil && models.MSM.MailServerConfig != nil && models.MSM.LogToMailConfig != nil {
+				if models.MSM.MailServerConfig.EnableSendLog && logfilter.GetLogFilterStatus() {
+					logfilter.SendToChannel(dockerEvent)
+				}
+			}
 			return nil
 		case models.Resource_WarningInfo:
 			sysConfig := models.SysConfig{}
@@ -474,11 +534,14 @@ func (this *NatsSubService) Save() error {
 					// WarningInfo 通过通道推送给邮件发送协程
 					logfilter := new(system.LogToMailFilterService)
 					logfilter.CurLevelTag = warningInfo.Level
-					logfilter.WarningType = warningInfo.Type
+					logfilter.InfoType = models.LogType_IntrudeDetectLog
+					logfilter.InfoSubType = warningInfo.Type
 
 					if models.MSM != nil && models.MSM.MailServerConfig != nil && models.MSM.LogToMailConfig != nil {
 						if models.MSM.MailServerConfig.EnableSendLog && logfilter.GetLogFilterStatus() {
-							logfilter.SendToChannel(warningInfo)
+							if warningInfo.Type != models.TMP_Type_BM_Docker && warningInfo.Type != models.TMP_Type_BM_K8S {
+								logfilter.SendToChannel(warningInfo)
+							}
 						}
 					}
 				}

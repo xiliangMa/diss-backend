@@ -194,12 +194,13 @@ var (
 
 	// log type tag
 	LogToEmail_Prefix            = "日志导出"
-	LogType_BenchMarkLog         = "BenchmarkMarkLog"          // 基线扫描日志
+	LogType_BenchMarkLog         = "BenchmarkLog"              // 基线扫描日志
 	LogType_ImageSecLog          = "ImageSecurityLog"          // 镜像安全日志
 	LogType_ContainerVirusLog    = "ContainerVirusLog"         // 容器杀毒日志
 	LogType_IntrudeDetectLog     = "IntrudeDetectLog"          // 入侵检测日志
 	LogType_ContainerSecAuditLog = "ContainerSecurityAuditLog" // 容器安全审计日志
 	LogType_CommandSecAuditLog   = "CommandSecurityAuditLog"   // 命令安全审计日志
+	LogSubType_DockerEvent		 = "DockerEvent"				// DockerEvent子类型（容器安全审计下）
 
 	// license type
 	LicType_TrialLicense    = "TrialLicense"
@@ -225,11 +226,12 @@ var (
 	Mail_CanNotSend_Msg          = "邮件发送不成功"
 
 	// 告警邮件字段定义
-	MailField_Subject = "Subject"
-	MailField_LogType = "LogType"
-	MailField_Body    = "Body"
-	MailField_From    = "From"
-	MailField_To      = "To"
+	MailField_Subject     = "Subject"
+	MailField_LogType     = "LogType"
+	MailField_InfoSubType = "InfoSubType"
+	MailField_Body        = "Body"
+	MailField_From        = "From"
+	MailField_To          = "To"
 
 	MailServerStatus_Normal   = "Normal"
 	MailServerStatus_Abnormal = "Abnormal"

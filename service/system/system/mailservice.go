@@ -9,6 +9,7 @@ import (
 	"github.com/xiliangMa/diss-backend/utils"
 	"gopkg.in/gomail.v2"
 	"net/http"
+	"strings"
 )
 
 type MailService struct {
@@ -36,6 +37,8 @@ func (this *MailService) SendMail() error {
 		m.SetBody("text/html", this.Body)
 
 		dialer.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+		this.Body = strings.Replace(this.Body, "Action", "Sensi1", 1)
+		this.Body = strings.Replace(this.Body, "Actor", "Sensi2", 1)
 		err = dialer.DialAndSend(m)
 	}
 
@@ -65,7 +68,7 @@ func (this *MailService) StartMailService() {
 					}
 					break
 				}
-				this.Subject = (*message)[models.MailField_Subject] + " - " + (*message)[models.MailField_LogType]
+				this.Subject = (*message)[models.MailField_Subject] + " - " + (*message)[models.MailField_LogType] + " - " + (*message)[models.MailField_InfoSubType]
 				this.Body = (*message)[models.MailField_Body]
 				err := this.SendMail()
 
