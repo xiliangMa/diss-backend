@@ -14,11 +14,13 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strings"
 	"time"
 )
 
 type LicenseService struct {
 	LicenseByte []byte
+	IsForce     bool
 	IsUpdate    bool
 	FileType    string
 }
@@ -52,11 +54,17 @@ func (this *LicenseService) LicenseActive() models.Result {
 	licenseObject.ActiveAt = time.Now()
 
 	message := ""
+	if licenseObject.Type == models.LicType_TrialLicense {
+		licenseObject.Id = ""
+	}
 	licInDb := licenseObject.Get()
 	if licInDb.Data != nil {
 		licData := licInDb.Data.([]*models.LicenseConfig)
 		if len(licData) > 0 {
 			this.IsUpdate = true
+			if licenseObject.Type == models.LicType_TrialLicense {
+				licenseObject.Id = licData[0].Id
+			}
 		}
 	}
 	if this.IsUpdate {
@@ -83,7 +91,10 @@ func (this *LicenseService) CheckLicenseFile(h *multipart.FileHeader) (models.Re
 	var result models.Result
 	fName := h.Filename
 	ext := path.Ext(fName)
-	stanardLicFilename := models.LicType_StandardLicense + models.LicFile_Extension
+	licFilename := models.LicType_StandardLicense + models.LicFile_Extension
+	if strings.Contains(strings.ToLower(fName), "trial") {
+		licFilename = models.LicType_TrialLicense + models.LicFile_Extension
+	}
 
 	//创建目录
 	licenseService.createLicenseConfigDir(fpath)
@@ -95,14 +106,16 @@ func (this *LicenseService) CheckLicenseFile(h *multipart.FileHeader) (models.Re
 		return result, fpath
 	}
 
-	// 检查文件是否存在
-	if code := licenseService.checkLicenseFileIsExist(fpath, stanardLicFilename); code != http.StatusOK {
-		result.Code = code
-		result.Message = "CheckLicenseFileIsExistErr"
-		return result, fpath
+	// 非强制更新时，检查文件是否存在
+	if !this.IsForce {
+		if code := licenseService.checkLicenseFileIsExist(fpath, licFilename); code != http.StatusOK {
+			result.Code = code
+			result.Message = "CheckLicenseFileIsExistErr"
+			return result, fpath
+		}
 	}
 
-	fpath = fpath + stanardLicFilename
+	fpath = fpath + licFilename
 	result.Code = http.StatusOK
 	return result, fpath
 }

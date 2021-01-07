@@ -200,7 +200,7 @@ var (
 	LogType_IntrudeDetectLog     = "IntrudeDetectLog"          // 入侵检测日志
 	LogType_ContainerSecAuditLog = "ContainerSecurityAuditLog" // 容器安全审计日志
 	LogType_CommandSecAuditLog   = "CommandSecurityAuditLog"   // 命令安全审计日志
-	LogSubType_DockerEvent		 = "DockerEvent"				// DockerEvent子类型（容器安全审计下）
+	LogSubType_DockerEvent       = "DockerEvent"               // DockerEvent子类型（容器安全审计下）
 
 	// license type
 	LicType_TrialLicense    = "TrialLicense"

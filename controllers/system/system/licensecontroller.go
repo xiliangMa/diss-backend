@@ -30,6 +30,7 @@ func (this *LicenseController) AddLicenseFile() {
 	f, h, _ := this.GetFile(key)
 
 	licenseService := sssystem.LicenseService{}
+	licenseService.IsForce = isForce
 	result, fpath := licenseService.CheckLicenseFile(h)
 	licenseByte := []byte{}
 
