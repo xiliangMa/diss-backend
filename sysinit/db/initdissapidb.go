@@ -8,7 +8,6 @@ import (
 	_ "github.com/lib/pq"
 	_ "github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
-	"os"
 )
 
 type DissApiDB struct {
@@ -16,11 +15,6 @@ type DissApiDB struct {
 
 func (this *DissApiDB) InitDB() {
 	driver := utils.DS_Driver_Postgres
-	runMode := beego.AppConfig.String("RunMode")
-	envRunMode := os.Getenv("RunMode")
-	if envRunMode != "" {
-		runMode = envRunMode
-	}
 	DSAlias := utils.DS_Diss_Api
 	// true: drop table 后再建表
 	//force, _ := beego.AppConfig.Bool("Force")
@@ -37,24 +31,6 @@ func (this *DissApiDB) InitDB() {
 	dbHost := beego.AppConfig.String(DSAlias + "::Host")
 	//端口
 	port := beego.AppConfig.String(DSAlias + "::Port")
-	// 生产环境
-	if runMode == utils.Run_Mode_Prod {
-		//数据库名称
-		dbName = os.Getenv(utils.DS_Diss_Api_DB_Name)
-		//数据库连接用户名
-		dbUser = os.Getenv(utils.DS_Diss_Api_User)
-		//数据库连接密码
-		dbPwd = os.Getenv(utils.DS_Diss_Api_Pwd)
-		//数据库IP（域名）
-		dbHost = os.Getenv(utils.DS_Diss_Api_Host)
-		//端口
-		port = os.Getenv(utils.DS_Diss_Api_Port)
-	}
-
-	// demo mysql
-	//orm.RegisterDataBase("default", "mysql", "root:abc123@tcp(127.0.0.1:3306)/uranus_local?charset=utf8")
-	//DS := fmt.Sprintf("%s%s%s%s%s%s%s%s", dbUser, ":", dbPwd, "@tcp(", dbHost, ":"+port+")/", dbName, "?charset=utf8")
-
 	// postgres
 	DS := fmt.Sprintf("%s%s%s%s%s%s", "host="+dbHost, " port="+port, " user="+dbUser, " password="+dbPwd, " dbname="+dbName, " sslmode=disable")
 	orm.RegisterDriver(driver, orm.DRPostgres)

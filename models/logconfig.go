@@ -7,7 +7,6 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"os"
 )
 
 type LogConfig struct {
@@ -93,19 +92,6 @@ func (this *LogConfig) Update() Result {
 }
 
 func GetSyslogServerUrl() string {
-	runMode := beego.AppConfig.String("RunMode")
-	envRunMode := os.Getenv("RunMode")
-	if envRunMode != "" {
-		runMode = envRunMode
-	}
-
 	serverUrl := beego.AppConfig.String("syslog::SyslogServer")
-	runMode = utils.Run_Mode_Prod
-	if runMode == utils.Run_Mode_Prod {
-		config, ok := GlobalLogConfig[Log_Config_SysLog_Export]
-		if ok {
-			serverUrl = config.ServerUrl + ":" + config.ServerPort
-		}
-	}
 	return serverUrl
 }

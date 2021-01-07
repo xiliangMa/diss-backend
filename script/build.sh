@@ -23,7 +23,7 @@ fi
 
 
 #### 编译二进制文件
-echo "=========== 2. build  diss-backen bin ==========="
+echo "=========== 2. build  diss-backend bin ==========="
 mkdir -p "$BUILD_DIR/bin"
 echo "build path: $(cd $BUILD_DIR; pwd)"
 cd "$PROJECT_DIR" || exit
@@ -39,12 +39,14 @@ fi
 echo "=========== 3. cp files for docker build ==========="
 cd $PROJECT_DIR
 cp -r conf swagger "$BUILD_DIR"
-cp entrypoint.sh script/install.sh "$BUILD_DIR"
+rm -rf "$BUILD_DIR/conf/app.conf"
+mv "$BUILD_DIR/conf/app-prod.conf" "$BUILD_DIR/conf/app.conf"
+cp entrypoint.sh "$BUILD_DIR"
 if [ $ARCH == 'arm' ]
 then
-  cp docker-compose-arm-prod.yml "$BUILD_DIR/docker-compose.yml"
+  cp docker-compose-arm.yml "$BUILD_DIR/docker-compose.yml"
 else
-  cp docker-compose-prod.yml "$BUILD_DIR/docker-compose.yml"
+  cp docker-compose.yml "$BUILD_DIR/docker-compose.yml"
 fi
 mkdir -p "$BUILD_DIR/upload/plugin/scope"
 mkdir -p "$BUILD_DIR/upload/license"
@@ -82,7 +84,8 @@ else
 fi
 
 cd $BUILD_DIR
-tar -zcvf diss-backend.tar.gz ./*
+tar -zcvf diss-backend.tar.gz ./docker-compose.yml ./conf
+rm -rf bin swagger entrypoint.sh upload
 
 echo "=========== 7. remove none images ==========="
 NONE_IMAGES_ID=`docker images -f "dangling=true" -q`

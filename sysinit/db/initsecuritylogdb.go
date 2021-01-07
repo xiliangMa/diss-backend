@@ -8,7 +8,6 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/xiliangMa/diss-backend/sysinit/dbscript/timescaledb"
 	"github.com/xiliangMa/diss-backend/utils"
-	"os"
 )
 
 type SecurityLogDb struct {
@@ -16,11 +15,6 @@ type SecurityLogDb struct {
 
 func (this *SecurityLogDb) InitDB() {
 	driver := utils.DS_Driver_Postgres
-	runMode := beego.AppConfig.String("RunMode")
-	envRunMode := os.Getenv("RunMode")
-	if envRunMode != "" {
-		runMode = envRunMode
-	}
 	DSAlias := utils.DS_Security_Log
 	// true: drop table 后再建表
 	//force, _ := beego.AppConfig.Bool("Force")
@@ -37,20 +31,6 @@ func (this *SecurityLogDb) InitDB() {
 	dbHost := beego.AppConfig.String(DSAlias + "::Host")
 	//端口
 	port := beego.AppConfig.String(DSAlias + "::Port")
-	// 生产环境
-	if runMode == utils.Run_Mode_Prod {
-		//数据库名称
-		dbName = os.Getenv(utils.DS_Security_Log_DB_Name)
-		//数据库连接用户名
-		dbUser = os.Getenv(utils.DS_Security_Log_User)
-		//数据库连接密码
-		dbPwd = os.Getenv(utils.DS_Security_Log_Pwd)
-		//数据库IP（域名）
-		dbHost = os.Getenv(utils.DS_Security_Log_Host)
-		//端口
-		port = os.Getenv(utils.DS_Security_Log_Port)
-	}
-
 	// postgres
 	DS := fmt.Sprintf("%s%s%s%s%s%s", "host="+dbHost, " port="+port, " user="+dbUser, " password="+dbPwd, " dbname="+dbName, " sslmode=disable")
 	orm.RegisterDriver(driver, orm.DRPostgres)

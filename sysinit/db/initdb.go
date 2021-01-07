@@ -9,7 +9,6 @@ import (
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/sysinit/dbscript"
 	"github.com/xiliangMa/diss-backend/utils"
-	"os"
 )
 
 type DefaultDB struct {
@@ -17,11 +16,6 @@ type DefaultDB struct {
 
 func (this *DefaultDB) InitDB() {
 	driver := utils.DS_Driver_Postgres
-	runMode := beego.AppConfig.String("RunMode")
-	envRunMode := os.Getenv("RunMode")
-	if envRunMode != "" {
-		runMode = envRunMode
-	}
 	DSAlias := utils.DS_Default
 	// true: drop table 后再建表
 	force, _ := beego.AppConfig.Bool("Force")
@@ -38,25 +32,7 @@ func (this *DefaultDB) InitDB() {
 	dbHost := beego.AppConfig.String(DSAlias + "::Host")
 	//端口
 	port := beego.AppConfig.String(DSAlias + "::Port")
-	// 生产环境
-	if runMode == utils.Run_Mode_Prod {
-		//数据库名称
-		dbName = os.Getenv(utils.DS_Default_POSTGRES_DB)
-		//数据库连接用户名
-		dbUser = os.Getenv(utils.DS_Default_POSTGRES_USER)
-		//数据库连接密码
-		dbPwd = os.Getenv(utils.DS_Default_POSTGRES_PASSWORD)
-		//数据库IP（域名）
-		dbHost = os.Getenv(utils.DS_Default_POSTGRES_HOST)
-		//端口
-		port = os.Getenv(utils.DS_Default_POSTGRES_PORT)
-	}
 
-	// demo mysql
-	//orm.RegisterDataBase("default", "mysql", "root:abc123@tcp(127.0.0.1:3306)/uranus_local?charset=utf8")
-	//DS := fmt.Sprintf("%s%s%s%s%s%s%s%s", dbUser, ":", dbPwd, "@tcp(", dbHost, ":"+port+")/", dbName, "?charset=utf8")
-
-	// postgres
 	DS := fmt.Sprintf("%s%s%s%s%s%s", "host="+dbHost, " port="+port, " user="+dbUser, " password="+dbPwd, " dbname="+dbName, " sslmode=disable")
 	orm.RegisterDriver(driver, orm.DRPostgres)
 	err := orm.RegisterDataBase(DSAlias, driver, DS)
