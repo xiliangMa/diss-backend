@@ -76,6 +76,9 @@ func (this *LicenseModule) Remove() Result {
 	o.Using(utils.DS_Default)
 	var ResultData Result
 	cond := orm.NewCondition()
+	if this.LicenseConfig == nil {
+		cond = cond.And("license_config_id__isnull", false)
+	}
 	if this.LicenseConfig != nil && this.LicenseConfig.Id != "" {
 		cond = cond.And("license_config_id", this.LicenseConfig.Id)
 	}
@@ -151,14 +154,15 @@ func (this *LicenseConfig) Add() Result {
 	var ResultData Result
 
 	err := o.Begin()
-	tmpmodule := LicenseModule{LicenseConfig: this}
+	tmpmodule := LicenseModule{}
 	tmpmodule.Remove()
 	licmodules := this.Modules
 	for _, licmodule := range licmodules {
 		uuidmodule, _ := uuid.NewV4()
 		tmplicmodule := LicenseModule{Id: uuidmodule.String(), LicenseConfig: this, LicenseCount: licmodule.LicenseCount, LicenseExpireAt: licmodule.LicenseExpireAt, ModuleCode: licmodule.ModuleCode}
-		_ = tmplicmodule.Add()
-		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+		ResultData = tmplicmodule.Add()
+		if ResultData.Code != http.StatusOK && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+			logs.Warn("Add license Modules fail, code %s, error: %s ", ResultData.Code, ResultData.Message)
 			o.Rollback()
 		}
 	}
@@ -197,7 +201,8 @@ func (this *LicenseConfig) Update() Result {
 	}
 
 	licmodules := this.Modules
-	tmpmodule := LicenseModule{LicenseConfig: this}
+	//清除现有所有modules信息
+	tmpmodule := LicenseModule{}
 	tmpmodule.Remove()
 	for _, licmodule := range licmodules {
 		uuidmodule, _ := uuid.NewV4()

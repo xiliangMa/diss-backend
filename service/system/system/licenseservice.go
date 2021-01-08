@@ -54,10 +54,17 @@ func (this *LicenseService) LicenseActive() models.Result {
 	licenseObject.ActiveAt = time.Now()
 
 	message := ""
+	licenseQueryObj := models.LicenseConfig{}
+
 	if licenseObject.Type == models.LicType_TrialLicense {
-		licenseObject.Id = ""
+		licenseQueryObj.Id = ""
+		licenseQueryObj.Type = models.LicType_TrialLicense
+	} else {
+		licenseQueryObj.Id = licenseObject.Id
+		licenseQueryObj.Type = models.LicType_StandardLicense
 	}
-	licInDb := licenseObject.Get()
+	licInDb := licenseQueryObj.Get()
+
 	if licInDb.Data != nil {
 		licData := licInDb.Data.([]*models.LicenseConfig)
 		if len(licData) > 0 {
@@ -77,10 +84,10 @@ func (this *LicenseService) LicenseActive() models.Result {
 		logs.Info(message)
 	}
 	//添加license 历史
-	liceseHistory := models.LicenseHistory{}
+	licenseHistory := models.LicenseHistory{}
 	licenseObjJson, _ := json.Marshal(licenseObject)
-	liceseHistory.LicenseJson = string(licenseObjJson)
-	liceseHistory.Add()
+	licenseHistory.LicenseJson = string(licenseObjJson)
+	licenseHistory.Add()
 
 	return result
 }
@@ -93,6 +100,13 @@ func (this *LicenseService) CheckLicenseFile(h *multipart.FileHeader) (models.Re
 	ext := path.Ext(fName)
 	licFilename := models.LicType_StandardLicense + models.LicFile_Extension
 	if strings.Contains(strings.ToLower(fName), "trial") {
+		err := os.Remove(fpath + licFilename)
+		if err != nil {
+			result.Code = utils.DeleteFileErr
+			message := "Delete file Error: " + fpath + licFilename
+			result.Message = message
+			logs.Info(message)
+		}
 		licFilename = models.LicType_TrialLicense + models.LicFile_Extension
 	}
 
