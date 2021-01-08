@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+  POSTGRES_DB: diss
+  POSTGRES_USER: diss
+kind: ConfigMap
+metadata:
+  labels:
+    origin: diss
+    app: diss-db
+  name: diss-db-env
+  namespace: diss
