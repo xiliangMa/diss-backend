@@ -17,7 +17,7 @@ services:
     depends_on:
       - diss-db
     volumes:
-      - /var/lib/diss/diss-backend/upload:/opt/diss-backend/upload
+      - /var/lib/diss/diss-backend/upload/kubernetes:/opt/diss-backend/upload/kubernetes
       - /var/log/diss-backend:/opt/diss-backend/logs
       - ./conf:/opt/diss-backend/conf
     entrypoint:
@@ -44,6 +44,6 @@ services:
     image: arm64v8/nats-streaming:latest
     ports:
       - 4222:4222
-    command: -cid=diss-cluster -p 4222 -m 8222 --user "diss" --pass "diss"
+    command: -cid=diss-cluster -p 4222 -m 8222 --user "diss" --pass "dissP@ssw0rd"
     networks:
       - "diss-net-all"
