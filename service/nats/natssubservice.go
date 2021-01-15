@@ -22,9 +22,9 @@ type NatsSubService struct {
 }
 
 func (this *NatsSubService) Save() error {
-	ms := models.WsData{}
+	ms := models.NatsData{}
 	if err := json.Unmarshal(this.Message, &ms); err != nil {
-		logs.Error("Paraces WsData error %s", err)
+		logs.Error("Paraces NatsData error %s", err)
 		return err
 	}
 
@@ -46,7 +46,7 @@ func (this *NatsSubService) Save() error {
 			//client := &models.Client{Hub: models.WSHub, Conn: this.Conn, Send: make(chan []byte, 256), ClientIp: ip[0], SystemId: heartBeat.SystemId}
 			//client.Hub.Register <- client
 			//logs.Info("Nats ############################ Agent Heater Beat data, >>> HostId: %s, Type: %s <<<", heartBeat.SystemId, models.Resource_HeartBeat)
-			//metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			//metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			//this.ReceiveData(metricsResult)
 		case models.Resource_CmdHistory_LatestTime:
 			cmdHistory := models.CmdHistory{}
@@ -61,7 +61,7 @@ func (this *NatsSubService) Save() error {
 			}
 			logs.Info(msg)
 			result := cmdHistory.GetLatestTime()
-			metricsResult := models.WsData{Code: result.Code, Type: models.Type_Control, Tag: models.Resource_CmdHistory_LatestTime, RCType: models.Resource_Control_Type_Get, Data: result.Data}
+			metricsResult := models.NatsData{Code: result.Code, Type: models.Type_Control, Tag: models.Resource_CmdHistory_LatestTime, RCType: models.Resource_Control_Type_Get, Data: result.Data}
 			this.ReceiveData(metricsResult)
 		case models.Resource_DockerEvent_LatestTime:
 			dockerEvent := models.DockerEvent{}
@@ -73,7 +73,7 @@ func (this *NatsSubService) Save() error {
 			msg := fmt.Sprintf("Nats ############################ Agent Fetch LatestTime data, >>> HostId: %s, Type: %s <<<", dockerEvent.HostId, models.Resource_DockerEvent_LatestTime)
 			logs.Info(msg)
 			result := dockerEvent.GetLatestTime()
-			metricsResult := models.WsData{Code: result.Code, Type: models.Type_Control, Tag: models.Resource_DockerEvent_LatestTime, RCType: models.Resource_Control_Type_Get, Data: result.Data}
+			metricsResult := models.NatsData{Code: result.Code, Type: models.Type_Control, Tag: models.Resource_DockerEvent_LatestTime, RCType: models.Resource_Control_Type_Get, Data: result.Data}
 			this.ReceiveData(metricsResult)
 		case models.Resource_HostInfoDynamic:
 			// k8s 主机更新主机的外网ip
@@ -87,7 +87,7 @@ func (this *NatsSubService) Save() error {
 			if result := hostInfo.UpdateDynamic(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 		case models.Resource_HostConfigDynamic:
 			// k8s 主机更新主机的外网ip
@@ -102,7 +102,7 @@ func (this *NatsSubService) Save() error {
 			if result := hostConfig.UpdateDynamic(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 		case models.Resource_HostConfig:
 			hostConfig := models.HostConfig{}
@@ -115,7 +115,7 @@ func (this *NatsSubService) Save() error {
 			if err := hostConfig.Add(); err != nil {
 				return err
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 		case models.Resource_HostInfo:
 			hostInfo := models.HostInfo{}
@@ -128,7 +128,7 @@ func (this *NatsSubService) Save() error {
 			if err := hostInfo.Add(); err != nil {
 				return err
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 		case models.Resource_ContainerConfig:
 			containerConfigList := []models.ContainerConfig{}
@@ -156,7 +156,7 @@ func (this *NatsSubService) Save() error {
 				agentCheckHandler := synccheck.AgentCheckHadler{CheckObject, nil}
 				agentCheckHandler.Check(models.Resource_ContainerConfig)
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_ContainerInfo:
@@ -185,7 +185,7 @@ func (this *NatsSubService) Save() error {
 				agentCheckHandler := synccheck.AgentCheckHadler{nil, CheckObject}
 				agentCheckHandler.Check(models.Resource_ContainerInfo)
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_ImageConfig:
@@ -208,7 +208,7 @@ func (this *NatsSubService) Save() error {
 				//}
 				imageConfig.Add()
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_ImageInfo:
@@ -230,7 +230,7 @@ func (this *NatsSubService) Save() error {
 				//}
 				imageInfo.Add()
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 		case models.Resource_HostPs:
 			hostPsList := []models.HostPs{}
@@ -252,7 +252,7 @@ func (this *NatsSubService) Save() error {
 				//}
 				hostPs.Add()
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_ContainerPs:
@@ -275,7 +275,7 @@ func (this *NatsSubService) Save() error {
 				//}
 				containerTop.Add()
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_DockerBenchMark:
@@ -306,7 +306,7 @@ func (this *NatsSubService) Save() error {
 				hostConfig.Update()
 			}
 
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			// 上报es
 			//esClient, err := utils.GetESClient()
@@ -360,7 +360,7 @@ func (this *NatsSubService) Save() error {
 
 				hostConfig.Update()
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			// 上报es
 			//esClient, err := utils.GetESClient()
@@ -403,7 +403,7 @@ func (this *NatsSubService) Save() error {
 			for _, cmdHistory := range cmdHistoryList.List {
 				cmdHistory.Add()
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 
 			// HostCmdHistory 通过通道推送给邮件发送协程
@@ -435,7 +435,7 @@ func (this *NatsSubService) Save() error {
 			for _, hostPackage := range hostPackageList.List {
 				hostPackage.Add()
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_ContainerCmdHistory:
@@ -454,7 +454,7 @@ func (this *NatsSubService) Save() error {
 			for _, cmdHistory := range cmdHistoryList.List {
 				cmdHistory.Add()
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 
 			// ContainerCmdHistory 通过通道推送给邮件发送协程
@@ -478,7 +478,7 @@ func (this *NatsSubService) Save() error {
 			}
 			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s<<<", dockerEvent.HostId, models.Resource_DockerEvent)
 			dockerEvent.Add()
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 
 			// DockerEvent 通过通道推送给邮件发送协程
@@ -528,7 +528,7 @@ func (this *NatsSubService) Save() error {
 					if result := warningInfo.Add(); result.Code != http.StatusOK {
 						return errors.New(result.Message)
 					}
-					metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+					metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 					this.ReceiveData(metricsResult)
 
 					// WarningInfo 通过通道推送给邮件发送协程
@@ -553,7 +553,7 @@ func (this *NatsSubService) Save() error {
 			// 获取任务列表接口
 			switch ms.RCType {
 			case models.Resource_Control_Type_Get:
-				metricsResult := models.WsData{Code: http.StatusOK, Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Get}
+				metricsResult := models.NatsData{Code: http.StatusOK, Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Get}
 				task := models.Task{}
 				s, _ := json.Marshal(ms.Data)
 				if err := json.Unmarshal(s, &task); err != nil {
@@ -582,13 +582,20 @@ func (this *NatsSubService) Save() error {
 				}
 			case models.Resource_Control_Type_Put:
 				//更新任务状态
-				metricsResult := models.WsData{Code: http.StatusOK, Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Put}
+				metricsResult := models.NatsData{Code: http.StatusOK, Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Put}
 				taskList := []models.Task{}
+				taskObj := models.Task{}
 				s, _ := json.Marshal(ms.Data)
-				if err := json.Unmarshal(s, &taskList); err != nil {
+				err := json.Unmarshal(s, &taskList)
+				if err != nil && err.Error() != "json: cannot unmarshal object into Go value of type []models.Task" {
 					logs.Error("Paraces: %s type: %s error: %s  ", ms.Tag, ms.RCType, err)
 					return err
 				}
+				if err.Error() == "json: cannot unmarshal object into Go value of type []models.Task" {
+					err = json.Unmarshal(s, &taskObj)
+					taskList = append(taskList, taskObj)
+				}
+
 				logTag := "Nats ############################ "
 				for _, task := range taskList {
 					metricsResult.Data = task
@@ -611,14 +618,14 @@ func (this *NatsSubService) Save() error {
 						return errors.New(result.Message)
 					} else {
 						msg := ""
-						if task.Host == nil {
-							if task.Container != nil {
-								this.ClientSubject = task.Container.HostName
-							}
-							msg = fmt.Sprintf("Update task Success, KStatus: %s >>> HostName: %s, Type: %s, task id: %s <<<", task.Status, task.Container.HostName, models.Resource_Task, task.Id)
-						} else {
-							msg = fmt.Sprintf("Update task Success, KStatus: %s >>> HostId: %s, Type: %s, task id: %s <<<", task.Status, task.Host.Id, models.Resource_Task, task.Id)
+						if task.Image != nil {
+							this.ClientSubject = task.Image.HostId
+						} else if task.Host != nil {
+							this.ClientSubject = task.Host.Id
+						} else if task.Container != nil {
+							this.ClientSubject = task.Container.HostName
 						}
+						msg = fmt.Sprintf("Update task Success, KStatus: %s >>> HostId: %s, Type: %s, task id: %s <<<", task.Status, this.ClientSubject, models.Resource_Task, task.Id)
 						logs.Info(logTag + msg)
 						taskRawInfo, _ := json.Marshal(task)
 						taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Info}
@@ -626,9 +633,10 @@ func (this *NatsSubService) Save() error {
 					}
 					this.ReceiveData(metricsResult)
 				}
+
 			case models.Resource_Control_Type_Delete:
 				logTag := "Nats ############################ "
-				metricsResult := models.WsData{Code: http.StatusOK, Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Delete}
+				metricsResult := models.NatsData{Code: http.StatusOK, Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Delete}
 				task := models.Task{}
 				s, _ := json.Marshal(ms.Data)
 				if err := json.Unmarshal(s, &task); err != nil {
@@ -679,7 +687,7 @@ func (this *NatsSubService) Save() error {
 func (this *NatsSubService) DeleteTask() error {
 	logs.Info("################ Delete Task <<<start>>> ################")
 	task := this.DelTask
-	result := models.WsData{Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Delete, Data: task}
+	result := models.NatsData{Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Delete, Data: task}
 	data, err := json.Marshal(result)
 
 	// 下发删除任务
@@ -711,7 +719,7 @@ func (this *NatsSubService) DeleteTask() error {
 	return nil
 }
 
-func (this *NatsSubService) ReceiveData(result models.WsData) {
+func (this *NatsSubService) ReceiveData(result models.NatsData) {
 	data, _ := json.Marshal(result)
 	err := this.Conn.Publish(this.ClientSubject, data)
 	if err != nil {

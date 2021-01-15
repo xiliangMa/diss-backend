@@ -25,10 +25,27 @@ type ImageConfig struct {
 type ImageConfigInterface interface {
 	Add() Result
 	Delete() Result
-	Edit() Result
-	Get() Result
+	Get() *ImageConfig
 	List(from, limit int) Result
 	GetDBImageByType() Result
+}
+
+func (this *ImageConfig) Get() *ImageConfig {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	object := new(ImageConfig)
+	var err error
+	cond := orm.NewCondition()
+	if this.ImageId != "" {
+		cond = cond.And("image_id", this.ImageId)
+	}
+
+	err = o.QueryTable(utils.ImageConfig).SetCond(cond).RelatedSel().One(object)
+	if err != nil {
+		logs.Error("Get ImageConfig failed, code: %d, err: %s", err.Error(), utils.GetImageContentErr)
+		return nil
+	}
+	return object
 }
 
 func (this *ImageConfig) Add() Result {

@@ -20,9 +20,9 @@ type WSMetricsService struct {
 }
 
 func (this *WSMetricsService) Save() error {
-	ms := models.WsData{}
+	ms := models.NatsData{}
 	if err := json.Unmarshal(this.Message, &ms); err != nil {
-		logs.Error("Paraces WsData error %s", err)
+		logs.Error("Paraces NatsData error %s", err)
 		return err
 	}
 	switch ms.Type {
@@ -70,7 +70,7 @@ func (this *WSMetricsService) Save() error {
 				currentHost.Update()
 			}
 			logs.Info("############################ Agent Heater Beat data, >>> HostId: %s, Type: %s <<<", heartBeat.SystemId, models.Resource_HeartBeat)
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 		case models.Resource_HostConfig:
 			hostConfig := models.HostConfig{}
@@ -83,7 +83,7 @@ func (this *WSMetricsService) Save() error {
 			if err := hostConfig.Add(); err != nil {
 				return err
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 		case models.Resource_HostInfo:
 			hostInfo := models.HostInfo{}
@@ -96,7 +96,7 @@ func (this *WSMetricsService) Save() error {
 			if err := hostInfo.Add(); err != nil {
 				return err
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 		case models.Resource_ContainerConfig:
 			containerConfigList := []models.ContainerConfig{}
@@ -123,7 +123,7 @@ func (this *WSMetricsService) Save() error {
 				agentCheckHandler := synccheck.AgentCheckHadler{CheckObject, nil}
 				agentCheckHandler.Check(models.Resource_ContainerConfig)
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_ContainerInfo:
@@ -152,7 +152,7 @@ func (this *WSMetricsService) Save() error {
 				agentCheckHandler := synccheck.AgentCheckHadler{nil, CheckObject}
 				agentCheckHandler.Check(models.Resource_ContainerInfo)
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_ImageConfig:
@@ -175,7 +175,7 @@ func (this *WSMetricsService) Save() error {
 				//}
 				imageConfig.Add()
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_ImageInfo:
@@ -197,7 +197,7 @@ func (this *WSMetricsService) Save() error {
 				//}
 				imageInfo.Add()
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 		case models.Resource_HostPs:
 			hostPsList := []models.HostPs{}
@@ -219,7 +219,7 @@ func (this *WSMetricsService) Save() error {
 				//}
 				hostPs.Add()
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_ContainerPs:
@@ -242,7 +242,7 @@ func (this *WSMetricsService) Save() error {
 				//}
 				containerTop.Add()
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_DockerBenchMark:
@@ -257,7 +257,7 @@ func (this *WSMetricsService) Save() error {
 			if result := benchMarkLog.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			// 上报es
 			//esClient, err := utils.GetESClient()
@@ -284,7 +284,7 @@ func (this *WSMetricsService) Save() error {
 			if result := benchMarkLog.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			// 上报es
 			//esClient, err := utils.GetESClient()
@@ -318,7 +318,7 @@ func (this *WSMetricsService) Save() error {
 				//}
 				cmdHistory.Add()
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_ContainerCmdHistory:
@@ -340,7 +340,7 @@ func (this *WSMetricsService) Save() error {
 				//}
 				cmdHistory.Add()
 			}
-			metricsResult := models.WsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
+			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			this.ReceiveData(metricsResult)
 			return nil
 		}
@@ -350,7 +350,7 @@ func (this *WSMetricsService) Save() error {
 			// 获取任务列表接口
 			switch ms.RCType {
 			case models.Resource_Control_Type_Get:
-				metricsResult := models.WsData{Code: http.StatusOK, Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Get}
+				metricsResult := models.NatsData{Code: http.StatusOK, Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Get}
 				task := models.Task{}
 				s, _ := json.Marshal(ms.Data)
 				if err := json.Unmarshal(s, &task); err != nil {
@@ -377,7 +377,7 @@ func (this *WSMetricsService) Save() error {
 				this.ReceiveData(metricsResult)
 			case models.Resource_Control_Type_Put:
 				//更新任务状态
-				metricsResult := models.WsData{Code: http.StatusOK, Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Put}
+				metricsResult := models.NatsData{Code: http.StatusOK, Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Put}
 				taskList := []models.Task{}
 				s, _ := json.Marshal(ms.Data)
 				if err := json.Unmarshal(s, &taskList); err != nil {
@@ -412,7 +412,7 @@ func (this *WSMetricsService) Save() error {
 	return nil
 }
 
-func (this *WSMetricsService) ReceiveData(result models.WsData) {
+func (this *WSMetricsService) ReceiveData(result models.NatsData) {
 	data, _ := json.Marshal(result)
 	err := this.Conn.WriteMessage(websocket.TextMessage, data)
 	if err != nil {
