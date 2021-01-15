@@ -14,7 +14,7 @@ type SecurityCheckController struct {
 }
 
 // @Title SecurityCheck
-// @Description Security heck
+// @Description Security check
 // @Param token header string true "authToken"
 // @Param account query string "admin" false "租户"
 // @Param body body models.SecurityCheckList true "检查列表"
@@ -30,5 +30,27 @@ func (this *SecurityCheckController) SecurityCheck() {
 	batch := time.Now().Unix()
 	securityCheckService := securitycheck.SecurityCheckService{SecurityCheckList: checkList, Batch: batch}
 	this.Data["json"] = securityCheckService.DeliverTask()
+	this.ServeJSON(false)
+}
+
+// @Title HostImageVulnScan
+// @Description Host Image Vuln Scan
+// @Param token header string true "authToken"
+// @Param account query string "admin" false "租户"
+// @Param isSystem query bool false false "系统检查"
+// @Param body body models.SecurityCheckParams true "安全检查参数"
+// @Success 200 {object} models.Result
+// @router /hostimagevulnscan [post]
+func (this *SecurityCheckController) HostImageVulnScan() {
+	params := new(models.SecurityCheckParams)
+	account := this.GetString("account")
+	isSystem, _ := this.GetBool("isSystem")
+	if account == "" {
+		account = models.Account_Admin
+	}
+	json.Unmarshal(this.Ctx.Input.RequestBody, &params)
+	batch := time.Now().Unix()
+	securityScanService := securitycheck.SecurityScanService{SecurityCheckParams: params, Batch: batch, IsSystem: isSystem}
+	this.Data["json"] = securityScanService.DeliverTask()
 	this.ServeJSON(false)
 }

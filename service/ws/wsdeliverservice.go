@@ -30,12 +30,16 @@ func (this *WSDeliverService) DeliverTaskToNats() {
 			if containerCount > 0 && task.Container.HostName != "" {
 				subject = task.Container.HostName
 			}
+		} else if task.Image != nil {
+			subject = task.Image.HostId
+			task.Job = nil
 		}
-		if subject != "" {
-			result := models.WsData{Type: models.Type_Control, Tag: models.Resource_Task, Data: task, RCType: models.Resource_Control_Type_Post}
-			data, _ := json.Marshal(result)
 
+		if subject != "" {
+			result := models.NatsData{Type: models.Type_Control, Tag: models.Resource_Task, Data: task, RCType: models.Resource_Control_Type_Post}
+			data, _ := json.MarshalIndent(result, "", "  ")
 			err := models.Nats.Conn.Publish(subject, data)
+			logs.Debug("Send task data: %s.", string(data))
 			if err == nil {
 				logs.Info("Deliver Task to Nats Success, Subject: %s Id: %s, data: %v", subject, task.Id, result)
 			} else {
@@ -54,7 +58,7 @@ func (this *WSDeliverService) DeliverTask() {
 	for _, task := range this.CurrentBatchTaskList {
 		if _, ok := this.Hub.DissClient[task.Host.Id]; ok {
 			client := this.Hub.DissClient[task.Host.Id]
-			result := models.WsData{Type: models.Type_Control, Tag: models.Resource_Task, Data: task, RCType: models.Resource_Control_Type_Post}
+			result := models.NatsData{Type: models.Type_Control, Tag: models.Resource_Task, Data: task, RCType: models.Resource_Control_Type_Post}
 			data, _ := json.Marshal(result)
 			err := client.Conn.WriteMessage(websocket.TextMessage, data)
 			if err == nil {

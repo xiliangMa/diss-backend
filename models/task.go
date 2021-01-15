@@ -20,6 +20,7 @@ type Task struct {
 	SystemTemplate *SystemTemplate  `orm:"rel(fk);null;" description:"(系统模板)"`
 	Host           *HostConfig      `orm:"rel(fk);null;on_delete(do_nothing)"description:"(主机)"`
 	Container      *ContainerConfig `orm:"rel(fk);null;on_delete(do_nothing)" description:"(容器)"`
+	Image          *ImageConfig     `orm:"rel(fk);null;on_delete(do_nothing)" description:"(镜像)"`
 	CreateTime     time.Time        `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
 	UpdateTime     time.Time        `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
 	Job            *Job             `orm:"rel(fk);null;" description:"(job)"`

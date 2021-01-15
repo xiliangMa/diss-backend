@@ -78,8 +78,9 @@ var (
 	Diss_Status_Unsafe = "Unsafe"
 
 	//// 系统魔板类型(此处和ws resource tag 保持一致，和授权模块关联)
-	//镜像仓库扫描：
-	TMP_Type_ImageScan = "ImageScan"
+	// 镜像扫描：
+	TMP_Type_ImageScan         = "ImageScan"
+	TMP_Type_HostImageVulnScan = "HostImageVulnScan"
 	//基线扫描：
 	TMP_Type_BM_Docker = "DockerBenchMark"
 	TMP_Type_BM_K8S    = "KubernetesBenchMark"
@@ -106,6 +107,7 @@ var (
 	//安全检查类型
 	SC_Type_Host      = "host"
 	Sc_Type_Container = "container"
+	Sc_Type_Image     = "image"
 
 	// 任务状态
 	Task_Status_Pending        = "Pending"
