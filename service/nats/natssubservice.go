@@ -536,13 +536,14 @@ func (this *NatsSubService) Save() error {
 				s, _ := json.Marshal(ms.Data)
 				logs.Debug("Receive task data: %s.", string(s))
 				err := json.Unmarshal(s, &taskList)
-				if err != nil && err.Error() != "json: cannot unmarshal object into Go value of type []models.Task" {
-					logs.Error("Paraces: %s type: %s error: %s  ", ms.Tag, ms.RCType, err)
-					return err
-				}
-				if err.Error() == "json: cannot unmarshal object into Go value of type []models.Task" {
-					err = json.Unmarshal(s, &taskObj)
-					taskList = append(taskList, taskObj)
+				if err != nil {
+					if err.Error() == "json: cannot unmarshal object into Go value of type []models.Task" {
+						err = json.Unmarshal(s, &taskObj)
+						taskList = append(taskList, taskObj)
+					} else {
+						logs.Error("Paraces: %s type: %s error: %s  ", ms.Tag, ms.RCType, err)
+						return err
+					}
 				}
 
 				logTag := "Nats ############################ "
