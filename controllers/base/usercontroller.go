@@ -2,13 +2,13 @@ package base
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 )
 
 // 用户接口口列表
 type UserController struct {
-	beego.Controller
+	web.Controller
 }
 
 // @Title GetUserEvents

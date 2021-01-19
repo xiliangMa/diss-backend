@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 	"strconv"
 )
 
@@ -129,46 +129,45 @@ func GetDBCountSql(hostId string) string {
  * @serverUrl nats://diss:diss@111.229.167.6:4222
  */
 func GetNatsServerUrl() string {
-
-	prefix := beego.AppConfig.String("nats::Prefix")
-	ip := beego.AppConfig.String("nats::Ip")
-	port := beego.AppConfig.String("nats::Port")
-	user := beego.AppConfig.String("nats::User")
-	pwd := beego.AppConfig.String("nats::Pwd")
+	prefix, _ := web.AppConfig.String("nats::Prefix")
+	ip, _ := web.AppConfig.String("nats::Ip")
+	port, _ := web.AppConfig.String("nats::Port")
+	user, _ := web.AppConfig.String("nats::User")
+	pwd, _ := web.AppConfig.String("nats::Pwd")
 	serverUrl := prefix + user + `:` + pwd + `@` + ip + `:` + port
 	logs.Info("Nats conect url: %s", serverUrl)
 	return serverUrl
 }
 
 func GetNatsClientId() string {
-	clientId := beego.AppConfig.String("nats::ClientId")
+	clientId, _ := web.AppConfig.String("nats::ClientId")
 	return clientId
 }
 
 func GetNatsClusterId() string {
-	clusterId := beego.AppConfig.String("nats::ClusterId")
+	clusterId, _ := web.AppConfig.String("nats::ClusterId")
 	return clusterId
 }
 
 func IsEnableNats() bool {
 	enable := false
-	if ok, _ := beego.AppConfig.Bool("nats::Enable"); ok {
+	if ok, _ := web.AppConfig.Bool("nats::Enable"); ok {
 		enable = true
 	}
 	return enable
 }
 
 func GetScopeYml() string {
-	scopeYml := beego.AppConfig.String("k8s::ScopeYml")
+	scopeYml, _ := web.AppConfig.String("k8s::ScopeYml")
 	return scopeYml
 }
 
 func GetScopeNameSpace() string {
-	scopeNameSpace := beego.AppConfig.String("k8s::ScopeNameSpace")
+	scopeNameSpace, _ := web.AppConfig.String("k8s::ScopeNameSpace")
 	return scopeNameSpace
 }
 
 func GetScopeAppName() string {
-	scopeAppName := beego.AppConfig.String("k8s::ScopeAppName")
+	scopeAppName, _ := web.AppConfig.String("k8s::ScopeAppName")
 	return scopeAppName
 }

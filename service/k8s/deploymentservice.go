@@ -2,7 +2,7 @@ package k8s
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	v1 "k8s.io/api/apps/v1"
@@ -17,11 +17,11 @@ type DeploymentService struct {
 }
 
 func (this *DeploymentService) List() (*v1.DeploymentList, error) {
-	return this.ClientGo.ClientSet.AppsV1().Deployments("").List(metav1.ListOptions{})
+	return this.ClientGo.ClientSet.AppsV1().Deployments("").List(nil, metav1.ListOptions{})
 }
 
 func (this *DeploymentService) Wtach() {
-	deployWatch, err := this.ClientGo.ClientSet.AppsV1().Deployments("").Watch(metav1.ListOptions{})
+	deployWatch, err := this.ClientGo.ClientSet.AppsV1().Deployments("").Watch(nil, metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}

@@ -2,7 +2,7 @@ package job
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 	jobservice "github.com/xiliangMa/diss-backend/service/job"
 	"net/http"
@@ -10,7 +10,7 @@ import (
 
 // Job 接口
 type JobController struct {
-	beego.Controller
+	web.Controller
 }
 
 // @Title GetJobList

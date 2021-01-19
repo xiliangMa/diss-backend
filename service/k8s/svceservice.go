@@ -2,7 +2,7 @@ package k8s
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	v1 "k8s.io/api/core/v1"
@@ -17,11 +17,11 @@ type SVCService struct {
 }
 
 func (this *SVCService) List() (*v1.ServiceList, error) {
-	return this.ClientGo.ClientSet.CoreV1().Services("").List(metav1.ListOptions{})
+	return this.ClientGo.ClientSet.CoreV1().Services("").List(nil, metav1.ListOptions{})
 }
 
 func (this *SVCService) Wtach() {
-	serviceWatch, err := this.ClientGo.ClientSet.CoreV1().Services("").Watch(metav1.ListOptions{})
+	serviceWatch, err := this.ClientGo.ClientSet.CoreV1().Services("").Watch(nil, metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}

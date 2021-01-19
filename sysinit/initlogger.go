@@ -2,8 +2,8 @@ package sysinit
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 )
 
 type adapterMultiFileConfig struct {
@@ -29,13 +29,13 @@ type adapterMultiFileConfig struct {
  *
  */
 func InitLogger() {
-	FileName := beego.AppConfig.String("logs::FileName")
-	MaxLines, _ := beego.AppConfig.Int64("logs::MaxLines")
-	MaxSize, _ := beego.AppConfig.Int64("logs::MaxSize")
-	Daily, _ := beego.AppConfig.Bool("logs::Daily")
-	MaxDays, _ := beego.AppConfig.Int64("logs::MaxDays")
-	Level, _ := beego.AppConfig.Int64("logs::Level")
-	Color, _ := beego.AppConfig.Bool("logs::Color")
+	FileName, _ := web.AppConfig.String("logs::FileName")
+	MaxLines, _ := web.AppConfig.Int64("logs::MaxLines")
+	MaxSize, _ := web.AppConfig.Int64("logs::MaxSize")
+	Daily, _ := web.AppConfig.Bool("logs::Daily")
+	MaxDays, _ := web.AppConfig.Int64("logs::MaxDays")
+	Level, _ := web.AppConfig.Int64("logs::Level")
+	Color, _ := web.AppConfig.Bool("logs::Color")
 
 	logConfig := adapterMultiFileConfig{
 		FileName: FileName,
@@ -49,5 +49,5 @@ func InitLogger() {
 
 	jsonbyte, _ := json.MarshalIndent(logConfig, "", "")
 	logs.Info("log config info %s", string(jsonbyte))
-	beego.SetLogger(logs.AdapterMultiFile, string(jsonbyte))
+	logs.SetLogger(logs.AdapterMultiFile, string(jsonbyte))
 }

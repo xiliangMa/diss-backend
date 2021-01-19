@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/anchore/client-go/pkg/external"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
 	"testing"
 )
 

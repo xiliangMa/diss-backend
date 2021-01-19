@@ -2,8 +2,8 @@ package job
 
 import (
 	"fmt"
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/securitycheck"
 	taskservice "github.com/xiliangMa/diss-backend/service/task"
@@ -137,7 +137,7 @@ func (this *JobService) CheckRuningTask() models.Result {
 func (this *JobService) GetTasksOfJobByStatus() []*models.Task {
 	var tasks []*models.Task
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	job := this.JobParam.Get()
 	if job.Id != "" {
 		o.LoadRelated(job, "Task")
@@ -153,7 +153,7 @@ func (this *JobService) GetTasksOfJobByStatus() []*models.Task {
 func (this *JobService) RemoveAssocTasks() models.Result {
 	var result models.Result
 	o := orm.NewOrm()
-	err := o.Begin()
+	txOrmer, err := o.Begin()
 	//移除相关的task
 	job := this.JobParam
 	if job.Id != "" {
@@ -163,7 +163,7 @@ func (this *JobService) RemoveAssocTasks() models.Result {
 			taskService.Task = task
 			result = taskService.RemoveTask()
 			if result.Code != http.StatusOK {
-				o.Rollback()
+				txOrmer.Rollback()
 				result.Code = utils.DeleteTaskErr
 				msg := fmt.Sprintf("Delete assoc task error, Id: %s , code: %d", task.Id, result.Code)
 				logs.Error(msg)
@@ -172,7 +172,7 @@ func (this *JobService) RemoveAssocTasks() models.Result {
 			}
 		}
 	}
-	err = o.Commit()
+	err = txOrmer.Commit()
 	if err != nil {
 		result.Code = utils.TaskCommitErr
 		result.Message = err.Error()

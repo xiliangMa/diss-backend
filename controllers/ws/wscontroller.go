@@ -1,8 +1,8 @@
 package ws
 
 import (
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/gorilla/websocket"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/ws"
@@ -10,7 +10,7 @@ import (
 )
 
 type WSMetricController struct {
-	beego.Controller
+	web.Controller
 }
 
 var upgrader = websocket.Upgrader{

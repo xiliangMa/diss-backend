@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
@@ -29,8 +29,7 @@ type HostPackageInterface interface {
 
 func (this *HostPackage) Add() Result {
 	insetSql := `INSERT INTO host_package VALUES(?, ?, ?, ?)`
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var ResultData Result
 
 	_, err := o.Raw(insetSql,
@@ -52,8 +51,7 @@ func (this *HostPackage) Add() Result {
 }
 
 func (this *HostPackage) Delete() Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var ResultData Result
 	deleteSql := `DELETE FROM host_package WHERE host_id = ?`
 
@@ -69,8 +67,7 @@ func (this *HostPackage) Delete() Result {
 }
 
 func (this *HostPackage) List(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var hostPackageList []*HostPackage
 	var ResultData Result
 	var err error
@@ -125,8 +122,7 @@ func (this *HostPackage) List(from, limit int) Result {
 }
 
 func (this *HostPackage) GetPackageCountByType() Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var packageCount []orm.Params
 	ResultData := Result{Code: http.StatusOK}
 	var err error

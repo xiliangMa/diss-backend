@@ -2,8 +2,8 @@ package models
 
 import (
 	//"fmt"
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -30,8 +30,7 @@ type UserEventInterface interface {
 }
 
 func (this *UserEvent) List(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var userEventList []*UserEvent = nil
 	var ResultData Result
 	var err error
@@ -94,8 +93,7 @@ func (this *UserEvent) List(from, limit int) Result {
 
 func (this *UserEvent) Add() Result {
 	insetSql := `INSERT INTO ` + string(utils.UserEvent) + ` VALUES(?, ?, ?, ?, ?)`
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var ResultData Result
 	uid, _ := uuid.NewV4()
 	this.Id = uid.String()

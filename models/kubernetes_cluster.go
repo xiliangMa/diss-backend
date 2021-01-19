@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"time"
@@ -48,7 +48,6 @@ type ClusterInterface interface {
 
 func (this *Cluster) Get() *Cluster {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	C := new(Cluster)
 
 	cond := orm.NewCondition()
@@ -66,7 +65,6 @@ func (this *Cluster) Get() *Cluster {
 
 func (this *Cluster) Add(isForce bool) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	ResultData := Result{Code: http.StatusOK}
 	cond := orm.NewCondition()
 	cluster := new(Cluster)
@@ -121,7 +119,6 @@ func (this *Cluster) Add(isForce bool) Result {
 func (this *Cluster) GetRequiredSyncList() Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
-	o.Using(utils.DS_Default)
 	var ClusterList []*Cluster
 	var ResultData Result
 	var err error
@@ -153,7 +150,6 @@ func (this *Cluster) GetRequiredSyncList() Result {
 func (this *Cluster) List(from, limit int) Result {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
-	o.Using(utils.DS_Default)
 	var ClusterList []*Cluster
 	var ResultData Result
 	var err error
@@ -199,7 +195,6 @@ func (this *Cluster) List(from, limit int) Result {
 
 func (this *Cluster) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -216,7 +211,6 @@ func (this *Cluster) Update() Result {
 
 func (this *Cluster) ListByAccount(from, limit int) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ClusterList []*Cluster
 	var cIds []string
 	ns := new(NameSpace)
@@ -267,7 +261,6 @@ func (this *Cluster) ListByAccount(from, limit int) Result {
 
 func (this *Cluster) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 	cond := orm.NewCondition()
 

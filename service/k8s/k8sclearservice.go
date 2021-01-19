@@ -2,8 +2,8 @@ package k8s
 
 import (
 	"fmt"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 	sssystem "github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -89,8 +89,9 @@ func (this *K8sClearService) ClearCluster() {
 	msg := fmt.Sprintf("Clear Cluster, Cluster: %s ", this.CurrentCluster.Name)
 	logs.Info(msg)
 	if this.CurrentCluster.AuthType == models.Api_Auth_Type_KubeConfig {
-		if beego.AppConfig.String("RunMode") == "prod" {
-			uploadPath := beego.AppConfig.String("system::UploadPath")
+		runMode, _ := web.AppConfig.String("RunMode")
+		if runMode == "prod" {
+			uploadPath, _ := web.AppConfig.String("system::UploadPath")
 			file := fmt.Sprintf("%+v%+v", uploadPath, this.CurrentCluster.FileName)
 			err := os.Remove(file)
 			if err != nil {

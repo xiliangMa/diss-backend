@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"time"
@@ -46,7 +46,7 @@ type TaskInterface interface {
 
 func (this *Task) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
 	_, err := o.Insert(this)
@@ -63,7 +63,7 @@ func (this *Task) Add() Result {
 
 func (this *Task) List(from, limit int) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var TaskList []*Task
 	var ResultData Result
 	var err error
@@ -123,7 +123,7 @@ func (this *Task) List(from, limit int) Result {
 
 func (this *Task) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 	cond := orm.NewCondition()
 	var err error
@@ -145,7 +145,7 @@ func (this *Task) Delete() Result {
 
 func (this *Task) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -162,7 +162,7 @@ func (this *Task) Update() Result {
 
 func (this *Task) GetCurrentBatchTaskList() (error, []*Task) {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var TaskList []*Task
 	var err error
 	cond := orm.NewCondition()
@@ -177,7 +177,7 @@ func (this *Task) GetCurrentBatchTaskList() (error, []*Task) {
 
 func (this *Task) GetUnFinishedTaskList() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var TaskList []*Task
 	var ResultData Result
 	var err error

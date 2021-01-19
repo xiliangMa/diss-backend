@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -39,7 +39,6 @@ type JobInterface interface {
 
 func (this *Job) List(from, limit int) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var JobList []*Job
 	var ResultData Result
 	var err error
@@ -99,7 +98,6 @@ func (this *Job) List(from, limit int) Result {
 
 func (this *Job) Get() *Job {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	job := new(Job)
 	var ResultData Result
 	var err error
@@ -127,29 +125,28 @@ func (this *Job) Get() *Job {
 
 func (this *Job) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 
-	err := o.Begin()
+	txOrmer, err := o.Begin()
 
 	uid, _ := uuid.NewV4()
 	this.Id = uid.String()
 
 	_, err = o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
-		o.Rollback()
+		txOrmer.Rollback()
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddJobErr
 		logs.Error("Add Job failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
-	result := this.fillRelationData(o)
+	result := this.fillRelationData(txOrmer)
 	if result.Code != 0 && result.Code != utils.ContainerExistInJobErr && result.Code != utils.HostExistInJobErr {
 		return result
 	}
 
-	err = o.Commit()
+	err = txOrmer.Commit()
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Code = utils.JobCommitErr
 		ResultData.Message = err.Error()
@@ -163,17 +160,16 @@ func (this *Job) Add() Result {
 
 func (this *Job) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 
-	err := o.Begin()
+	txOrmer, err := o.Begin()
 	// 移除job-host  , job-container关联
 	m2mhost := o.QueryM2M(this, "HostConfig")
 	_, err = m2mhost.Clear()
 	m2mcont := o.QueryM2M(this, "ContainerConfig")
 	_, err = m2mcont.Clear()
 	if err != nil {
-		o.Rollback()
+		txOrmer.Rollback()
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteJobErr
 		logs.Error("Delete Job: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
@@ -188,14 +184,14 @@ func (this *Job) Delete() Result {
 
 	_, err = o.QueryTable(utils.Job).SetCond(cond).Delete()
 	if err != nil {
-		o.Rollback()
+		txOrmer.Rollback()
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteJobErr
 		logs.Error("Delete Job failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
-	err = o.Commit()
+	err = txOrmer.Commit()
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Code = utils.JobCommitErr
 		ResultData.Message = err.Error()
@@ -209,27 +205,26 @@ func (this *Job) Delete() Result {
 
 func (this *Job) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 
-	err := o.Begin()
+	txOrmer, err := o.Begin()
 	_, err = o.Update(this)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.EditJobErr
-		o.Rollback()
+		txOrmer.Rollback()
 		logs.Error("Update Job: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
 	if this.IsUpdateHost {
-		result := this.fillRelationData(o)
+		result := this.fillRelationData(txOrmer)
 		if result.Code != 0 && result.Code != utils.ContainerExistInJobErr && result.Code != utils.HostExistInJobErr {
 			return result
 		}
 	}
 
-	err = o.Commit()
+	err = txOrmer.Commit()
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Code = utils.JobCommitErr
 		ResultData.Message = err.Error()
@@ -242,9 +237,9 @@ func (this *Job) Update() Result {
 	return ResultData
 }
 
-func (this *Job) fillRelationData(o orm.Ormer) Result {
+func (this *Job) fillRelationData(txOrmer orm.TxOrmer) Result {
 	var ResultData Result
-	m2m := o.QueryM2M(this, "HostConfig")
+	m2m := txOrmer.QueryM2M(this, "HostConfig")
 	m2m.Clear()
 	for _, hostconfig := range this.HostConfig {
 		if m2m.Exist(hostconfig) != true {
@@ -252,7 +247,7 @@ func (this *Job) fillRelationData(o orm.Ormer) Result {
 			if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 				ResultData.Message = err.Error()
 				ResultData.Code = utils.RelationJobHostErr
-				o.Rollback()
+				txOrmer.Rollback()
 				logs.Error("Relation Job %s to HostConifg error, code %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
 				return ResultData
 			}
@@ -262,7 +257,7 @@ func (this *Job) fillRelationData(o orm.Ormer) Result {
 			logs.Warn("Relation Job %s to HostConifg error, code %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
 		}
 	}
-	m2m = o.QueryM2M(this, "ContainerConfig")
+	m2m = txOrmer.QueryM2M(this, "ContainerConfig")
 	m2m.Clear()
 	for _, containerconfig := range this.ContainerConfig {
 		if m2m.Exist(containerconfig) != true {
@@ -270,7 +265,7 @@ func (this *Job) fillRelationData(o orm.Ormer) Result {
 			if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 				ResultData.Message = err.Error()
 				ResultData.Code = utils.RelationJobContainerErr
-				o.Rollback()
+				txOrmer.Rollback()
 				logs.Error("Relation Job %s to ContainerConfig error, code %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
 				return ResultData
 			}
@@ -285,7 +280,6 @@ func (this *Job) fillRelationData(o orm.Ormer) Result {
 
 func (this *Job) GetDefaultJob() map[string]*Job {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var systemJobList []*Job
 	defaultJobList := make(map[string]*Job)
 	var err error

@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -29,7 +29,7 @@ type NetworkPolicyInterface interface {
 
 func (this *NetworkPolicy) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 	NetworkPolicy := new(NetworkPolicy)
 	var err error
@@ -66,7 +66,7 @@ func (this *NetworkPolicy) Add() Result {
 
 func (this *NetworkPolicy) List(from, limit int) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var NetworkPolicyList []*NetworkPolicy = nil
 	var ResultData Result
 	var err error
@@ -110,7 +110,7 @@ func (this *NetworkPolicy) List(from, limit int) Result {
 
 func (this *NetworkPolicy) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -127,7 +127,7 @@ func (this *NetworkPolicy) Update() Result {
 
 func (this *NetworkPolicy) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 	cond := orm.NewCondition()
 

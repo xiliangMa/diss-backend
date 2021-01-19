@@ -2,13 +2,13 @@ package asset
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 )
 
 // Asset image object api list
 type ImageController struct {
-	beego.Controller
+	web.Controller
 }
 
 // @Title GetContainers

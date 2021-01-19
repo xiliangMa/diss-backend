@@ -2,8 +2,8 @@ package models
 
 import (
 	"fmt"
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -71,7 +71,7 @@ type SystemTemplateGroupInterface interface {
 
 func (this *SystemTemplate) Get() (SystemTemplate, error) {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	cond := orm.NewCondition()
 	template := SystemTemplate{}
 
@@ -89,7 +89,7 @@ func (this *SystemTemplate) Get() (SystemTemplate, error) {
 
 func (this *SystemTemplate) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
 	if this.Name == "" || this.Type == "" || this.Version == "" {
@@ -121,7 +121,7 @@ func (this *SystemTemplate) Add() Result {
 
 func (this *SystemTemplate) List(from, limit int) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var systemTemplateList []*SystemTemplate
 	var ResultData Result
 	var err error
@@ -176,7 +176,7 @@ func (this *SystemTemplate) List(from, limit int) Result {
 
 func (this *SystemTemplate) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 	cond := orm.NewCondition()
 
@@ -197,7 +197,7 @@ func (this *SystemTemplate) Delete() Result {
 
 func (this *SystemTemplate) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -214,7 +214,7 @@ func (this *SystemTemplate) Update() Result {
 
 func (this *SystemTemplate) GetDefaultTemplate() map[string]*SystemTemplate {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var systemTemplateList []*SystemTemplate
 	defaultTemplateList := make(map[string]*SystemTemplate)
 	var err error
@@ -234,7 +234,7 @@ func (this *SystemTemplate) GetDefaultTemplate() map[string]*SystemTemplate {
 
 func (this *SystemTemplateGroup) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 	this.IsDefault = false
 
@@ -256,7 +256,7 @@ func (this *SystemTemplateGroup) Add() Result {
 
 func (this *SystemTemplateGroup) List(from, limit int) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var SystemTemplateGroupList []*SystemTemplateGroup
 	var ResultData Result
 	var err error
@@ -308,7 +308,7 @@ func (this *SystemTemplateGroup) List(from, limit int) Result {
 
 func (this *SystemTemplateGroup) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 	cond := orm.NewCondition()
 
@@ -329,7 +329,7 @@ func (this *SystemTemplateGroup) Delete() Result {
 
 func (this *SystemTemplateGroup) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
 	_, err := o.Update(this)

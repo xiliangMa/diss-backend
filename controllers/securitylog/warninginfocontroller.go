@@ -2,14 +2,14 @@ package securitypolicy
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/nats"
 )
 
 // Warning Info api list
 type WarningInfoController struct {
-	beego.Controller
+	web.Controller
 }
 
 // @Title GetWarningInfo

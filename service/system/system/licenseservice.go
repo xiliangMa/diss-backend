@@ -4,8 +4,8 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/shirou/gopsutil/host"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -204,7 +204,8 @@ func (this *LicenseService) InitTrialLicense() models.Result {
 }
 
 func (this *LicenseService) GetLicenseFilePath() string {
-	return beego.AppConfig.String("license::LicensePath")
+	path, _ := web.AppConfig.String("license::LicensePath")
+	return path
 }
 
 func (this *LicenseService) GetLicenseData(licConfig *models.LicenseConfig) models.Result {
@@ -303,7 +304,8 @@ func (this *LicenseService) createLicenseConfigDir(fpath string) {
 	_, err := os.Stat(fpath)
 	if os.IsNotExist(err) {
 		logs.Info("Create License Dir success, path: %s", fpath)
-		os.MkdirAll(beego.AppConfig.String("license::LicensePath"), os.ModePerm)
+		path, _ := web.AppConfig.String("license::LicensePath")
+		os.MkdirAll(path, os.ModePerm)
 	}
 }
 

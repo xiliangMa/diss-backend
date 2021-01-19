@@ -13,12 +13,12 @@ func init() {
 	// initDB
 	defaultDB := db.DefaultDB{}
 	defaultDB.InitDB()
-
-	securityLogDb := db.SecurityLogDb{}
-	securityLogDb.InitDB()
-
-	dissApiDB := db.DissApiDB{}
-	dissApiDB.InitDB()
+	//
+	//securityLogDb := db.SecurityLogDb{}
+	//securityLogDb.InitDB()
+	//
+	//dissApiDB := db.DissApiDB{}
+	//dissApiDB.InitDB()
 
 	//init logger
 	InitLogger()

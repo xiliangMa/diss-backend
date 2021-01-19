@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"time"
@@ -32,7 +32,6 @@ type ImageConfigInterface interface {
 
 func (this *ImageConfig) Get() *ImageConfig {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	object := new(ImageConfig)
 	var err error
 	cond := orm.NewCondition()
@@ -50,7 +49,6 @@ func (this *ImageConfig) Get() *ImageConfig {
 
 func (this *ImageConfig) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 	var err error
 	var imageConfigList []*ImageConfig
@@ -93,7 +91,6 @@ func (this *ImageConfig) Add() Result {
 
 func (this *ImageConfig) List(from, limit int) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var imageConfigList []*ImageConfig
 	var ResultData Result
 	var err error
@@ -136,7 +133,6 @@ func (this *ImageConfig) List(from, limit int) Result {
 
 func (this *ImageConfig) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -153,7 +149,6 @@ func (this *ImageConfig) Update() Result {
 
 func (this *ImageConfig) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 	cond := orm.NewCondition()
 
@@ -175,7 +170,6 @@ func (this *ImageConfig) Delete() Result {
 
 func (this *ImageConfig) GetDBCountByType() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	ResultData := Result{Code: http.StatusOK}
 	var dbCount []orm.Params
 	var err error
@@ -208,7 +202,6 @@ func (this *ImageConfig) GetDBCountByType() Result {
 
 func (this *ImageConfig) GetDBImageByType() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var imageList []*ImageConfig
 	var ResultData Result
 	var err error

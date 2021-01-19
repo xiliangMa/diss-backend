@@ -2,8 +2,8 @@ package models
 
 import (
 	"errors"
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"time"
@@ -54,7 +54,6 @@ type HostConfigInterface interface {
 
 func (this *HostConfig) Add() error {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var err error
 	var hostConfigList []*HostConfig
 	cond := orm.NewCondition()
@@ -101,7 +100,6 @@ func (this *HostConfig) Add() error {
 
 func (this *HostConfig) Get() *HostConfig {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	HostConfig := new(HostConfig)
 	var err error
 	cond := orm.NewCondition()
@@ -119,7 +117,6 @@ func (this *HostConfig) Get() *HostConfig {
 
 func (this *HostConfig) List(from, limit int) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var HostConfigList []*HostConfig = nil
 	var ResultData Result
 	var err error
@@ -176,7 +173,6 @@ func (this *HostConfig) List(from, limit int) Result {
 
 func (this *HostConfig) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -193,7 +189,6 @@ func (this *HostConfig) Update() Result {
 
 func (this *HostConfig) UpdateDynamic() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 	hostConfig := new(HostConfig)
 	cond := orm.NewCondition()
@@ -221,7 +216,6 @@ func (this *HostConfig) UpdateDynamic() Result {
 
 func (this *HostConfig) Count() int64 {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 
 	cond := orm.NewCondition()
 	if this.Id != "" {
@@ -237,7 +231,6 @@ func (this *HostConfig) Count() int64 {
 // docker基线 / k8s 基线
 func (this *HostConfig) GetBnechMarkProportion() (int64, int64) {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	dockerBenchMarkCount, _ := o.QueryTable(utils.HostConfig).Count()
 	k8sBenchMarkCount, _ := o.QueryTable(utils.HostConfig).Filter("is_in_k8s", true).Count()
 	return dockerBenchMarkCount, k8sBenchMarkCount
@@ -246,7 +239,6 @@ func (this *HostConfig) GetBnechMarkProportion() (int64, int64) {
 // 已安全容器 / 未安装安全容器
 func (this *HostConfig) GetDissCountProportion() (int64, int64) {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	safeCount, _ := o.QueryTable(utils.HostConfig).Filter("diss_status", Diss_status_Safe).Count()
 	unSafeCount, _ := o.QueryTable(utils.HostConfig).Filter("diss_status", Diss_Status_Unsafe).Count()
 	return safeCount, unSafeCount
@@ -255,7 +247,6 @@ func (this *HostConfig) GetDissCountProportion() (int64, int64) {
 // Online / Offline
 func (this *HostConfig) GetOnlineProportion() (int64, int64) {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	all, _ := o.QueryTable(utils.HostConfig).Count()
 	onlineCount, _ := o.QueryTable(utils.HostConfig).Filter("status", Host_Status_Normal).Count()
 	return onlineCount, all - onlineCount
@@ -263,7 +254,6 @@ func (this *HostConfig) GetOnlineProportion() (int64, int64) {
 
 func (this *HostConfig) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 	cond := orm.NewCondition()
 

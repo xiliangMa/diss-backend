@@ -1,8 +1,8 @@
 package task
 
 import (
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/system/system"
 	"os"
@@ -66,7 +66,7 @@ func (this *SyslogManager) ReGenSyncSyslogTask() {
 			logExGroup := (*this.ExportTypes)[exType]
 			logExGroup.TaskId = exType
 			(*this.ExportTypes)[exType] = logExGroup
-			specSyslog := beego.AppConfig.String("syslog::SyslogSyncSpec")
+			specSyslog, _ := web.AppConfig.String("syslog::SyslogSyncSpec")
 			if err := SysLogTaskHandler.AddByFunc(exType, specSyslog, system.GetSyncSyslogFunc(exType)); err != nil {
 				logs.Error("Error to add syslog TaskHandler task: %s", err)
 				os.Exit(-1)

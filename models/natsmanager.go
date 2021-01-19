@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/nats-io/stan.go"
 	"github.com/xiliangMa/diss-backend/utils"
 )

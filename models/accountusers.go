@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 )
 
@@ -22,8 +22,7 @@ type AccountUsersInterface interface {
 }
 
 func (this *AccountUsers) GetAccountByUser() (error, string) {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Diss_Api)
+	o := orm.NewOrmUsingDB(utils.DS_Diss_Api)
 	var accountName string
 
 	err := o.Raw("select account_name from "+utils.AccountUsers+" where username = ?", this.UserName).QueryRow(&accountName)

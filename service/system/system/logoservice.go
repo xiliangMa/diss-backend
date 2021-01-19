@@ -1,8 +1,8 @@
 package system
 
 import (
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"mime/multipart"
@@ -15,7 +15,8 @@ type LogoService struct {
 }
 
 func (this *LogoService) getLogoPath() string {
-	return beego.AppConfig.String("system::LogoPath")
+	path, _ := web.AppConfig.String("system::LogoPath")
+	return path
 }
 
 func (this *LogoService) CheckLogoPost(ext, fName string) int {
@@ -32,7 +33,8 @@ func (this *LogoService) CreateLogoDir(fpath string) {
 	_, err := os.Stat(fpath)
 	if os.IsNotExist(err) {
 		logs.Info("Create logo Dir success, path: %s", fpath)
-		os.MkdirAll(beego.AppConfig.String("system::LogoPath"), os.ModePerm)
+		path, _ := web.AppConfig.String("system::LogoPath")
+		os.MkdirAll(path, os.ModePerm)
 	}
 }
 
@@ -52,13 +54,15 @@ func (this *LogoService) Check(h *multipart.FileHeader) (models.Result, string) 
 		return result, fpath
 	}
 
-	fpath = fpath + beego.AppConfig.String("system::NewLogoName")
+	logoName, _ := web.AppConfig.String("system::NewLogoName")
+	fpath = fpath + logoName
 	result.Code = http.StatusOK
 	return result, fpath
 }
 
 func (this *LogoService) CheckLogoIsExist() models.Result {
-	newLogoPath := this.getLogoPath() + beego.AppConfig.String("system::NewLogoName")
+	logoName, _ := web.AppConfig.String("system::NewLogoName")
+	newLogoPath := this.getLogoPath() + logoName
 	var result models.Result
 	if _, err := os.Stat(newLogoPath); err != nil {
 		result.Code = utils.CheckLogoIsNotExistErr
@@ -66,7 +70,8 @@ func (this *LogoService) CheckLogoIsExist() models.Result {
 		return result
 	}
 	data := make(map[string]string)
-	data["url"] = "http://ip:port/" + beego.AppConfig.String("system::LogoUrl")
+	url, _ := web.AppConfig.String("system::LogoUrl")
+	data["url"] = "http://ip:port/" + url
 	result.Data = data
 	result.Code = http.StatusOK
 	return result

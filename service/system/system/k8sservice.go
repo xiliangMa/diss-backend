@@ -1,8 +1,8 @@
 package system
 
 import (
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"mime/multipart"
@@ -86,13 +86,15 @@ func TestClient(params models.ApiParams) models.Result {
 }
 
 func getK8sFilePath() string {
-	return beego.AppConfig.String("k8s::KubeConfigPath")
+	path, _ := web.AppConfig.String("k8s::KubeConfigPath")
+	return path
 }
 
 func CreateKubeConfigDir(fpath string) {
 	_, err := os.Stat(fpath)
 	if os.IsNotExist(err) {
 		logs.Info("Create KubeConfig Dir success, path: %s", fpath)
-		os.MkdirAll(beego.AppConfig.String("k8s::KubeConfigPath"), os.ModePerm)
+		path, _ := web.AppConfig.String("k8s::KubeConfigPath")
+		os.MkdirAll(path, os.ModePerm)
 	}
 }

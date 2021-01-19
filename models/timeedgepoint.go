@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -26,7 +26,7 @@ type TimeEdgePointInterface interface {
 
 func (this *TimeEdgePoint) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
 	uid, _ := uuid.NewV4()
@@ -45,7 +45,7 @@ func (this *TimeEdgePoint) Add() Result {
 
 func (this *TimeEdgePoint) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -62,7 +62,7 @@ func (this *TimeEdgePoint) Update() Result {
 
 func (this *TimeEdgePoint) Get() []*TimeEdgePoint {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var TEPoint []*TimeEdgePoint = nil
 	var ResultData Result
 	cond := orm.NewCondition()

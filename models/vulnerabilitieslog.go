@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
@@ -52,8 +52,7 @@ type ImagePackageVulnerabilitiesInterface interface {
 	where d."severity" = 'Low' and d."pkg_user_id" = 'admin' and d."vulnerability_id" = 'CVE-2016-2781' and d."pkg_image_name" like '%docker.io/mysql:8.0.17%' limit 20 OFFSET 0
 */
 func (this *ImagePackageVulnerabilities) List(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Diss_Api)
+	o := orm.NewOrmUsingDB(utils.DS_Diss_Api)
 	var ImagePackageVulnerabilitiesList []*ImagePackageVulnerabilities = nil
 	var ResultData Result
 	var err error

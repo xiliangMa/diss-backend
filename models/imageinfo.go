@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -29,7 +29,6 @@ type ImageInfoInterface interface {
 
 func (this *ImageInfo) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 	var err error
 
@@ -48,7 +47,6 @@ func (this *ImageInfo) Add() Result {
 
 func (this *ImageInfo) List() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var imageList []*ImageInfo
 	var ResultData Result
 	var err error
@@ -94,7 +92,6 @@ func (this *ImageInfo) List() Result {
 
 func (this *ImageInfo) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 	cond := orm.NewCondition()
 

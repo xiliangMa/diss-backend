@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -28,7 +28,7 @@ type ServiceInterface interface {
 
 func (this *Service) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 	var ServiceList []*Service
 	var err error
@@ -71,7 +71,7 @@ func (this *Service) Add() Result {
 
 func (this *Service) List(from, limit int) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ServiceList []*Service = nil
 	var ResultData Result
 	var err error
@@ -109,7 +109,7 @@ func (this *Service) List(from, limit int) Result {
 
 func (this *Service) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -126,7 +126,7 @@ func (this *Service) Update() Result {
 
 func (this *Service) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 	cond := orm.NewCondition()
 

@@ -2,8 +2,8 @@ package models
 
 import (
 	"fmt"
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
@@ -50,8 +50,7 @@ type DockerVirusInterface interface {
 	as c  where c."userId" = 'admin' and c."image_name" like '%docker.io/openstack001/av-sample:2%' limit 20 OFFSET 0
 */
 func (this *ImageVirus) List(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Diss_Api)
+	o := orm.NewOrmUsingDB(utils.DS_Diss_Api)
 	var imageVirusList []*ImageVirus = nil
 	var ResultData Result
 	var err error
@@ -112,8 +111,7 @@ func (this *ImageVirus) List(from, limit int) Result {
 }
 
 func (this *DockerVirus) List(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Diss_Api)
+	o := orm.NewOrmUsingDB(utils.DS_Diss_Api)
 	var dockerVirusList []*DockerVirus = nil
 	var ResultData Result
 	var err error

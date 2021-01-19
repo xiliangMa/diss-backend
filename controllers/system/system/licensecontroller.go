@@ -2,8 +2,8 @@ package system
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 	sssystem "github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -14,7 +14,7 @@ import (
 )
 
 type LicenseController struct {
-	beego.Controller
+	web.Controller
 }
 
 // @Title Import License File

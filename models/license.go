@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -55,7 +55,7 @@ type LicenseHistoryInterface interface {
 
 func (this *LicenseModule) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 	_, err := o.Insert(this)
 
@@ -73,7 +73,7 @@ func (this *LicenseModule) Add() Result {
 
 func (this *LicenseModule) Remove() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 	cond := orm.NewCondition()
 	if this.LicenseConfig == nil {
@@ -96,7 +96,6 @@ func (this *LicenseModule) Remove() Result {
 }
 func (this *LicenseModule) List() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 
 	var licModuleList []*LicenseModule = nil
 	var ResultData Result
@@ -128,7 +127,6 @@ func (this *LicenseModule) List() Result {
 
 func (this *LicenseModule) Get() LicenseModule {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 
 	licModule := LicenseModule{}
 	cond := orm.NewCondition()
@@ -150,10 +148,10 @@ func (this *LicenseModule) Get() LicenseModule {
 
 func (this *LicenseConfig) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
-	err := o.Begin()
+	txOrmer, err := o.Begin()
 	tmpmodule := LicenseModule{}
 	tmpmodule.Remove()
 	licmodules := this.Modules
@@ -163,15 +161,15 @@ func (this *LicenseConfig) Add() Result {
 		ResultData = tmplicmodule.Add()
 		if ResultData.Code != http.StatusOK && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 			logs.Warn("Add license Modules fail, code %s, error: %s ", ResultData.Code, ResultData.Message)
-			o.Rollback()
+			txOrmer.Rollback()
 		}
 	}
 
 	_, err = o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
-		o.Rollback()
+		txOrmer.Rollback()
 	}
-	errCommit := o.Commit()
+	errCommit := txOrmer.Commit()
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -190,14 +188,14 @@ func (this *LicenseConfig) Add() Result {
 
 func (this *LicenseConfig) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
-	err := o.Begin()
+	txOrmer, err := o.Begin()
 
 	_, err = o.Update(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
-		o.Rollback()
+		txOrmer.Rollback()
 	}
 
 	licmodules := this.Modules
@@ -209,11 +207,11 @@ func (this *LicenseConfig) Update() Result {
 		tmplicmodule := LicenseModule{Id: uuidmodule.String(), LicenseConfig: this, LicenseCount: licmodule.LicenseCount, LicenseExpireAt: licmodule.LicenseExpireAt, ModuleCode: licmodule.ModuleCode}
 		_ = tmplicmodule.Add()
 		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
-			o.Rollback()
+			txOrmer.Rollback()
 		}
 	}
 
-	errCommit := o.Commit()
+	errCommit := txOrmer.Commit()
 
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -231,7 +229,7 @@ func (this *LicenseConfig) Update() Result {
 
 func (this *LicenseConfig) Get() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 	var licConfigData []*LicenseConfig = nil
 
@@ -261,7 +259,7 @@ func (this *LicenseConfig) Get() Result {
 
 func (this *LicenseHistory) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 	uuidlic, _ := uuid.NewV4()
 	this.Id = uuidlic.String()
@@ -280,7 +278,7 @@ func (this *LicenseHistory) Add() Result {
 
 func (this *LicenseHistory) List(from, limit int) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var licenseHistoryList []*LicenseHistory = nil
 	var ResultData Result
 	var err error
@@ -312,7 +310,7 @@ func (this *LicenseHistory) List(from, limit int) Result {
 
 func (this *LicenseModule) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
 	_, err := o.Update(this)

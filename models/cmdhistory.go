@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
@@ -37,8 +37,7 @@ type CmdHistoryInterface interface {
 
 func (this *CmdHistory) Add() Result {
 	insetSql := `INSERT INTO cmd_history VALUES(?, ?, ?, ? , ?, ?, ?, ?, ?)`
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var ResultData Result
 
 	_, err := o.Raw(insetSql, this.Id,
@@ -64,8 +63,7 @@ func (this *CmdHistory) Add() Result {
 }
 
 func (this *CmdHistory) Delete() Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var ResultData Result
 	deleteSql := `DELETE FROM cmd_history WHERE TYPE = ? AND host_id = ?`
 
@@ -81,8 +79,7 @@ func (this *CmdHistory) Delete() Result {
 }
 
 func (this *CmdHistory) List(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var cmdHistoryList []*CmdHistory
 	var ResultData Result
 	var err error
@@ -154,8 +151,7 @@ func (this *CmdHistory) List(from, limit int) Result {
 }
 
 func (this *CmdHistory) GetLatestTime() Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var ResultData Result
 	var cmdHistory *CmdHistory
 

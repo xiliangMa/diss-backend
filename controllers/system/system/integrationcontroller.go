@@ -2,13 +2,13 @@ package system
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/task"
 )
 
 type IntegrationController struct {
-	beego.Controller
+	web.Controller
 }
 
 // @Title Log Config

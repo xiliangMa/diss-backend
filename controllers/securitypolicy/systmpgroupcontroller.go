@@ -2,13 +2,13 @@ package securitypolicy
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 )
 
 // System Template Group object api list
 type SystemTemplateGroupController struct {
-	beego.Controller
+	web.Controller
 }
 
 // @Title GetSystemTemplateGroupList

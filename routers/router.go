@@ -5,9 +5,9 @@
 package routers
 
 import (
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/context"
-	"github.com/astaxie/beego/plugins/cors"
+	"github.com/beego/beego/v2/server/web"
+	"github.com/beego/beego/v2/server/web/context"
+	"github.com/beego/beego/v2/server/web/filter/cors"
 	"github.com/xiliangMa/diss-backend/controllers"
 	caccounts "github.com/xiliangMa/diss-backend/controllers/accounts"
 	"github.com/xiliangMa/diss-backend/controllers/anchoreengine"
@@ -28,45 +28,45 @@ import (
 )
 
 func init() {
-	ns := beego.NewNamespace("/api",
-		beego.NSNamespace("/v1/users",
-			beego.NSInclude(
+	ns := web.NewNamespace("/api",
+		web.NSNamespace("/v1/users",
+			web.NSInclude(
 				&cbase.UserController{},
 			),
 		),
-		beego.NSNamespace("/v1/statistics",
-			beego.NSInclude(
+		web.NSNamespace("/v1/statistics",
+			web.NSInclude(
 				&cstatistics.StatisticsController{},
 				&cstatistics.PackageStatisticsController{},
 			),
 		),
-		beego.NSNamespace("/v1/asset/images",
-			beego.NSInclude(
+		web.NSNamespace("/v1/asset/images",
+			web.NSInclude(
 				&casset.ImageController{},
 			),
 		),
-		beego.NSNamespace("/v1/asset/hosts",
-			beego.NSInclude(
+		web.NSNamespace("/v1/asset/hosts",
+			web.NSInclude(
 				&casset.HostController{},
 			),
 		),
-		beego.NSNamespace("/v1/asset/k8s",
-			beego.NSInclude(
+		web.NSNamespace("/v1/asset/k8s",
+			web.NSInclude(
 				&casset.K8SController{},
 			),
 		),
-		beego.NSNamespace("/v1/securitypolicy/systmps",
-			beego.NSInclude(
+		web.NSNamespace("/v1/securitypolicy/systmps",
+			web.NSInclude(
 				&csecuritypolicy.SystemTemplateController{},
 			),
 		),
-		beego.NSNamespace("/v1/securitypolicy/systmpgroups",
-			beego.NSInclude(
+		web.NSNamespace("/v1/securitypolicy/systmpgroups",
+			web.NSInclude(
 				&csecuritypolicy.SystemTemplateGroupController{},
 			),
 		),
-		beego.NSNamespace("/v1/securitylog",
-			beego.NSInclude(
+		web.NSNamespace("/v1/securitylog",
+			web.NSInclude(
 				&csecuritylog.IntrudeDetectLogController{},
 				&csecuritylog.BenchMarkLogController{},
 				&csecuritylog.VirusLogController{},
@@ -74,104 +74,104 @@ func init() {
 				&csecuritylog.WarningInfoController{},
 			),
 		),
-		beego.NSNamespace("/v1/securityaudit",
-			beego.NSInclude(
+		web.NSNamespace("/v1/securityaudit",
+			web.NSInclude(
 				&csecurityaudit.CmdHistoryController{},
 				&csecurityaudit.DockerEventController{},
 			),
 		),
-		beego.NSNamespace("/auth",
-			beego.NSInclude(
+		web.NSNamespace("/auth",
+			web.NSInclude(
 				&controllers.AuthController{},
 			),
 		),
-		beego.NSNamespace("/v1/accounts",
-			beego.NSInclude(
+		web.NSNamespace("/v1/accounts",
+			web.NSInclude(
 				&caccounts.AccountsController{},
 			),
 		),
-		beego.NSNamespace("/v1/groups",
-			beego.NSInclude(
+		web.NSNamespace("/v1/groups",
+			web.NSInclude(
 				&cbase.GroupsController{},
 			),
 		),
-		beego.NSNamespace("/v1/hosts",
-			beego.NSInclude(
+		web.NSNamespace("/v1/hosts",
+			web.NSInclude(
 				&cbase.HostController{},
 			),
 		),
-		beego.NSNamespace("/v1/containers",
-			beego.NSInclude(
+		web.NSNamespace("/v1/containers",
+			web.NSInclude(
 				&cbase.ContainerController{},
 			),
 		),
-		beego.NSNamespace("/v1/images",
-			beego.NSInclude(
+		web.NSNamespace("/v1/images",
+			web.NSInclude(
 				&cbase.ImageController{},
 			),
 		),
-		beego.NSNamespace("/v1/k8s/clusters",
-			beego.NSInclude(
+		web.NSNamespace("/v1/k8s/clusters",
+			web.NSInclude(
 				&ck8s.ClusterController{},
 			),
 		),
-		beego.NSNamespace("/v1/k8s/namespaces",
-			beego.NSInclude(
+		web.NSNamespace("/v1/k8s/namespaces",
+			web.NSInclude(
 				&ck8s.NSController{},
 			),
 		),
-		beego.NSNamespace("/v1/k8s/pods",
-			beego.NSInclude(
+		web.NSNamespace("/v1/k8s/pods",
+			web.NSInclude(
 				&ck8s.PodController{},
 			),
 		),
-		beego.NSNamespace("/v1/k8s/services",
-			beego.NSInclude(
+		web.NSNamespace("/v1/k8s/services",
+			web.NSInclude(
 				&ck8s.ServiceController{},
 			),
 		),
-		beego.NSNamespace("/v1/k8s/deployment",
-			beego.NSInclude(
+		web.NSNamespace("/v1/k8s/deployment",
+			web.NSInclude(
 				&ck8s.DeploymentController{},
 			),
 		),
-		beego.NSNamespace("/v1/k8s/networkpolicy",
-			beego.NSInclude(
+		web.NSNamespace("/v1/k8s/networkpolicy",
+			web.NSInclude(
 				&ck8s.NetworkPolicyController{},
 			),
 		),
-		beego.NSNamespace("/v1/system",
-			beego.NSInclude(
+		web.NSNamespace("/v1/system",
+			web.NSInclude(
 				&csystem.SystemController{},
 				&csystem.IntegrationController{},
 				&csystem.LicenseController{},
 				&csystem.FeedsController{},
 			),
 		),
-		beego.NSNamespace("/v1/jobs",
-			beego.NSInclude(
+		web.NSNamespace("/v1/jobs",
+			web.NSInclude(
 				&cjob.JobController{},
 			),
 		),
-		beego.NSNamespace("/v1/tasks",
-			beego.NSInclude(
+		web.NSNamespace("/v1/tasks",
+			web.NSInclude(
 				&cjob.TaskController{},
 			),
 		),
-		beego.NSNamespace("/v1/securitycheck",
-			beego.NSInclude(
+		web.NSNamespace("/v1/securitycheck",
+			web.NSInclude(
 				&csecuritycheck.SecurityCheckController{},
 			),
 		),
-		beego.NSNamespace("/v1/anchore",
-			beego.NSInclude(
+		web.NSNamespace("/v1/anchore",
+			web.NSInclude(
 				&anchoreengine.AnchoreImageController{},
 			),
 		),
 	)
 
 	// add route for ws
-	beego.Router("/metrics", &ws.WSMetricController{}, "*:Metrics")
+	web.Router("/metrics", &ws.WSMetricController{}, "*:Metrics")
 
 	var isLogin = func(ctx *context.Context) {
 		jwtService := auth.JwtService{}
@@ -183,14 +183,14 @@ func init() {
 		}
 
 	}
-	beego.InsertFilter("/api/v1/*", beego.BeforeRouter, isLogin)
+	web.InsertFilter("/api/v1/*", web.BeforeRouter, isLogin)
 
-	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
+	web.InsertFilter("*", web.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins:  true,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Authorization", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type", "token"},
 		ExposeHeaders:    []string{"Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
 		AllowCredentials: true,
 	}))
-	beego.AddNamespace(ns)
+	web.AddNamespace(ns)
 }

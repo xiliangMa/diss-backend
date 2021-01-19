@@ -1,9 +1,9 @@
 package models
 
 import (
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -28,7 +28,7 @@ var GlobalLogConfig = map[string]*LogConfig{}
 
 func (this *LogConfig) Get() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var logConfig []*LogConfig = nil
 	var ResultData Result
 	cond := orm.NewCondition()
@@ -57,7 +57,7 @@ func (this *LogConfig) Get() Result {
 // 此项目前为内部使用
 func (this *LogConfig) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
 	uid, _ := uuid.NewV4()
@@ -76,7 +76,7 @@ func (this *LogConfig) Add() Result {
 
 func (this *LogConfig) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -92,6 +92,6 @@ func (this *LogConfig) Update() Result {
 }
 
 func GetSyslogServerUrl() string {
-	serverUrl := beego.AppConfig.String("syslog::SyslogServer")
+	serverUrl, _ := web.AppConfig.String("syslog::SyslogServer")
 	return serverUrl
 }

@@ -2,7 +2,7 @@ package job
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 	taskservice "github.com/xiliangMa/diss-backend/service/task"
 	"net/http"
@@ -10,7 +10,7 @@ import (
 
 // Task 接口
 type TaskController struct {
-	beego.Controller
+	web.Controller
 }
 
 // @Title GetTaskList

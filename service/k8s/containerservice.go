@@ -2,7 +2,7 @@ package k8s
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/watch"

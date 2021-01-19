@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/context"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web/context"
 	"github.com/gorilla/websocket"
 	"net/http"
 )

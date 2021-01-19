@@ -2,8 +2,8 @@ package k8s
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/k8s"
@@ -18,7 +18,7 @@ import (
 
 // 集群接口
 type ClusterController struct {
-	beego.Controller
+	web.Controller
 }
 
 // @Title AddCluster

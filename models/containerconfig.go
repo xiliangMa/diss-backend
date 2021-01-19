@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -40,7 +40,6 @@ type ContainerConfigInterface interface {
 
 func (this *ContainerConfig) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 	var err error
 	var containerConfigList []*ContainerConfig
@@ -78,7 +77,6 @@ func (this *ContainerConfig) Add() Result {
 
 func (this *ContainerConfig) Get() *ContainerConfig {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	containerConfig := new(ContainerConfig)
 	var err error
 	cond := orm.NewCondition()
@@ -96,7 +94,6 @@ func (this *ContainerConfig) Get() *ContainerConfig {
 
 func (this *ContainerConfig) List(from, limit int, groupSearch bool) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ContainerList []*ContainerConfig = nil
 	var ResultData Result
 	var err error
@@ -166,7 +163,6 @@ func (this *ContainerConfig) List(from, limit int, groupSearch bool) Result {
 
 func (this *ContainerConfig) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -183,14 +179,12 @@ func (this *ContainerConfig) Update() Result {
 
 func (this *ContainerConfig) Count() int64 {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	count, _ := o.QueryTable(utils.ContainerConfig).Count()
 	return count
 }
 
 func (this *ContainerConfig) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 	cond := orm.NewCondition()
 
@@ -226,7 +220,6 @@ func (this *ContainerConfig) Delete() Result {
 
 func (this *ContainerConfig) EmptyDirtyDataForAgent() error {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	_, err := o.Raw("delete from "+utils.ContainerConfig+" where host_name = ? and sync_check_point != ? and pod_id = '' ", this.HostName, this.SyncCheckPoint).Exec()
 	if err != nil {
 		logs.Error("Empty Dirty Data failed,  model: %s, code: %d, err: %s", utils.ContainerConfig, utils.EmptyDirtyDataContinerConfigErr, err.Error())
@@ -236,7 +229,6 @@ func (this *ContainerConfig) EmptyDirtyDataForAgent() error {
 
 func (this *ContainerConfig) EmptyDirtyDataForK8s() error {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	_, err := o.Raw("delete from "+utils.ContainerConfig+" where cluster_name = ? and sync_check_point != ? and pod_id = '' ", this.ClusterName, this.SyncCheckPoint).Exec()
 
 	if err != nil {

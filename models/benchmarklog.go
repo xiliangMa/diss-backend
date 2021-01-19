@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -42,7 +42,6 @@ type BenchMarkLogInterface interface {
 
 func (this *BenchMarkLog) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 	var err error
 
@@ -62,7 +61,6 @@ func (this *BenchMarkLog) Add() Result {
 
 func (this *BenchMarkLog) List(from, limit int) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var BenchMarkLogList []*BenchMarkLog = nil
 	var ResultData Result
 	var err error
@@ -150,7 +148,6 @@ type MarkSummary struct {
 func (this *BenchMarkLog) GetMarkSummary() Result {
 	var ResultData Result
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	// docker 基线统计
 	dockerMarkSummary := new(MarkSummary)
 	o.Raw(utils.GetMarkSummarySql(BMLT_Docker)).QueryRow(&dockerMarkSummary)
@@ -170,7 +167,6 @@ func (this *BenchMarkLog) GetMarkSummary() Result {
 func (this *BenchMarkLog) GetHostMarkSummary() Result {
 	var ResultData Result
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	// host 基线统计
 	hostMarkSummary := new(MarkSummary)
 	o.Raw(utils.GetHostMarkSummarySql(this.HostId)).QueryRow(&hostMarkSummary)

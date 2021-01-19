@@ -2,7 +2,7 @@ package k8s
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/scope"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -22,11 +22,11 @@ func (this *PodService) List() (*v1.PodList, error) {
 	if this.Cluster != nil {
 		ns = this.Cluster.Name
 	}
-	return this.ClientGo.ClientSet.CoreV1().Pods(ns).List(metav1.ListOptions{})
+	return this.ClientGo.ClientSet.CoreV1().Pods(ns).List(nil, metav1.ListOptions{})
 }
 
 func (this *PodService) Wtach() {
-	podWatch, err := this.ClientGo.ClientSet.CoreV1().Pods("").Watch(metav1.ListOptions{})
+	podWatch, err := this.ClientGo.ClientSet.CoreV1().Pods("").Watch(nil, metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}

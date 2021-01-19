@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/gorilla/websocket"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/nats"
@@ -246,7 +246,7 @@ func (this *WSMetricsService) Save() error {
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_DockerBenchMark:
-			//index := beego.AppConfig.String("security_log::BenchMarkIndex")
+			//index := web.AppConfig.String("security_log::BenchMarkIndex")
 			benchMarkLog := models.BenchMarkLog{}
 			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &benchMarkLog); err != nil {
@@ -273,7 +273,7 @@ func (this *WSMetricsService) Save() error {
 			//}
 			//defer respones.Body.Close()
 		case models.Resource_KubernetesBenchMark:
-			//index := beego.AppConfig.String("security_log::BenchMarkIndex")
+			//index := web.AppConfig.String("security_log::BenchMarkIndex")
 			benchMarkLog := models.BenchMarkLog{}
 			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &benchMarkLog); err != nil {

@@ -2,7 +2,7 @@ package system
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"strings"
 )

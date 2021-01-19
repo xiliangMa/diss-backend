@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -37,8 +37,7 @@ type WarningInfoInterface interface {
 }
 
 func (this *WarningInfo) List(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var WarningInfoList []*WarningInfo = nil
 	var ResultData Result
 	var err error
@@ -116,8 +115,7 @@ func (this *WarningInfo) List(from, limit int) Result {
 
 func (this *WarningInfo) Add() Result {
 	insertSql := `INSERT INTO ` + utils.WarningInfo + ` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var ResultData Result
 	if this.Id == "" {
 		uid, _ := uuid.NewV4()
@@ -157,8 +155,7 @@ func (this *WarningInfo) Add() Result {
 
 func (this *WarningInfo) Update() Result {
 	updateSql := `UPDATE ` + utils.WarningInfo + ` SET status=? WHERE id=?`
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var ResultData Result
 
 	_, err := o.Raw(updateSql,

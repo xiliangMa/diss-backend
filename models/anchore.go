@@ -3,8 +3,8 @@ package models
 import (
 	"encoding/base64"
 	"github.com/anchore/client-go/pkg/external"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 )
 
 type AnchoreEngineManager struct {
@@ -21,9 +21,9 @@ type ImageSearchParams struct {
 
 func NewAnchoreEngineManager() *AnchoreEngineManager {
 	//todo mv app.conf key to utils
-	anchoreUrl := beego.AppConfig.String("anchore-engine::Url")
-	userName := beego.AppConfig.String("anchore-engine::User")
-	pwd := beego.AppConfig.String("anchore-engine::Pwd")
+	anchoreUrl, _ := web.AppConfig.String("anchore-engine::Url")
+	userName, _ := web.AppConfig.String("anchore-engine::User")
+	pwd, _ := web.AppConfig.String("anchore-engine::Pwd")
 	cfg := external.NewConfiguration()
 	basic := "Basic "
 	cfg.AddDefaultHeader("Authorization", basic+base64.StdEncoding.EncodeToString([]byte(userName+`:`+pwd)))

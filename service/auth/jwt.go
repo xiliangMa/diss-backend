@@ -2,7 +2,7 @@ package auth
 
 import (
 	"fmt"
-	"github.com/astaxie/beego"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/system/system"
@@ -51,12 +51,15 @@ func (this *JwtService) CreateToken(name, pwd string) (string, int) {
 			user = nil
 		}
 	}
-	if user != nil || (name == beego.AppConfig.String("system::AdminUser") && pwd == beego.AppConfig.String("system::AdminPwd")) {
+	configName, _ := web.AppConfig.String("system::AdminUser")
+	configPwd, _ := web.AppConfig.String("system::AdminPwd")
+	if user != nil || (name == configName && pwd == configPwd) {
 		// Create token
 		this.Token = jwt.New(jwt.SigningMethodHS256)
 
 		claims := this.Token.Claims.(jwt.MapClaims)
-		claims["name"] = beego.AppConfig.String("AppName")
+		appName, _ := web.AppConfig.String("AppName")
+		claims["name"] = appName
 		claims["admin"] = true
 		claims["exp"] = time.Now().Add(time.Hour * 1).Unix()
 		claims["UserName"] = name

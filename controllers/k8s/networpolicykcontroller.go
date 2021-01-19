@@ -2,8 +2,8 @@ package k8s
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/k8s"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -13,7 +13,7 @@ import (
 
 // NetworkPolicy 接口
 type NetworkPolicyController struct {
-	beego.Controller
+	web.Controller
 }
 
 // @Title GetNetworkPolicy

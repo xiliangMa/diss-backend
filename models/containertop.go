@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -31,7 +31,6 @@ type ContainerPsInterface interface {
 
 func (this *ContainerPs) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 	var err error
 	var containerTopList []*ContainerPs
@@ -70,7 +69,6 @@ func (this *ContainerPs) Add() Result {
 
 func (this *ContainerPs) List(from, limit int) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ContainerList []*ContainerPs = nil
 	var ResultData Result
 	var err error
@@ -106,7 +104,6 @@ func (this *ContainerPs) List(from, limit int) Result {
 
 func (this *ContainerPs) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -123,7 +120,6 @@ func (this *ContainerPs) Update() Result {
 
 func (this *ContainerPs) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	cond := orm.NewCondition()

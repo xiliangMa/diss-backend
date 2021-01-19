@@ -1,8 +1,8 @@
 package task
 
 import (
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 	"net/http"
 	"time"
@@ -21,7 +21,7 @@ func (this *SystemCheckHandler) SystemCheck() {
 	for _, host := range items.([]*models.HostConfig) {
 		now := time.Now().UTC()
 		sub := int(now.Sub(host.HeartBeat).Minutes())
-		agentHeartBeatTime, _ := beego.AppConfig.Int("system::AgentHeartBeatTime")
+		agentHeartBeatTime, _ := web.AppConfig.Int("system::AgentHeartBeatTime")
 		if host.IsEnableHeartBeat {
 			if sub > agentHeartBeatTime {
 				host.Diss = models.Diss_NotInstalled

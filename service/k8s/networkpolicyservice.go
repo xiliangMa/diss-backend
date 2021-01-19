@@ -2,7 +2,7 @@ package k8s
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"k8s.io/api/networking/v1"
@@ -18,7 +18,7 @@ type NetworkPolicyService struct {
 }
 
 func (this *NetworkPolicyService) List() (*v1.NetworkPolicyList, error) {
-	return this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies("").List(metav1.ListOptions{})
+	return this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies("").List(nil, metav1.ListOptions{})
 }
 
 func (this *NetworkPolicyService) Wtach() {
@@ -26,7 +26,7 @@ func (this *NetworkPolicyService) Wtach() {
 	if this.NetworkPolicy != nil {
 		ns = this.NetworkPolicy.NameSpaceName
 	}
-	netpolWatch, err := this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies(ns).Watch(metav1.ListOptions{})
+	netpolWatch, err := this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies(ns).Watch(nil, metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}
@@ -137,7 +137,7 @@ func (this *NetworkPolicyService) Create() (*v1.NetworkPolicy, error) {
 	netpol := v1.NetworkPolicy{ObjectMeta: objectMeta, Spec: spec}
 	netpol.ObjectMeta.ResourceVersion = ""
 
-	return this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies(this.NetworkPolicy.NameSpaceName).Create(&netpol)
+	return this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies(this.NetworkPolicy.NameSpaceName).Create(nil, &netpol, metav1.CreateOptions{})
 }
 
 func (this *NetworkPolicyService) Update() (*v1.NetworkPolicy, error) {
@@ -161,9 +161,9 @@ func (this *NetworkPolicyService) Update() (*v1.NetworkPolicy, error) {
 	netpol := v1.NetworkPolicy{ObjectMeta: objectMeta, Spec: spec}
 	netpol.ObjectMeta.ResourceVersion = ""
 
-	return this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies(this.NetworkPolicy.NameSpaceName).Update(&netpol)
+	return this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies(this.NetworkPolicy.NameSpaceName).Update(nil, &netpol, metav1.UpdateOptions{})
 }
 
 func (this *NetworkPolicyService) Delete() error {
-	return this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies(this.NetworkPolicy.NameSpaceName).Delete(this.NetworkPolicy.Name, nil)
+	return this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies(this.NetworkPolicy.NameSpaceName).Delete(nil, this.NetworkPolicy.Name, metav1.DeleteOptions{})
 }

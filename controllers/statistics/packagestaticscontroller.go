@@ -1,13 +1,13 @@
 package statistics
 
 import (
-	"github.com/astaxie/beego"
+	"github.com/beego/beego/v2/server/web"
 	ss "github.com/xiliangMa/diss-backend/service/statistics"
 )
 
 // Package statistics api list
 type PackageStatisticsController struct {
-	beego.Controller
+	web.Controller
 }
 
 // @Title GetPackacgeStatistics

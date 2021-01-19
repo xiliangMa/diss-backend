@@ -3,7 +3,7 @@ package k8s
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	v1 "k8s.io/api/core/v1"
@@ -19,11 +19,11 @@ type NodeService struct {
 }
 
 func (this *NodeService) List() (*v1.NodeList, error) {
-	return this.ClientGo.ClientSet.CoreV1().Nodes().List(metav1.ListOptions{})
+	return this.ClientGo.ClientSet.CoreV1().Nodes().List(nil, metav1.ListOptions{})
 }
 
 func (this *NodeService) Wtach() {
-	nodeWatch, err := this.ClientGo.ClientSet.CoreV1().Nodes().Watch(metav1.ListOptions{})
+	nodeWatch, err := this.ClientGo.ClientSet.CoreV1().Nodes().Watch(nil, metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}

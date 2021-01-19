@@ -1,14 +1,14 @@
 package accounts
 
 import (
-	"github.com/astaxie/beego"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 )
 
 // Account（租户） object api list
 type AccountsController struct {
-	beego.Controller
+	web.Controller
 }
 
 // @Title GetAccounts

@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -27,7 +27,7 @@ func (this *SecurityLogService) GetHostBenchMarkLogInfo() models.Result {
 		ResultData.Code = utils.ElasticConnErr
 		return ResultData
 	}
-	index := beego.AppConfig.String("security_log::BenchMarkIndex")
+	index := web.AppConfig.String("security_log::BenchMarkIndex")
 	//esqueryStr := `{
 	//"size": 1,
 	//"query": {

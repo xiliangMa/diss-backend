@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
@@ -24,8 +24,7 @@ type FeedsInterface interface {
 }
 
 func (this *Feeds) List(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Diss_Api)
+	o := orm.NewOrmUsingDB(utils.DS_Diss_Api)
 	var feedsList []*Feeds
 	var ResultData Result
 	var err error

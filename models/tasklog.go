@@ -2,8 +2,8 @@ package models
 
 import (
 	"fmt"
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -29,8 +29,7 @@ type TaskLog1Interface interface {
 }
 
 func (this *TaskLog) List(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var taskLogList []*TaskLog = nil
 	var ResultData Result
 	var err error
@@ -93,8 +92,7 @@ func (this *TaskLog) List(from, limit int) Result {
 
 func (this *TaskLog) Add() Result {
 	insetSql := `INSERT INTO ` + utils.TaskLog + ` VALUES(?, ?, ?, ?, ?, ?)`
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var ResultData Result
 	uid, _ := uuid.NewV4()
 	_, err := o.Raw(insetSql,

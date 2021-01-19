@@ -2,8 +2,8 @@ package models
 
 import (
 	"fmt"
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
@@ -34,8 +34,7 @@ type DockerEventInterface interface {
 }
 
 func (this *DockerEvent) List(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var dockerEventList []*DockerEvent = nil
 	var ResultData Result
 	var err error
@@ -110,8 +109,7 @@ func (this *DockerEvent) List(from, limit int) Result {
 
 func (this *DockerEvent) Add() Result {
 	insetSql := `INSERT INTO docker_event VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var ResultData Result
 
 	_, err := o.Raw(insetSql,
@@ -140,8 +138,7 @@ func (this *DockerEvent) Add() Result {
 }
 
 func (this *DockerEvent) GetLatestTime() Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var ResultData Result
 	var DockerEvent *DockerEvent
 

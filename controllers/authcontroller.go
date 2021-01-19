@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/auth"
 	"github.com/xiliangMa/diss-backend/service/system/system"
@@ -11,7 +11,7 @@ import (
 )
 
 type AuthController struct {
-	beego.Controller
+	web.Controller
 }
 
 // @Title login

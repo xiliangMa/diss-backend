@@ -2,9 +2,9 @@ package db
 
 import (
 	"fmt"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 	_ "github.com/lib/pq"
 	"github.com/xiliangMa/diss-backend/sysinit/dbscript/timescaledb"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -17,20 +17,20 @@ func (this *SecurityLogDb) InitDB() {
 	driver := utils.DS_Driver_Postgres
 	DSAlias := utils.DS_Security_Log
 	// true: drop table 后再建表
-	//force, _ := beego.AppConfig.Bool("Force")
+	//force, _ := web.AppConfig.Bool("Force")
 
 	//连接名称
-	//dbAlias := beego.AppConfig.String(DS + "::Alias")
+	//dbAlias := web.AppConfig.String(DS + "::Alias")
 	//数据库名称
-	dbName := beego.AppConfig.String(DSAlias + "::DBName")
+	dbName, _ := web.AppConfig.String(DSAlias + "::DBName")
 	//数据库连接用户名
-	dbUser := beego.AppConfig.String(DSAlias + "::User")
+	dbUser, _ := web.AppConfig.String(DSAlias + "::User")
 	//数据库连接密码
-	dbPwd := beego.AppConfig.String(DSAlias + "::Pwd")
+	dbPwd, _ := web.AppConfig.String(DSAlias + "::Pwd")
 	//数据库IP（域名）
-	dbHost := beego.AppConfig.String(DSAlias + "::Host")
+	dbHost, _ := web.AppConfig.String(DSAlias + "::Host")
 	//端口
-	port := beego.AppConfig.String(DSAlias + "::Port")
+	port, _ := web.AppConfig.String(DSAlias + "::Port")
 	// postgres
 	DS := fmt.Sprintf("%s%s%s%s%s%s", "host="+dbHost, " port="+port, " user="+dbUser, " password="+dbPwd, " dbname="+dbName, " sslmode=disable")
 	orm.RegisterDriver(driver, orm.DRPostgres)
@@ -45,8 +45,7 @@ func (this *SecurityLogDb) InitDB() {
 
 func (this *SecurityLogDb) CreateOrUpdateDb() {
 	dbName := utils.DS_Security_Log
-	o := orm.NewOrm()
-	o.Using(dbName)
+	o := orm.NewOrmUsingDB(dbName)
 	logs.Info("Create Or Update Db: %s data start................", dbName)
 
 	logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", utils.CmdHistory)

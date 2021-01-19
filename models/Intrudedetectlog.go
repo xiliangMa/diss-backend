@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
@@ -44,9 +44,7 @@ type DcokerIdsInterface interface {
 }
 
 func (this *DcokerIds) GetIntrudeDetectLogStatistics(timeCycle int) Result {
-	o := orm.NewOrm()
-
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	dcokerIdsCountList := make(map[int]*int)
 	var ResultData Result
 	var err error
@@ -83,8 +81,7 @@ func (this *DcokerIds) GetIntrudeDetectLogStatistics(timeCycle int) Result {
 }
 
 func (this *IntrudeDetectLog) List(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var dcokerIdsList []*DcokerIds = nil
 	var ResultData Result
 	var err error
@@ -122,8 +119,7 @@ func (this *IntrudeDetectLog) List(from, limit int) Result {
 }
 
 func (this *IntrudeDetectLog) List1(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
+	o := orm.NewOrmUsingDB(utils.DS_Security_Log)
 	var dcokerIdsList []*DcokerIds = nil
 	var ResultData Result
 	var err error

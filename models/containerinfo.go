@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -42,7 +42,6 @@ type ContainerInfoInterface interface {
 
 func (this *ContainerInfo) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 	var err error
 	var ContainerInfogList []*ContainerInfo
@@ -85,7 +84,6 @@ func (this *ContainerInfo) Add() Result {
 
 func (this *ContainerInfo) List() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ContainerList []*ContainerInfo = nil
 	var ResultData Result
 	var err error
@@ -130,7 +128,6 @@ func (this *ContainerInfo) List() Result {
 
 func (this *ContainerInfo) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -147,7 +144,6 @@ func (this *ContainerInfo) Update() Result {
 
 func (this *ContainerInfo) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 	cond := orm.NewCondition()
 
@@ -178,7 +174,6 @@ func (this *ContainerInfo) Delete() Result {
 
 func (this *ContainerInfo) EmptyDirtyDataForAgent() error {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	_, err := o.Raw("delete from "+utils.ContainerInfo+" where host_name = ? and sync_check_point != ? and pod_id = '' ", this.HostName, this.SyncCheckPoint).Exec()
 
 	if err != nil {
@@ -189,7 +184,6 @@ func (this *ContainerInfo) EmptyDirtyDataForAgent() error {
 
 func (this *ContainerInfo) EmptyDirtyDataForK8s() error {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	_, err := o.Raw("delete from "+utils.ContainerInfo+" where cluster_name = ? and sync_check_point != ? and pod_id = '' ", this.ClusterName, this.SyncCheckPoint).Exec()
 
 	if err != nil {

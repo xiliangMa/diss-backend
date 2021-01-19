@@ -2,8 +2,8 @@ package models
 
 import (
 	"errors"
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -48,7 +48,6 @@ type HostInfoInterface interface {
 
 func (this *HostInfo) Add() error {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var err error
 	var hostInfoList []*HostInfo
 	cond := orm.NewCondition()
@@ -104,7 +103,6 @@ func (this *HostInfo) Add() error {
 
 func (this *HostInfo) List() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var HostInfoList []*HostInfo = nil
 	var ResultData Result
 	cond := orm.NewCondition()
@@ -135,7 +133,6 @@ func (this *HostInfo) List() Result {
 
 func (this *HostInfo) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -152,7 +149,6 @@ func (this *HostInfo) Update() Result {
 
 func (this *HostInfo) UpdateDynamic() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 	hostInfo := new(HostInfo)
 	cond := orm.NewCondition()
@@ -185,7 +181,6 @@ func (this *HostInfo) UpdateDynamic() Result {
 
 func (this *HostInfo) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 	cond := orm.NewCondition()
 

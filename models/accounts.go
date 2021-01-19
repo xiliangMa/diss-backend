@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -26,8 +26,7 @@ type AccounstInterface interface {
 }
 
 func (this *Accounts) List(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Diss_Api)
+	o := orm.NewOrmUsingDB(utils.DS_Diss_Api)
 	var accountsList []*Accounts
 	var ResultData Result
 	var total int64

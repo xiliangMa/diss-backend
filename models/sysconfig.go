@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -23,7 +23,7 @@ type SysConfigInterface interface {
 
 func (this *SysConfig) Get() *SysConfig {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var sysConfig []*SysConfig = nil
 	var ResultData Result
 	cond := orm.NewCondition()
@@ -47,7 +47,7 @@ func (this *SysConfig) Get() *SysConfig {
 
 func (this *SysConfig) List() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var sysConfig []*SysConfig = nil
 	var ResultData Result
 	cond := orm.NewCondition()
@@ -78,7 +78,7 @@ func (this *SysConfig) List() Result {
 
 func (this *SysConfig) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
 	uid, _ := uuid.NewV4()
@@ -97,7 +97,7 @@ func (this *SysConfig) Add() Result {
 
 func (this *SysConfig) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
 	_, err := o.Update(this)

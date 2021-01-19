@@ -2,7 +2,7 @@ package task
 
 import (
 	"github.com/pkg/errors"
-	"github.com/robfig/cron"
+	"github.com/robfig/cron/v3"
 	"sync"
 )
 

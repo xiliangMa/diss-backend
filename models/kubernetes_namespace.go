@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -32,7 +32,7 @@ type NameSpaceInterface interface {
 
 func (this *NameSpace) Add(update bool) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 	var dbNS []*NameSpace
 	var err error
@@ -76,7 +76,7 @@ func (this *NameSpace) Add(update bool) Result {
 
 func (this *NameSpace) List(from, limit int) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var nameSpaceList []*NameSpace
 	var ResultData Result
 	var err error
@@ -125,7 +125,7 @@ func (this *NameSpace) List(from, limit int) Result {
 
 func (this *NameSpace) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -142,16 +142,16 @@ func (this *NameSpace) Update() Result {
 
 func (this *NameSpace) UnBindAccount() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
-	err := o.Begin()
+	txOrmer, err := o.Begin()
 	params := orm.Params{"account_name": Account_Admin}
 	cond := orm.NewCondition()
 	cond = cond.And("id", this.Id)
 
 	_, err = o.QueryTable(utils.NameSpace).SetCond(cond).Update(params)
 	if err != nil {
-		o.Rollback()
+		txOrmer.Rollback()
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.UnBindNameSpaceErr
 		logs.Error("UnBind NameSpace: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
@@ -160,7 +160,7 @@ func (this *NameSpace) UnBindAccount() Result {
 	// 解除 pod 和 pod 下容器的 租户绑定关系
 	_, err = o.QueryTable(utils.Pod).Filter("name_space_name", this.Name).Update(params)
 	if err != nil {
-		o.Rollback()
+		txOrmer.Rollback()
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.UnBindPodErr
 		logs.Error("UnBind Pod failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -168,13 +168,13 @@ func (this *NameSpace) UnBindAccount() Result {
 	}
 	_, err = o.QueryTable(utils.ContainerConfig).Filter("name_space_name", this.Name).Update(params)
 	if err != nil {
-		o.Rollback()
+		txOrmer.Rollback()
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.UnBindContainerErr
 		logs.Error("UnBind Container failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
-	o.Commit()
+	txOrmer.Commit()
 	ResultData.Code = http.StatusOK
 	ResultData.Data = nil
 	return ResultData
@@ -182,12 +182,13 @@ func (this *NameSpace) UnBindAccount() Result {
 
 func (this *NameSpace) BindAccount() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 	cond := orm.NewCondition()
 	cond = cond.And("id", this.Id)
 	dbList := []*NameSpace{}
 
+	txOrmer, _ := o.Begin()
 	o.QueryTable(utils.NameSpace).SetCond(cond).All(&dbList)
 	if dbList == nil {
 		ResultData.Message = "NoNameSpacedErr"
@@ -203,7 +204,7 @@ func (this *NameSpace) BindAccount() Result {
 			dbList[0].AccountName = this.AccountName
 		} else {
 			if this.Force != true {
-				o.Rollback()
+				txOrmer.Rollback()
 				ResultData.Message = "IsBindErr"
 				ResultData.Code = utils.IsBindErr
 				logs.Error("NameSpace: %s bind accout failed, code: %d, err: %s", dbList[0].Name, ResultData.Code, ResultData.Message)
@@ -215,7 +216,7 @@ func (this *NameSpace) BindAccount() Result {
 
 	_, err := o.Update(dbList[0])
 	if err != nil {
-		o.Rollback()
+		txOrmer.Rollback()
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.EditNameSpaceErr
 		logs.Error("Bind NameSpace: %s, AccountNamecode: %s, fail: %d, err: %s", dbList[0].Name, this.AccountName, ResultData.Code, ResultData.Message)
@@ -225,7 +226,7 @@ func (this *NameSpace) BindAccount() Result {
 	params := orm.Params{"account_name": this.AccountName}
 	_, err = o.QueryTable(utils.Pod).Filter("name_space_name", this.Name).Update(params)
 	if err != nil {
-		o.Rollback()
+		txOrmer.Rollback()
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.UnBindPodErr
 		logs.Error("UnBind Pod failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
@@ -234,13 +235,13 @@ func (this *NameSpace) BindAccount() Result {
 
 	_, err = o.QueryTable(utils.ContainerConfig).Filter("name_space_name", this.Name).Update(params)
 	if err != nil {
-		o.Rollback()
+		txOrmer.Rollback()
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.UnBindContainerErr
 		logs.Error("UnBind Container failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
-	o.Commit()
+	txOrmer.Commit()
 	ResultData.Code = http.StatusOK
 	ResultData.Data = dbList[0]
 	return ResultData
@@ -249,7 +250,6 @@ func (this *NameSpace) BindAccount() Result {
 func (this *NameSpace) ListByAccountGroupByClusterId() (error, []string) {
 	o := orm.NewOrm()
 
-	o.Using(utils.DS_Default)
 	var cIds []string
 	cond := orm.NewCondition()
 
@@ -268,7 +268,7 @@ func (this *NameSpace) ListByAccountGroupByClusterId() (error, []string) {
 
 func (this *NameSpace) EmptyDirtyData() error {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	_, err := o.Raw("delete from "+utils.NameSpace+" where cluster_id = ? and sync_check_point != ? ", this.ClusterId, this.SyncCheckPoint).Exec()
 	if err != nil {
 		logs.Error("Empty Dirty Data failed,  model: %s, code: %d, err: %s", utils.NameSpace, utils.EmptyDirtyDataNameSpaceErr, err.Error())
@@ -280,7 +280,7 @@ func (this *NameSpace) EmptyDirtyData() error {
 
 func (this *NameSpace) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 	cond := orm.NewCondition()
 

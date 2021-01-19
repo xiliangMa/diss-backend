@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"io"
 	"k8s.io/api/core/v1"
@@ -92,7 +92,7 @@ func CreateK8sClient(params *ApiParams) ClientGo {
 }
 
 func (clientgo *ClientGo) GetNodes() (*v1.NodeList, error) {
-	return clientgo.ClientSet.CoreV1().Nodes().List(v12.ListOptions{})
+	return clientgo.ClientSet.CoreV1().Nodes().List(nil, v12.ListOptions{})
 }
 
 func InitClientHub() {
@@ -239,16 +239,16 @@ func (this *KubernetesHandler) CreateOrDeleteResourceByYml() Result {
 		// 创建 Resource
 		if this.IsActive {
 			if mapping.Resource.Resource == "namespaces" || mapping.Resource.Resource == "clusterroles" || mapping.Resource.Resource == "clusterrolebindings" {
-				_, err = this.DymaicClient.Interface.Resource(mapping.Resource).Create(&unstruct, metav1.CreateOptions{})
+				_, err = this.DymaicClient.Interface.Resource(mapping.Resource).Create(nil, &unstruct, metav1.CreateOptions{})
 			} else {
-				_, err = this.DymaicClient.Interface.Resource(mapping.Resource).Namespace(namespace).Create(&unstruct, metav1.CreateOptions{})
+				_, err = this.DymaicClient.Interface.Resource(mapping.Resource).Namespace(namespace).Create(nil, &unstruct, metav1.CreateOptions{})
 			}
 		} else {
 			operatorType = "Delete"
 			if mapping.Resource.Resource == "namespaces" || mapping.Resource.Resource == "clusterroles" || mapping.Resource.Resource == "clusterrolebindings" {
-				err = this.DymaicClient.Interface.Resource(mapping.Resource).Delete(unstruct.GetName(), &metav1.DeleteOptions{})
+				err = this.DymaicClient.Interface.Resource(mapping.Resource).Delete(nil, unstruct.GetName(), metav1.DeleteOptions{})
 			} else {
-				err = this.DymaicClient.Interface.Resource(mapping.Resource).Namespace(namespace).Delete(unstruct.GetName(), &metav1.DeleteOptions{})
+				err = this.DymaicClient.Interface.Resource(mapping.Resource).Namespace(namespace).Delete(nil, unstruct.GetName(), metav1.DeleteOptions{})
 			}
 		}
 		if err != nil {

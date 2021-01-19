@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -32,7 +32,7 @@ type PodInterface interface {
 
 func (this *Pod) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 	var podList []*Pod
 	var err error
@@ -75,7 +75,7 @@ func (this *Pod) Add() Result {
 
 func (this *Pod) List(from, limit int) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var PodList []*Pod = nil
 	var ResultData Result
 	var err error
@@ -113,7 +113,7 @@ func (this *Pod) List(from, limit int) Result {
 
 func (this *Pod) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -130,7 +130,7 @@ func (this *Pod) Update() Result {
 
 func (this *Pod) EmptyDirtyData() error {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	_, err := o.Raw("delete from "+utils.Pod+" where cluster_name = ? and sync_check_point != ? ", this.ClusterName, this.SyncCheckPoint).Exec()
 	if err != nil {
 		logs.Error("Empty Dirty Data failed,  model: %s, code: %d, err: %s", utils.Pod, utils.EmptyDirtyDataPodErr, err.Error())
@@ -140,7 +140,7 @@ func (this *Pod) EmptyDirtyData() error {
 
 func (this *Pod) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
+
 	var ResultData Result
 	cond := orm.NewCondition()
 

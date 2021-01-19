@@ -2,7 +2,7 @@ package k8s
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/scope"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -18,11 +18,11 @@ type NameSpaceService struct {
 }
 
 func (this *NameSpaceService) List() (*v1.NamespaceList, error) {
-	return this.ClientGo.ClientSet.CoreV1().Namespaces().List(metav1.ListOptions{})
+	return this.ClientGo.ClientSet.CoreV1().Namespaces().List(nil, metav1.ListOptions{})
 }
 
 func (this *NameSpaceService) Wtach() {
-	nswatch, err := this.ClientGo.ClientSet.CoreV1().Namespaces().Watch(metav1.ListOptions{})
+	nswatch, err := this.ClientGo.ClientSet.CoreV1().Namespaces().Watch(nil, metav1.ListOptions{})
 	if err != nil {
 		panic(err)
 	}

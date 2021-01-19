@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 )
@@ -30,7 +30,6 @@ type HostPsInterface interface {
 
 func (this *HostPs) List(from, limit int) Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var hostPsList []*HostPs = nil
 	var ResultData Result
 	cond := orm.NewCondition()
@@ -62,7 +61,6 @@ func (this *HostPs) List(from, limit int) Result {
 
 func (this *HostPs) Add() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Insert(this)
@@ -80,7 +78,6 @@ func (this *HostPs) Add() Result {
 
 func (this *HostPs) Update() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	_, err := o.Update(this)
@@ -97,7 +94,6 @@ func (this *HostPs) Update() Result {
 
 func (this *HostPs) Delete() Result {
 	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
 	var ResultData Result
 	cond := orm.NewCondition()
 

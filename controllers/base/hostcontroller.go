@@ -2,7 +2,7 @@ package base
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service"
 	sssystem "github.com/xiliangMa/diss-backend/service/system/system"
@@ -11,7 +11,7 @@ import (
 
 // 主机接口列表
 type HostController struct {
-	beego.Controller
+	web.Controller
 }
 
 // @Title GetHosts

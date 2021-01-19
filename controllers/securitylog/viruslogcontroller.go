@@ -2,13 +2,13 @@ package securitypolicy
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego"
+	"github.com/beego/beego/v2/server/web"
 	"github.com/xiliangMa/diss-backend/models"
 )
 
 // Virus Log api list
 type VirusLogController struct {
-	beego.Controller
+	web.Controller
 }
 
 // @Title GetImageVirusLog
