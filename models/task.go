@@ -78,6 +78,10 @@ func (this *Task) List(from, limit int) Result {
 	if this.Container != nil && this.Container.Id != "" {
 		cond = cond.And("container_id", this.Container.Id)
 	}
+	if this.Image != nil && this.Image.Id != "" {
+		cond = cond.And("image_id", this.Image.Id)
+		//cond = cond.And("host_id", this.Image.HostId)
+	}
 	if this.Account != "" {
 		cond = cond.And("account", this.Account)
 	}
