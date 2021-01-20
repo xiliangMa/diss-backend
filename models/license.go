@@ -126,11 +126,11 @@ func (this *LicenseModule) List() Result {
 	return ResultData
 }
 
-func (this *LicenseModule) Get() LicenseModule {
+func (this *LicenseModule) Get() *LicenseModule {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 
-	licModule := LicenseModule{}
+	licModule := &LicenseModule{}
 	cond := orm.NewCondition()
 	if this.Id != "" {
 		cond = cond.And("license_config_id", this.Id)
@@ -139,10 +139,11 @@ func (this *LicenseModule) Get() LicenseModule {
 		cond = cond.And("module_code", this.ModuleCode)
 	}
 
-	err := o.QueryTable(utils.LicenseModule).SetCond(cond).One(&licModule)
+	err := o.QueryTable(utils.LicenseModule).SetCond(cond).One(licModule)
 
 	if err != nil {
 		logs.Error("Get LicenseModule failed, code: %d, err: %s", utils.DeleteLicenseModuleErr, err.Error())
+		licModule = nil
 	}
 
 	return licModule
