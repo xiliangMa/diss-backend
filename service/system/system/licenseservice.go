@@ -83,6 +83,8 @@ func (this *LicenseService) LicenseActive() models.Result {
 		message = fmt.Sprintf("License import success, License：%s", string(plainText))
 		logs.Info(message)
 	}
+
+	licenseService.GetLicensedHostCount()
 	//添加license 历史
 	licenseHistory := models.LicenseHistory{}
 	licenseObjJson, _ := json.Marshal(licenseObject)
@@ -223,15 +225,21 @@ func (this *LicenseService) GetLicensedHostCount() int64 {
 	hostObj := models.HostConfig{}
 	hostObj.LicCount = true
 	licenseHostCount := hostObj.Count()
-	this.UpdateLicenseCountForBenchMarkModel(licenseHostCount)
+	this.UpdateLicenseCountOfModules(licenseHostCount)
 	return licenseHostCount
 }
 
-func (this *LicenseService) UpdateLicenseCountForBenchMarkModel(count int64) models.Result {
+func (this *LicenseService) UpdateLicenseCountOfModules(count int64) models.Result {
 	result := models.Result{Code: http.StatusOK}
 	lm := models.LicenseModule{ModuleCode: models.LicModuleType_BenchMark}
 	dbLm := lm.Get()
-	if dbLm.Id != "" {
+	if dbLm != nil && dbLm.Id != "" {
+		dbLm.IsLicensedCount = count
+		result = dbLm.Update()
+	}
+	lm = models.LicenseModule{ModuleCode: models.TMP_Type_HostImageVulnScan}
+	dbLm = lm.Get()
+	if dbLm != nil && dbLm.Id != "" && dbLm.LicenseCount > 0 {
 		dbLm.IsLicensedCount = count
 		result = dbLm.Update()
 	}
