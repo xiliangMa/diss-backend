@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/base"
 	"github.com/xiliangMa/diss-backend/service/k8s"
 	"github.com/xiliangMa/diss-backend/service/scope"
 	"github.com/xiliangMa/diss-backend/service/securitycheck"
@@ -254,6 +255,27 @@ func (this *ClusterController) Scope() {
 		logs.Info("Active Scope success, ClusterName: %s", dbCluster.Name)
 	}
 	result = dbCluster.Update()
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
+// @Title ProxyOperator
+// @Description ClusterSecurityCheck
+// @Param token header string true "authToken"
+// @Param close query bool false false "是否关闭"
+// @Param targetUrl query string "" true "目标地址"
+// @Success 200 {object} models.Result
+// @router /proxy [post]
+func (this *ClusterController) ProxyOperator() {
+	result := models.Result{Code: http.StatusOK}
+	close, _ := this.GetBool("close")
+	targetUrl := this.GetString("targetUrl")
+	proxyService := base.ProxyService{TargetUrl: targetUrl, Close: close}
+	err := proxyService.ScopeProxyOperator()
+	if err != nil {
+		result.Code = 0
+		result.Message = err.Error()
+	}
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }

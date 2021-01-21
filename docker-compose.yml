@@ -12,6 +12,7 @@ services:
     image: registry.cn-qingdao.aliyuncs.com/diss/diss-backend
     ports:
       - "10443:10443"
+      - "10444:10444"
     links:
       - diss-db
     depends_on:

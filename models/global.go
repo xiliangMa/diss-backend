@@ -1,5 +1,7 @@
 package models
 
+import "net/http"
+
 var (
 	WSHub *Hub
 	Nats  *NatsManager
@@ -8,4 +10,5 @@ var (
 	MSM   *MailServerManager
 	LM    *LDAPManager
 	AEM   *AnchoreEngineManager
+	CPM   *http.Server
 )
