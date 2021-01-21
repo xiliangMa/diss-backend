@@ -81,6 +81,15 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/asset:HostController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/asset:HostController"],
 		beego.ControllerComments{
+			Method:           "SetClientModule",
+			Router:           `/:hostId/setclientmodule`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/asset:HostController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/asset:HostController"],
+		beego.ControllerComments{
 			Method:           "GetHostContainerConfigList",
 			Router:           `/:hostName/containers`,
 			AllowHTTPMethods: []string{"post"},

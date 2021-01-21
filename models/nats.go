@@ -26,6 +26,7 @@ const (
 	Resource_DockerEvent_LatestTime = "DockerEvent_LatestTime" // docker 审计最新上报时间
 	Resource_WarningInfo            = "WarningInfo"            // 告警
 	Resource_HostPackage            = "HostPackage"            // 主机包
+	Resource_ClientModuleControl    = "ClientModuleControl"    // 客户端模块控制
 
 	// #################### （Type）Nats Type 通信类型
 	Type_Metric       = "Metric"       //指标类型

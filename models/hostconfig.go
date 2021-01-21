@@ -10,35 +10,36 @@ import (
 )
 
 type HostConfig struct {
-	Id                string    `orm:"pk;size(128)" description:"(主机id)"`
-	HostName          string    `orm:"size(64)" description:"(主机名)"`
-	OS                string    `orm:"size(32)" description:"(系统)"`
-	PG                string    `orm:"size(32);default(sys-default)" description:"(安全策略组)"`
-	InternalAddr      string    `orm:"size(32);default(null);" description:"(主机ip 内)"`
-	PublicAddr        string    `orm:"size(32);default(null);" description:"(主机ip 外)"`
-	Status            string    `orm:"size(32);default(Normal)" description:"(主机状态 正常 Normal 异常 Abnormal)"`
-	Diss              string    `orm:"size(32);default(Installed)" description:"(安全容器 Installed NotInstalled)"`
-	DissStatus        string    `orm:"size(32);default(Safe)" description:"(安全状态 Safe Unsafe)"`
-	AccountName       string    `orm:"size(32);default(admin)" description:"(租户)"`
-	GroupId           string    `orm:"-" description:"(查询参数：分组Id， 仅仅是查询使用, 返回数据看 Group)"`
-	Group             *Groups   `orm:"rel(fk);null;on_delete(set_null)" description:"(分组)"`
-	Type              string    `orm:"size(32);default(Server);" description:"(类型 服务器: Server 虚拟机: Vm)"`
-	IsInK8s           bool      `orm:"default(false);" description:"(是否在k8s集群)"`
-	ClusterId         string    `orm:"size(128);default(null);" description:"(集群id)"`
-	ClusterName       string    `orm:"size(128);default(null);" description:"(集群名)"`
-	Label             string    `orm:"size(32);default(null);" description:"(标签)"`
-	Job               []*Job    `orm:"rel(m2m);null;" description:"(job)"`
-	IsEnableHeartBeat bool      `orm:"default(false);" description:"(是否开启心跳上报)"`
-	HeartBeat         time.Time `orm:"null;type(datetime)" description:"(心跳)"`
-	KMetaData         string    `orm:"" description:"(源数据)"`
-	KSpec             string    `orm:"" description:"(Spec数据)"`
-	KStatus           string    `orm:"" description:"(状态数据)"`
-	KubernetesVer     string    `orm:"size(64)" description:"(kubernetes 版本)"`
-	NodeRole          string    `orm:"size(64)" description:"(集群主机角色)"`
-	DockerCISCount    string    `orm:"null;" description:"(docker基线结果个数)"`
-	KubeCISCount      string    `orm:"null;" description:"(k8s基线结果个数)"`
-	IsLicensed        bool      `orm:"default(false);" description:"(是否已经授权)"`
-	LicCount          bool      `orm:"-" description:"(是否获取授权个数操作)"`
+	Id                  string    `orm:"pk;size(128)" description:"(主机id)"`
+	HostName            string    `orm:"size(64)" description:"(主机名)"`
+	OS                  string    `orm:"size(32)" description:"(系统)"`
+	PG                  string    `orm:"size(32);default(sys-default)" description:"(安全策略组)"`
+	InternalAddr        string    `orm:"size(32);default(null);" description:"(主机ip 内)"`
+	PublicAddr          string    `orm:"size(32);default(null);" description:"(主机ip 外)"`
+	Status              string    `orm:"size(32);default(Normal)" description:"(主机状态 正常 Normal 异常 Abnormal)"`
+	Diss                string    `orm:"size(32);default(Installed)" description:"(安全容器 Installed NotInstalled)"`
+	DissStatus          string    `orm:"size(32);default(Safe)" description:"(安全状态 Safe Unsafe)"`
+	AccountName         string    `orm:"size(32);default(admin)" description:"(租户)"`
+	GroupId             string    `orm:"-" description:"(查询参数：分组Id， 仅仅是查询使用, 返回数据看 Group)"`
+	Group               *Groups   `orm:"rel(fk);null;on_delete(set_null)" description:"(分组)"`
+	Type                string    `orm:"size(32);default(Server);" description:"(类型 服务器: Server 虚拟机: Vm)"`
+	IsInK8s             bool      `orm:"default(false);" description:"(是否在k8s集群)"`
+	ClusterId           string    `orm:"size(128);default(null);" description:"(集群id)"`
+	ClusterName         string    `orm:"size(128);default(null);" description:"(集群名)"`
+	Label               string    `orm:"size(32);default(null);" description:"(标签)"`
+	Job                 []*Job    `orm:"rel(m2m);null;" description:"(job)"`
+	IsEnableHeartBeat   bool      `orm:"default(false);" description:"(是否开启心跳上报)"`
+	IsEnableDockerEvent bool      `orm:"default(false);" description:"(是否开启容器审计上报)"`
+	HeartBeat           time.Time `orm:"null;type(datetime)" description:"(心跳)"`
+	KMetaData           string    `orm:"" description:"(源数据)"`
+	KSpec               string    `orm:"" description:"(Spec数据)"`
+	KStatus             string    `orm:"" description:"(状态数据)"`
+	KubernetesVer       string    `orm:"size(64)" description:"(kubernetes 版本)"`
+	NodeRole            string    `orm:"size(64)" description:"(集群主机角色)"`
+	DockerCISCount      string    `orm:"null;" description:"(docker基线结果个数)"`
+	KubeCISCount        string    `orm:"null;" description:"(k8s基线结果个数)"`
+	IsLicensed          bool      `orm:"default(false);" description:"(是否已经授权)"`
+	LicCount            bool      `orm:"-" description:"(是否获取授权个数操作)"`
 }
 
 type HostConfigInterface interface {

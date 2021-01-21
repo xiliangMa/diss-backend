@@ -3,8 +3,11 @@ package asset
 import (
 	"encoding/json"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
+	"net/http"
 )
 
 // Asset host object api list
@@ -55,6 +58,47 @@ func (this *HostController) GetHostInfoList() {
 	hostInfo := new(models.HostInfo)
 	hostInfo.Id = id
 	this.Data["json"] = hostInfo.List()
+	this.ServeJSON(false)
+
+}
+
+// @Title SetClientModule
+// @Description Set ClientModule
+// @Param token header string true "authToken"
+// @Param hostId path string "" true "hostId"
+// @Param body body models.ClientModuleControl false "ClientModuleControl , 目前支持模块： DockerEvent"
+// @Success 200 {object} models.Result
+// @router /:hostId/setclientmodule [post]
+func (this *HostController) SetClientModule() {
+	result := models.Result{Code: http.StatusOK}
+	id := this.GetString(":hostId")
+	hostConfig := new(models.HostConfig)
+	hostConfig.Id = id
+	hostConfig = hostConfig.Get()
+	if hostConfig == nil {
+		result.Code = utils.HostConfigNotFoundErr
+		result.Message = "Host does not exist."
+		logs.Warn("Not Get Host ID: %s, code: %d, message: %s", id, result.Code, result.Message)
+	}
+
+	// 下发模块控制给agent
+	cmcontrol := models.ClientModuleControl{}
+	json.Unmarshal(this.Ctx.Input.RequestBody, &cmcontrol)
+	cmservice := system.ClientModuleService{}
+	cmservice.HostId = id
+	cmservice.ClientModuleControl = &cmcontrol
+	cmservice.SetModule()
+
+	// 更新主机中的模块状态
+	hostConfig.IsEnableDockerEvent = cmcontrol.Enable
+	result = hostConfig.Update()
+	if result.Code != http.StatusOK {
+		this.Data["json"] = result
+		this.ServeJSON(false)
+	}
+	result.Code = http.StatusOK
+	result.Data = cmcontrol
+	this.Data["json"] = result
 	this.ServeJSON(false)
 
 }
