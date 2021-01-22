@@ -104,6 +104,9 @@ func (this *ImageConfig) List(from, limit int) Result {
 	if this.HostId != "" {
 		cond = cond.And("host_id", this.HostId)
 	}
+	if this.HostName != "" {
+		cond = cond.And("host_name__icontains", this.HostName)
+	}
 	if this.ImageId != "" {
 		cond = cond.And("image_id", this.ImageId)
 	}
