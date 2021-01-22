@@ -44,6 +44,7 @@ type ClusterInterface interface {
 	List(from, limit int) Result
 	ListByAccount(from, limit int) Result
 	GetRequiredSyncList() Result
+	Count() int64
 }
 
 func (this *Cluster) Get() *Cluster {
@@ -284,4 +285,11 @@ func (this *Cluster) Delete() Result {
 	}
 	ResultData.Code = http.StatusOK
 	return ResultData
+}
+
+func (this *Cluster) Count() int64 {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	count, _ := o.QueryTable(utils.Cluster).Count()
+	return count
 }

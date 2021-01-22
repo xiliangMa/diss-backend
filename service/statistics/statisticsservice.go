@@ -16,6 +16,7 @@ func (this *StatisticsService) GetAssetStatistics() models.Result {
 	data := make(map[string]interface{})
 	data["ContainerCount"] = 0
 	data["HostCount"] = 0
+	data["ClusterCount"] = 0
 
 	//主机数
 	hostConfig := new(models.HostConfig)
@@ -23,6 +24,9 @@ func (this *StatisticsService) GetAssetStatistics() models.Result {
 	//容器数
 	containerConfig := new(models.ContainerConfig)
 	data["ContainerCount"] = containerConfig.Count()
+	//集群数
+	cluster := new(models.Cluster)
+	data["ClusterCount"] = cluster.Count()
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
