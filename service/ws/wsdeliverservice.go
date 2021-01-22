@@ -32,7 +32,7 @@ func (this *WSDeliverService) DeliverTaskToNats() {
 			}
 		} else if task.Image != nil {
 			subject = task.Image.HostId
-			task.Job = nil
+			//task.Job = nil
 		}
 
 		if subject != "" {

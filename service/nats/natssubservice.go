@@ -548,6 +548,19 @@ func (this *NatsSubService) Save() error {
 
 				logTag := "Nats ############################ "
 				for _, task := range taskList {
+					count := task.RunCount
+					// 更新任务次数
+					if task.Job.Type == models.Job_Type_Once {
+						if task.Status == models.Task_Status_Finished {
+							task.RunCount = 1
+						}
+					} else {
+						if task.Status == models.Task_Status_Finished {
+							if task.SystemTemplate.Type != models.TMP_Type_BM_Docker || task.SystemTemplate.Type != models.TMP_Type_BM_K8S {
+								task.RunCount = count + 1
+							}
+						}
+					}
 					metricsResult.Data = task
 					if result := task.Update(); result.Code != http.StatusOK {
 						metricsResult.Code = result.Code
