@@ -1,22 +1,22 @@
 package models
 
 import (
+	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type Feeds struct {
-	Name         string    `description:"(名称)"`
-	Description  string    `description:"(描述)"`
-	AccessTier   string    `description:"(AccessTier)"`
-	LastFullSync time.Time `description:"(最新同步时间)"`
-	LastUpdate   time.Time `description:"(更新时间)"`
-	CreateAt     time.Time `description:"(创建时间)"`
+	Name         string `description:"(名称)"`
+	Description  string `description:"(描述)"`
+	AccessTier   string `description:"(AccessTier)"`
+	LastFullSync int64  `description:"(最新同步时间)"`
+	LastUpdate   int64  `description:"(更新时间)"`
+	CreateAt     int64  `description:"(创建时间)"`
 }
 
 type FeedsInterface interface {
@@ -39,8 +39,11 @@ func (this *Feeds) List(from, limit int) Result {
 		filter = filter + ` name = '` + this.Name + `' and `
 
 	}
-	if this.LastFullSync.String() != Null_Time {
-		filter = filter + `last_full_sync   '` + this.LastFullSync.String() + `' and `
+	//if this.LastFullSync.String() != Null_Time {
+	//	filter = filter + `last_full_sync   '` + this.LastFullSync.String() + `' and `
+	//}
+	if this.LastFullSync != 0 {
+		filter = filter + `last_full_sync   ` + fmt.Sprintf("%v", this.LastFullSync) + ` and `
 	}
 
 	if filter != "" {

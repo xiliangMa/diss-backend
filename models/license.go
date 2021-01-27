@@ -14,8 +14,8 @@ type LicenseConfig struct {
 	ProductName  string           `orm:"" description:"(产品名称)"`
 	CustomerName string           `orm:"" description:"(许可对象)"`
 	Type         string           `orm:"" description:"(授权类型 测试授权 正式授权)"`
-	BuyAt        time.Time        `orm:"null;type(datetime)" description:"(授权购买时间)"`
-	ActiveAt     time.Time        `orm:"null;auto_now;type(datetime)" description:"(激活时间)"`
+	BuyAt        int64            `orm:"default(0)" description:"(授权购买时间)"`
+	ActiveAt     int64            `orm:"default(0)" description:"(激活时间)"`
 	Modules      []*LicenseModule `orm:"reverse(many);null" description:"(授权的模块)"`
 }
 
@@ -44,7 +44,7 @@ type LicenseModule struct {
 	ModuleCode      string         `orm:"size(128);" description:"(授权模块)"`
 	LicenseCount    int64          `orm:"size(32);default(0)" description:"(授权模块数量)"`
 	IsLicensedCount int64          `orm:"size(32);default(0)" description:"(已使用授权模块数量)"`
-	LicenseExpireAt time.Time      `orm:"null" description:"(授权结束时间)"`
+	LicenseExpireAt int64          `orm:"default(0)" description:"(授权结束时间)"`
 }
 
 type LicenseHistoryInterface interface {

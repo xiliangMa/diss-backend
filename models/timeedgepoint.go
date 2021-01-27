@@ -12,8 +12,8 @@ type TimeEdgePoint struct {
 	TEPointId     string `orm:"pk;" description:"(时间边界点id)"`
 	EdgePointCode string `orm:"" description:"(时间边界Code)"`
 	EdgePointName string `orm:"" description:"(时间边界名称/说明)"`
-	TimePointA    string `orm:"" description:"(时间边界A点)"`
-	TimePointB    string `orm:"" description:"(时间边界B点)"`
+	TimePointA    int64  `orm:"default(0)" description:"(时间边界A点)"`
+	TimePointB    int64  `orm:"default(0)" description:"(时间边界B点)"`
 	Direction     string `orm:"" description:"(时间区方向，回溯/范围/向前/展望/预期等)"`
 	ScopeSymbol   string `orm:"" description:"(时间区域图示, 如----|)"`
 }
@@ -75,7 +75,7 @@ func (this *TimeEdgePoint) Get() []*TimeEdgePoint {
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetTimeEdgePointErr
-		//logs.Info("Get TimeEdgePoint failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Warn("Get TimeEdgePoint failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return nil
 	}
 	return TEPoint

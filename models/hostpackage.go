@@ -42,7 +42,7 @@ func (this *HostPackage) Add() Result {
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.AddHostPackageErr
-		logs.Error("Add AHostPackage failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error("Add HostPackage failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 

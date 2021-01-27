@@ -16,8 +16,8 @@ type Groups struct {
 	ThirdLevel  string        `orm:"null" description:"(三级分组)"`
 	Type        string        `orm:"default(Host)" description:"(All Host Container)"`
 	AccountName string        `orm:"default(admin)" description:"(租户 默认 admin)"`
-	CreateTime  time.Time     `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
-	UpdateTime  time.Time     `orm:"auto_now;type(datetime)" description:"(更新时间)"`
+	CreateTime  int64         `orm:"default(0)" description:"(创建时间)"`
+	UpdateTime  int64         `orm:"default(0)" description:"(更新时间)"`
 	HostConfig  []*HostConfig `orm:"reverse(many);null" description:"(主机列表)"`
 }
 
@@ -35,6 +35,8 @@ func (this *Groups) Add() Result {
 	var ResultData Result
 	uuid, _ := uuid.NewV4()
 	this.Id = uuid.String()
+	this.CreateTime = time.Now().UnixNano()
+	this.UpdateTime = time.Now().UnixNano()
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -103,6 +105,7 @@ func (this *Groups) Update() Result {
 	o.Using(utils.DS_Default)
 	var ResultData Result
 
+	this.UpdateTime = time.Now().UnixNano()
 	_, err := o.Update(this)
 	if err != nil {
 		ResultData.Message = err.Error()

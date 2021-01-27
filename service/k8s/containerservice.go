@@ -63,11 +63,11 @@ func (this *ContainerService) AddContainer() {
 		imageId := c.ImageID
 		imageName := c.Image
 		hostName := hostName
-		startTime := pod.Status.StartTime.String()
+		startTime := pod.Status.StartTime
 
 		//计算运行时间
 		now := time.Now()
-		createTime, _ := time.Parse(time.RFC3339Nano, startTime)
+		createTime, _ := time.Parse(time.RFC3339, startTime.String())
 		created := now.Sub(createTime)
 
 		//动态的回去容器状态
@@ -91,8 +91,8 @@ func (this *ContainerService) AddContainer() {
 		ccob.Status = status
 		ccob.ClusterName = clusterName
 		ccob.Age = "Up " + created.String()
-		ccob.CreateTime = startTime
-		ccob.UpdateTime = startTime
+		ccob.CreateTime = startTime.Unix()
+		ccob.UpdateTime = startTime.Unix()
 		ccob.AccountName = models.Account_Admin
 
 		//同步 containerinfo
@@ -107,8 +107,8 @@ func (this *ContainerService) AddContainer() {
 		ciob.ImageName = imageName
 		//ciob.HostId = ""
 		ciob.HostName = hostName
-		ciob.StartedAt = createTime.String()
-		ciob.CreatedAt = createTime.String()
+		ciob.StartedAt = createTime.Unix()
+		ciob.CreatedAt = createTime.Unix()
 		ciob.Status = status
 		ciob.Ip = podIp
 		ciob.Labels = labels

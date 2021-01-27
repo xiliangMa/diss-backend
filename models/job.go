@@ -18,8 +18,8 @@ type Job struct {
 	Type                string               `orm:"" description:"(类型 重复执行 单次执行)"`
 	SystemTemplateType  string               `orm:"default(Disable)" description:"(模板类型)"`
 	Status              string               `orm:"default(Disable)" description:"(状态: 执行中、启用、禁用)"`
-	CreateTime          time.Time            `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
-	UpdateTime          time.Time            `orm:"null;auto_now;type(datetime)" description:"(更新时间)"`
+	CreateTime          int64                `orm:"default(0)" description:"(创建时间)"`
+	UpdateTime          int64                `orm:"default(0)" description:"(更新时间)"`
 	SystemTemplate      *SystemTemplate      `orm:"rel(fk);null;" description:"(策略)"`
 	SystemTemplateGroup *SystemTemplateGroup `orm:"rel(fk);null;" description:"(策略组)"`
 	Task                []*Task              `orm:"reverse(many);null" description:"(任务列表)"`
@@ -135,6 +135,8 @@ func (this *Job) Add() Result {
 	uid, _ := uuid.NewV4()
 	this.Id = uid.String()
 
+	this.CreateTime = time.Now().UnixNano()
+	this.UpdateTime = time.Now().UnixNano()
 	_, err = o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		o.Rollback()
@@ -213,6 +215,7 @@ func (this *Job) Update() Result {
 	var ResultData Result
 
 	err := o.Begin()
+	this.UpdateTime = time.Now().UnixNano()
 	_, err = o.Update(this)
 	if err != nil {
 		ResultData.Message = err.Error()

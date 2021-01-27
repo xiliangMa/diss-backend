@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type DockerEvent struct {
@@ -23,8 +22,8 @@ type DockerEvent struct {
 	Scope     string `orm:"size(256)" description:"(范围)"`
 	Time      int64  `orm:"" description:"(时间)"`
 	TimeNano  int64  `orm:"" description:"(精确时间)"`
-	StartTime string `orm:"-" description:"(开始时间, 注意时间格式为 local 时间)"`
-	EndTime   string `orm:"-" description:"(结束时间, 注意时间格式为 local 时间)"`
+	StartTime int64  `orm:"-" description:"(开始时间, 注意时间格式为 local 时间)"`
+	EndTime   int64  `orm:"-" description:"(结束时间, 注意时间格式为 local 时间)"`
 }
 
 type DockerEventInterface interface {
@@ -70,10 +69,10 @@ func (this *DockerEvent) List(from, limit int) Result {
 		filter = filter + `scope = '` + this.Scope + `' and `
 	}
 
-	if this.StartTime != "" && this.EndTime != "" {
-		startTime, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.Local)
-		endTime, _ := time.ParseInLocation("2006-01-02T15:04:05", this.EndTime, time.Local)
-		filter = filter + `time BETWEEN ` + fmt.Sprintf("%v", startTime.Unix()) + ` and '` + fmt.Sprintf("%v", endTime.Unix()) + `' and `
+	if this.StartTime != 0 && this.EndTime != 0 {
+		//startTime, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.Local)
+		//endTime, _ := time.ParseInLocation("2006-01-02T15:04:05", this.EndTime, time.Local)
+		filter = filter + `time BETWEEN ` + fmt.Sprintf("%v", this.StartTime) + ` and ` + fmt.Sprintf("%v", this.EndTime) + ` and `
 	}
 
 	if filter != "" {

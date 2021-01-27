@@ -17,7 +17,7 @@ type BenchMarkLog struct {
 	InternalAddr  string `orm:"" description:"(主机ip 内)"`
 	PublicAddr    string `orm:"" description:"(主机ip 外)"`
 	OS            string `orm:"" description:"(系统)"`
-	UpdateTime    string `orm:"" description:"(更新时间)"`
+	UpdateTime    int64  `orm:"default(0)" description:"(更新时间)"`
 	FailCount     int    `orm:"" description:"(检查失败个数, kubeCIS)"`
 	WarnCount     int    `orm:"" description:"(检查警告个数, dockerCIS和kubeCIS)"`
 	PassCount     int    `orm:"" description:"(检查通过个数, dockerCIS和kubeCIS)"`
@@ -31,13 +31,10 @@ type BenchMarkLog struct {
 }
 
 type BenchMarkLogInterface interface {
-	Add()
-	Delete()
-	Edit()
-	Get()
-	List()
-	GetMarkSummary()
-	GetHostMarkSummary()
+	Add() Result
+	List(from, limit int) Result
+	GetMarkSummary() Result
+	GetHostMarkSummary() Result
 }
 
 func (this *BenchMarkLog) Add() Result {
@@ -46,7 +43,6 @@ func (this *BenchMarkLog) Add() Result {
 	var ResultData Result
 	var err error
 
-	//this.RawLog = ""
 	_, err = o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -96,7 +92,7 @@ func (this *BenchMarkLog) List(from, limit int) Result {
 		cond = cond.And("bench_mark_name", this.BenchMarkName)
 	}
 
-	if this.UpdateTime == "" {
+	if this.UpdateTime != 0 {
 		cond = cond.And("update_time__gte", this.UpdateTime)
 	}
 
@@ -123,7 +119,7 @@ func (this *BenchMarkLog) List(from, limit int) Result {
 		return ResultData
 	}
 	var total int64
-	if this.UpdateTime == "" {
+	if this.UpdateTime == 0 {
 		total, _ = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Count()
 	} else {
 		total, _ = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Filter("update_time__gte", this.UpdateTime).Count()

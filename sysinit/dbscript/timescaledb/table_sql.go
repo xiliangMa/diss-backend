@@ -9,7 +9,7 @@ var (
 	  "container_name" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "user" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "command" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
-	  "create_time" timestamptz(6),
+	  "create_time" int8 NOT NULL DEFAULT 0,
 	  "type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT 'Host'::character varying
 	)
 	;
@@ -47,7 +47,7 @@ var (
 	  "account_name" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "raw_log" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT 'null'::text,
 	  "model_type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
-	  "create_time" timestamptz(6) NOT NULL
+	  "create_time" int8 NOT NULL DEFAULT 0
 	)
 	;
 	ALTER TABLE "public"."user_event" OWNER TO "postgres";
@@ -63,7 +63,7 @@ var (
 	  "task" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
 	  "raw_log" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
 	  "level" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT 'Info'::character varying,
-	  "create_time" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text
+	  "create_time" int8 NOT NULL DEFAULT 0
 	)
 	;
 	ALTER TABLE "public"."task_log" OWNER TO "postgres";
@@ -84,8 +84,8 @@ var (
 	  "info" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
 	  "level" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "status" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
-	  "create_time" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
-	  "update_time" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "create_time" int8 NOT NULL DEFAULT 0,
+	  "update_time" int8 NOT NULL DEFAULT 0,
 	  "proposal" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
 	  "analysis" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text
 	)
@@ -99,7 +99,7 @@ var (
 
 	Tab_Create_HostPackage = `CREATE TABLE "public"."host_package" (
 	  "id" varchar(128) COLLATE "pg_catalog"."default" NOT NULL,
-	  "name" varchar COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "name" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
 	  "type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "host_id" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying
 	)

@@ -35,8 +35,7 @@ func InitTimeEdgePoint() {
 		if len(TEPinDB) == 0 {
 			//初始起始时间设置为2018-1-1
 			uid, _ := uuid.NewV4()
-			TEPoint.TimePointA = "2018-01-01T0:00:00Z"
-
+			TEPoint.TimePointA = 1514736000000
 			TEPoint.EdgePointName = exGroup.ExportName
 			TEPoint.TEPointId = uid.String()
 			TEPoint.Direction = "lookback"

@@ -11,7 +11,7 @@ type UserAccessCredentials struct {
 	UserName string `orm:"column(username)" description:"(用户名)"`
 	Type     string `orm:"" description:"(类型)"`
 	Value    string `orm:"" description:"(密码)"`
-	CreateAt int32  `orm:"" description:"(创建时间)"`
+	CreateAt int64  `orm:"" description:"(创建时间)"`
 }
 
 type UserAccessCredentialsInterface interface {

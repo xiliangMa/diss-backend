@@ -13,16 +13,12 @@ type Accounts struct {
 	State       string `description:"(状态)"`
 	Type        string `description:"(类型)"`
 	Email       string `description:"(邮箱)"`
-	CreatedAt   int    `description:"(创建时间)"`
-	LastUpdated int    `description:"(更新时间)"`
+	CreatedAt   int64  `description:"(创建时间)"`
+	LastUpdated int64  `description:"(更新时间)"`
 }
 
 type AccounstInterface interface {
-	Add()
-	Delete()
-	Edit()
-	Get()
-	List()
+	List(from, limit int) Result
 }
 
 func (this *Accounts) List(from, limit int) Result {

@@ -20,8 +20,8 @@ type ContainerInfo struct {
 	ClusterName    string `orm:"" description:"(集群名)"`
 	SyncCheckPoint int64  `orm:"default(0);" description:"(同步检查点)"`
 	Command        string `orm:"default(null);" description:"(命令)"`
-	StartedAt      string `orm:"default(null);" description:"(启动时间)"`
-	CreatedAt      string `orm:"default(null);" description:"(创建时间)"`
+	StartedAt      int64  `orm:"default(0);" description:"(启动时间)"`
+	CreatedAt      int64  `orm:"default(0);" description:"(创建时间)"`
 	Status         string `orm:"default(null);" description:"(状态)"`
 	Ports          string `orm:"default(null);" description:"(端口)"`
 	Ip             string `orm:"default(null);" description:"(ip)"`
@@ -51,12 +51,6 @@ func (this *ContainerInfo) Add() Result {
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
-	//if this.HostId != "" {
-	//	cond = cond.And("host_id", this.HostId)
-	//}
-	//if this.ImageId != "" {
-	//	cond = cond.And("image_id", this.ImageId)
-	//}
 
 	_, err = o.QueryTable(utils.ContainerInfo).SetCond(cond).All(&ContainerInfogList)
 	if err != nil {

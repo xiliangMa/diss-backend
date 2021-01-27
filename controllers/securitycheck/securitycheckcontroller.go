@@ -27,7 +27,7 @@ func (this *SecurityCheckController) SecurityCheck() {
 		account = models.Account_Admin
 	}
 	json.Unmarshal(this.Ctx.Input.RequestBody, &checkList)
-	batch := time.Now().Unix()
+	batch := time.Now().UnixNano()
 	securityCheckService := securitycheck.SecurityCheckService{SecurityCheckList: checkList, Batch: batch}
 	this.Data["json"] = securityCheckService.DeliverTask()
 	this.ServeJSON(false)
@@ -49,7 +49,7 @@ func (this *SecurityCheckController) HostImageVulnScan() {
 		account = models.Account_Admin
 	}
 	json.Unmarshal(this.Ctx.Input.RequestBody, &params)
-	batch := time.Now().Unix()
+	batch := time.Now().UnixNano()
 	securityScanService := securitycheck.SecurityScanService{SecurityCheckParams: params, Batch: batch, IsSystem: isSystem}
 	this.Data["json"] = securityScanService.DeliverTask()
 	this.ServeJSON(false)

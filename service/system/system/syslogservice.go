@@ -90,7 +90,8 @@ func GetSyncSyslogFunc(exType string) func() {
 						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
 
-					TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
+					//TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
+					TEPinDB[0].TimePointA = time.Now().UnixNano()
 					TEPinDB[0].Update()
 				}
 			}
@@ -109,7 +110,8 @@ func GetSyncSyslogFunc(exType string) func() {
 						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
 
-					TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
+					//TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
+					TEPinDB[0].TimePointA = time.Now().UnixNano()
 					TEPinDB[0].Update()
 				}
 			}
@@ -120,9 +122,9 @@ func GetSyncSyslogFunc(exType string) func() {
 			TEPointObj.EdgePointCode = exType
 			TEPinDB := TEPointObj.Get()
 			if len(TEPinDB) > 0 {
-				timeTemplate1 := "2006-01-02T15:04:05Z"
-				stamp, _ := time.ParseInLocation(timeTemplate1, TEPinDB[0].TimePointA, time.Local)
-				dockerVirus.CreatedAt = stamp.Unix()
+				//timeTemplate1 := "2006-01-02T15:04:05Z"
+				//stamp, _ := time.ParseInLocation(timeTemplate1, TEPinDB[0].TimePointA, time.Local)
+				dockerVirus.CreatedAt = TEPinDB[0].TimePointA
 				loglist := dockerVirus.List(from, limit)
 				if loglist.Code == 200 && loglist.Data != nil {
 					mapdata := loglist.Data.(map[string]interface{})
@@ -131,7 +133,8 @@ func GetSyncSyslogFunc(exType string) func() {
 						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
 
-					TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
+					//TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
+					TEPinDB[0].TimePointA = time.Now().UnixNano()
 					TEPinDB[0].Update()
 				}
 			}
@@ -142,9 +145,9 @@ func GetSyncSyslogFunc(exType string) func() {
 			TEPointObj.EdgePointCode = exType
 			TEPinDB := TEPointObj.Get()
 			if len(TEPinDB) > 0 {
-				timeTemplate1 := "2006-01-02T15:04:05Z"
-				stamp, _ := time.ParseInLocation(timeTemplate1, TEPinDB[0].TimePointA, time.Local)
-				imageVirus.CreatedAt = stamp.Unix()
+				//timeTemplate1 := "2006-01-02T15:04:05Z"
+				//stamp, _ := time.ParseInLocation(timeTemplate1, TEPinDB[0].TimePointA, time.Local)
+				imageVirus.CreatedAt = TEPinDB[0].TimePointA
 				loglist := imageVirus.List(from, limit)
 				if loglist.Code == 200 && loglist.Data != nil {
 					mapdata := loglist.Data.(map[string]interface{})
@@ -153,7 +156,8 @@ func GetSyncSyslogFunc(exType string) func() {
 						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
 
-					TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
+					//TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
+					TEPinDB[0].TimePointA = time.Now().UnixNano()
 					TEPinDB[0].Update()
 				}
 			}
@@ -173,7 +177,8 @@ func GetSyncSyslogFunc(exType string) func() {
 						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
 
-					TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
+					//TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
+					TEPinDB[0].TimePointA = time.Now().UnixNano()
 					TEPinDB[0].Update()
 				}
 			}
@@ -184,6 +189,7 @@ func GetSyncSyslogFunc(exType string) func() {
 			TEPointObj.EdgePointCode = exType
 			TEPinDB := TEPointObj.Get()
 			if len(TEPinDB) > 0 {
+				//secCommandAuditDocker.StartTime = TEPinDB[0].TimePointA
 				secCommandAuditDocker.StartTime = TEPinDB[0].TimePointA
 				loglist := secCommandAuditDocker.List(from, limit)
 				if loglist.Code == 200 && loglist.Data != nil {
@@ -194,7 +200,8 @@ func GetSyncSyslogFunc(exType string) func() {
 						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
 
-					TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
+					//TEPinDB[0].TimePointA = time.Now().In(models.CstZone).Format("2006-01-02T15:04:05Z")
+					TEPinDB[0].TimePointA = time.Now().UnixNano()
 					TEPinDB[0].Update()
 				}
 			}

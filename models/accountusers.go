@@ -12,13 +12,13 @@ type AccountUsers struct {
 	AccountName string `description:"(租户)"`
 	Type        string `description:"(类型)"`
 	Source      string `description:"(资源)"`
-	CreatedAt   int    `description:"(创建时间)"`
-	LastUpdated int    `description:"(更新时间)"`
+	CreatedAt   int64  `description:"(创建时间)"`
+	LastUpdated int64  `description:"(更新时间)"`
 	uuid        string `description:"(id)"`
 }
 
 type AccountUsersInterface interface {
-	GetAccountByUser()
+	GetAccountByUser() (error, string)
 }
 
 func (this *AccountUsers) GetAccountByUser() (error, string) {

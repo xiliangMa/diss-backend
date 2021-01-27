@@ -1,27 +1,27 @@
 package models
 
 import (
+	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type CmdHistory struct {
-	Id            string    `orm:"pk;size(64)" description:"(id)"`
-	HostId        string    `orm:"size(64)" description:"(主机id)"`
-	HostName      string    `orm:"size(64)" description:"(主机名)"`
-	ContainerId   string    `orm:"size(256)" description:"(容器id)"`
-	ContainerName string    `orm:"size(256)" description:"(容器名)"`
-	User          string    `orm:"size(32)" description:"(用户)"`
-	Command       string    `orm:"" description:"(命令)"`
-	CreateTime    time.Time `orm:"null;" description:"(更新时间)"`
-	Type          string    `orm:"default(Host);size(32)" description:"(类型 Host Container)"`
-	StartTime     string    `orm:"-;default(null)" description:"(开始时间)"`
-	EndTime       string    `orm:"-;default(null)" description:"(结束时间)"`
+	Id            string `orm:"pk;size(64)" description:"(id)"`
+	HostId        string `orm:"size(64)" description:"(主机id)"`
+	HostName      string `orm:"size(64)" description:"(主机名)"`
+	ContainerId   string `orm:"size(256)" description:"(容器id)"`
+	ContainerName string `orm:"size(256)" description:"(容器名)"`
+	User          string `orm:"size(32)" description:"(用户)"`
+	Command       string `orm:"" description:"(命令)"`
+	CreateTime    int64  `orm:"default(0);" description:"(更新时间)"`
+	Type          string `orm:"default(Host);size(32)" description:"(类型 Host Container)"`
+	StartTime     int64  `orm:"-;default(0)" description:"(开始时间)"`
+	EndTime       int64  `orm:"-;default(0)" description:"(结束时间)"`
 }
 
 type CmdHistoryList struct {
@@ -115,8 +115,8 @@ func (this *CmdHistory) List(from, limit int) Result {
 		filter = filter + `command like '%` + this.Command + `%' and `
 	}
 
-	if this.StartTime != "" && this.EndTime != "" {
-		filter = filter + `create_time  BETWEEN '` + this.StartTime + `' and '` + this.EndTime + `' and `
+	if this.StartTime != 0 && this.EndTime != 0 {
+		filter = filter + `create_time  BETWEEN ` + fmt.Sprintf("%v", this.StartTime) + ` and ` + fmt.Sprintf("%v", this.EndTime) + ` and `
 	}
 
 	if filter != "" {

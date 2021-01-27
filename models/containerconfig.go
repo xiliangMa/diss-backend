@@ -22,8 +22,8 @@ type ContainerConfig struct {
 	Command        string `orm:"default(null);" description:"(命令)"`
 	ImageName      string `orm:"default(null);" description:"(镜像名)"`
 	Age            string `orm:"null;" description:"(运行时长)"`
-	CreateTime     string `orm:"null;" description:"(创建时间);"`
-	UpdateTime     string `orm:"null;" description:"(更新时间);"`
+	CreateTime     int64  `orm:"default(0);" description:"(创建时间);"`
+	UpdateTime     int64  `orm:"default(0);" description:"(更新时间);"`
 	Job            []*Job `orm:"rel(m2m);null;" description:"(job)"`
 }
 

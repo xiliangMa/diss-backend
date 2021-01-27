@@ -18,9 +18,9 @@ type TaskLog struct {
 	Task       string `orm:"" description:"(任务详情json)"`
 	RawLog     string `orm:"" description:"(日志)"`
 	Level      string `orm:"default(Info);size(32)" description:"(日志级别)"`
-	CreateTime string `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
-	StartTime  string `orm:"-" description:"(开始时间, 注意时间格式为 local 时间)"`
-	EndTime    string `orm:"-" description:"(结束时间, 注意时间格式为 local 时间)"`
+	CreateTime int64  `orm:"default(0)" description:"(创建时间)"`
+	StartTime  int64  `orm:"-" description:"(开始时间, 注意时间格式为 local 时间)"`
+	EndTime    int64  `orm:"-" description:"(结束时间, 注意时间格式为 local 时间)"`
 }
 
 type TaskLog1Interface interface {
@@ -54,7 +54,7 @@ func (this *TaskLog) List(from, limit int) Result {
 	if this.Level != "" {
 		filter = filter + `level = '` + this.Level + `' and `
 	}
-	if this.StartTime != "" && this.EndTime != "" {
+	if this.StartTime != 0 && this.EndTime != 0 {
 		filter = filter + `create_time BETWEEN ` + fmt.Sprintf("%v", this.StartTime) + ` and '` + fmt.Sprintf("%v", this.EndTime) + `' and `
 	}
 
@@ -103,7 +103,7 @@ func (this *TaskLog) Add() Result {
 		this.Task,
 		this.RawLog,
 		this.Level,
-		time.Now().String()).Exec()
+		time.Now().UnixNano()).Exec()
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()

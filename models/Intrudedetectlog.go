@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -17,24 +18,24 @@ type IntrudeDetectLog struct {
 	TargeType   string `description:"(类型)"`
 	ContainerId string `description:"(容日Id 如果是主机该字段为：host， 如果是容器为：容器的实际ID)"`
 	Output      string `description:"(事件信息)"`
-	StartTime   string `description:"(开始时间)"`
-	ToTime      string `description:"(结束时间)"`
+	StartTime   int64  `description:"(开始时间)"`
+	ToTime      int64  `description:"(结束时间)"`
 	AccountName string `description:"(租户)"`
 	Priority    string `description:"(安全等级)"`
 }
 
 // 入侵检测日志（IntrudeDetectLog） 保存于 timescaledb
 type DcokerIds struct {
-	HostId       string    `orm:"pk" description:"(主机id)"`
-	HostName     string    `description:"(主机名)"`
-	MachineId    string    `description:"(Machine_id)"`
-	ContainerId  string    `description:"(容器id)"`
-	Time         time.Time `description:"(日志生成时间)"`
-	Priority     string    `description:"(安全等级)"`
-	Rule         string    `description:"(规则)"`
-	Output       string    `description:"(事件信息)"`
-	OutputFields string    `description:"(Output json)"`
-	CreatedAt    int       `description:"(日志保存时间)"`
+	HostId       string `orm:"pk" description:"(主机id)"`
+	HostName     string `description:"(主机名)"`
+	MachineId    string `description:"(Machine_id)"`
+	ContainerId  string `description:"(容器id)"`
+	Time         int64  `description:"(日志生成时间)"`
+	Priority     string `description:"(安全等级)"`
+	Rule         string `description:"(规则)"`
+	Output       string `description:"(事件信息)"`
+	OutputFields string `description:"(Output json)"`
+	CreatedAt    int    `description:"(日志保存时间)"`
 }
 
 type DcokerIdsInterface interface {
@@ -90,15 +91,15 @@ func (this *IntrudeDetectLog) List(from, limit int) Result {
 	var err error
 	containerId := this.ContainerId
 	//cond := orm.NewCondition()
-	st, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.UTC)
-	tt, _ := time.ParseInLocation("2006-01-02T15:04:05", this.ToTime, time.UTC)
+	//st, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.UTC)
+	//tt, _ := time.ParseInLocation("2006-01-02T15:04:05", this.ToTime, time.UTC)
 
 	var total int64
 	if this.TargeType == IDLT_Docker {
 		containerId = string([]byte(this.ContainerId)[:12])
-		total, err = o.Raw("select * from docker_ids where container_id = ? and created_at > ? and created_at < ? order by created_at desc limit ? OFFSET ?", containerId, st.Unix(), tt.Unix(), limit, from).QueryRows(&dcokerIdsList)
+		total, err = o.Raw("select * from docker_ids where container_id = ? and created_at > ? and created_at < ? order by created_at desc limit ? OFFSET ?", containerId, this.StartTime, this.ToTime, limit, from).QueryRows(&dcokerIdsList)
 	} else {
-		total, err = o.Raw("select * from docker_ids where host_id = ? and container_id = ? and created_at > ? and created_at < ? order by created_at desc limit ? OFFSET ?", this.HostId, containerId, st.Unix(), tt.Unix(), limit, from).QueryRows(&dcokerIdsList)
+		total, err = o.Raw("select * from docker_ids where host_id = ? and container_id = ? and created_at > ? and created_at < ? order by created_at desc limit ? OFFSET ?", this.HostId, containerId, this.StartTime, this.ToTime, limit, from).QueryRows(&dcokerIdsList)
 	}
 
 	if err != nil {
@@ -145,13 +146,13 @@ func (this *IntrudeDetectLog) List1(from, limit int) Result {
 		if this.HostName != "" {
 			filterSql = filterSql + "host_name = '" + this.HostName + "' and "
 		}
-		if this.StartTime != "" {
-			st, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.UTC)
-			filterSql = filterSql + "created_at > '" + strconv.FormatInt(st.Unix(), 10) + "' and "
+		if this.StartTime != 0 {
+			//st, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.UTC)
+			filterSql = filterSql + "created_at > '" + strconv.FormatInt(this.StartTime, 10) + "' and "
 		}
-		if this.ToTime != "" {
-			tt, _ := time.ParseInLocation("2006-01-02T15:04:05", this.ToTime, time.UTC)
-			filterSql = filterSql + "created_at < '" + strconv.FormatInt(tt.Unix(), 10) + "' and "
+		if this.ToTime != 0 {
+			//tt, _ := time.ParseInLocation("2006-01-02T15:04:05", this.ToTime, time.UTC)
+			filterSql = filterSql + "created_at < '" + strconv.FormatInt(this.ToTime, 10) + "' and "
 		}
 		if this.Priority != "" {
 			filterSql = filterSql + "priority = '" + this.Priority + "' and "
@@ -176,13 +177,13 @@ func (this *IntrudeDetectLog) List1(from, limit int) Result {
 		if this.HostName != "" {
 			filterSql = filterSql + "host_name = '" + this.HostName + "' and "
 		}
-		if this.StartTime != "" {
-			st, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.UTC)
-			filterSql = filterSql + "created_at > '" + strconv.FormatInt(st.Unix(), 10) + "' and "
+		if this.StartTime != 0 {
+			//st, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.UTC)
+			filterSql = filterSql + "created_at > " + fmt.Sprintf("%v", this.StartTime) + " and "
 		}
-		if this.ToTime != "" {
-			tt, _ := time.ParseInLocation("2006-01-02T15:04:05", this.ToTime, time.UTC)
-			filterSql = filterSql + "created_at < '" + strconv.FormatInt(tt.Unix(), 10) + "' and "
+		if this.ToTime != 0 {
+			//tt, _ := time.ParseInLocation("2006-01-02T15:04:05", this.ToTime, time.UTC)
+			filterSql = filterSql + "created_at < " + fmt.Sprintf("%v", this.ToTime) + " and "
 		}
 		if this.Priority != "" {
 			filterSql = filterSql + "priority = '" + this.Priority + "' and "

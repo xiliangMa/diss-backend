@@ -5,23 +5,22 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"time"
 )
 
 type ImageConfig struct {
-	Id            string    `orm:"pk;" description:"(镜像id   k8s拿不到镜像id, 用主机id+镜像名称填充)"`
-	ImageId       string    `orm:"" description:"(镜像id)"`
-	HostId        string    `orm:"" description:"(主机id)"`
-	HostName      string    `orm:"" description:"(主机名称)"`
-	Name          string    `orm:"" description:"(镜像名)"`
-	Size          string    `orm:"" description:"(大小)"`
-	OS            string    `orm:"" description:"(镜像名)"`
-	DissStatus    int8      `orm:"" description:"(安全状态)"`
-	Age           string    `orm:"default(null);" description:"(运行时长)"`
-	CreateTime    time.Time `orm:"null;type(datetime)" description:"(创建时间)"`
-	DBType        string    `-" description:"(数据库类型 Mysql Oracle Redis Postgres Mongodb Memcache DB2 Hbase)"`
-	GetLatestTask bool      `-" description:"(是否获取最新一个task、否则获取所有task列表)"`
-	TaskList      []*Task   `orm:"reverse(many);null" description:"(任务列表)"`
+	Id            string  `orm:"pk;" description:"(镜像id   k8s拿不到镜像id, 用主机id+镜像名称填充)"`
+	ImageId       string  `orm:"" description:"(镜像id)"`
+	HostId        string  `orm:"" description:"(主机id)"`
+	HostName      string  `orm:"" description:"(主机名称)"`
+	Name          string  `orm:"" description:"(镜像名)"`
+	Size          string  `orm:"" description:"(大小)"`
+	OS            string  `orm:"" description:"(镜像名)"`
+	DissStatus    int8    `orm:"" description:"(安全状态)"`
+	Age           string  `orm:"default(null);" description:"(运行时长)"`
+	CreateTime    int64   `orm:"default(0)" description:"(创建时间)"`
+	DBType        string  `-" description:"(数据库类型 Mysql Oracle Redis Postgres Mongodb Memcache DB2 Hbase)"`
+	GetLatestTask bool    `-" description:"(是否获取最新一个task、否则获取所有task列表)"`
+	TaskList      []*Task `orm:"reverse(many);null" description:"(任务列表)"`
 }
 
 type ImageConfigInterface interface {

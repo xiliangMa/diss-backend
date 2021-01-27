@@ -9,22 +9,22 @@ import (
 )
 
 type Cluster struct {
-	Id          string    `orm:"pk" description:"(集群id)"`
-	Name        string    `orm:"unique;size(32)" description:"(集群名)"`
-	FileName    string    `orm:"size(255)" description:"(KubeConfig 文件)"`
-	AuthType    string    `orm:"size(32);default(BearerToken)" description:"(认证类型 KubeConfig BearerToken)"`
-	BearerToken string    `orm:"" description:"(Token)"`
-	MasterUrls  string    `orm:"size(255)" description:"(ApiServer 访问地址)"`
-	Status      string    `orm:"size(32);default(Active)" description:"(集群状态 Active Unavailable)"`
-	Type        string    `orm:"size(32);default(Kubernetes)" description:"(类型 Kubernetes Openshift Rancher)"`
-	IsSync      bool      `orm:"default(false)" description:"(是否同步)"`
-	Label       string    `orm:"size(64);default(null)" description:"(标签)"`
-	ScopeUrl    string    `orm:"size(512);default()" description:"(scope访问地址)"`
-	SocpeStatus string    `orm:"size(64);default()" description:"(scope 操作状态)"`
-	AccountName string    `orm:"-" description:"(租户)"`
-	SyncStatus  string    `orm:"default(NotSynced)" description:"(同步状态 NotSynced 未同步 Synced 成功 InProcess 同步中 Fail 失败 Clearing 清理中)"`
-	CreateTime  time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
-	UpdateTime  time.Time `orm:"auto_now;type(datetime)" description:"(更新时间)"`
+	Id          string `orm:"pk" description:"(集群id)"`
+	Name        string `orm:"unique;size(32)" description:"(集群名)"`
+	FileName    string `orm:"size(255)" description:"(KubeConfig 文件)"`
+	AuthType    string `orm:"size(32);default(BearerToken)" description:"(认证类型 KubeConfig BearerToken)"`
+	BearerToken string `orm:"" description:"(Token)"`
+	MasterUrls  string `orm:"size(255)" description:"(ApiServer 访问地址)"`
+	Status      string `orm:"size(32);default(Active)" description:"(集群状态 Active Unavailable)"`
+	Type        string `orm:"size(32);default(Kubernetes)" description:"(类型 Kubernetes Openshift Rancher)"`
+	IsSync      bool   `orm:"default(false)" description:"(是否同步)"`
+	Label       string `orm:"size(64);default(null)" description:"(标签)"`
+	ScopeUrl    string `orm:"size(512);default()" description:"(scope访问地址)"`
+	SocpeStatus string `orm:"size(64);default()" description:"(scope 操作状态)"`
+	AccountName string `orm:"-" description:"(租户)"`
+	SyncStatus  string `orm:"default(NotSynced)" description:"(同步状态 NotSynced 未同步 Synced 成功 InProcess 同步中 Fail 失败 Clearing 清理中)"`
+	CreateTime  int64  `orm:"default(0)" description:"(创建时间)"`
+	UpdateTime  int64  `orm:"default(0)" description:"(更新时间)"`
 }
 
 type ClusterCheck struct {

@@ -73,7 +73,7 @@ func (this *ImageVirus) List(from, limit int) Result {
 	}
 
 	if this.CreatedAt != 0 {
-		filter = filter + `c."createdAt" > ` + fmt.Sprintf("%s", this.CreatedAt) + " and "
+		filter = filter + `c."createdAt" > ` + fmt.Sprintf("%v", this.CreatedAt) + " and "
 	}
 	if this.ImageName != "" {
 		filter = filter + `c."image_name" like '%` + this.ImageName + `%'`

@@ -70,7 +70,7 @@ func (this *JobService) ActiveJob() models.Result {
 
 func (this *JobService) InitsecurityCheckService() securitycheck.SecurityCheckService {
 
-	batch := time.Now().Unix()
+	batch := time.Now().UnixNano()
 	SecCheckListModel := models.SecurityCheckList{CheckList: this.securityCheckList}
 	securityCheckService := securitycheck.SecurityCheckService{SecurityCheckList: &SecCheckListModel, Batch: batch}
 

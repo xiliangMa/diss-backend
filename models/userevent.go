@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	//"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
@@ -9,18 +10,17 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type UserEvent struct {
-	Id          string    `orm:"pk;size(128)" description:"(pod id)"`
-	UserName    string    `orm:"size(32)" description:"(用户名)"`
-	AccountName string    `orm:"size(32)" description:"(租户)"`
-	RawLog      string    `orm:"default(null);" description:"(操作详情)"`
-	ModelType   string    `orm:"size(32)" description:"(模块类型)"`
-	CreateTime  time.Time `orm:"auto_now_add;type(datetime)" description:"(创建时间)"`
-	StartTime   string    `orm:"-" description:"(开始时间, 注意时间格式为 local 时间)"`
-	EndTime     string    `orm:"-" description:"(结束时间, 注意时间格式为 local 时间)"`
+	Id          string `orm:"pk;size(128)" description:"(pod id)"`
+	UserName    string `orm:"size(32)" description:"(用户名)"`
+	AccountName string `orm:"size(32)" description:"(租户)"`
+	RawLog      string `orm:"default(null);" description:"(操作详情)"`
+	ModelType   string `orm:"size(32)" description:"(模块类型)"`
+	CreateTime  int64  `orm:"default(0)" description:"(创建时间)"`
+	StartTime   int64  `orm:"-" description:"(开始时间, 注意时间格式为 local 时间)"`
+	EndTime     int64  `orm:"-" description:"(结束时间, 注意时间格式为 local 时间)"`
 }
 
 type UserEventInterface interface {
@@ -56,8 +56,8 @@ func (this *UserEvent) List(from, limit int) Result {
 		filter = filter + `raw_log like '%` + this.RawLog + `%' and `
 	}
 
-	if this.StartTime != "" && this.EndTime != "" {
-		filter = filter + `create_time BETWEEN '` + this.StartTime + `' and '` + this.EndTime + `' and `
+	if this.StartTime != 0 && this.EndTime != 0 {
+		filter = filter + `create_time BETWEEN ` + fmt.Sprintf("%v", this.StartTime) + ` and ` + fmt.Sprintf("%v", this.EndTime) + ` and `
 	}
 
 	if filter != "" {

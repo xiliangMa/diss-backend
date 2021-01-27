@@ -7,36 +7,35 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type ImagePackageVulnerabilities struct {
-	PkgUserId                  string    `description:"(用户Id)"`
-	PkgImageId                 string    `description:"(镜像id)"`
-	PkgImageName               string    `description:"(镜像名)"`
-	PkgName                    string    `description:"(名称)"`
-	PkgVersion                 string    `description:"(版本)"`
-	PkgPath                    string    `description:"(Path)"`
-	PkgType                    string    `description:"(类型)"`
-	PkgArch                    string    `description:"(架构)"`
-	VulnerabilityId            string    `description:"(漏铜Id)"`
-	VulnerabilityNamespaceName string    `description:"(操作系统)"`
-	CreatedAt                  time.Time `description:"(创建时间)"`
-	Severity                   string    `description:"(安全等级)"`
-	Link                       string    `description:"(漏洞详情)"`
+	PkgUserId                  string `description:"(用户Id)"`
+	PkgImageId                 string `description:"(镜像id)"`
+	PkgImageName               string `description:"(镜像名)"`
+	PkgName                    string `description:"(名称)"`
+	PkgVersion                 string `description:"(版本)"`
+	PkgPath                    string `description:"(Path)"`
+	PkgType                    string `description:"(类型)"`
+	PkgArch                    string `description:"(架构)"`
+	VulnerabilityId            string `description:"(漏铜Id)"`
+	VulnerabilityNamespaceName string `description:"(操作系统)"`
+	CreatedAt                  int64  `description:"(创建时间)"`
+	Severity                   string `description:"(安全等级)"`
+	Link                       string `description:"(漏洞详情)"`
 }
 
 type FeedDataVulnerabilities struct {
-	Id            string    `description:"(Id)"`
-	NamespaceName string    `description:"(命名空间名称)"`
-	Severity      string    `description:"(安全等级)"`
-	Description   string    `description:"(描述)"`
-	Link          string    `description:"(漏洞详情)"`
-	MetadataJson  string    `description:"(元数据)"`
-	Cvss2Vectors  string    `description:"(向量)"`
-	Cvss2Score    string    `description:"(分数)"`
-	CreatedAt     time.Time `description:"(创建时间)"`
-	UpdatedAt     time.Time `description:"(更新时间)"`
+	Id            string `description:"(Id)"`
+	NamespaceName string `description:"(命名空间名称)"`
+	Severity      string `description:"(安全等级)"`
+	Description   string `description:"(描述)"`
+	Link          string `description:"(漏洞详情)"`
+	MetadataJson  string `description:"(元数据)"`
+	Cvss2Vectors  string `description:"(向量)"`
+	Cvss2Score    string `description:"(分数)"`
+	CreatedAt     int64  `description:"(创建时间)"`
+	UpdatedAt     int64  `description:"(更新时间)"`
 }
 
 type ImagePackageVulnerabilitiesInterface interface {

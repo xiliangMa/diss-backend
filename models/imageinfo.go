@@ -16,7 +16,7 @@ type ImageInfo struct {
 	RepoTags    string `orm:"" description:"(RepoTags)"`
 	RepoDigests string `orm:"" description:"(RepoDigests)"`
 	Os          string `orm:"" description:"(系统)"`
-	Created     string `orm:"" description:"(创建时间)"`
+	Created     int64  `orm:"" description:"(创建时间)"`
 	Size        string `orm:"" description:"(大小)"`
 	Layers      string `orm:"" description:"(Layers)"`
 }

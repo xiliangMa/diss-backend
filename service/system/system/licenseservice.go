@@ -51,7 +51,7 @@ func (this *LicenseService) LicenseActive() models.Result {
 		}
 	}
 
-	licenseObject.ActiveAt = time.Now()
+	licenseObject.ActiveAt = time.Now().UnixNano()
 
 	message := ""
 	licenseQueryObj := models.LicenseConfig{}

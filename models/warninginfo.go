@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	uuid "github.com/satori/go.uuid"
@@ -22,10 +23,10 @@ type WarningInfo struct {
 	Info       string `orm:"" description:"(告警详情，json，请自定义内部结构)"`
 	Level      string `orm:"size(32)" description:"(告警级别)"`
 	Status     string `orm:"size(32)" description:"(状态)"`
-	CreateTime string `orm:"size(128)" description:"(发生时间)"`
-	UpdateTime string `orm:"size(128)" description:"(更新时间)"`
-	StartTime  string `orm:"-" description:"(开始时间, 注意时间格式为 local 时间)"`
-	EndTime    string `orm:"-" description:"(结束时间, 注意时间格式为 local 时间)"`
+	CreateTime int64  `orm:"size(128)" description:"(发生时间)"`
+	UpdateTime int64  `orm:"size(128)" description:"(更新时间)"`
+	StartTime  int64  `orm:"-" description:"(开始时间, 注意时间格式为 local 时间)"`
+	EndTime    int64  `orm:"-" description:"(结束时间, 注意时间格式为 local 时间)"`
 	Proposal   string `orm:"" description:"(建议)"`
 	Analysis   string `orm:"" description:"(关联分析)"`
 }
@@ -75,11 +76,11 @@ func (this *WarningInfo) List(from, limit int) Result {
 		filter = filter + `level = '` + this.Level + `' and `
 	}
 
-	if this.StartTime != "" && this.EndTime != "" {
-		startTime, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.Local)
-		endTime, _ := time.ParseInLocation("2006-01-02T15:04:05", this.EndTime, time.Local)
+	if this.StartTime != 0 && this.EndTime != 0 {
+		//startTime, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.Local)
+		//endTime, _ := time.ParseInLocation("2006-01-02T15:04:05", this.EndTime, time.Local)
 		//filter = filter + `create_time BETWEEN  '` + fmt.Sprintf("%v", startTime.Unix()) + `' and '` + fmt.Sprintf("%v", endTime.Unix()) + `' and `
-		filter = filter + `create_time BETWEEN  '` + startTime.Format("2006-01-02T15:04:05") + `' and '` + endTime.Format("2006-01-02T15:04:05") + `' and `
+		filter = filter + `create_time BETWEEN  ` + fmt.Sprintf("%v", this.StartTime) + ` and ` + fmt.Sprintf("%v", this.EndTime) + ` and `
 	}
 
 	if filter != "" {
@@ -124,8 +125,11 @@ func (this *WarningInfo) Add() Result {
 		this.Id = uid.String()
 	}
 
-	if this.CreateTime == "" {
-		this.CreateTime = time.Now().Format("2006-01-02T15:04:05Z")
+	if this.CreateTime == 0 {
+		this.CreateTime = time.Now().UnixNano()
+	}
+	if this.UpdateTime == 0 {
+		this.UpdateTime = time.Now().UnixNano()
 	}
 	_, err := o.Raw(insertSql,
 		this.Id,
@@ -161,6 +165,7 @@ func (this *WarningInfo) Update() Result {
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
 
+	this.UpdateTime = time.Now().UnixNano()
 	_, err := o.Raw(updateSql,
 		this.Status,
 		this.Id).Exec()

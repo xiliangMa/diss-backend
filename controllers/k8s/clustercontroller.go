@@ -206,7 +206,7 @@ func (this *ClusterController) DeleteCluster() {
 func (this *ClusterController) ClusterSecurityCheck() {
 	clusterCheck := new(models.ClusterCheck)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &clusterCheck)
-	batch := time.Now().Unix()
+	batch := time.Now().UnixNano()
 	clusterCheck.Batch = batch
 	securityCheckService := securitycheck.SecurityCheckService{ClusterCheckObject: clusterCheck, Batch: batch}
 	this.Data["json"] = securityCheckService.ClusterCheck()
