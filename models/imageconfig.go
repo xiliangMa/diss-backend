@@ -38,6 +38,9 @@ func (this *ImageConfig) Get() *ImageConfig {
 	object := new(ImageConfig)
 	var err error
 	cond := orm.NewCondition()
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
 	if this.ImageId != "" {
 		cond = cond.And("image_id", this.ImageId)
 	}

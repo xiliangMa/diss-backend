@@ -71,7 +71,7 @@ func (this *BaseService) CheckImageIsExist() (models.Result, []*models.ImageConf
 
 	for _, id := range strings.Split(this.ImageIds, ",") {
 		object := new(models.ImageConfig)
-		object.ImageId = id
+		object.Id = id
 		data := object.Get()
 		if data == nil {
 			ResultData.Code = utils.GetImageConfigErr
