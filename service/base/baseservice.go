@@ -71,15 +71,18 @@ func (this *BaseService) CheckImageIsExist() (models.Result, []*models.ImageConf
 
 	for _, id := range strings.Split(this.ImageIds, ",") {
 		object := new(models.ImageConfig)
-		object.Id = id
-		data := object.Get()
-		if data == nil {
-			ResultData.Code = utils.GetImageConfigErr
-			ResultData.Message = "GetImageConfigErr"
-			logs.Error("Check failed, Err: %s.", ResultData.Message)
-			return ResultData, nil
+		if id != "" {
+			object.Id = id
+			data := object.Get()
+			if data == nil {
+				ResultData.Code = utils.GetImageConfigErr
+				ResultData.Message = "GetImageConfigErr"
+				logs.Error("Check failed, Err: %s.", ResultData.Message)
+				return ResultData, nil
+			}
+			list = append(list, data)
 		}
-		list = append(list, data)
+
 	}
 	return ResultData, list
 }
