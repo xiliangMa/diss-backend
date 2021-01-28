@@ -125,6 +125,12 @@ func GetDBCountSql(hostId string) string {
 	return sqlByHostId
 }
 
+func GetNatsServes() string {
+	servers := beego.AppConfig.String("nats::Servers")
+	logs.Info("Nats conect url: %s", servers)
+	return servers
+}
+
 /**
  * @serverUrl nats://diss:diss@111.229.167.6:4222
  */

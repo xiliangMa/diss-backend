@@ -14,7 +14,7 @@ type HostPs struct {
 	User    string        `orm:"" description:"(用户)"`
 	CPU     string        `orm:"" description:"(CPU)"`
 	Mem     string        `orm:"" description:"(内存)"`
-	Time    string         `orm:"" description:"(时间)"`
+	Time    string        `orm:"" description:"(时间)"`
 	Start   string        `orm:"" description:"(运行时长 非mac)"`
 	Started string        `orm:"" description:"(运行时长 mac)"`
 	Command orm.TextField `orm:"" description:"(Command)"`

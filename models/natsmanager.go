@@ -2,8 +2,11 @@ package models
 
 import (
 	"github.com/astaxie/beego/logs"
+	"github.com/nats-io/nats.go"
 	"github.com/nats-io/stan.go"
 	"github.com/xiliangMa/diss-backend/utils"
+	"math/rand"
+	"strconv"
 )
 
 type NatsManager struct {
@@ -14,17 +17,35 @@ type NatsManager struct {
 }
 
 func NewNatsManager() *NatsManager {
-	serverUrl := utils.GetNatsServerUrl()
+	servers := utils.GetNatsServes()
+	//serverUrl := utils.GetNatsServerUrl()
 	clusterId := utils.GetNatsClusterId()
 	clientId := utils.GetNatsClientId()
-	nc, err := stan.Connect(clusterId, clientId, stan.NatsURL(serverUrl))
-	if err != nil {
-		logs.Error("Create NatsManager fail, ServerUrl: %s ClusterId: %s ClientId: %s, err: %s", serverUrl, clusterId, clientId, err)
-	}
+	sc, err := createStanConnect(clusterId, clientId, servers)
 	return &NatsManager{
-		Conn:      nc,
+		Conn:      sc,
 		Err:       err,
 		ClientId:  clientId,
 		ClusterId: clusterId,
 	}
+}
+
+func createStanConnect(clusterId, clientId, servers string) (stan.Conn, error) {
+	nc, err := nats.Connect(servers)
+	if err != nil {
+		logs.Error("Create Nats Connect failed, Servers: %s, err: %s", servers, err)
+	}
+	var sc stan.Conn
+	for {
+		id := clientId + strconv.Itoa(rand.Intn(1000))
+		sc, err = stan.Connect(clusterId, id, stan.NatsConn(nc))
+		if err != nil {
+			logs.Error("Create stan Connect failed, Servers: %s ClusterId: %s ClientId: %s, err: %s", servers, clusterId, clientId, err)
+			sc, err = stan.Connect(clusterId, id, stan.NatsConn(nc))
+		} else {
+			logs.Info("Create stan Connect success.")
+			break
+		}
+	}
+	return sc, err
 }
