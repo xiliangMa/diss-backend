@@ -200,6 +200,13 @@ func (this *SystemTemplate) Update() Result {
 	o.Using(utils.DS_Default)
 	var ResultData Result
 
+	if this.IsDefault {
+		_, err := o.Raw("update " + utils.SYSTemplate + " set is_default=false where type='" + this.Type + "'").Exec()
+		if err != nil {
+			logs.Warn("Update SystemTemplate isDefault fail , err: ", err)
+		}
+	}
+
 	_, err := o.Update(this)
 	if err != nil {
 		ResultData.Message = err.Error()
