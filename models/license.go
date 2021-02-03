@@ -42,8 +42,8 @@ type LicenseModule struct {
 	Id              string         `orm:"pk;" description:"(license module id)"`
 	LicenseConfig   *LicenseConfig `orm:"rel(fk)" description:"(license file)"`
 	ModuleCode      string         `orm:"size(128);" description:"(授权模块)"`
-	LicenseCount    int64          `orm:"size(32);default(0)" description:"(授权模块数量)"`
-	IsLicensedCount int64          `orm:"size(32);default(0)" description:"(已使用授权模块数量)"`
+	LicenseCount    int64          `orm:"size(64);default(0)" description:"(授权模块数量)"`
+	IsLicensedCount int64          `orm:"size(64);default(0)" description:"(已使用授权模块数量)"`
 	LicenseExpireAt int64          `orm:"default(0)" description:"(授权结束时间)"`
 }
 

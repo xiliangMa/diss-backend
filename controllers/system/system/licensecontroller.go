@@ -199,7 +199,7 @@ func (this *LicenseController) SetHostLicense() {
 	// 4 - ，如果是添加授权，检查是否授权过期
 	expireTime := licBenchData.LicenseExpireAt
 	curTime := time.Now().UnixNano()
-	if curTime < expireTime {
+	if curTime > expireTime {
 		result.Code = utils.LicenseExpiredErr
 		result.Message = "License Expired"
 		this.Data["json"] = result
