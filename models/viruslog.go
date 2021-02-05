@@ -141,7 +141,7 @@ func (this *DockerVirus) List(from, limit int) Result {
 		}
 
 		if this.TargeType == IDLT_Host {
-			filterSql = filterSql + "host_id = '" + this.HostId + "' and "
+			filterSql = filterSql + "host_id ilike '%" + this.HostId + "%' and "
 		}
 		if this.Virus != "" {
 			filterSql = filterSql + utils.DockerVirus + `."virus" like '%` + this.Virus + "%' and "
