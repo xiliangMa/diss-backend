@@ -17,12 +17,6 @@ services:
       - diss-db
     depends_on:
       - diss-db
-      - nats1
-      - nats2
-      - nats3
-      - nats-streaming1
-      - nats-streaming2
-      - nats-streaming3
     volumes:
       - /var/lib/diss/diss-backend/upload/kubernetes:/opt/diss-backend/upload/kubernetes
       - /var/log/diss/diss-backend:/opt/diss-backend/logs
@@ -45,66 +39,13 @@ services:
     networks:
       - "diss-net-all"
 
-  nats1:
-    image: registry.cn-qingdao.aliyuncs.com/diss/nats:2.1.9
+  diss-nats-streaming:
+    restart: unless-stopped
+    container_name: diss-nats-streaming
+    image: registry.cn-qingdao.aliyuncs.com/diss/nats-streaming:latest
     ports:
       - 4222:4222
-      - 8222:8222
+    command: -cid=diss-cluster -p 4222 -m 8222 --user "diss" --pass "dissP@ssw0rd"
     networks:
-      - diss-net-all
-    command: -m 8222 --user "diss" --pass "dissP@ssw0rd" --cluster nats://0.0.0.0:6222 --routes nats://nats3:6222
-  nats2:
-    image: registry.cn-qingdao.aliyuncs.com/diss/nats:2.1.9
-    ports:
-      - 4223:4222
-      - 8223:8222
-    networks:
-      - diss-net-all
-    command: -m 8222 --user "diss" --pass "dissP@ssw0rd" --cluster nats://0.0.0.0:6222 --routes nats://nats1:6222
-  nats3:
-    image: registry.cn-qingdao.aliyuncs.com/diss/nats:2.1.9
-    ports:
-      - 4224:4222
-      - 8224:8222
-    networks:
-      - diss-net-all
-    command: -m 8222 --user "diss" --pass "dissP@ssw0rd" --cluster nats://0.0.0.0:6222 --routes nats://nats2:6222
+      - "diss-net-all"
 
-  nats-streaming1:
-    image: registry.cn-qingdao.aliyuncs.com/diss/nats-streaming:0.20.0
-    depends_on:
-      - nats1
-      - nats2
-      - nats3
-    networks:
-      - diss-net-all
-    volumes:
-      - /var/lib/diss/nats/nats-streaming1/data:/workspace/data
-      - /var/log/diss/nats/nats-streaming1/log:/workspace/log
-    command: "--store file --dir /workspace/data -clustered --cluster_log_path /workspace/log --cluster_id diss-cluster --cluster_node_id nats-streaming1  --cluster_peers nats-streaming2,nats-streaming3 --cluster_sync --nats_server nats://diss:dissP@ssw0rd@nats1:4222,nats://diss:dissP@ssw0rd@nats2:4222,nats://diss:dissP@ssw0rd@nats3:4222"
-
-  nats-streaming2:
-    image: registry.cn-qingdao.aliyuncs.com/diss/nats-streaming:0.20.0
-    depends_on:
-      - nats1
-      - nats2
-      - nats3
-    networks:
-      - diss-net-all
-    volumes:
-      - /var/lib/diss/nats/nats-streaming2/data:/workspace/data
-      - /var/log/diss/nats/nats-streaming2/log:/workspace/log
-    command: "--store file --dir /workspace/data -clustered --cluster_log_path /workspace/log --cluster_id diss-cluster --cluster_node_id nats-streaming2 --cluster_peers nats-streaming1,nats-streaming3 --cluster_sync --nats_server nats://diss:dissP@ssw0rd@nats1:4222,nats://diss:dissP@ssw0rd@nats2:4222,nats://diss:dissP@ssw0rd@nats3:4222"
-
-  nats-streaming3:
-    image: registry.cn-qingdao.aliyuncs.com/diss/nats-streaming:0.20.0
-    depends_on:
-      - nats1
-      - nats2
-      - nats3
-    networks:
-      - diss-net-all
-    volumes:
-      - /var/lib/diss/nats/nats-streaming3/data:/workspace/data
-      - /var/log/diss/nats/nats-streaming3/log:/workspace/log
-    command: "--store file --dir /workspace/data -clustered --cluster_log_path /workspace/log --cluster_id diss-cluster --cluster_node_id nats-streaming3 --cluster_peers nats-streaming1,nats-streaming2 --cluster_sync --nats_server nats://diss:dissP@ssw0rd@nats1:4222,nats://diss:dissP@ssw0rd@nats2:4222,nats://diss:dissP@ssw0rd@nats3:4222"
