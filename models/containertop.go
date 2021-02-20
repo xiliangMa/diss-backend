@@ -15,7 +15,7 @@ type ContainerPs struct {
 	ContainerId string        `orm:"" description:"(容器id)"`
 	CPU         string        `orm:"" description:"(CPU)"`
 	Mem         string        `orm:"" description:"(内存)"`
-	Time        string         `orm:"" description:"(时间)"`
+	Time        string        `orm:"" description:"(时间)"`
 	Start       string        `orm:"" description:"(运行时长 非mac)"`
 	Started     string        `orm:"" description:"(运行时长 mac)"`
 	Command     orm.TextField `orm:"" description:"(Command)"`

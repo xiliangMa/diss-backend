@@ -201,6 +201,10 @@ var (
 	LicenseFCodeErr                 = 1238
 	LicenseHostErr                  = 1239
 	LDAPConnErr                     = 1240
+	AddWarningWhiteListErr          = 1241
+	EditWarningWhiteListErr         = 1242
+	GetWarningWhiteListErr          = 1243
+	DeleteWarningWhiteListErr       = 1244
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300

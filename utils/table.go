@@ -30,6 +30,7 @@ var (
 	Deployment       = "deployment"
 	NetworkPolicy    = "network_policy"
 	SysConfig        = "sys_config"
+	WarningWhiteList = "warning_white_list"
 
 	//security_log timescaledb
 	DcokerIds   = "docker_ids"

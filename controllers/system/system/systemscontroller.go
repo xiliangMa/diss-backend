@@ -105,3 +105,68 @@ func (this *SystemController) UpdateSysConfig() {
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }
+
+// @Title AddWarningWhiteList
+// @Description Add WarningWhiteList Item
+// @Param token header string true "authToken"
+// @Param body body models.WarningWhiteList false "告警白名单"
+// @Success 200 {object} models.Result
+// @router /system/warnwhitelist [post]
+func (this *SystemController) AddWarningWhiteList() {
+	whiteListConfig := new(models.WarningWhiteList)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &whiteListConfig)
+
+	this.Data["json"] = whiteListConfig.Add()
+	this.ServeJSON(false)
+}
+
+// @Title UpdateWarningWhiteList
+// @Description Update WarningWhiteList
+// @Param token header string true "authToken"
+// @Param id path string "" true "Id"
+// @Param body body models.WarningWhiteList false "告警白名单"
+// @Success 200 {object} models.Result
+// @router /system/warnwhitelist/:id [put]
+func (this *SystemController) UpdateWarningWhiteList() {
+	id := this.GetString(":id")
+	whiteListConfig := new(models.WarningWhiteList)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &whiteListConfig)
+	whiteListConfig.Id = id
+	result := whiteListConfig.Update()
+
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
+// @Title GetWarningWhiteList
+// @Description Get WarningWhiteList
+// @Param token header string true "authToken"
+// @Param body body models.WarningWhiteList false "告警白名单"
+// @Success 200 {object} models.Result
+// @Param from query int 0 false "from"
+// @Param limit query int 20 false "limit"
+// @router /system/warnwhitelists [post]
+func (this *SystemController) GetWarningWhiteList() {
+	whiteListConfig := new(models.WarningWhiteList)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &whiteListConfig)
+
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+	this.Data["json"] = whiteListConfig.List(from, limit)
+	this.ServeJSON(false)
+}
+
+// @Title DeleteWarningWhiteList
+// @Description Delete WarningWhiteList
+// @Param token header string true "authToken"
+// @Param id path string "" true "id"
+// @Success 200 {object} models.Result
+// @router /system/warnwhitelist/:id [delete]
+func (this *SystemController) DeleteWarningWhiteList() {
+	id := this.GetString(":id")
+	whiteListConfig := new(models.WarningWhiteList)
+	whiteListConfig.Id = id
+
+	this.Data["json"] = whiteListConfig.Delete()
+	this.ServeJSON(false)
+}
