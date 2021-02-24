@@ -137,7 +137,7 @@ func (this *DockerVirus) List(from, limit int) Result {
 		if this.ContainerId != IDLT_Host && this.TargeType == IDLT_Docker {
 			containerId := this.ContainerId
 			containerId = string([]byte(this.ContainerId)[:12])
-			filterSql = filterSql + "container_id = '" + containerId + "' and "
+			filterSql = filterSql + "container_id ilike '" + containerId + "' and "
 		}
 
 		if this.TargeType == IDLT_Host {
