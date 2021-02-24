@@ -146,7 +146,10 @@ func (this *DefaultDB) InitSystemData() {
 	if err != nil {
 		logs.Error("Init WarningInfo Config  fail, err: %s", err)
 	}
-
+	_, err = o.Raw(dbscript.WarningWhiteListConfig).Exec()
+	if err != nil {
+		logs.Error("Init WarningInfoWhiteListConfig Config  fail, err: %s", err)
+	}
 	_, err = o.Raw(dbscript.DefaultMailServerConfig).Exec()
 	if err != nil {
 		logs.Error("Init DefaultMailServer Config fail, err: %s", err)

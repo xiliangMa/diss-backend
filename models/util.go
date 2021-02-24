@@ -265,4 +265,11 @@ var (
 	Image_Content_Type_OS        = "os"
 	Image_Vuln_Type_All          = "all"
 	Image_Metadata_Type_Manifest = "manifest"
+
+	// white list
+	WarnWhiteListConfigKey             = "WarnWhiteList"
+	WarnWhiteListCnTrans_Node          = []string{"节点", "node"}
+	WarnWhiteListCnTrans_ContainerId   = []string{"容器ID", "container\\.id"}
+	WarnWhiteListCnTrans_ContainerName = []string{"容器名称", "container\\.name"}
+	WarnWhiteListCnTrans_CmdLine       = []string{"命令包含", "proc\\.cmdline"}
 )

@@ -445,55 +445,64 @@ func (this *NatsSubService) Save() error {
 			}
 			return nil
 		case models.Resource_WarningInfo:
-			sysConfig := models.SysConfig{}
-			sysConfig.Key = models.Resource_WarningInfo
-			warningInfoConfig := sysConfig.Get()
+			sysConfigService := system.SysConfigService{}
+			sysConfigService.ConfigKey = models.Resource_WarningInfo
+			sysConfigService.ParamName = models.Enable
+			warningInfoConfigStatus, _ := sysConfigService.GetConfigDataBool()
 
-			// WarningInfo 配置项开启时上报告警数据
-			if warningInfoConfig != nil && warningInfoConfig.Value != "" {
-				sysConfigJson := map[string]bool{}
-				err := json.Unmarshal([]byte(warningInfoConfig.Value), &sysConfigJson)
-				if err != nil {
-					logs.Error("Parse %s Config error %s", models.Resource_WarningInfo, err)
+			// WarningInfoConfig 配置项开启时上报告警数据
+			if warningInfoConfigStatus {
+				warningInfo := models.WarningInfo{}
+				s, _ := json.Marshal(ms.Data)
+				if err := json.Unmarshal(s, &warningInfo); err != nil {
+					logs.Error("Parse %s error %s", ms.Tag, err)
 					return err
 				}
-				if sysConfigJson[models.Enable] == true {
-					warningInfo := models.WarningInfo{}
-					s, _ := json.Marshal(ms.Data)
-					if err := json.Unmarshal(s, &warningInfo); err != nil {
-						logs.Error("Parse %s error %s", ms.Tag, err)
-						return err
+				logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", warningInfo.HostId, models.Resource_WarningInfo+"-"+warningInfo.Type)
+
+				// WarnWhiteListConfig 告警白名单启用时执行
+				sysConfigService.ConfigKey = models.WarnWhiteListConfigKey
+				sysConfigService.ParamName = models.Enable
+				warningWhiteListConfig, _ := sysConfigService.GetConfigDataBool()
+				if warningWhiteListConfig {
+					warningInfoFilter := system.WariningFilterService{}
+					filterstatus := warningInfoFilter.FilterWarnWhiteList(warningInfo)
+
+					// 符合白名单规则的，直接停止后续处理
+					if filterstatus {
+						break
 					}
-					logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", warningInfo.HostId, models.Resource_WarningInfo+"-"+warningInfo.Type)
-					if warningInfo.HostId != "" {
-						if strings.HasPrefix(warningInfo.Type, "ALERT_TYPE") {
-							hostParam := models.HostConfig{Id: warningInfo.HostId}
-							hostconfig := hostParam.Get()
-							if hostconfig != nil {
-								warningInfo.Cluster = hostconfig.ClusterName
-							}
-							warningInfo.Account = "admin"
+				}
+
+				if warningInfo.HostId != "" {
+					if strings.HasPrefix(warningInfo.Type, "ALERT_TYPE") {
+						hostParam := models.HostConfig{Id: warningInfo.HostId}
+						hostconfig := hostParam.Get()
+						if hostconfig != nil {
+							warningInfo.Cluster = hostconfig.ClusterName
 						}
+						warningInfo.Account = "admin"
 					}
+				}
 
-					if result := warningInfo.Add(); result.Code != http.StatusOK {
-						return errors.New(result.Message)
-					}
+				if result := warningInfo.Add(); result.Code != http.StatusOK {
+					return errors.New(result.Message)
+				}
 
-					// WarningInfo 通过通道推送给邮件发送协程
-					logfilter := new(system.LogToMailFilterService)
-					logfilter.CurLevelTag = warningInfo.Level
-					logfilter.InfoType = models.LogType_IntrudeDetectLog
-					logfilter.InfoSubType = warningInfo.Type
+				// WarningInfo 通过通道推送给邮件发送协程
+				logfilter := new(system.LogToMailFilterService)
+				logfilter.CurLevelTag = warningInfo.Level
+				logfilter.InfoType = models.LogType_IntrudeDetectLog
+				logfilter.InfoSubType = warningInfo.Type
 
-					if models.MSM != nil && models.MSM.MailServerConfig != nil && models.MSM.LogToMailConfig != nil {
-						if models.MSM.MailServerConfig.EnableSendLog && logfilter.GetLogFilterStatus() {
-							if warningInfo.Type != models.TMP_Type_BM_Docker && warningInfo.Type != models.TMP_Type_BM_K8S {
-								logfilter.SendToChannel(warningInfo)
-							}
+				if models.MSM != nil && models.MSM.MailServerConfig != nil && models.MSM.LogToMailConfig != nil {
+					if models.MSM.MailServerConfig.EnableSendLog && logfilter.GetLogFilterStatus() {
+						if warningInfo.Type != models.TMP_Type_BM_Docker && warningInfo.Type != models.TMP_Type_BM_K8S {
+							logfilter.SendToChannel(warningInfo)
 						}
 					}
 				}
+
 			}
 		}
 	case models.Type_Control:
