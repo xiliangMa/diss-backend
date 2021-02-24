@@ -23,7 +23,7 @@ spec:
       containers:
       - command:
         - ./entrypoint.sh
-        image: registry.cn-qingdao.aliyuncs.com/diss/diss-backend
+        image: registry.cn-qingdao.aliyuncs.com/diss/diss-backend:2.2.0.4
         imagePullPolicy: IfNotPresent
         name: diss-backend
         ports:

@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   labels:
     origin: diss
@@ -7,13 +7,12 @@ metadata:
   name: diss-db
   namespace: diss
 spec:
+  serviceName: diss-db
   replicas: 1
   selector:
     matchLabels:
       origin: diss
       app: diss-db
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
@@ -54,7 +53,6 @@ spec:
           - mountPath: /var/lib/diss/postgres
             name: diss-db-data
             subPath: data
-      restartPolicy: Always
       volumes:
       - name: diss-db-data
         emptyDir: {}

@@ -121,6 +121,9 @@ data:
 
     [license]
     LicensePath = "upload/license/"
+
+    [proxy]
+    Port = 10444
 kind: ConfigMap
 metadata:
   labels:

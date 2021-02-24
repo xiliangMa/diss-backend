@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: diss-ingress
+spec:
+  rules:
+  - host: "dns"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: diss-backend
+            port:
+              number: 10443
+
