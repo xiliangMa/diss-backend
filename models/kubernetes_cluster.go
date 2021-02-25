@@ -92,6 +92,7 @@ func (this *Cluster) Add(isForce bool) Result {
 		cluster.MasterUrls = this.MasterUrls
 		cluster.Status = Cluster_Status_Active
 		cluster.IsSync = Cluster_IsSync
+		cluster.UpdateTime = time.Now().UnixNano()
 		ResultData = cluster.Update()
 		if ResultData.Code != http.StatusOK {
 			return ResultData
@@ -106,6 +107,8 @@ func (this *Cluster) Add(isForce bool) Result {
 			logs.Error("Add Cluster failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 			return ResultData
 		}
+		this.CreateTime = time.Now().UnixNano()
+		this.UpdateTime = time.Now().UnixNano()
 		_, err = o.Insert(this)
 
 		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
