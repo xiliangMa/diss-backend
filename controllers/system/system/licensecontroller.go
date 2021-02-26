@@ -35,13 +35,22 @@ func (this *LicenseController) AddLicenseFile() {
 	licenseByte := []byte{}
 
 	defer f.Close()
+	// 文件上传或更新不成功，直接返回（预处理未通过）
+	if result.Code != http.StatusOK {
+		this.Data["json"] = result
+		this.ServeJSON(false)
+		return
+	}
 
 	err := this.SaveToFile(key, fpath)
 
-	if err != nil && result.Code != utils.CheckLicenseFileIsExistErr {
-		result.Code = utils.ImportLicenseFileErr
-		result.Message = "ImportLicenseFileErr"
-		logs.Error("Import license file fail, err: %s", err.Error())
+	if err != nil {
+		result.Code = utils.SaveLicenseFileErr
+		result.Message = "Save LicenseFile Err"
+		logs.Error("Save LicenseFile fail, err: %s", err.Error())
+		this.Data["json"] = result
+		this.ServeJSON(false)
+		return
 	}
 
 	if isForce { // 强制更新
@@ -83,8 +92,8 @@ func (this *LicenseController) AddLicenseFile() {
 		}
 	}
 
-	if result.Code == utils.LicenseFCodeErr {
-		//特征码无效 ，删除上传的文件
+	if result.Code != http.StatusOK {
+		// 导入授权出错，删除上传的文件
 		err := os.Remove(fpath)
 		if err != nil {
 			result.Code = utils.DeleteFileErr

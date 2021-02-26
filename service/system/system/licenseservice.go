@@ -38,7 +38,11 @@ func (this *LicenseService) LicenseActive() models.Result {
 	err := json.Unmarshal(plainText, &licenseObject)
 	if err != nil {
 		result.Code = utils.LicenseUnmarshalErr
-		logs.Error("License import fail, Unmarshal license err,  %s", err)
+		msg := fmt.Sprintf("License file format or content fail, err:  %s", err)
+		result.Message = msg
+		result.Data = nil
+		logs.Error(msg)
+		return result
 	}
 
 	if licenseObject.Type != models.LicType_TrialLicense {
@@ -108,6 +112,7 @@ func (this *LicenseService) CheckLicenseFile(h *multipart.FileHeader) (models.Re
 			message := "Delete file Error: " + fpath + licFilename
 			result.Message = message
 			logs.Info(message)
+			return result, fpath
 		}
 		licFilename = models.LicType_TrialLicense + models.LicFile_Extension
 	}
