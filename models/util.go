@@ -272,4 +272,7 @@ var (
 	WarnWhiteListCnTrans_ContainerId   = []string{"容器ID", "container\\.id"}
 	WarnWhiteListCnTrans_ContainerName = []string{"容器名称", "container\\.name"}
 	WarnWhiteListCnTrans_CmdLine       = []string{"命令包含", "proc\\.cmdline"}
+
+	// png type
+	PictureType = "image/png"
 )

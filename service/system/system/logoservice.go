@@ -8,7 +8,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"path"
 )
 
 type LogoService struct {
@@ -18,20 +17,34 @@ func (this *LogoService) getLogoPath() string {
 	return beego.AppConfig.String("system::LogoPath")
 }
 
-func (this *LogoService) CheckLogoPost(ext, fName string) int {
-	var AllowExtMap map[string]bool = map[string]bool{
-		".png": true,
-	}
-	if _, ok := AllowExtMap[ext]; !ok {
+func (this *LogoService) CheckLogoPost(fh *multipart.FileHeader) int {
+
+	// Open File
+	f, err := fh.Open()
+	if err != nil {
+		logs.Error("Open file error, err: %s", err)
 		return utils.ChecLogoPostErr
 	}
+	defer f.Close()
+
+	// Get the content
+	datatype, err := this.GetFileContentType(f)
+	if err != nil {
+		logs.Error("Get the content error, err: %s", err)
+		return utils.ChecLogoPostErr
+	}
+
+	if datatype != models.PictureType {
+		return utils.ChecLogoPostErr
+	}
+
 	return http.StatusOK
 }
 
 func (this *LogoService) CreateLogoDir(fpath string) {
 	_, err := os.Stat(fpath)
 	if os.IsNotExist(err) {
-		logs.Info("Create logo Dir success, path: %s", fpath)
+		logs.Info("Create logo dir success, path: %s", fpath)
 		os.MkdirAll(beego.AppConfig.String("system::LogoPath"), os.ModePerm)
 	}
 }
@@ -39,16 +52,14 @@ func (this *LogoService) CreateLogoDir(fpath string) {
 func (this *LogoService) Check(h *multipart.FileHeader) (models.Result, string) {
 	var fpath = this.getLogoPath()
 	var result models.Result
-	fName := h.Filename
-	ext := path.Ext(fName)
 
 	//创建目录
 	this.CreateLogoDir(fpath)
 
 	// 后缀名不符合上传要求
-	if code := this.CheckLogoPost(ext, fName); code != http.StatusOK {
+	if code := this.CheckLogoPost(h); code != http.StatusOK {
 		result.Code = code
-		result.Message = "ChecLogoPostErr"
+		result.Message = "Png Format Incorrect."
 		return result, fpath
 	}
 
@@ -70,4 +81,19 @@ func (this *LogoService) CheckLogoIsExist() models.Result {
 	result.Data = data
 	result.Code = http.StatusOK
 	return result
+}
+
+func (this *LogoService) GetFileContentType(file multipart.File) (string, error) {
+
+	buffer := make([]byte, 512)
+
+	contentType := ""
+	_, err := file.Read(buffer)
+	if err != nil {
+		return contentType, err
+	}
+
+	contentType = http.DetectContentType(buffer)
+
+	return contentType, nil
 }
