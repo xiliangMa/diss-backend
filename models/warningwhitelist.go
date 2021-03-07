@@ -17,6 +17,7 @@ type WarningWhiteList struct {
 	Rule            string `orm:"size(256)" description:"(规则)"`
 	Enabled         bool   `orm:"" description:"(是否启用)"`
 	IsAll           bool   `orm:"-" description:"(是否获取全部)"`
+	WarningInfoId   string `orm:"size(128)" description:"(外键id)" `
 }
 
 type WarningWhiteListInterface interface {

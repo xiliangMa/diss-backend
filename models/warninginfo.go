@@ -13,22 +13,27 @@ import (
 )
 
 type WarningInfo struct {
-	Id         string `orm:"pk;size(128)" description:"(Id)"`
-	Name       string `orm:"size(256)" description:"(告警名称)"`
-	HostId     string `orm:"size(256)" description:"(主机Id agent采集数据)"`
-	HostName   string `orm:"size(256)" description:"(主机Name agent采集数据)"`
-	Cluster    string `orm:"size(256)" description:"(集群名)"`
-	Account    string `orm:"size(256)" description:"(租户)"`
-	Type       string `orm:"size(32)" description:"(类型 如：基线检测、病毒检查、入侵检测、镜像安全等)"`
-	Info       string `orm:"" description:"(告警详情，json，请自定义内部结构)"`
-	Level      string `orm:"size(32)" description:"(告警级别)"`
-	Status     string `orm:"size(32)" description:"(状态)"`
-	CreateTime int64  `orm:"size(128)" description:"(发生时间)"`
-	UpdateTime int64  `orm:"size(128)" description:"(更新时间)"`
-	StartTime  int64  `orm:"-" description:"(开始时间, 注意时间格式为 local 时间)"`
-	EndTime    int64  `orm:"-" description:"(结束时间, 注意时间格式为 local 时间)"`
-	Proposal   string `orm:"" description:"(建议)"`
-	Analysis   string `orm:"" description:"(关联分析)"`
+	Id            string `orm:"pk;size(128)" description:"(Id)"`
+	Name          string `orm:"size(256)" description:"(告警名称)"`
+	HostId        string `orm:"size(256)" description:"(主机Id agent采集数据)"`
+	HostName      string `orm:"size(256)" description:"(主机Name agent采集数据)"`
+	Cluster       string `orm:"size(256)" description:"(集群名)"`
+	Account       string `orm:"size(256)" description:"(租户)"`
+	Type          string `orm:"size(32)" description:"(类型 如：基线检测、病毒检查、入侵检测、镜像安全等)"`
+	Info          string `orm:"size(1024)" description:"(告警详情，json，请自定义内部结构)"`
+	Level         string `orm:"size(32)" description:"(告警级别)"`
+	Status        string `orm:"size(256)" description:"(状态)"`
+	CreateTime    int64  `orm:"" description:"(发生时间)"`
+	UpdateTime    int64  `orm:"" description:"(更新时间)"`
+	StartTime     int64  `orm:"-" description:"(开始时间, 注意时间格式为 local 时间)"`
+	EndTime       int64  `orm:"-" description:"(结束时间, 注意时间格式为 local 时间)"`
+	Proposal      string `orm:"size(256)" description:"(建议)"`
+	Analysis      string `orm:"size(256)" description:"(关联分析)"`
+	Mode          string `orm:"size(128)" description:"(方式)"`
+	ContainerId   string `orm:"-"`
+	ContainerName string `orm:"-"`
+	ImageName     string `orm:"-"`
+	Action        string `orm:"-" description:"(处理方式：isolation、pause、stop、kill)"`
 }
 
 type WarningInfoInterface interface {
@@ -98,14 +103,14 @@ func (this *WarningInfo) List(from, limit int) Result {
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetWarningInfoListErr
-		logs.Error("Get WarningInfo List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error("Get WarningInfo list failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
 	o.Raw(countSql).QueryRow(&total)
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = WarningInfoList
+	data[Result_Total] = total
+	data[Result_Items] = WarningInfoList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
@@ -116,7 +121,7 @@ func (this *WarningInfo) List(from, limit int) Result {
 }
 
 func (this *WarningInfo) Add() Result {
-	insertSql := `INSERT INTO ` + utils.WarningInfo + ` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	insertSql := `INSERT INTO ` + utils.WarningInfo + ` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
@@ -145,7 +150,7 @@ func (this *WarningInfo) Add() Result {
 		this.CreateTime,
 		this.UpdateTime,
 		this.Proposal,
-		this.Analysis).Exec()
+		this.Analysis, this.Mode).Exec()
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -160,15 +165,27 @@ func (this *WarningInfo) Add() Result {
 }
 
 func (this *WarningInfo) Update() Result {
-	updateSql := `UPDATE ` + utils.WarningInfo + ` SET status=? WHERE id=?`
+	var err error
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
 
 	this.UpdateTime = time.Now().UnixNano()
-	_, err := o.Raw(updateSql,
-		this.Status,
-		this.Id).Exec()
+	if this.Status != "" {
+		_, err = o.Raw(`UPDATE `+utils.WarningInfo+` SET status=? WHERE id=?`, this.Status, this.Id).Exec()
+	}
+
+	if this.Proposal != "" {
+		_, err = o.Raw(`UPDATE `+utils.WarningInfo+` SET proposal=? WHERE id=?`, this.Proposal, this.Id).Exec()
+	}
+
+	if this.Proposal != "" && this.Status != "" {
+		_, err = o.Raw(`UPDATE `+utils.WarningInfo+` SET proposal=?,status=? WHERE id=?`, this.Proposal, this.Status, this.Id).Exec()
+	}
+
+	if this.Mode != "" {
+		_, err = o.Raw(`UPDATE `+utils.WarningInfo+` SET mode=? WHERE id=?`, this.Mode, this.Id).Exec()
+	}
 
 	if err != nil {
 		ResultData.Message = err.Error()

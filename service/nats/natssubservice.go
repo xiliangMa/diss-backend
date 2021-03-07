@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/astaxie/beego/logs"
+	"github.com/mitchellh/mapstructure"
 	"github.com/nats-io/stan.go"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/synccheck"
@@ -647,6 +648,56 @@ func (this *NatsSubService) Save() error {
 					taskLog.Add()
 				}
 			}
+		case models.Resource_ContainerControlStatus:
+
+			var obj map[string]interface{}
+			var cc map[string]interface{}
+			resp := models.RespCenter{}
+			wi := models.WarningInfo{}
+			s, _ := json.Marshal(ms.Data)
+			if err := json.Unmarshal(s, &obj); err != nil {
+				logs.Error("Parse %s error %s", ms.Tag, err)
+				return err
+			}
+
+			containerControl := obj["ContainerControl"]
+
+			if err := json.Unmarshal([]byte(containerControl.(string)), &cc); err != nil {
+				logs.Error("Parse %s error %s", ms.Tag, err)
+				return err
+			}
+
+			logs.Info("ContainerControlStatus Status : %s, data: %v", obj[models.StatusKey], cc)
+
+			if cc[models.WarningInfoId] == nil {
+				if err := mapstructure.Decode(cc, &wi); err != nil {
+					logs.Error("Parse %s error %s", ms.Tag, err)
+				}
+
+				if obj[models.StatusKey] == "" {
+					wi.Status = models.WarnInfoStatus
+				} else {
+					wi.Status = models.FailStatus
+				}
+
+				if result := wi.Update(); result.Code != http.StatusOK {
+					return errors.New(result.Message)
+				}
+
+			} else {
+				if err := mapstructure.Decode(cc, &resp); err != nil {
+					logs.Error("Parse %s error %s", ms.Tag, err)
+				}
+				if obj[models.StatusKey] == "" {
+					resp.Status = models.Status
+				} else {
+					resp.Status = obj[models.StatusKey].(string)
+				}
+				if result := resp.Update(); result.Code != http.StatusOK {
+					return errors.New(result.Message)
+				}
+			}
+
 		}
 	}
 

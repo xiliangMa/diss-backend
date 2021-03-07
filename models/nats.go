@@ -29,10 +29,12 @@ const (
 	Resource_ClientModuleControl    = "ClientModuleControl"    // 客户端模块控制
 
 	// #################### （Type）Nats Type 通信类型
-	Type_Metric       = "Metric"       //指标类型
-	Type_ReceiveState = "ReceiveState" //接收状态类型
-	Type_RequestState = "RequestState" //请求状态类型
-	Type_Control      = "Control"      //控制类型
+	Type_Metric                     = "Metric"                 //指标类型
+	Type_ReceiveState               = "ReceiveState"           //接收状态类型
+	Type_RequestState               = "RequestState"           //请求状态类型
+	Type_Control                    = "Control"                //控制类型
+	Resource_ContainerControl       = "ContainerControl"       // 容器控制
+	Resource_ContainerControlStatus = "ContainerControlStatus" // 响应中心状态
 
 	// #################### （ResourceControlType）Nats RCType  资源操作类型
 	Resource_Control_Type_Get    = "Get"
