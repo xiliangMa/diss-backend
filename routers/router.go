@@ -146,6 +146,7 @@ func init() {
 				&csystem.IntegrationController{},
 				&csystem.LicenseController{},
 				&csystem.FeedsController{},
+				&csystem.RespCenterController{},
 			),
 		),
 		beego.NSNamespace("/v1/jobs",

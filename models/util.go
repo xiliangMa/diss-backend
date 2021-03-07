@@ -275,4 +275,15 @@ var (
 
 	// png type
 	PictureType = "image/png"
+
+	WarnInfoStatus = "已处理"
+
+	// status
+	Status = "Processed Success"
+
+	// resp center operation
+	Container = "Container"
+
+	//const key
+	StatusKey = "Status"
 )

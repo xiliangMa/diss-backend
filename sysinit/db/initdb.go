@@ -69,7 +69,7 @@ func (this *DefaultDB) registerModel() {
 		new(models.ContainerConfig), new(models.ContainerInfo), new(models.ContainerPs),
 		new(models.HostConfig), new(models.HostInfo), new(models.HostPs), new(models.ImageConfig),
 		new(models.ImageInfo), new(models.Groups), new(models.SysConfig))
-	orm.RegisterModel(new(models.LogConfig), new(models.TimeEdgePoint), new(models.WarningWhiteList))
+	orm.RegisterModel(new(models.LogConfig), new(models.TimeEdgePoint), new(models.WarningWhiteList), new(models.RespCenter))
 	// license
 	orm.RegisterModel(new(models.LicenseConfig), new(models.LicenseModule), new(models.LicenseHistory))
 }

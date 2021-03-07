@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/nats"
+	sl "github.com/xiliangMa/diss-backend/service/securitylog"
 )
 
 // Warning Info api list
@@ -26,6 +27,7 @@ func (this *WarningInfoController) GetWarningInfoList() {
 
 	warningInfo := new(models.WarningInfo)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &warningInfo)
+
 	this.Data["json"] = warningInfo.List(from, limit)
 	this.ServeJSON(false)
 }
@@ -41,8 +43,10 @@ func (this *WarningInfoController) UpdateWarningInfo() {
 	id := this.GetString(":id")
 	warningInfo := new(models.WarningInfo)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &warningInfo)
+
 	warningInfo.Id = id
 	result := warningInfo.Update()
+
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }
@@ -56,6 +60,23 @@ func (this *WarningInfoController) UpdateWarningInfo() {
 func (this *WarningInfoController) AddClientSub_Image_Safe() {
 	libname := this.GetString(":libname")
 	result := nats.AddClientSub_Image_Safe(libname)
+
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
+// @Title WarninginfoDisposal
+// @Description Add Alarm Processing
+// @Param token header string true "authToken"
+// @Param body body models.WarningInfo true "WarningInfo"
+// @Success 200 {object} models.Result
+// @router /warninginfo/disposal [post]
+func (this *WarningInfoController) DisposalMode() {
+	warningInfo := new(models.WarningInfo)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &warningInfo)
+	wis := new(sl.WarningInfoService)
+	result := wis.DisposalMode(warningInfo)
+
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }
