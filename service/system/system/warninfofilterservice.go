@@ -43,9 +43,6 @@ func (this *WariningFilterService) FilterWarnWhiteList(warningInfo models.Warnin
 	if err != nil {
 		logs.Error("Get WarningWhiteList to Apply failed, code: %d, err: %s", utils.GetWarningWhiteListErr, err.Error())
 	}
-	if len(avaiWhiteList) == 0 {
-		return false
-	}
 
 	if len(avaiWhiteList) > 0 {
 		for _, whiteItem := range avaiWhiteList {
@@ -54,11 +51,11 @@ func (this *WariningFilterService) FilterWarnWhiteList(warningInfo models.Warnin
 				warnFilterservice.Info = warningInfo.Info
 				warnFilterservice.Rule = whiteItem.Rule
 				checkstatus := warnFilterservice.CheckFromWhiteListItem()
-				if !checkstatus {
-					return false
+				if checkstatus {
+					return true
 				}
 			}
 		}
 	}
-	return true
+	return false
 }
