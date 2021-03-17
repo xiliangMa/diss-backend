@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
@@ -16,18 +17,15 @@ type AuthController struct {
 
 // @Title login
 // @Description login
-// @Param name query string true "userName"
-// @Param pwd query string true "userPwd"
-// @Param loginType query string true "loginType类型 LOCAL(本地) LDAP(ldap登录)，空值视为LOCAL"
+// @Param body body models.UserAccessCredentials false "login"
 // @Success 200 {object} models.Result
 // @router /login [post]
 func (this *AuthController) Login() {
-	name := this.GetString("name")
-	pwd := this.GetString("pwd")
-	loginType := this.GetString("loginType")
+	uc := new(models.UserAccessCredentials)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &uc)
 
 	var ResultData models.Result
-	if name == "" || pwd == "" {
+	if uc.UserName == "" || uc.Value == "" {
 		ResultData.Message = "UserAndPwdNotNull"
 		ResultData.Code = utils.UserAndPwdNotNull
 		this.Data["json"] = ResultData
@@ -36,8 +34,8 @@ func (this *AuthController) Login() {
 
 	}
 	jwtService := auth.JwtService{}
-	jwtService.LoginType = loginType
-	result, code := jwtService.CreateToken(name, pwd)
+	jwtService.LoginType = uc.Type
+	result, code := jwtService.CreateToken(uc.UserName, uc.Value)
 	ResultData.Code = code
 	if code != http.StatusOK {
 		ResultData.Message = result

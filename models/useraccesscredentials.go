@@ -8,10 +8,10 @@ import (
 )
 
 type UserAccessCredentials struct {
-	UserName string `orm:"column(username)" description:"(用户名)"`
-	Type     string `orm:"" description:"(类型)"`
-	Value    string `orm:"" description:"(密码)"`
-	CreateAt int64  `orm:"" description:"(创建时间)"`
+	UserName string `orm:"column(username)" description:"(用户名)" json:"username"`
+	Type     string `orm:"" description:"(loginType类型 LOCAL(本地) LDAP(ldap登录)，空值视为LOCAL)" json:"loginType"`
+	Value    string `orm:"" description:"(密码)" json:"pwd"`
+	CreateAt int64  `orm:"" description:"(创建时间)" json:"-"`
 }
 
 type UserAccessCredentialsInterface interface {

@@ -23,12 +23,17 @@ type JwtService struct {
 
 func (this *JwtService) CreateToken(name, pwd string) (string, int) {
 	//检测 diss-api 用户
-	loginUser := models.UserAccessCredentials{UserName: name, Value: pwd}
+	loginUser := models.UserAccessCredentials{UserName: name}
 
 	user := &models.UserAccessCredentials{}
 
 	if this.LoginType != models.Login_Type_LDAP {
 		user = loginUser.Get()
+
+		match, err := utils.ComparePassword(pwd, user.Value)
+		if !match || err != nil {
+			return "Password Invalid", utils.SiginErr
+		}
 	} else {
 		if !models.LM.Config.Enable {
 			return "LDAP is Disabled", utils.LDAPIsDisabledErr
