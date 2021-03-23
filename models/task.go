@@ -9,25 +9,26 @@ import (
 )
 
 type Task struct {
-	Id             string           `orm:"pk;" description:"(任务id)"`
-	Account        string           `orm:"default(admin)" description:"(租户)"`
-	Name           string           `orm:"" description:"(名称)"`
-	Description    string           `orm:"" description:"(描述)"`
-	Spec           string           `orm:"" description:"(定时器)"`
-	Type           string           `orm:"" description:"(类型 重复执行 单次执行 )"`
-	Status         string           `orm:"null;" description:"(状态: 未开始、执行中、完成、暂停)"`
-	Batch          int64            `orm:"default(0);" description:"(任务批次)"`
-	SystemTemplate *SystemTemplate  `orm:"rel(fk);null;" description:"(系统模板)"`
-	Host           *HostConfig      `orm:"rel(fk);null;on_delete(do_nothing)"description:"(主机)"`
-	Container      *ContainerConfig `orm:"rel(fk);null;on_delete(do_nothing)" description:"(容器)"`
-	Image          *ImageConfig     `orm:"rel(fk);null;on_delete(do_nothing)" description:"(镜像)"`
-	CreateTime     int64            `orm:"default(0)" description:"(创建时间)"`
-	UpdateTime     int64            `orm:"default(0)" description:"(更新时间)"`
-	Job            *Job             `orm:"rel(fk);null;" description:"(job)"`
-	ClusterId      string           `orm:"size(256)" description:"(集群Id)"`
-	IsOne          bool             `orm:"-" description:"(是否取单条记录)"`
-	RunCount       int64            `orm:"" description:"(运行次数)"`
-	Action         string           `orm:"size(256)" description:"(操作类型标记)"`
+	Id              string           `orm:"pk;" description:"(任务id)"`
+	Account         string           `orm:"default(admin)" description:"(租户)"`
+	Name            string           `orm:"" description:"(名称)"`
+	Description     string           `orm:"" description:"(描述)"`
+	Spec            string           `orm:"" description:"(定时器)"`
+	Type            string           `orm:"" description:"(类型 重复执行 单次执行 )"`
+	Status          string           `orm:"null;" description:"(状态: 未开始、执行中、完成、暂停)"`
+	Batch           int64            `orm:"default(0);" description:"(任务批次)"`
+	SystemTemplate  *SystemTemplate  `orm:"rel(fk);null;" description:"(系统模板)"`
+	Host            *HostConfig      `orm:"rel(fk);null;on_delete(do_nothing)"description:"(主机)"`
+	Container       *ContainerConfig `orm:"rel(fk);null;on_delete(do_nothing)" description:"(容器)"`
+	Image           *ImageConfig     `orm:"rel(fk);null;on_delete(do_nothing)" description:"(镜像)"`
+	CreateTime      int64            `orm:"default(0)" description:"(创建时间)"`
+	UpdateTime      int64            `orm:"default(0)" description:"(更新时间)"`
+	Job             *Job             `orm:"rel(fk);null;" description:"(job)"`
+	ClusterId       string           `orm:"size(256)" description:"(集群Id)"`
+	IsOne           bool             `orm:"-" description:"(是否取单条记录)"`
+	RunCount        int64            `orm:"" description:"(运行次数)"`
+	Action          string           `orm:"size(256)" description:"(操作类型标记)"`
+	ContainerHostId string           `orm:"size(128)" description:"(主机id)"`
 }
 
 type TaskLogInterface interface {

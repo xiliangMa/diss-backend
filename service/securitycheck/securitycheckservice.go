@@ -192,6 +192,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 			logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_DockerVS, uid)
 			task.SystemTemplate = TMP_Type_DockerVS_DT
 			task.Description = taskpre + models.TMP_Type_DockerVS
+			task.ContainerHostId = securityCheck.Container.HostId
 		} else {
 			//主机病毒
 			logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_HostVS, uid)
