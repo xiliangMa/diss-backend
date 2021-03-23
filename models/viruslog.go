@@ -126,26 +126,27 @@ func (this *DockerVirus) List(from, limit int) Result {
 	// 根据 TargeType = host 和 HostId = All 判断是否是查询所有主机日志 如果不是则匹配其它所传入的条件
 	// 根据 TargeType = container 和 ContainerId = All 判断是否是查询所有容器日志 如果不是则匹配其它所传入的条件
 
-	if this.TargeType == IDLT_Host && this.HostId == All {
-		filterSql = filterSql + "container_id = '" + IDLT_Host + "' and "
-	}
-	if this.TargeType == IDLT_Docker && this.ContainerId == All {
-		filterSql = filterSql + "container_id != '" + IDLT_Host + "' and "
+	if this.HostId != "" {
+		filterSql = filterSql + "host_id ilike '%" + this.HostId + "%' and "
 	}
 
-	if (this.ContainerId != "" && this.ContainerId != All) || (this.HostId != "" && this.HostId != All) {
-		if this.ContainerId != IDLT_Host && this.TargeType == IDLT_Docker {
+	if this.TargeType == IDLT_Host {
+
+		if this.FileName != "" {
+			filterSql = filterSql + "file_name ilike '%" + this.FileName + "%' and "
+		}
+
+		filterSql = filterSql + "container_id = '" + IDLT_Host + "' and "
+	}
+
+	if this.TargeType == IDLT_Docker {
+		if this.ContainerId != "" {
 			containerId := this.ContainerId
 			containerId = string([]byte(this.ContainerId)[:12])
 			filterSql = filterSql + "container_id ilike '%" + containerId + "%' and "
 		}
 
-		if this.TargeType == IDLT_Host {
-			filterSql = filterSql + "host_id ilike '%" + this.HostId + "%' and "
-		}
-		if this.Virus != "" {
-			filterSql = filterSql + utils.DockerVirus + `."virus" like '%` + this.Virus + "%' and "
-		}
+		filterSql = filterSql + "container_id != '" + IDLT_Host + "' and "
 	}
 
 	if this.CreatedAt != 0 {
@@ -173,8 +174,8 @@ func (this *DockerVirus) List(from, limit int) Result {
 
 	o.Raw(countSql).QueryRow(&total)
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = dockerVirusList
+	data[Result_Total] = total
+	data[Result_Items] = dockerVirusList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
