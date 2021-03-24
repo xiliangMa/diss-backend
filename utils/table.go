@@ -31,7 +31,6 @@ var (
 	NetworkPolicy    = "network_policy"
 	SysConfig        = "sys_config"
 	WarningWhiteList = "warning_white_list"
-	RespCenter       = "resp_center"
 
 	//security_log timescaledb
 	DcokerIds   = "docker_ids"

@@ -9,6 +9,7 @@ import (
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -95,7 +96,7 @@ func (this *SecurityLogService) GetIntrudeDetectLogInfo() models.Result {
 	startTime := this.IntrudeDetectLog.StartTime
 	toTime := this.IntrudeDetectLog.ToTime
 	hostId := strings.ToLower(this.IntrudeDetectLog.HostId)
-	//limit := strconv.Itoa(this.IntrudeDetectLog.Limit)
+	limit := strconv.Itoa(this.IntrudeDetectLog.Limit)
 
 	esclient, err := utils.GetESClient()
 	if err != nil {
@@ -114,13 +115,13 @@ func (this *SecurityLogService) GetIntrudeDetectLogInfo() models.Result {
 		}
 	}
 
-	esqueryStr := strings.Replace(models.ESString("intrude_detect"), "!Param@gteTime!", string(startTime), 1)
-	esqueryStr = strings.Replace(esqueryStr, "!Param@lteTime!", string(toTime), 1)
+	esqueryStr := strings.Replace(models.ESString("intrude_detect"), "!Param@gteTime!", startTime, 1)
+	esqueryStr = strings.Replace(esqueryStr, "!Param@lteTime!", toTime, 1)
 	esqueryStr = strings.Replace(esqueryStr, "!Param@hostname!", hostId, 1)
 	esqueryStr = strings.Replace(esqueryStr, "!Param@targetTypeM!", matchMode, 1)
 	esqueryStr = strings.Replace(esqueryStr, "!Param@targetType!", targetType, 1)
 	esqueryStr = strings.Replace(esqueryStr, "!Filter@container!", containerFilterStr, 1)
-	//esqueryStr = strings.Replace(esqueryStr, "!Param@limit!", limit, 1)
+	esqueryStr = strings.Replace(esqueryStr, "!Param@limit!", limit, 1)
 
 	res, err := esclient.API.Search(esclient.Search.WithContext(context.Background()),
 		esclient.Search.WithIndex(hostId),

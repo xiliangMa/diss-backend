@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"strconv"
@@ -172,16 +171,4 @@ func GetScopeNameSpace() string {
 func GetScopeAppName() string {
 	scopeAppName := beego.AppConfig.String("k8s::ScopeAppName")
 	return scopeAppName
-}
-
-func ConvertType(from interface{}, to interface{}) error {
-	data, err := json.Marshal(from)
-	if err != nil {
-		return err
-	}
-	err = json.Unmarshal(data, to)
-	if err != nil {
-		return err
-	}
-	return nil
 }

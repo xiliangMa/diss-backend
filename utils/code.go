@@ -205,9 +205,6 @@ var (
 	EditWarningWhiteListErr         = 1242
 	GetWarningWhiteListErr          = 1243
 	DeleteWarningWhiteListErr       = 1244
-	GetRespCenterErr                = 1245
-	AddRespCenterErr                = 1246
-	UpdateRespCenterErr             = 1247
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300

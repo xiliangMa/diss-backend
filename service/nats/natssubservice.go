@@ -647,32 +647,6 @@ func (this *NatsSubService) Save() error {
 					taskLog.Add()
 				}
 			}
-		case models.Resource_ContainerControlStatus:
-
-			var obj map[string]interface{}
-			resp := models.RespCenter{}
-			s, _ := json.Marshal(ms.Data)
-			if err := json.Unmarshal(s, &obj); err != nil {
-				logs.Error("Parse %s error %s", ms.Tag, err)
-				return err
-			}
-
-			containerControl := obj["ContainerControl"]
-
-			if err := json.Unmarshal([]byte(containerControl.(string)), &resp); err != nil {
-				logs.Error("Parse %s error %s", ms.Tag, err)
-				return err
-			}
-
-			if obj[models.StatusKey] == "" {
-				resp.Status = models.Status
-			} else {
-				resp.Status = obj[models.StatusKey].(string)
-			}
-
-			if result := resp.Update(); result.Code != http.StatusOK {
-				return errors.New(result.Message)
-			}
 		}
 	}
 
