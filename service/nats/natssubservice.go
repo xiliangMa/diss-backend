@@ -780,27 +780,37 @@ func RunClientSub_Image_Safe() {
 	}
 }
 
-func RunClientSub_IDL() {
+func RunClientSub_IDL(hostId string) {
 	natsManager := models.Nats
 	if natsManager != nil && natsManager.Conn != nil {
 		host := models.HostConfig{}
 		hostList := host.List(0, 0)
-		if hostList.Code != http.StatusOK || hostList.Data == nil {
+		if hostList.Code != http.StatusOK {
 			return
 		}
 
-		hostListData := hostList.Data.(map[string]interface{})["items"]
-
-		if hostListData != nil {
-			for _, host := range hostListData.([]*models.HostConfig) {
-				hostid := host.Id
-				IDLSubject := hostid + `_` + models.Subject_IntrudeDetect
-				logs.Info("Subscribe Intrude Detect :", IDLSubject)
-				natsManager.Conn.Subscribe(IDLSubject, func(m *stan.Msg) {
-					natsSubService := NatsSubService{Conn: natsManager.Conn, Message: m.Data, ClientSubject: hostid}
-					natsSubService.Save()
-				}, stan.DurableName(IDLSubject))
+		if hostId == "" {
+			if hostList.Data != nil {
+				hostListData := hostList.Data.(map[string]interface{})["items"]
+				if hostListData != nil {
+					for _, host := range hostListData.([]*models.HostConfig) {
+						hostid := host.Id
+						IDLSubject := hostid + `_` + models.Subject_IntrudeDetect
+						logs.Info("Subscribe Intrude Detect :", IDLSubject)
+						natsManager.Conn.Subscribe(IDLSubject, func(m *stan.Msg) {
+							natsSubService := NatsSubService{Conn: natsManager.Conn, Message: m.Data, ClientSubject: hostid}
+							natsSubService.Save()
+						}, stan.DurableName(IDLSubject))
+					}
+				}
 			}
+		} else {
+			IDLSubject := hostId + `_` + models.Subject_IntrudeDetect
+			logs.Info("Subscribe Intrude Detect :", IDLSubject)
+			natsManager.Conn.Subscribe(IDLSubject, func(m *stan.Msg) {
+				natsSubService := NatsSubService{Conn: natsManager.Conn, Message: m.Data, ClientSubject: hostId}
+				natsSubService.Save()
+			}, stan.DurableName(IDLSubject))
 		}
 
 	}

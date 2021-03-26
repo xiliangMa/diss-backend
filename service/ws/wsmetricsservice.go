@@ -43,6 +43,7 @@ func (this *WSMetricsService) Save() error {
 				if _, ok := models.WSHub.DissClient[client.SystemId]; !ok {
 					nats.RunClientSub(client.SystemId)
 					logs.Info("Run nats client sub success , HostId: %s", client.SystemId)
+					nats.RunClientSub_IDL(client.SystemId)
 
 					hostObj := new(models.HostConfig)
 					hostObj.Id = client.SystemId

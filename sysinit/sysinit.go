@@ -36,7 +36,7 @@ func init() {
 	// 1. NatsManager
 	models.Nats = models.NewNatsManager()
 	nats.RunClientSub_Image_Safe()
-	nats.RunClientSub_IDL()
+	nats.RunClientSub_IDL("")
 
 	// 2. WSManager
 	models.WSHub = models.NewHub()
