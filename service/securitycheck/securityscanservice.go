@@ -73,30 +73,12 @@ func (this *SecurityScanService) PrePare() {
 				}
 				this.PrePareTask(&securityCheck)
 			}
-			if this.SecurityCheckParams.LeakScan {
-				securityCheck := models.SecurityCheck{
-					LeakScan: this.SecurityCheckParams.LeakScan,
-					Host:     host,
-					Type:     models.SC_Type_Host,
-					Job:      this.Job,
-				}
-				this.PrePareTask(&securityCheck)
-			}
 		}
 	case models.Sc_Type_Container:
 		for _, object := range this.ContainerList {
 			if this.SecurityCheckParams.VirusScan {
 				securityCheck := models.SecurityCheck{
 					VirusScan: this.SecurityCheckParams.VirusScan,
-					Container: object,
-					Type:      models.Sc_Type_Container,
-					Job:       this.Job,
-				}
-				this.PrePareTask(&securityCheck)
-			}
-			if this.SecurityCheckParams.LeakScan {
-				securityCheck := models.SecurityCheck{
-					LeakScan:  this.SecurityCheckParams.LeakScan,
 					Container: object,
 					Type:      models.Sc_Type_Container,
 					Job:       this.Job,

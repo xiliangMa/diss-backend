@@ -73,6 +73,8 @@ func (this *DefaultDB) registerModel() {
 	orm.RegisterModel(new(models.LogConfig), new(models.TimeEdgePoint), new(models.WarningWhiteList), new(models.RespCenter))
 	// license
 	orm.RegisterModel(new(models.LicenseConfig), new(models.LicenseModule), new(models.LicenseHistory))
+	// trivy
+	orm.RegisterModel(new(models.ImageVulnerabilities), new(models.Vulnerabilities), new(models.Registry))
 }
 
 func (this *DefaultDB) InitSystemData() {

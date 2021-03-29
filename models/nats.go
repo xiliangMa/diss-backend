@@ -16,6 +16,7 @@ const (
 	Resource_KubernetesBenchMark    = "KubernetesBenchMark"    // k8s 基线数据
 	Resource_HostCmdHistory         = "HostCmdHistory"         // 主机命令历史数据
 	Resource_ContainerCmdHistory    = "ContainerCmdHistory"    // 容器命令历史数据
+	Resource_HostImageVulnScan      = "HostImageVulnScan"      // 主机镜像扫描
 	Resource_NameSpace              = "NameSpace"              // k8s 命名空间
 	Resource_Pod                    = "Pod"                    // k8s Pod
 	Resource_HeartBeat              = "HeartBeat"              // 心跳

@@ -504,7 +504,24 @@ func (this *NatsSubService) Save() error {
 				}
 
 			}
+		case models.Resource_HostImageVulnScan:
+			imageVulnList := []models.ImageVulnerabilities{}
+			s, _ := json.Marshal(ms.Data)
+			if err := json.Unmarshal(s, &imageVulnList); err != nil {
+				logs.Error("Paraces %s error %s", ms.Tag, err)
+				return err
+			}
+			size := len(imageVulnList)
+			if size != 0 {
+				logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", imageVulnList[0].HostId, models.Resource_HostImageVulnScan, size)
+			}
+			for _, vuln := range imageVulnList {
+				vuln.Delete()
+				vuln.Add()
+			}
+			return nil
 		}
+
 	case models.Type_Control:
 		switch ms.Tag {
 		case models.Resource_Task:

@@ -121,6 +121,17 @@ var (
 	Task_Status_Receive_Failed = "ReceiveFailed"
 	Task_Status_Unavailable    = "Unavailable"
 
+	// 任务类型
+	Task_Type_KubenetesCIS       = "KubenetesCIS"
+	Task_Type_DockerCIS          = "DockerCIS"
+	Task_Type_ImageVulnScan      = "ImageVulnScan"
+	Task_Type_HostImageVulnScan  = "HostImageVulnScan"
+	Task_Type_RepoVulnScan       = "RepoVulnScan"
+	Task_Type_FileVulnScan       = "FileVulnScan"
+	Task_Type_ContainerVirusScan = "ContainerVirusScan"
+	Task_Type_HostVirusScan      = "HostVirusScan"
+	Task_Type_ImageVirusScan     = "ImageVirusScan"
+
 	//任务操作
 	Task_Action_Deactive = "Deactive"
 

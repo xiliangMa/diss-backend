@@ -44,3 +44,20 @@ func (this *VulnerabilitiesLogController) GetImageVulnerabilityInfo() {
 	this.Data["json"] = imagePackageVulnerabilityInfo.List(from, limit)
 	this.ServeJSON(false)
 }
+
+// @Title GetVulnerabilities
+// @Description Get Vulnerabilities Log
+// @Param token header string true "authToken"
+// @Param body body models.ImageVulnerabilities false "漏洞"
+// @Param from query int 0 false "from"
+// @Param limit query int 20 false "limit"
+// @Success 200 {object} models.Result
+// @router /vulnerabilities [post]
+func (this *VulnerabilitiesLogController) GetVulnerabilities() {
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+	imageVulnerabilities := new(models.ImageVulnerabilities)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &imageVulnerabilities)
+	this.Data["json"] = imageVulnerabilities.List(from, limit)
+	this.ServeJSON(false)
+}

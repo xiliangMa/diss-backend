@@ -33,21 +33,16 @@ func (this *SecurityCheckController) SecurityCheck() {
 	this.ServeJSON(false)
 }
 
-// @Title HostImageVulnScan
-// @Description Host Image Vuln Scan
+// @Title SecurityCheck2
+// @Description Security Check2
 // @Param token header string true "authToken"
-// @Param account query string "admin" false "租户"
 // @Param isSystem query bool false false "系统检查"
 // @Param body body models.SecurityCheckParams true "安全检查参数"
 // @Success 200 {object} models.Result
-// @router /hostimagevulnscan [post]
-func (this *SecurityCheckController) HostImageVulnScan() {
+// @router /v2 [post]
+func (this *SecurityCheckController) SecurityCheck2() {
 	params := new(models.SecurityCheckParams)
-	account := this.GetString("account")
 	isSystem, _ := this.GetBool("isSystem")
-	if account == "" {
-		account = models.Account_Admin
-	}
 	json.Unmarshal(this.Ctx.Input.RequestBody, &params)
 	batch := time.Now().UnixNano()
 	securityScanService := securitycheck.SecurityScanService{SecurityCheckParams: params, Batch: batch, IsSystem: isSystem}

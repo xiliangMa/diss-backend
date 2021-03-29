@@ -108,6 +108,11 @@ var (
 	GetImageMetadataErr             = 113
 	GetImageSensitivenfoErr         = 114
 	NotEnoughParametersErr          = 115
+	AddImageVulnerabilitiesErr      = 116
+	GetImageVulnerabilitiesErr      = 117
+	DeleteImageVulnerabilitiesErr   = 118
+	AddVulnerabilitiesErr           = 119
+	GetVulnerabilitiesErr           = 120
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001
