@@ -24,7 +24,7 @@ func init() {
 	InitLogger()
 
 	// init global logConfig
-	InitGlobalLogConfig()
+	InitSysLogConfig(true)
 
 	// init global syslog handler
 	task.InitGlobalSyslogHander()

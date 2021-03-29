@@ -1,7 +1,6 @@
 package models
 
 import (
-	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	uuid "github.com/satori/go.uuid"
@@ -89,9 +88,4 @@ func (this *LogConfig) Update() Result {
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
-}
-
-func GetSyslogServerUrl() string {
-	serverUrl := beego.AppConfig.String("syslog::SyslogServer")
-	return serverUrl
 }

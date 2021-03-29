@@ -47,23 +47,23 @@ func AllExGroups() *map[string]LogExportGroup {
 }
 
 func (this *SyslogManager) ReGenSyncSyslogTask() {
-	syslogConfig := models.GlobalLogConfig[models.Log_Config_SysLog_Export]
+	system.GlobalSyslog.UpdateSysLogConfCache()
 
-	// 清除全部的syslog任务
 	for _, exGroup := range *this.ExportTypes {
 		if exGroup.TaskId != "" {
 			SysLogTaskHandler.DelByID(exGroup.TaskId)
-			logs.Info("Delete logSync task type - %s \n", exGroup.TaskId)
 		}
 	}
 	if len(*this.ExportTypes) != 0 {
 		this.ExportTypes = &map[string]LogExportGroup{}
 	}
 
+	syslogConfig := models.GlobalLogConfig[models.Log_Config_SysLog_Export]
 	if syslogConfig.Enabled == true {
 		exportTypes := strings.Split(syslogConfig.ExportedTypes, ",")
 		for _, exType := range exportTypes {
 			logExGroup := (*this.ExportTypes)[exType]
+			logs.Info("Start logSync task Type : %s \n", exType)
 			logExGroup.TaskId = exType
 			(*this.ExportTypes)[exType] = logExGroup
 			specSyslog := beego.AppConfig.String("syslog::SyslogSyncSpec")

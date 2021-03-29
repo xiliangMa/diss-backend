@@ -208,6 +208,7 @@ var (
 	GetRespCenterErr                = 1245
 	AddRespCenterErr                = 1246
 	UpdateRespCenterErr             = 1247
+	CheckLogConfigErr               = 1248
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300

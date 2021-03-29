@@ -244,7 +244,8 @@ var (
 	Null_Time = "0001-01-01 00:00:00 +0000 UTC"
 
 	// time and zone
-	CstZone = time.FixedZone("CST", 8*3600)
+	CstZone                     = time.FixedZone("CST", 8*3600)
+	DefaultStartTimeStamp int64 = 1514736000000000000
 
 	// db image type
 	DB_Image_type_Mysql    = "Mysql"

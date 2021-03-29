@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/service/task"
+	"github.com/xiliangMa/diss-backend/utils"
 )
 
 type IntegrationController struct {
@@ -36,6 +38,14 @@ func (this *IntegrationController) UpdateLogConfig() {
 	logConfig := new(models.LogConfig)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &logConfig)
 	var result models.Result
+
+	//检查服务器是否可用
+	err := system.GlobalSyslog.CheckSyslogServer(logConfig.ServerUrl, logConfig.ServerPort)
+	if err != nil {
+		result.Code = utils.GetLogConfigErr
+		result.Message = "Syslog Server Config Error."
+		return
+	}
 
 	logConfig.ConfigName = models.Log_Config_SysLog_Export
 	chkconfig := logConfig.Get()

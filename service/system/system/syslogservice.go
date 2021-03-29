@@ -19,9 +19,41 @@ type SyslogHandler struct {
 var GlobalSyslog = new(SyslogHandler)
 
 func (this *SyslogHandler) OpenSyslog(tag string) error {
+	syslogConfig := models.GlobalLogConfig[models.Log_Config_SysLog_Export]
+	syslogServer := fmt.Sprintf("%s:%s", syslogConfig.ServerUrl, syslogConfig.ServerPort)
 
-	syslogServer := models.GetSyslogServerUrl()
+	sysLog, err := syslog.Dial("tcp", syslogServer,
+		syslog.LOG_WARNING, tag)
+	if err != nil {
+		logs.Error("Syslog Server Connect failed, code: %d, err: %s", utils.ConnectSyslogErr, err.Error())
+	}
 
+	this.syslog = sysLog
+	return err
+}
+
+func (this *SyslogHandler) UpdateSysLogConfCache() {
+
+	var logConfig models.LogConfig
+	logConfig.ConfigName = models.Log_Config_SysLog_Export
+	models.GlobalLogConfig[models.Log_Config_SysLog_Export] = &logConfig
+
+	syslogConfig := logConfig.Get()
+	if syslogConfig.Data != nil {
+
+		syslogConfigList := syslogConfig.Data.([]*models.LogConfig)
+		if len(syslogConfigList) > 0 {
+			logConfig = *syslogConfigList[0]
+		}
+
+		models.GlobalLogConfig[models.Log_Config_SysLog_Export] = &logConfig
+	}
+}
+
+func (this *SyslogHandler) CheckSyslogServer(ServerUrl, ServerPort string) error {
+	tag := "Test syslog connection."
+
+	syslogServer := fmt.Sprintf("%s:%s", ServerUrl, ServerPort)
 	sysLog, err := syslog.Dial("tcp", syslogServer,
 		syslog.LOG_WARNING, tag)
 	if err != nil {
@@ -95,6 +127,7 @@ func GetSyncSyslogFunc(exType string) func() {
 					TEPinDB[0].Update()
 				}
 			}
+
 		case models.LogType_IntrudeDetectLog:
 			intrudeDetectLog := new(models.IntrudeDetectLog)
 			TEPointObj := new(models.TimeEdgePoint)

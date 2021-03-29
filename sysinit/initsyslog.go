@@ -3,26 +3,18 @@ package sysinit
 import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/service/task"
 )
 
-func InitGlobalLogConfig() {
-	var logConfig models.LogConfig
-	logConfig.ConfigName = models.Log_Config_SysLog_Export
-	models.GlobalLogConfig[models.Log_Config_SysLog_Export] = &logConfig
+func InitSysLogConfig(resetime bool) {
 
-	syslogConfig := logConfig.Get()
-	if syslogConfig.Data != nil {
+	system.GlobalSyslog.UpdateSysLogConfCache()
 
-		syslogConfigList := syslogConfig.Data.([]*models.LogConfig)
-		if len(syslogConfigList) > 0 {
-			logConfig = *syslogConfigList[0]
-		}
-
-		models.GlobalLogConfig[models.Log_Config_SysLog_Export] = &logConfig
+	if resetime {
+		InitTimeEdgePoint()
 	}
 
-	InitTimeEdgePoint()
 }
 
 func InitTimeEdgePoint() {
@@ -35,7 +27,7 @@ func InitTimeEdgePoint() {
 		if len(TEPinDB) == 0 {
 			//初始起始时间设置为2018-1-1
 			uid, _ := uuid.NewV4()
-			TEPoint.TimePointA = 1514736000000
+			TEPoint.TimePointA = models.DefaultStartTimeStamp
 			TEPoint.EdgePointName = exGroup.ExportName
 			TEPoint.TEPointId = uid.String()
 			TEPoint.Direction = "lookback"
