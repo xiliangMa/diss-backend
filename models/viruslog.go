@@ -73,7 +73,7 @@ func (this *ImageVirus) List(from, limit int) Result {
 	}
 
 	if this.CreatedAt != 0 {
-		filter = filter + `c."createdAt" > ` + fmt.Sprintf("%v", this.CreatedAt) + " and "
+		filter = filter + `c."created_at" > ` + fmt.Sprintf("%v", this.CreatedAt) + " and "
 	}
 	if this.ImageName != "" {
 		filter = filter + `c."image_name" like '%` + this.ImageName + `%'`
@@ -149,8 +149,12 @@ func (this *DockerVirus) List(from, limit int) Result {
 		filterSql = filterSql + "container_id != '" + IDLT_Host + "' and "
 	}
 
+	if this.Virus != "" {
+		filterSql = filterSql + utils.DockerVirus + `."virus" like '%` + this.Virus + "%' and "
+	}
+
 	if this.CreatedAt != 0 {
-		filterSql = filterSql + utils.ImageVirus + `."createdAt" > ` + fmt.Sprintf("%s", this.CreatedAt) + " and "
+		filterSql = filterSql + `"created_at" > ` + fmt.Sprintf("%v", this.CreatedAt) + " and "
 	}
 
 	if filterSql != "" {

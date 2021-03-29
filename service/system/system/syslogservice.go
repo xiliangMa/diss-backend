@@ -180,7 +180,7 @@ func GetSyncSyslogFunc(exType string) func() {
 			if len(TEPinDB) > 0 {
 				//timeTemplate1 := "2006-01-02T15:04:05Z"
 				//stamp, _ := time.ParseInLocation(timeTemplate1, TEPinDB[0].TimePointA, time.Local)
-				imageVirus.CreatedAt = TEPinDB[0].TimePointA
+				imageVirus.CreatedAt = TEPinDB[0].TimePointA / 1e9
 				loglist := imageVirus.List(from, limit)
 				if loglist.Code == 200 && loglist.Data != nil {
 					mapdata := loglist.Data.(map[string]interface{})
@@ -201,7 +201,7 @@ func GetSyncSyslogFunc(exType string) func() {
 			TEPointObj.EdgePointCode = exType
 			TEPinDB := TEPointObj.Get()
 			if len(TEPinDB) > 0 {
-				secDockerAuditDocker.StartTime = TEPinDB[0].TimePointA
+				secDockerAuditDocker.StartTime = TEPinDB[0].TimePointA / 1e9
 				loglist := secDockerAuditDocker.List(from, limit)
 				if loglist.Code == 200 && loglist.Data != nil {
 					mapdata := loglist.Data.(map[string]interface{})
