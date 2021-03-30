@@ -10,7 +10,6 @@ import (
 	"github.com/astaxie/beego/plugins/cors"
 	"github.com/xiliangMa/diss-backend/controllers"
 	caccounts "github.com/xiliangMa/diss-backend/controllers/accounts"
-	"github.com/xiliangMa/diss-backend/controllers/anchoreengine"
 	casset "github.com/xiliangMa/diss-backend/controllers/asset"
 	cbase "github.com/xiliangMa/diss-backend/controllers/base"
 	cjob "github.com/xiliangMa/diss-backend/controllers/job"
@@ -162,11 +161,6 @@ func init() {
 		beego.NSNamespace("/v1/securitycheck",
 			beego.NSInclude(
 				&csecuritycheck.SecurityCheckController{},
-			),
-		),
-		beego.NSNamespace("/v1/anchore",
-			beego.NSInclude(
-				&anchoreengine.AnchoreImageController{},
 			),
 		),
 	)

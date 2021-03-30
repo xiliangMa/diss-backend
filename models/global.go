@@ -9,6 +9,5 @@ var (
 	KCM   *KubernetesClientManager
 	MSM   *MailServerManager
 	LM    *LDAPManager
-	AEM   *AnchoreEngineManager
 	CPM   *http.Server
 )
