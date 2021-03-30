@@ -64,7 +64,4 @@ func init() {
 
 	// 6. LDAPManager
 	models.LM = models.NewLDAPManager()
-
-	//7. init AnchoreEngineManager
-	models.AEM = models.NewAnchoreEngineManager()
 }
