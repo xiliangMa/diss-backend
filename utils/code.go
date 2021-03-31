@@ -158,8 +158,6 @@ var (
 	JobIsDisabledErr  = 1104
 	TaskIsRunningWarn = 1105
 	TaskCommitErr     = 1106
-	TaskIdIsNull      = 1107
-	TaskNotFound      = 1108
 
 	//system 1200-1300
 	CheckK8sFilePostErr             = 1200

@@ -155,35 +155,15 @@ func (this *Task) Update() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
-	task := new(Task)
-	cond := orm.NewCondition()
 
-	if this.Id == "" {
-		ResultData.Message = "TaskIdIsNull"
-		ResultData.Code = utils.TaskIdIsNull
-		logs.Error("Update Task: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-	cond = cond.And("id", this.Id)
-
-	err := o.QueryTable(utils.Task).SetCond(cond).One(task)
-	if err != nil || task.Id == "" {
-		ResultData.Message = "TaskNotFound"
-		ResultData.Code = utils.TaskNotFound
-		logs.Error("Update Task: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-
-	task.UpdateTime = time.Now().UnixNano()
-	task.Status = this.Status
-	_, err = o.Update(task)
+	this.UpdateTime = time.Now().UnixNano()
+	_, err := o.Update(this)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.EditTaskErr
 		logs.Error("Update Task: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
-
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
