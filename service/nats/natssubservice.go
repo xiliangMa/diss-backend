@@ -28,7 +28,6 @@ func (this *NatsSubService) Save() error {
 		logs.Error("Paraces NatsData error %s", err)
 		return err
 	}
-
 	if ms.Data == nil {
 		return nil
 	}
@@ -583,6 +582,9 @@ func (this *NatsSubService) Save() error {
 						} else if task.Container != nil {
 							this.ClientSubject = task.Container.HostName
 						}
+						if ms.Code != http.StatusOK {
+							result.Message = ms.Msg
+						}
 						msg = fmt.Sprintf("Update task KStatus: %s, fail, >>> Subject: %s, task id: %s, error: %s <<<", task.Status, this.ClientSubject, task.Id, result.Message)
 						logs.Error(logTag + msg)
 						taskRawInfo, _ := json.Marshal(task)
@@ -597,6 +599,9 @@ func (this *NatsSubService) Save() error {
 							this.ClientSubject = task.Host.Id
 						} else if task.Container != nil {
 							this.ClientSubject = task.Container.HostName
+						}
+						if ms.Code != http.StatusOK {
+							result.Message = ms.Msg
 						}
 						msg = fmt.Sprintf("Update task Success, KStatus: %s >>> HostId: %s, Type: %s, task id: %s <<<", task.Status, this.ClientSubject, models.Resource_Task, task.Id)
 						logs.Info(logTag + msg)
