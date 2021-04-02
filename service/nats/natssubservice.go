@@ -550,7 +550,7 @@ func (this *NatsSubService) Save() error {
 						err = json.Unmarshal(s, &taskObj)
 						taskList = append(taskList, taskObj)
 					} else {
-						logs.Error("Paraces: %s type: %s error: %s  ", ms.Tag, ms.RCType, err)
+						logs.Error("Parses: %s type: %s error: %s  ", ms.Tag, ms.RCType, err)
 						return err
 					}
 				}
@@ -585,7 +585,7 @@ func (this *NatsSubService) Save() error {
 						if ms.Code != http.StatusOK {
 							result.Message = ms.Msg
 						}
-						msg = fmt.Sprintf("Update task KStatus: %s, fail, >>> Subject: %s, task id: %s, error: %s <<<", task.Status, this.ClientSubject, task.Id, result.Message)
+						msg = fmt.Sprintf("Update task Status: %s, fail, >>> Subject: %s, task id: %s, error: %s <<<", task.Status, this.ClientSubject, task.Id, result.Message)
 						logs.Error(logTag + msg)
 						taskRawInfo, _ := json.Marshal(task)
 						taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Error}
@@ -602,8 +602,11 @@ func (this *NatsSubService) Save() error {
 						}
 						if ms.Code != http.StatusOK {
 							result.Message = ms.Msg
+							msg = fmt.Sprintf("Update task failed, Status: %s >>> HostId: %s, Type: %s, task id: %s Error: %s <<<", task.Status, this.ClientSubject, models.Resource_Task, task.Id, result.Message)
+						} else {
+							msg = fmt.Sprintf("Update task success, Status: %s >>> HostId: %s, Type: %s, task id: %s <<<", task.Status, this.ClientSubject, models.Resource_Task, task.Id)
 						}
-						msg = fmt.Sprintf("Update task Success, KStatus: %s >>> HostId: %s, Type: %s, task id: %s <<<", task.Status, this.ClientSubject, models.Resource_Task, task.Id)
+
 						logs.Info(logTag + msg)
 						taskRawInfo, _ := json.Marshal(task)
 						taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Info}
@@ -616,7 +619,7 @@ func (this *NatsSubService) Save() error {
 				task := models.Task{}
 				s, _ := json.Marshal(ms.Data)
 				if err := json.Unmarshal(s, &task); err != nil {
-					logs.Error("Paraces: %s type: %s error: %s  ", ms.Tag, ms.RCType, err)
+					logs.Error("Parses: %s type: %s error: %s  ", ms.Tag, ms.RCType, err)
 					return err
 				}
 
