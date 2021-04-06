@@ -1,8 +1,8 @@
 package system
 
 import (
-	"encoding/json"
 	"github.com/astaxie/beego/logs"
+	huge "github.com/dablelv/go-huge-util"
 	"github.com/xiliangMa/diss-backend/models"
 	"strings"
 )
@@ -82,15 +82,15 @@ func (this *LogToMailFilterService) TransLogTypeAndTag() string {
 }
 
 func (this *LogToMailFilterService) SendToChannel(dataModel interface{}) {
-	dataModelJson, err := json.Marshal(dataModel)
+	dataModelString, err := huge.ToIndentJSON(&dataModel)
+
 	if err != nil {
 		logs.Error("Encode json for mail fail, error: ", err)
 	}
-	dataModelString := string(dataModelJson)
 	dataModelMap := map[string]string{}
 	dataModelMap[models.MailField_Subject] = models.LogToEmail_Prefix
 	dataModelMap[models.MailField_LogType] = this.LogType
 	dataModelMap[models.MailField_InfoSubType] = this.InfoSubType
-	dataModelMap[models.MailField_Body] = dataModelString
+	dataModelMap[models.MailField_Body] = "<pre>"+dataModelString+"</pre>"
 	models.MSM.LogChannel <- &dataModelMap
 }
