@@ -35,7 +35,7 @@ func (this *AuthController) Login() {
 	}
 	jwtService := auth.JwtService{}
 	jwtService.LoginType = uc.Type
-	result, code := jwtService.CreateToken(uc.UserName, uc.Value)
+	result, code := jwtService.CreateToken(uc.UserName, uc.Value, uc.Type)
 	ResultData.Code = code
 	if code != http.StatusOK {
 		ResultData.Message = result

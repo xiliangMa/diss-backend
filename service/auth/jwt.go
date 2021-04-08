@@ -21,7 +21,7 @@ type JwtService struct {
 	LoginType string
 }
 
-func (this *JwtService) CreateToken(name, pwd string) (string, int) {
+func (this *JwtService) CreateToken(name, pwd, userType string) (string, int) {
 	//检测 diss-api 用户
 	loginUser := models.UserAccessCredentials{UserName: name}
 
@@ -29,10 +29,11 @@ func (this *JwtService) CreateToken(name, pwd string) (string, int) {
 
 	if this.LoginType != models.Login_Type_LDAP {
 		user = loginUser.Get()
-
-		match, err := utils.ComparePassword(pwd, user.Value)
-		if !match || err != nil {
-			return "Password Invalid", utils.SiginErr
+		if beego.AppConfig.String("RunMode") != "dev" && userType != models.Login_Type_DEV {
+			match, err := utils.ComparePassword(pwd, user.Value)
+			if !match || err != nil {
+				return "Password Invalid", utils.SiginErr
+			}
 		}
 	} else {
 		if !models.LM.Config.Enable {
