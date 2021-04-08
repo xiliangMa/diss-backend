@@ -35,11 +35,12 @@ func (this *DissApiDB) InitDB() {
 	DS := fmt.Sprintf("%s%s%s%s%s%s", "host="+dbHost, " port="+port, " user="+dbUser, " password="+dbPwd, " dbname="+dbName, " sslmode=disable")
 	orm.RegisterDriver(driver, orm.DRPostgres)
 	err := orm.RegisterDataBase(DSAlias, driver, DS)
-	orm.SetMaxIdleConns(DSAlias, 2)
-	orm.SetMaxOpenConns(DSAlias, 100)
 	if err != nil {
 		logs.Error("DB Register fail, >>> DSAlias: %s <<<, Err: %s", DSAlias, err)
+		return
 	}
+	orm.SetMaxIdleConns(DSAlias, 2)
+	orm.SetMaxOpenConns(DSAlias, 100)
 
 	//auto create db
 	//err = orm.RunSyncdb(DSAlias, force, true)
