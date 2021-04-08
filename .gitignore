@@ -23,7 +23,7 @@ upload/audit/*
 upload/kubernetes/*
 upload/license/*
 upload/logo/*
-
+upload/warnwhitelist/*
 
 #license_srv
 license_srv/*

@@ -91,6 +91,6 @@ func (this *LogToMailFilterService) SendToChannel(dataModel interface{}) {
 	dataModelMap[models.MailField_Subject] = models.LogToEmail_Prefix
 	dataModelMap[models.MailField_LogType] = this.LogType
 	dataModelMap[models.MailField_InfoSubType] = this.InfoSubType
-	dataModelMap[models.MailField_Body] = "<pre>"+dataModelString+"</pre>"
+	dataModelMap[models.MailField_Body] = "<pre>" + dataModelString + "</pre>"
 	models.MSM.LogChannel <- &dataModelMap
 }

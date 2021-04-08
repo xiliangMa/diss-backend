@@ -216,6 +216,15 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:SystemController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:SystemController"],
 		beego.ControllerComments{
+			Method:           "ImportWhiteList",
+			Router:           `/system/warnwhitelist/import`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:SystemController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/system/system:SystemController"],
+		beego.ControllerComments{
 			Method:           "GetWarningWhiteList",
 			Router:           `/system/warnwhitelists`,
 			AllowHTTPMethods: []string{"post"},

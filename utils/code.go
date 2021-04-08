@@ -209,6 +209,11 @@ var (
 	AddRespCenterErr                = 1246
 	UpdateRespCenterErr             = 1247
 	CheckLogConfigErr               = 1248
+	UploadWarnWhitelistErr          = 1249
+	ImportWarnWhitelistErr          = 1250
+	WarnWhitelistUnmarshalErr       = 1251
+	CheckFilePostErr                = 1252
+	CheckFileTypeErr                = 1253
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300

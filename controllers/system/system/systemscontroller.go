@@ -7,6 +7,7 @@ import (
 	"github.com/xiliangMa/diss-backend/models"
 	css "github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -168,5 +169,43 @@ func (this *SystemController) DeleteWarningWhiteList() {
 	whiteListConfig.Id = id
 
 	this.Data["json"] = whiteListConfig.Delete()
+	this.ServeJSON(false)
+}
+
+// @Title ImportWarnWhiteList
+// @Description Import WarnInfo WhiteList
+// @Param token header string true "authToken"
+// @Param whitelistfile formData file true "whitelistfile"
+// @Success 200 {object} models.Result
+// @router /system/warnwhitelist/import [post]
+func (this *SystemController) ImportWhiteList() {
+	key := "whitelistfile"
+	f, h, _ := this.GetFile(key)
+	defer f.Close()
+
+	whitelistService := new(css.WarnWhitelistService)
+	result, fpath := whitelistService.Check(h)
+	if result.Code != http.StatusOK {
+		logs.Error("Upload Warninfo Whitelist fail, err: %s", result.Message)
+	} else {
+		err := this.SaveToFile(key, fpath)
+		if err != nil {
+			result.Code = utils.UploadWarnWhitelistErr
+			result.Message = "UploadWarnWhitelistErr"
+			logs.Error("Save Warninfo Whitelist fail, err: %s", err.Error())
+		} else {
+			// parse and save warninfo whitelist
+			whitelistByte, err := ioutil.ReadAll(f)
+			if err != nil {
+				result.Code = utils.ImportWarnWhitelistErr
+				result.Message = err.Error()
+				logs.Error("Read Warninfo Whitelist file fail, err: %s", err)
+			} else {
+				whitelistService.WhitelistData = whitelistByte
+				result = whitelistService.SaveList()
+			}
+		}
+	}
+	this.Data["json"] = result
 	this.ServeJSON(false)
 }
