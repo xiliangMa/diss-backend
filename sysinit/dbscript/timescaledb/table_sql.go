@@ -84,11 +84,11 @@ var (
 	  "info" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
 	  "level" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "status" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
-      "mode" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "create_time" int8 NOT NULL DEFAULT 0,
 	  "update_time" int8 NOT NULL DEFAULT 0,
 	  "proposal" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
-	  "analysis" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text
+	  "analysis" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
+	  "mode" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying
 	)
 	;
 	ALTER TABLE "public"."warning_info" OWNER TO "postgres";
