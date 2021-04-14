@@ -185,3 +185,11 @@ func ConvertType(from interface{}, to interface{}) error {
 	}
 	return nil
 }
+
+func GetLogoPath() string {
+	return beego.AppConfig.String("system::LogoPath")
+}
+
+func GetWarnWhitelistPath() string {
+	return beego.AppConfig.String("system::WarnWhitelistPath")
+}

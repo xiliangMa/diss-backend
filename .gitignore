@@ -23,11 +23,10 @@ upload/audit/*
 upload/kubernetes/*
 upload/license/*
 upload/logo/*
-
+upload/warnwhitelist/*
 
 #license_srv
 license_srv/*
 
 #commentsRouters
-routers/commentsRouter___________________Volumes_MacData_King*
-routers/commentsRouter___________________Volumes_MacData_Galaxy*
+routers/commentsRouter___________________Volumes_*

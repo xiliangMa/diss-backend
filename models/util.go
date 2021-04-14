@@ -274,8 +274,8 @@ var (
 	WarnWhiteListCnTrans_ContainerName = []string{"容器名称", "container\\.name"}
 	WarnWhiteListCnTrans_CmdLine       = []string{"命令包含", "proc\\.cmdline"}
 
-	// png type
 	PictureType = "image/png"
+	TextType    = "text/plain"
 
 	WarnInfoStatus = "已处理"
 
