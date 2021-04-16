@@ -219,6 +219,8 @@ var (
 	EmailServerConfig = "EmailServerConfig"
 	LDAPClientConfig  = "LDAPClientConfig"
 	Login_Type_LDAP   = "LDAP"
+	Login_Type_DEV    = "DEV"
+	Login_Type_LOCAL  = "LOCAL"
 
 	// LogConfigs
 	Log_Config_SysLog_Export = "SysLogExport"
