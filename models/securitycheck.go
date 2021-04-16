@@ -9,7 +9,8 @@ type SecurityCheck struct {
 	KubenetesCIS      bool             `description:"(required: false, 开启K8s基线检测)"`
 	VirusScan         bool             `description:"(required: false, 开启病毒)"`
 	LeakScan          bool             `description:"(required: false, 开启漏洞)"`
-	HostImageVulnScan bool             `description:"(required: false, 开启漏洞)"`
+	HostImageVulnScan bool             `description:"(required: false, 主机镜像漏洞)"`
+	ImageVulnScan     bool             `description:"(required: false, 仓库镜像扫描)"`
 	Host              *HostConfig      `description:"(required: false, 主机)"`
 	Container         *ContainerConfig `description:"(required: false, 容器)"`
 	Image             *ImageConfig     `description:"(required: false, 镜像)"`

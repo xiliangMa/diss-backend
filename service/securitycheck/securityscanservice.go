@@ -97,6 +97,15 @@ func (this *SecurityScanService) PrePare() {
 				}
 				this.PrePareTask(&securityCheck)
 			}
+			if this.SecurityCheckParams.ImageVulnScan {
+				securityCheck := models.SecurityCheck{
+					ImageVulnScan: this.SecurityCheckParams.ImageVulnScan,
+					Image:         image,
+					Type:          models.Sc_Type_Image,
+					Job:           this.Job,
+				}
+				this.PrePareTask(&securityCheck)
+			}
 		}
 	}
 
@@ -112,6 +121,7 @@ func (this *SecurityScanService) PrePareTask(securityCheck *models.SecurityCheck
 	Job_Type_DockerVS := this.DefaultJob[models.TMP_Type_DockerVS]
 	Job_Type_HostVS := this.DefaultJob[models.TMP_Type_HostVS]
 	Job_Type_HostImageVulnScan := this.DefaultJob[models.TMP_Type_HostImageVulnScan]
+	Job_Type_ImageScan := this.DefaultJob[models.TMP_Type_ImageVulnScan]
 
 	// 默认模板
 
@@ -135,6 +145,10 @@ func (this *SecurityScanService) PrePareTask(securityCheck *models.SecurityCheck
 		// 主机镜像扫描
 		if securityCheck.HostImageVulnScan {
 			securityCheck.Job = Job_Type_HostImageVulnScan
+		}
+		// 仓库镜像扫描
+		if securityCheck.ImageVulnScan {
+			securityCheck.Job = Job_Type_ImageScan
 		}
 	}
 
@@ -186,6 +200,12 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_HostImageVulnScan, uid)
 		task.Description = taskpre + models.TMP_Type_HostImageVulnScan
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_HostImageVulnScan]
+		task.Image = securityCheck.Image
+	} else if securityCheck.ImageVulnScan {
+		// 主机镜像扫描
+		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_HostImageVulnScan, uid)
+		task.Description = taskpre + models.TMP_Type_ImageVulnScan
+		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_ImageVulnScan]
 		task.Image = securityCheck.Image
 	}
 
@@ -367,18 +387,20 @@ func (this *SecurityScanService) Check() models.Result {
 	}
 
 	// 主机授权、主机资源检查
-	ResultData, this.HostList = baseService.CheckHostLicense()
-	if ResultData.Code != http.StatusOK {
-		return ResultData
+	if !this.ImageVulnScan {
+		ResultData, this.HostList = baseService.CheckHostLicense()
+		if ResultData.Code != http.StatusOK {
+			return ResultData
+		}
 	}
 
-	// 资源镜像资源
+	// 镜像资源
 	ResultData, this.ImageList = baseService.CheckImageIsExist()
 	if ResultData.Code != http.StatusOK {
 		return ResultData
 	}
 
-	// 检查容器资源
+	// 容器资源
 	ResultData, this.ContainerList = baseService.CheckContainerIsExist()
 	if ResultData.Code != http.StatusOK {
 		return ResultData

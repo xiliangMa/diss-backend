@@ -79,7 +79,7 @@ var (
 
 	//// 系统魔板类型(此处和ws resource tag 保持一致，和授权模块关联)
 	// 镜像扫描：
-	TMP_Type_ImageScan         = "ImageScan"
+	TMP_Type_ImageVulnScan     = "ImageScan"
 	TMP_Type_HostImageVulnScan = "HostImageVulnScan"
 	//基线扫描：
 	TMP_Type_BM_Docker = "DockerBenchMark"
