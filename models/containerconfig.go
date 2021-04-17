@@ -36,6 +36,7 @@ type ContainerConfigInterface interface {
 	Count() int64
 	EmptyDirtyDataForAgent() error
 	EmptyDirtyDataForK8s() error
+	GetContainerConfigList() []*ContainerConfig
 }
 
 func (this *ContainerConfig) Add() Result {
@@ -243,4 +244,22 @@ func (this *ContainerConfig) EmptyDirtyDataForK8s() error {
 		logs.Error("Empty Dirty Data failed,  model: %s, code: %d, err: %s", utils.ContainerConfig, utils.EmptyDirtyDataContinerConfigErr, err.Error())
 	}
 	return err
+}
+
+func (this *ContainerConfig) GetContainerConfigList() []*ContainerConfig {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var err error
+	var containerConfigList []*ContainerConfig
+
+	cond := orm.NewCondition()
+	if this.ImageName != "" {
+		cond = cond.And("image_name", this.ImageName)
+	}
+
+	_, err = o.QueryTable(utils.ContainerConfig).SetCond(cond).All(&containerConfigList)
+	if err != nil {
+		logs.Error("Get ContainerConfig failed, code: %d, err: %s", utils.GetContainerConfigErr, err.Error())
+	}
+	return containerConfigList
 }

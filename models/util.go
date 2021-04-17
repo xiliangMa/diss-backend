@@ -305,4 +305,7 @@ var (
 
 	//const key
 	WarningInfoId = "WarningInfoId"
+
+	// Image Blocking operation
+	ClearImage = "ClearImage"
 )

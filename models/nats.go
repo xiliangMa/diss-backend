@@ -36,6 +36,8 @@ const (
 	Type_Control                    = "Control"                //控制类型
 	Resource_ContainerControl       = "ContainerControl"       // 容器控制
 	Resource_ContainerControlStatus = "ContainerControlStatus" // 响应中心状态
+	Image_Control                   = "ImageControl"           // 镜像阻断控制
+	Image_ControlStatus             = "ImageControlStatus"     // 镜像阻断控制状态
 
 	// #################### （ResourceControlType）Nats RCType  资源操作类型
 	Resource_Control_Type_Get    = "Get"

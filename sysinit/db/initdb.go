@@ -68,7 +68,7 @@ func (this *DefaultDB) registerModel() {
 	//base
 	orm.RegisterModel(new(models.SystemTemplate), new(models.SystemTemplateGroup),
 		new(models.ContainerConfig), new(models.ContainerInfo), new(models.ContainerPs),
-		new(models.HostConfig), new(models.HostInfo), new(models.HostPs), new(models.ImageConfig),
+		new(models.HostConfig), new(models.HostInfo), new(models.HostPs), new(models.ImageConfig), new(models.ImageBlocking),
 		new(models.ImageInfo), new(models.Groups), new(models.SysConfig))
 	orm.RegisterModel(new(models.LogConfig), new(models.TimeEdgePoint), new(models.WarningWhiteList), new(models.RespCenter))
 	// license

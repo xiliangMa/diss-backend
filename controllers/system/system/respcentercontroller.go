@@ -40,9 +40,8 @@ func (this *RespCenterController) GetRespCenterList() {
 func (this *RespCenterController) GetRespCenter() {
 	id := this.GetString(":id")
 	rc := new(models.RespCenter)
-	json.Unmarshal(this.Ctx.Input.RequestBody, &rc)
-
 	rc.Id = id
+
 	this.Data["json"] = rc.GetRespCenter()
 	this.ServeJSON(false)
 }

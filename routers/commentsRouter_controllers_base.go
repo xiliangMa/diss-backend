@@ -124,6 +124,33 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:ImageBlockingController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:ImageBlockingController"],
+		beego.ControllerComments{
+			Method:           "GetImageBlockingList",
+			Router:           `/`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:ImageBlockingController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:ImageBlockingController"],
+		beego.ControllerComments{
+			Method:           "Get",
+			Router:           `/:imageId`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:ImageBlockingController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:ImageBlockingController"],
+		beego.ControllerComments{
+			Method:           "Operation",
+			Router:           `/operation`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
 	beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:ImageController"] = append(beego.GlobalControllerRouter["github.com/xiliangMa/diss-backend/controllers/base:ImageController"],
 		beego.ControllerComments{
 			Method:           "GetImagesList",
