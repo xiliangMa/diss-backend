@@ -720,12 +720,19 @@ func (this *NatsSubService) Save() error {
 					wi.Status = models.WarnInfoStatus
 				} else {
 					wi.Status = models.FailStatus
+
+					resp.WarningInfoId = wi.Id
+					if r := resp.Get(); r != nil {
+						r.Status = obj[models.StatusKey].(string)
+						if result := r.Update(); result.Code != http.StatusOK {
+							return errors.New(result.Message)
+						}
+					}
 				}
 
 				if result := wi.Update(); result.Code != http.StatusOK {
 					return errors.New(result.Message)
 				}
-
 			} else {
 				if err := mapstructure.Decode(cc, &resp); err != nil {
 					logs.Error("Parse %s error %s", ms.Tag, err)
