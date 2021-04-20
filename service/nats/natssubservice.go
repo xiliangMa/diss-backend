@@ -125,6 +125,7 @@ func (this *NatsSubService) Save() error {
 		case models.Resource_ContainerConfig:
 			containerConfigList := []models.ContainerConfig{}
 			CheckObject := new(models.ContainerConfig)
+			result := models.Result{}
 			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &containerConfigList); err != nil {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
@@ -136,6 +137,23 @@ func (this *NatsSubService) Save() error {
 			}
 			for _, containerConfig := range containerConfigList {
 				containerConfig.AccountName = models.Account_Admin
+
+				ib := models.ImageBlocking{}
+				ib.ImageName = containerConfig.ImageName
+
+				logs.Info("result suss, containerConfig : %+v", containerConfig)
+
+				if ibg := ib.GetIb(); ibg != nil {
+					ibg.Action = models.ClearImage
+
+					result.Code = http.StatusOK
+					result.Message = "Image Blocking Operation Success"
+
+					this.ClientSubject = containerConfig.HostId
+					nd := models.NatsData{Code: result.Code, Type: models.Type_Control, Msg: result.Message, Tag: models.Image_Control, RCType: models.Resource_Control_Type_Delete, Data: ibg}
+					this.ReceiveData(nd)
+					continue
+				}
 				containerConfig.Add()
 			}
 			// 清除脏数据
@@ -674,7 +692,6 @@ func (this *NatsSubService) Save() error {
 				}
 			}
 		case models.Resource_ContainerControlStatus:
-
 			var obj map[string]interface{}
 			var cc map[string]interface{}
 			resp := models.RespCenter{}
@@ -703,12 +720,19 @@ func (this *NatsSubService) Save() error {
 					wi.Status = models.WarnInfoStatus
 				} else {
 					wi.Status = models.FailStatus
+
+					resp.WarningInfoId = wi.Id
+					if r := resp.Get(); r != nil {
+						r.Status = obj[models.StatusKey].(string)
+						if result := r.Update(); result.Code != http.StatusOK {
+							return errors.New(result.Message)
+						}
+					}
 				}
 
 				if result := wi.Update(); result.Code != http.StatusOK {
 					return errors.New(result.Message)
 				}
-
 			} else {
 				if err := mapstructure.Decode(cc, &resp); err != nil {
 					logs.Error("Parse %s error %s", ms.Tag, err)
@@ -721,6 +745,34 @@ func (this *NatsSubService) Save() error {
 				if result := resp.Update(); result.Code != http.StatusOK {
 					return errors.New(result.Message)
 				}
+			}
+
+		case models.Image_ControlStatus:
+
+			var obj map[string]interface{}
+
+			cc := new(models.ContainerConfig)
+
+			s, _ := json.Marshal(ms.Data)
+
+			if err := json.Unmarshal(s, &obj); err != nil {
+				logs.Error("Parse %s error %s", ms.Tag, err)
+				return err
+			}
+
+			logs.Info("ImageControlStatus obj : data: %v", obj)
+
+			imageControl := obj["ImageControl"]
+
+			if err := json.Unmarshal([]byte(imageControl.(string)), &cc); err != nil {
+				logs.Error("Parse %s error %s", ms.Tag, err)
+				return err
+			}
+
+			list := cc.GetContainerConfigList()
+
+			for _, containerConfig := range list {
+				containerConfig.Delete()
 			}
 
 		}
@@ -767,6 +819,7 @@ func (this *NatsSubService) DeleteTask() error {
 func (this *NatsSubService) ReceiveData(result models.NatsData) {
 	data, _ := json.Marshal(result)
 	err := this.Conn.Publish(this.ClientSubject, data)
+	logs.Info("Publish suss, subject: %s data : %s", this.ClientSubject, data)
 	if err != nil {
 		logs.Error("Nats ############################ Received data from agent fail ############################", err)
 	}

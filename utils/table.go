@@ -10,6 +10,7 @@ var (
 	Pod                  = "pod"
 	ImageConfig          = "image_config"
 	ImageInfo            = "image_info"
+	ImageBlocking        = "image_blocking"
 	ContainerConfig      = "container_config"
 	ContainerInfo        = "container_info"
 	ContainerInspect     = "container_inspect"

@@ -37,6 +37,7 @@ type RespCenterInterface interface {
 	Add()
 	Update() Result
 	GetRespCenter() Result
+	Get() *RespCenter
 }
 
 func (this *RespCenter) List(from, limit int) Result {
@@ -200,5 +201,22 @@ func (this *RespCenter) GetRespCenter() Result {
 	ResultData.Data = data
 
 	return ResultData
+}
 
+func (this *RespCenter) Get() *RespCenter {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	rc := new(RespCenter)
+	var err error
+	cond := orm.NewCondition()
+	if this.WarningInfoId != "" {
+		cond = cond.And("warning_info_id", this.WarningInfoId)
+	}
+
+	err = o.QueryTable(utils.RespCenter).SetCond(cond).RelatedSel().One(rc)
+	if err != nil {
+		logs.Error("Get failed, code: %d, err: %s", utils.GetRespCenterErr, err.Error())
+		return nil
+	}
+	return rc
 }

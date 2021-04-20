@@ -109,6 +109,11 @@ func init() {
 				&cbase.ImageController{},
 			),
 		),
+		beego.NSNamespace("/v1/images/blocking",
+			beego.NSInclude(
+				&cbase.ImageBlockingController{},
+			),
+		),
 		beego.NSNamespace("/v1/k8s/clusters",
 			beego.NSInclude(
 				&ck8s.ClusterController{},
