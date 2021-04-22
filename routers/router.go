@@ -22,8 +22,9 @@ import (
 	csystem "github.com/xiliangMa/diss-backend/controllers/system/system"
 	"github.com/xiliangMa/diss-backend/service/auth"
 
-	ws "github.com/xiliangMa/diss-backend/controllers/ws"
 	"net/http"
+
+	ws "github.com/xiliangMa/diss-backend/controllers/ws"
 )
 
 func init() {
@@ -151,6 +152,8 @@ func init() {
 				&csystem.LicenseController{},
 				&csystem.FeedsController{},
 				&csystem.RespCenterController{},
+				&csystem.VulnerabilityController{},
+				&csystem.ProbeDriverController{},
 			),
 		),
 		beego.NSNamespace("/v1/jobs",
