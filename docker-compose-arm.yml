@@ -19,6 +19,8 @@ services:
       - diss-db
     volumes:
       - /var/lib/diss/diss-backend/upload/kubernetes:/opt/diss-backend/upload/kubernetes
+      - /var/lib/diss/diss-backend/upload/vuln:/opt/diss-backend/upload/vuln
+      - /var/lib/diss/diss-backend/upload/probe:/opt/diss-backend/upload/probe
       - /var/log/diss/diss-backend:/opt/diss-backend/logs
       - ./conf:/opt/diss-backend/conf
     entrypoint:

@@ -190,6 +190,30 @@ func GetLogoPath() string {
 	return beego.AppConfig.String("system::LogoPath")
 }
 
+func GetLogoName() string {
+	return beego.AppConfig.String("system::NewLogoName")
+}
+
+func GetLogoUrl() string {
+	return beego.AppConfig.String("system::LogoUrl")
+}
+
 func GetWarnWhitelistPath() string {
 	return beego.AppConfig.String("system::WarnWhitelistPath")
+}
+
+func GetVulnDbPath() string {
+	return beego.AppConfig.String("system::VulnDbPath")
+}
+
+func GetVulnDbUrl() string {
+	return beego.AppConfig.String("system::VulnDbUrl")
+}
+
+func GetProbeDriverPath() string {
+	return beego.AppConfig.String("system::ProbeDriverPath")
+}
+
+func GetProbeDriverUrl() string {
+	return beego.AppConfig.String("system::ProbeDriverUrl")
 }
