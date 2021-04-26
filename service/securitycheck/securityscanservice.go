@@ -20,6 +20,7 @@ type SecurityScanService struct {
 	HostList             []*models.HostConfig
 	ContainerList        []*models.ContainerConfig
 	ImageList            []*models.ImageConfig
+	ClusterList          []*models.Cluster
 	Job                  *models.Job
 	Batch                int64
 	CurrentBatchTaskList []*models.Task
@@ -70,6 +71,15 @@ func (this *SecurityScanService) PrePare() {
 					Host:      host,
 					Type:      models.SC_Type_Host,
 					Job:       this.Job,
+				}
+				this.PrePareTask(&securityCheck)
+			}
+			if this.SecurityCheckParams.KubenetesScan {
+				securityCheck := models.SecurityCheck{
+					ImageVulnScan: this.SecurityCheckParams.KubenetesScan,
+					Host:          host,
+					Type:          models.SC_Type_Host,
+					Job:           this.Job,
 				}
 				this.PrePareTask(&securityCheck)
 			}
@@ -376,24 +386,10 @@ func (this *SecurityScanService) Check() models.Result {
 		HostIds:      this.SecurityCheckParams.HostIds,
 		ImageIds:     this.ImageIds,
 		ContainerIds: this.ContainerIds,
-		JobId:        this.SecurityCheckParams.JobId}
-
-	// job检查
-	if !this.IsSystem {
-		ResultData, this.Job = baseService.CheckJobIsExist()
-		if ResultData.Code != http.StatusOK {
-			return ResultData
-		}
+		JobId:        this.SecurityCheckParams.JobId,
+		ClusterIds:   this.SecurityCheckParams.JobId,
 	}
-
-	// 主机授权、主机资源检查
-	if !this.ImageVulnScan {
-		ResultData, this.HostList = baseService.CheckHostLicense()
-		if ResultData.Code != http.StatusOK {
-			return ResultData
-		}
-	}
-
+	// 1. 资源检查
 	// 镜像资源
 	ResultData, this.ImageList = baseService.CheckImageIsExist()
 	if ResultData.Code != http.StatusOK {
@@ -405,5 +401,28 @@ func (this *SecurityScanService) Check() models.Result {
 	if ResultData.Code != http.StatusOK {
 		return ResultData
 	}
+
+	// kubernetes 资源
+	ResultData, this.ClusterList, baseService.HostListInCluster = baseService.CheckClusterIsExist()
+	if ResultData.Code != http.StatusOK {
+		return ResultData
+	}
+
+	// 2. job检查
+	if !this.IsSystem {
+		ResultData, this.Job = baseService.CheckJobIsExist()
+		if ResultData.Code != http.StatusOK {
+			return ResultData
+		}
+	}
+
+	// 3. 主机授权检查
+	if !this.ImageVulnScan {
+		ResultData, this.HostList = baseService.CheckHostLicense()
+		if ResultData.Code != http.StatusOK {
+			return ResultData
+		}
+	}
+
 	return ResultData
 }

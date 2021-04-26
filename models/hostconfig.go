@@ -45,6 +45,7 @@ type HostConfig struct {
 type HostConfigInterface interface {
 	Add() error
 	List(from, limit int) Result
+	BaseList(from, limit int) (error, int64, []*HostConfig)
 	Update() Result
 	Delete() Result
 	UpdateDynamic() Result
@@ -121,8 +122,26 @@ func (this *HostConfig) Get() *HostConfig {
 func (this *HostConfig) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var HostConfigList []*HostConfig = nil
 	var ResultData Result
+	err, total, list := this.BaseList(from, limit)
+	if err != nil {
+		ResultData.Code = utils.GetHostConfigErr
+	}
+	data := make(map[string]interface{})
+	data["items"] = list
+	data["total"] = total
+	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
+	ResultData.Code = http.StatusOK
+	return ResultData
+}
+
+func (this *HostConfig) BaseList(from, limit int) (error, int64, []*HostConfig) {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var list []*HostConfig = nil
 	var err error
 	cond := orm.NewCondition()
 	if this.Id != "" {
@@ -155,24 +174,13 @@ func (this *HostConfig) List(from, limit int) Result {
 	if this.LicCount {
 		cond = cond.And("is_licensed", true)
 	}
-	_, err = o.QueryTable(utils.HostConfig).SetCond(cond).Limit(limit, from).OrderBy("-host_name").RelatedSel().All(&HostConfigList)
+	_, err = o.QueryTable(utils.HostConfig).SetCond(cond).Limit(limit, from).OrderBy("-host_name").RelatedSel().All(&list)
 	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetHostConfigErr
-		logs.Error("GetHostConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
+		logs.Error("GetHostConfig failed, code: %d, err: %s", utils.GetHostConfigErr, err.Error())
+		return err, 0, nil
 	}
-
 	total, _ := o.QueryTable(utils.HostConfig).SetCond(cond).Count()
-	data := make(map[string]interface{})
-	data["items"] = HostConfigList
-	data["total"] = total
-	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
-	ResultData.Code = http.StatusOK
-	return ResultData
+	return nil, total, list
 }
 
 func (this *HostConfig) Update() Result {
