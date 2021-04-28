@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -31,7 +32,7 @@ func (this *LicenseController) AddLicenseFile() {
 
 	licenseService := sssystem.LicenseService{}
 	licenseService.IsForce = isForce
-	result, fpath := licenseService.CheckLicenseFile(h)
+	result:= licenseService.CheckLicenseFile(h)
 	licenseByte := []byte{}
 
 	defer f.Close()
@@ -42,6 +43,11 @@ func (this *LicenseController) AddLicenseFile() {
 		return
 	}
 
+	fpath := licenseService.LicTrialFile
+	// 正式授权先保存为临时名称
+	if licenseService.LicType == models.LicType_StandardLicense{
+		fpath = licenseService.LicStandTmpFile
+	}
 	err := this.SaveToFile(key, fpath)
 
 	if err != nil {
@@ -99,6 +105,9 @@ func (this *LicenseController) AddLicenseFile() {
 			result.Code = utils.DeleteFileErr
 			result.Message = "Delete file Error: " + fpath
 		}
+	}
+	if strings.Contains(fpath, models.LicType_StandardLicense) {
+		os.Rename(licenseService.LicStandTmpFile, licenseService.LicStandFile)
 	}
 
 	this.Data["json"] = result
