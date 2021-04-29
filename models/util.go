@@ -219,6 +219,7 @@ var (
 	LicType_TrialLicense    = "TrialLicense"
 	LicType_StandardLicense = "StandardLicense"
 	LicFile_Extension       = ".lic"
+	LicFileTemp_Extension   = ".lictmp"
 
 	LicModuleType_BenchMark = "BenchMark"
 

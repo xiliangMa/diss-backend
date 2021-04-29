@@ -19,10 +19,14 @@ import (
 )
 
 type LicenseService struct {
-	LicenseByte []byte
-	IsForce     bool
-	IsUpdate    bool
-	FileType    string
+	LicenseByte     []byte
+	IsForce         bool
+	IsUpdate        bool
+	FileType        string
+	LicStandFile    string
+	LicStandTmpFile string
+	LicTrialFile    string
+	LicType      	string
 }
 
 func (this *LicenseService) LicenseActive() models.Result {
@@ -69,16 +73,17 @@ func (this *LicenseService) LicenseActive() models.Result {
 	}
 	licInDb := licenseQueryObj.Get()
 
+	dbUpdate := false
 	if licInDb.Data != nil {
 		licData := licInDb.Data.([]*models.LicenseConfig)
 		if len(licData) > 0 {
-			this.IsUpdate = true
+			dbUpdate = true
 			if licenseObject.Type == models.LicType_TrialLicense {
 				licenseObject.Id = licData[0].Id
 			}
 		}
 	}
-	if this.IsUpdate {
+	if dbUpdate {
 		result = licenseObject.Update()
 		message = fmt.Sprintf("Force update license file success, License: %s", string(plainText))
 		logs.Info(message)
@@ -98,23 +103,31 @@ func (this *LicenseService) LicenseActive() models.Result {
 	return result
 }
 
-func (this *LicenseService) CheckLicenseFile(h *multipart.FileHeader) (models.Result, string) {
+func (this *LicenseService) CheckLicenseFile(h *multipart.FileHeader) (models.Result) {
 	licenseService := LicenseService{}
 	var fpath = licenseService.GetLicenseFilePath()
 	var result models.Result
 	fName := h.Filename
 	ext := path.Ext(fName)
-	licFilename := models.LicType_StandardLicense + models.LicFile_Extension
+	this.LicStandFile = fpath + models.LicType_StandardLicense + models.LicFile_Extension
+	this.LicStandTmpFile = fpath + models.LicType_StandardLicense + models.LicFileTemp_Extension
+	this.LicTrialFile = fpath + models.LicType_TrialLicense + models.LicFile_Extension
+	licFilename := ""
+
+	// 如果传了试用版，重置授权为试用版文件
 	if strings.Contains(strings.ToLower(fName), "trial") {
-		err := os.Remove(fpath + licFilename)
+		err := os.Remove(this.LicStandFile)
 		if err != nil {
 			result.Code = utils.DeleteFileErr
-			message := "Delete file Error: " + fpath + licFilename
+			message := "Delete file Error: " + this.LicStandFile
 			result.Message = message
-			logs.Info(message)
-			return result, fpath
+			return result
 		}
+		this.LicType = models.LicType_TrialLicense
 		licFilename = models.LicType_TrialLicense + models.LicFile_Extension
+	}else{
+		this.LicType = models.LicType_StandardLicense
+		licFilename = models.LicType_StandardLicense + models.LicFile_Extension
 	}
 
 	//创建目录
@@ -124,7 +137,7 @@ func (this *LicenseService) CheckLicenseFile(h *multipart.FileHeader) (models.Re
 	if code := licenseService.checkLicenseFilePost(ext, fName); code != http.StatusOK {
 		result.Code = code
 		result.Message = "CheckLicenseFilePostErr"
-		return result, fpath
+		return result
 	}
 
 	// 非强制更新时，检查文件是否存在
@@ -132,13 +145,12 @@ func (this *LicenseService) CheckLicenseFile(h *multipart.FileHeader) (models.Re
 		if code := licenseService.checkLicenseFileIsExist(fpath, licFilename); code != http.StatusOK {
 			result.Code = code
 			result.Message = "CheckLicenseFileIsExistErr"
-			return result, fpath
+			return result
 		}
 	}
 
-	fpath = fpath + licFilename
 	result.Code = http.StatusOK
-	return result, fpath
+	return result
 }
 
 func (this *LicenseService) CheckLicenseType() (res models.Result) {
