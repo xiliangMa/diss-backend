@@ -233,6 +233,7 @@ var (
 	GetWarningInfoListErr  = 1307
 	AddWarningInfoListErr  = 1308
 	UpdateWarningInfoErr   = 1309
+	NoSuchUser             = 1310
 
 	// diss_api 1400-1500
 	GetAccountsErr                        = 1400
