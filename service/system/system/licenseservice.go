@@ -26,7 +26,7 @@ type LicenseService struct {
 	LicStandFile    string
 	LicStandTmpFile string
 	LicTrialFile    string
-	LicType      	string
+	LicType         string
 }
 
 func (this *LicenseService) LicenseActive() models.Result {
@@ -103,7 +103,7 @@ func (this *LicenseService) LicenseActive() models.Result {
 	return result
 }
 
-func (this *LicenseService) CheckLicenseFile(h *multipart.FileHeader) (models.Result) {
+func (this *LicenseService) CheckLicenseFile(h *multipart.FileHeader) models.Result {
 	licenseService := LicenseService{}
 	var fpath = licenseService.GetLicenseFilePath()
 	var result models.Result
@@ -125,7 +125,7 @@ func (this *LicenseService) CheckLicenseFile(h *multipart.FileHeader) (models.Re
 		}
 		this.LicType = models.LicType_TrialLicense
 		licFilename = models.LicType_TrialLicense + models.LicFile_Extension
-	}else{
+	} else {
 		this.LicType = models.LicType_StandardLicense
 		licFilename = models.LicType_StandardLicense + models.LicFile_Extension
 	}

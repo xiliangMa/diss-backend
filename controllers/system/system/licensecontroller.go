@@ -32,7 +32,7 @@ func (this *LicenseController) AddLicenseFile() {
 
 	licenseService := sssystem.LicenseService{}
 	licenseService.IsForce = isForce
-	result:= licenseService.CheckLicenseFile(h)
+	result := licenseService.CheckLicenseFile(h)
 	licenseByte := []byte{}
 
 	defer f.Close()
@@ -45,7 +45,7 @@ func (this *LicenseController) AddLicenseFile() {
 
 	fpath := licenseService.LicTrialFile
 	// 正式授权先保存为临时名称
-	if licenseService.LicType == models.LicType_StandardLicense{
+	if licenseService.LicType == models.LicType_StandardLicense {
 		fpath = licenseService.LicStandTmpFile
 	}
 	err := this.SaveToFile(key, fpath)
