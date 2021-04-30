@@ -50,7 +50,7 @@ func (this *K8sWatchService) WatchCluster() models.Result {
 	if clientGo.ErrMessage == "" {
 		this.Cluster.SyncStatus = models.Cluster_Sync_Status_InProcess
 		this.Cluster.Update()
-		logs.Info("Cluster:  %s, Watch start.", clusterName)
+		logs.Info("ClusterOBJ:  %s, Watch start.", clusterName)
 
 		// 异常捕获更新状态
 		defer func() {
@@ -58,7 +58,7 @@ func (this *K8sWatchService) WatchCluster() models.Result {
 				// 更新集群的同步状态
 				this.Cluster.SyncStatus = models.Cluster_Watch_Status_Fail
 				this.Cluster.Update()
-				logs.Error("Cluster: %s, id: %s , Watch fail. err: %s", clusterName, clusterId, err)
+				logs.Error("ClusterOBJ: %s, id: %s , Watch fail. err: %s", clusterName, clusterId, err)
 			}
 		}()
 		watchType := ""

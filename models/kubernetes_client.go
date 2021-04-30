@@ -7,6 +7,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/utils"
 	"io"
+	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -57,6 +58,8 @@ type KubernetesHandler struct {
 	*DymaicClient
 	IsActive bool
 	File     *os.File
+	*Task
+	*Cluster
 }
 
 func CreateK8sClient(params *ApiParams) ClientGo {
@@ -236,31 +239,76 @@ func (this *KubernetesHandler) CreateOrDeleteResourceByYml() Result {
 				namespace = internalns.(string)
 			}
 		}
+		res := mapping.Resource.Resource
 		// 创建 Resource
 		if this.IsActive {
-			if mapping.Resource.Resource == "namespaces" || mapping.Resource.Resource == "clusterroles" || mapping.Resource.Resource == "clusterrolebindings" {
+			if res == "namespaces" || res == "clusterroles" || res == "clusterrolebindings" {
 				_, err = this.DymaicClient.Interface.Resource(mapping.Resource).Create(&unstruct, metav1.CreateOptions{})
 			} else {
-				_, err = this.DymaicClient.Interface.Resource(mapping.Resource).Namespace(namespace).Create(&unstruct, metav1.CreateOptions{})
+				if res == "jobs" {
+					newUnstruct, _ := this.UpdateKubeScanYml(unstruct)
+					_, err = this.DymaicClient.Interface.Resource(mapping.Resource).Namespace(namespace).Create(newUnstruct, metav1.CreateOptions{})
+				} else {
+					_, err = this.DymaicClient.Interface.Resource(mapping.Resource).Namespace(namespace).Create(&unstruct, metav1.CreateOptions{})
+				}
 			}
 		} else {
 			operatorType = "Delete"
-			if mapping.Resource.Resource == "namespaces" || mapping.Resource.Resource == "clusterroles" || mapping.Resource.Resource == "clusterrolebindings" {
+			if res == "namespaces" || res == "clusterroles" || res == "clusterrolebindings" {
 				err = this.DymaicClient.Interface.Resource(mapping.Resource).Delete(unstruct.GetName(), &metav1.DeleteOptions{})
 			} else {
-				err = this.DymaicClient.Interface.Resource(mapping.Resource).Namespace(namespace).Delete(unstruct.GetName(), &metav1.DeleteOptions{})
+				propagationPolicy := metav1.DeletePropagationBackground
+				err = this.DymaicClient.Interface.Resource(mapping.Resource).Namespace(namespace).Delete(unstruct.GetName(), &metav1.DeleteOptions{PropagationPolicy: &propagationPolicy})
 			}
 		}
 		if err != nil {
-			msg := fmt.Sprintf("%s kind: %s, name: %s  fail. Err: %s", operatorType, mapping.Resource.Resource, unstruct.GetName(), err)
+			msg := fmt.Sprintf("%s kind: %s, name: %s  fail. Err: %s", operatorType, res, unstruct.GetName(), err)
 			logs.Error(msg)
 			result.Code = utils.CretaeResourceError
 			result.Message = msg
 			return result
 		} else {
-			msg := fmt.Sprintf("%s kind: %s, name: %s  success.", operatorType, mapping.Resource.Resource, unstruct.GetName())
+			msg := fmt.Sprintf("%s kind: %s, name: %s  success.", operatorType, res, unstruct.GetName())
 			logs.Info(msg)
 		}
 	}
 	return result
+}
+
+func (this *KubernetesHandler) UpdateKubeScanYml(unstruct unstructured.Unstructured) (*unstructured.Unstructured, error) {
+	var lis []v1.EnvVar
+	var s1 v1.EnvVar
+	s1.Name = utils.GetKubeScanEnvDisPatchUrlKey()
+	s1.Value = utils.GetKubeScanReportUrl()
+	lis = append(lis, s1)
+	var s2 v1.EnvVar
+	s2.Name = utils.GetKubeScanEnvTaskIdKey()
+	s2.Value = this.Task.Id
+	lis = append(lis, s2)
+	var s3 v1.EnvVar
+	s3.Name = utils.GetKubeScanEnvClusterIdKey()
+	s3.Value = this.Cluster.Id
+	lis = append(lis, s3)
+
+	ss, _ := unstruct.MarshalJSON()
+	job := batchv1.Job{}
+	json.Unmarshal(ss, &job)
+	job.Spec.Template.Spec.Containers[0].Env = lis
+	jobByte, err := json.Marshal(job)
+	if err != nil {
+		logs.Error("Marshal job failed. Err: %s", err)
+		return nil, err
+	}
+	obj, _, err := unstructured.UnstructuredJSONScheme.Decode(jobByte, nil, nil)
+	if err != nil {
+		logs.Error("Decode jobByte to obj failed. Err: %s", err)
+		return nil, err
+	}
+	unstructuredObj, err := runtime.DefaultUnstructuredConverter.ToUnstructured(obj)
+	if err != nil {
+		logs.Error("Converter job to unstructured failed. Err: %s", err)
+		return nil, err
+	}
+	unstruct.Object = unstructuredObj
+	return &unstruct, nil
 }

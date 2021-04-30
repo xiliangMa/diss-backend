@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"strconv"
@@ -130,7 +131,6 @@ func GetDBCountSql(hostId string) string {
  * @serverUrl nats://diss:diss@111.229.167.6:4222
  */
 func GetNatsServerUrl() string {
-
 	prefix := beego.AppConfig.String("nats::Prefix")
 	ip := beego.AppConfig.String("nats::Ip")
 	port := beego.AppConfig.String("nats::Port")
@@ -139,6 +139,16 @@ func GetNatsServerUrl() string {
 	serverUrl := prefix + user + `:` + pwd + `@` + ip + `:` + port
 	logs.Info("Nats conect url: %s", serverUrl)
 	return serverUrl
+}
+
+func GetHTTPSAddr() string {
+	HTTPSAddr := beego.AppConfig.String("HTTPSAddr")
+	return HTTPSAddr
+}
+
+func GetHTTPSPort() string {
+	HTTPSPort := beego.AppConfig.String("HTTPSPort")
+	return HTTPSPort
 }
 
 func GetNatsClientId() string {
@@ -162,6 +172,39 @@ func IsEnableNats() bool {
 func GetScopeYml() string {
 	scopeYml := beego.AppConfig.String("k8s::ScopeYml")
 	return scopeYml
+}
+
+func GetKubeScanYml() string {
+	kubescanYml := beego.AppConfig.String("k8s::KubeScanYml")
+	return kubescanYml
+}
+
+func GetKubeScanEnvDisPatchUrlKey() string {
+	KubeScanEnvDisPatchUrlKey := beego.AppConfig.String("k8s::KubeScanEnvDisPatchUrlKey")
+	return KubeScanEnvDisPatchUrlKey
+}
+
+func GetKubeScanEnvTaskIdKey() string {
+	KubeScanEnvTaskIdKey := beego.AppConfig.String("k8s::KubeScanEnvTaskIdKey")
+	return KubeScanEnvTaskIdKey
+}
+
+func GetKubeScanEnvClusterIdKey() string {
+	KubeScanEnvClusterIdKey := beego.AppConfig.String("k8s::KubeScanEnvClusterIdKey")
+	return KubeScanEnvClusterIdKey
+}
+
+func GetKubeScanReportApi() string {
+	KubeScanReportApi := beego.AppConfig.String("k8s::KubeScanReportApi")
+	return KubeScanReportApi
+}
+
+func GetKubeScanReportUrl() string {
+	sechemes := "https://"
+	addr := GetHTTPSAddr()
+	port := GetHTTPSPort()
+	repotUri := fmt.Sprintf("%s%s:%s%s", sechemes, addr, port, GetKubeScanReportApi())
+	return repotUri
 }
 
 func GetScopeNameSpace() string {

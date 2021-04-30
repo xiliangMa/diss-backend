@@ -74,15 +74,6 @@ func (this *SecurityScanService) PrePare() {
 				}
 				this.PrePareTask(&securityCheck)
 			}
-			if this.SecurityCheckParams.KubenetesScan {
-				securityCheck := models.SecurityCheck{
-					ImageVulnScan: this.SecurityCheckParams.KubenetesScan,
-					Host:          host,
-					Type:          models.SC_Type_Host,
-					Job:           this.Job,
-				}
-				this.PrePareTask(&securityCheck)
-			}
 		}
 	case models.Sc_Type_Container:
 		for _, object := range this.ContainerList {
@@ -117,6 +108,18 @@ func (this *SecurityScanService) PrePare() {
 				this.PrePareTask(&securityCheck)
 			}
 		}
+	case models.Sc_Type_Cluster:
+		for _, cluster := range this.ClusterList {
+			if this.SecurityCheckParams.KubenetesScan {
+				securityCheck := models.SecurityCheck{
+					KubenetesScan: this.SecurityCheckParams.KubenetesScan,
+					Cluster:       cluster,
+					Type:          models.Sc_Type_Cluster,
+					Job:           this.Job,
+				}
+				this.PrePareTask(&securityCheck)
+			}
+		}
 	}
 
 	logs.Info("PrePare task end ......")
@@ -132,6 +135,7 @@ func (this *SecurityScanService) PrePareTask(securityCheck *models.SecurityCheck
 	Job_Type_HostVS := this.DefaultJob[models.TMP_Type_HostVS]
 	Job_Type_HostImageVulnScan := this.DefaultJob[models.TMP_Type_HostImageVulnScan]
 	Job_Type_ImageScan := this.DefaultJob[models.TMP_Type_ImageVulnScan]
+	Job_Type_KubeScan := this.DefaultJob[models.TMP_Type_KubernetesVulnScan]
 
 	// 默认模板
 
@@ -159,6 +163,10 @@ func (this *SecurityScanService) PrePareTask(securityCheck *models.SecurityCheck
 		// 仓库镜像扫描
 		if securityCheck.ImageVulnScan {
 			securityCheck.Job = Job_Type_ImageScan
+		}
+		// 集群漏扫
+		if securityCheck.KubenetesScan {
+			securityCheck.Job = Job_Type_KubeScan
 		}
 	}
 
@@ -217,6 +225,12 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		task.Description = taskpre + models.TMP_Type_ImageVulnScan
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_ImageVulnScan]
 		task.Image = securityCheck.Image
+	} else if securityCheck.KubenetesScan {
+		//kubernetes 漏扫
+		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_KubernetesVulnScan, uid)
+		task.Description = taskpre + models.TMP_Type_KubernetesVulnScan
+		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_KubernetesVulnScan]
+		task.ClusterOBJ = securityCheck.Cluster
 	}
 
 	if securityCheck.Job.Type == "" {
@@ -387,7 +401,7 @@ func (this *SecurityScanService) Check() models.Result {
 		ImageIds:     this.ImageIds,
 		ContainerIds: this.ContainerIds,
 		JobId:        this.SecurityCheckParams.JobId,
-		ClusterIds:   this.SecurityCheckParams.JobId,
+		ClusterIds:   this.SecurityCheckParams.ClusterIds,
 	}
 	// 1. 资源检查
 	// 镜像资源
@@ -417,7 +431,7 @@ func (this *SecurityScanService) Check() models.Result {
 	}
 
 	// 3. 主机授权检查
-	if !this.ImageVulnScan {
+	if !this.ImageVulnScan && !this.KubenetesScan {
 		ResultData, this.HostList = baseService.CheckHostLicense()
 		if ResultData.Code != http.StatusOK {
 			return ResultData

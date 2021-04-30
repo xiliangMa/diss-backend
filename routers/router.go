@@ -19,6 +19,7 @@ import (
 	csecuritylog "github.com/xiliangMa/diss-backend/controllers/securitylog"
 	csecuritypolicy "github.com/xiliangMa/diss-backend/controllers/securitypolicy"
 	cstatistics "github.com/xiliangMa/diss-backend/controllers/statistics"
+	"github.com/xiliangMa/diss-backend/controllers/system/report"
 	csystem "github.com/xiliangMa/diss-backend/controllers/system/system"
 	"github.com/xiliangMa/diss-backend/service/auth"
 
@@ -29,6 +30,11 @@ import (
 
 func init() {
 	ns := beego.NewNamespace("/api",
+		beego.NSNamespace("/report",
+			beego.NSInclude(
+				&report.KubeVulnLogController{},
+			),
+		),
 		beego.NSNamespace("/v1/users",
 			beego.NSInclude(
 				&cbase.UserController{},

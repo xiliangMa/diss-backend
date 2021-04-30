@@ -18,7 +18,7 @@ func (this *K8sTaskHandler) CheckClusterStatusTask() {
 	cluster := new(models.Cluster)
 	result := cluster.List(0, 0)
 	if result.Code != http.StatusOK {
-		logs.Error("Cluster status check fail, err: %s", result.Message)
+		logs.Error("ClusterOBJ status check fail, err: %s", result.Message)
 		return
 	}
 	if result.Data == nil {
@@ -46,7 +46,7 @@ func (this *K8sTaskHandler) CheckClusterStatusTask() {
 				k8sClearService := k8s.K8sClearService{ClusterList: deleteClusterList, DropCluster: false}
 				go k8sClearService.ClearAll()
 			}
-			logs.Error("Cluster Unavailable, please check your cluster.")
+			logs.Error("ClusterOBJ Unavailable, please check your cluster.")
 			if _, ok := models.KCM.ClientHub[cluster.Id]; ok {
 				delete(models.KCM.ClientHub, cluster.Id)
 			}
@@ -62,7 +62,7 @@ func (this *K8sTaskHandler) CheckClusterStatusTask() {
 				k8sClearService := k8s.K8sClearService{ClusterList: deleteClusterList, DropCluster: false}
 				go k8sClearService.ClearAll()
 			}
-			logs.Error("Cluster Unavailable, please check your cluster.")
+			logs.Error("ClusterOBJ Unavailable, please check your cluster.")
 			if _, ok := models.KCM.ClientHub[cluster.Id]; ok {
 				delete(models.KCM.ClientHub, cluster.Id)
 			}

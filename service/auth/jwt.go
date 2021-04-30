@@ -24,7 +24,6 @@ type JwtService struct {
 func (this *JwtService) CreateToken(name, pwd, userType string) (string, int) {
 	//检测 diss-api 用户
 	loginUser := models.UserAccessCredentials{UserName: name}
-
 	user := &models.UserAccessCredentials{}
 
 	if this.LoginType != models.Login_Type_LDAP {

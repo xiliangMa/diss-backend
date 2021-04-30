@@ -79,8 +79,9 @@ var (
 
 	//// 系统魔板类型(此处和ws resource tag 保持一致，和授权模块关联)
 	// 镜像扫描：
-	TMP_Type_ImageVulnScan     = "ImageScan"
-	TMP_Type_HostImageVulnScan = "HostImageVulnScan"
+	TMP_Type_ImageVulnScan      = "ImageScan"
+	TMP_Type_HostImageVulnScan  = "HostImageVulnScan"
+	TMP_Type_KubernetesVulnScan = "KubernetesVulnScan"
 	//基线扫描：
 	TMP_Type_BM_Docker = "DockerBenchMark"
 	TMP_Type_BM_K8S    = "KubernetesBenchMark"
@@ -108,6 +109,7 @@ var (
 	SC_Type_Host      = "host"
 	Sc_Type_Container = "container"
 	Sc_Type_Image     = "image"
+	Sc_Type_Cluster   = "cluster"
 
 	// 任务状态
 	Task_Status_Created        = "Created"
@@ -172,6 +174,7 @@ var (
 	Subject_Common        = "Common"
 	Subject_Image_Safe    = "IMAGE_SAFE"
 	Subject_IntrudeDetect = "INTRUDE_DETECT"
+	Subject_Cluster       = "Cluster"
 
 	// 告警信息类型
 	WarningInfo_File      = "ALERT_TYPE_FILE"

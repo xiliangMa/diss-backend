@@ -60,7 +60,7 @@ Retry:
 				pod.KSpec = string(KSpec)
 				pod.KStatus = string(KStatus)
 
-				logs.Info("Watch >>> Pod: %s <<<, >>> Cluster: %s <<<, >>> EventType: %s <<<", id, clusterName, event.Type)
+				logs.Info("Watch >>> Pod: %s <<<, >>> ClusterOBJ: %s <<<, >>> EventType: %s <<<", id, clusterName, event.Type)
 
 				// 根据 scope app 状态动态组件 集群 scope url
 				scopeService := scope.ScopeService{Pod: object, Cluster: this.Cluster}

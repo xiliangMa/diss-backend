@@ -142,7 +142,7 @@ func (this *BaseService) CheckClusterIsExist() (models.Result, []*models.Cluster
 		return ResultData, nil, nil
 	}
 
-	for _, id := range strings.Split(this.ContainerIds, ",") {
+	for _, id := range strings.Split(this.ClusterIds, ",") {
 		object := new(models.Cluster)
 		if id != "" {
 			object.Id = id

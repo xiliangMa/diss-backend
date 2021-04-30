@@ -38,9 +38,9 @@ func InitSystemCheckTask(th *task.TaskHandler) {
 func InitClusterStatusCheckTask(th *task.TaskHandler) {
 	clusterStatusCheckTaskId, _ := uuid.NewV4()
 	clusterStatusCheckSpec := beego.AppConfig.String("system::ClusterStatusCheckSpec")
-	logs.Info("Start Cluster Check TaskHandler, clusterStatusCheckSpec: %s", clusterStatusCheckSpec)
+	logs.Info("Start ClusterOBJ Check TaskHandler, clusterStatusCheckSpec: %s", clusterStatusCheckSpec)
 	if err := th.AddByFunc(clusterStatusCheckTaskId.String(), clusterStatusCheckSpec, new(task.K8sTaskHandler).CheckClusterStatusTask); err != nil {
-		logs.Error("Start Cluster Check TaskHandler fail, err: %s", err)
+		logs.Error("Start ClusterOBJ Check TaskHandler fail, err: %s", err)
 		os.Exit(-1)
 	}
 }

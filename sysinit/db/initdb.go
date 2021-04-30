@@ -77,6 +77,8 @@ func (this *DefaultDB) registerModel() {
 	orm.RegisterModel(new(models.LicenseConfig), new(models.LicenseModule), new(models.LicenseHistory))
 	// trivy
 	orm.RegisterModel(new(models.ImageVulnerabilities), new(models.Vulnerabilities), new(models.Registry))
+	// kube-hunter
+	orm.RegisterModel(new(models.KubeScan), new(models.KubeVulnerabilities))
 }
 
 func (this *DefaultDB) InitSystemData() {
@@ -126,6 +128,11 @@ func (this *DefaultDB) InitSystemData() {
 		logs.Error("Init DefaultHostVirusScanSql fail, err: %s", err)
 	}
 
+	_, err = o.Raw(dbscript.DefaultKubeVulnScanSql).Exec()
+	if err != nil {
+		logs.Error("Init DefaultKubeVulnScanSql fail, err: %s", err)
+	}
+
 	logs.Info("Init default system Job >>>>>>>>>>>>>>>>")
 
 	//系统job
@@ -157,6 +164,11 @@ func (this *DefaultDB) InitSystemData() {
 	_, err = o.Raw(dbscript.DefaultImageVlunScanJobSql).Exec()
 	if err != nil {
 		logs.Error("Init DefaultImageVlunScanJobSql Job fail, err: %s", err)
+	}
+
+	_, err = o.Raw(dbscript.DefaultKubeVlunScanJobSql).Exec()
+	if err != nil {
+		logs.Error("Init DefaultKubeVlunScanJobSql Job fail, err: %s", err)
 	}
 
 	_, err = o.Raw(dbscript.WarningInfoConfig).Exec()

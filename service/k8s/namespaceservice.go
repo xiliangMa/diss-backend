@@ -57,7 +57,7 @@ Retry:
 				ns.KSpec = string(KSpec)
 				ns.KStatus = string(KStatus)
 
-				logs.Info("Watch >>> Namespace: %s <<<, >>> Cluster: %s <<<, >>> EventType: %s <<<", id, clusterId, event.Type)
+				logs.Info("Watch >>> Namespace: %s <<<, >>> ClusterOBJ: %s <<<, >>> EventType: %s <<<", id, clusterId, event.Type)
 				switch event.Type {
 				case watch.Added:
 					ns.Add(false)

@@ -21,6 +21,7 @@ type Task struct {
 	Host            *HostConfig      `orm:"rel(fk);null;on_delete(do_nothing)"description:"(主机)"`
 	Container       *ContainerConfig `orm:"rel(fk);null;on_delete(do_nothing)" description:"(容器)"`
 	Image           *ImageConfig     `orm:"rel(fk);null;on_delete(do_nothing)" description:"(镜像)"`
+	ClusterOBJ      *Cluster         `orm:"rel(fk);null;on_delete(do_nothing)" description:"(集群)"`
 	CreateTime      int64            `orm:"default(0)" description:"(创建时间)"`
 	UpdateTime      int64            `orm:"default(0)" description:"(更新时间)"`
 	Job             *Job             `orm:"rel(fk);null;" description:"(job)"`
@@ -43,6 +44,25 @@ type TaskInterface interface {
 	Update() Result
 	GetCurrentBatchTaskList() (error, []*Task)
 	GetUnFinishedTaskList() Result
+	Get() *Task
+}
+
+func (this *Task) Get() *Task {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	task := new(Task)
+	var err error
+	cond := orm.NewCondition()
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+
+	err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().One(task)
+	if err != nil {
+		logs.Error("Get Task failed, code: %d, err: %s", err.Error(), utils.GetHostConfigErr)
+		return nil
+	}
+	return task
 }
 
 func (this *Task) Add() Result {

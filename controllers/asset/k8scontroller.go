@@ -13,10 +13,10 @@ type K8SController struct {
 }
 
 // @Title GetClusters
-// @Description Get Cluster List
+// @Description Get ClusterOBJ List
 // @Param token header string true "authToken"
 // @Param user query string "admin" true "diss api 系统的登入用户 如果用户all，直接根据租户查询"
-// @Param body body models.Cluster false "集群"
+// @Param body body models.ClusterOBJ false "集群"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result

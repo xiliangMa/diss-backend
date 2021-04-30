@@ -55,7 +55,7 @@ Retry:
 				deploy.KSpec = string(KSpec)
 				deploy.KStatus = string(KStatus)
 
-				logs.Info("Watch >>> Deployment: %s <<<, >>> Cluster: %s <<<,  >>> NameSpace: %s <<<, >>> EventType: %s <<<", id, clusterId, name, event.Type)
+				logs.Info("Watch >>> Deployment: %s <<<, >>> ClusterOBJ: %s <<<,  >>> NameSpace: %s <<<, >>> EventType: %s <<<", id, clusterId, name, event.Type)
 				switch event.Type {
 				case watch.Added:
 					deploy.Add()

@@ -23,7 +23,7 @@ type ClusterController struct {
 }
 
 // @Title AddCluster
-// @Description Add Cluster "authType=KubeConfig, 需要 上传KubeConfig文件; authType=BearerToken， 需要设置 masterUrl、bearerToken 参数"
+// @Description Add ClusterOBJ "authType=KubeConfig, 需要 上传KubeConfig文件; authType=BearerToken， 需要设置 masterUrl、bearerToken 参数"
 // @Param token header string true "authToken"
 // @Param authType formData string true "default: BearerToken、KubeConfig"
 // @Param masterUrl formData string false "ApiServer 访问地址"
@@ -69,7 +69,7 @@ func (this *ClusterController) AddCluster() {
 	case models.Api_Auth_Type_BearerToken:
 		if result = css.TestClient(params); result.Code == http.StatusOK {
 			if result = cluster.Add(isForce); result.Code == http.StatusOK {
-				logs.Info("Add Cluster success, MasterUrl: %s", cluster.MasterUrls)
+				logs.Info("Add ClusterOBJ success, MasterUrl: %s", cluster.MasterUrls)
 				if result.Code == http.StatusOK {
 					// 启动watch
 					k8sWatchService := k8s.K8sWatchService{Cluster: &cluster}
@@ -146,9 +146,9 @@ func (this *ClusterController) AddCluster() {
 }
 
 // @Title GetClusters
-// @Description Get Cluster List(不支持租户查询)
+// @Description Get ClusterOBJ List(不支持租户查询)
 // @Param token header string true "authToken"
-// @Param body body models.Cluster false "集群"
+// @Param body body models.ClusterOBJ false "集群"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
@@ -163,10 +163,10 @@ func (this *ClusterController) GetClusters() {
 }
 
 // @Title UpdateCluster
-// @Description Update Cluster
+// @Description Update ClusterOBJ
 // @Param token header string true "authToken"
 // @Param id path string "" true "Id"
-// @Param body body models.Cluster true "集群"
+// @Param body body models.ClusterOBJ true "集群"
 // @Success 200 {object} models.Result
 // @router /:id [put]
 func (this *ClusterController) UpdateCluster() {
@@ -180,7 +180,7 @@ func (this *ClusterController) UpdateCluster() {
 }
 
 // @Title DeleteCluster
-// @Description delete Cluster
+// @Description delete ClusterOBJ
 // @Param token header string true "authToken"
 // @Param id path string "" true "Id"
 // @Success 200 {object} models.Result

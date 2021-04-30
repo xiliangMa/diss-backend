@@ -104,7 +104,7 @@ func (this *Cluster) Add(isForce bool) Result {
 		if count != 0 {
 			ResultData.Message = "ClusterIsExistErr"
 			ResultData.Code = utils.ClusterIsExistErr
-			logs.Error("Add Cluster failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+			logs.Error("Add ClusterOBJ failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 			return ResultData
 		}
 		this.CreateTime = time.Now().UnixNano()
@@ -114,7 +114,7 @@ func (this *Cluster) Add(isForce bool) Result {
 		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 			ResultData.Message = err.Error()
 			ResultData.Code = utils.AddClusterErr
-			logs.Error("Add Cluster failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+			logs.Error("Add ClusterOBJ failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 			return ResultData
 		}
 	}
@@ -138,7 +138,7 @@ func (this *Cluster) GetRequiredSyncList() Result {
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetClusterErr
-		logs.Error("Get Cluster List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error("Get ClusterOBJ List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
@@ -185,7 +185,7 @@ func (this *Cluster) List(from, limit int) Result {
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetClusterErr
-		logs.Error("Get Cluster List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error("Get ClusterOBJ List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
@@ -253,7 +253,7 @@ func (this *Cluster) ListByAccount(from, limit int) Result {
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetClusterErr
-		logs.Error("Get Cluster List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error("Get ClusterOBJ List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
@@ -283,7 +283,7 @@ func (this *Cluster) Delete() Result {
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteClusterErr
-		logs.Error("Delete Cluster failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error("Delete ClusterOBJ failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK

@@ -55,7 +55,7 @@ Retry:
 				service.KSpec = string(KSpec)
 				service.KStatus = string(KStatus)
 
-				logs.Info("Watch >>> Service: %s <<<, >>> Cluster: %s <<<, >>> EventType: %s <<<", id, clusterName, event.Type)
+				logs.Info("Watch >>> Service: %s <<<, >>> ClusterOBJ: %s <<<, >>> EventType: %s <<<", id, clusterName, event.Type)
 				switch event.Type {
 				case watch.Added:
 					service.Add()

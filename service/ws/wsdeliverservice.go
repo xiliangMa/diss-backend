@@ -6,6 +6,8 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/gorilla/websocket"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/kubevuln"
+	"net/http"
 )
 
 type WSDeliverService struct {
@@ -33,21 +35,42 @@ func (this *WSDeliverService) DeliverTaskToNats() {
 		} else if task.Image != nil {
 			subject = task.Image.HostId
 			//task.Job = nil
+		} else if task.ClusterOBJ != nil {
+			subject = models.Subject_Cluster
 		}
 
 		if subject != "" {
-			result := models.NatsData{Type: models.Type_Control, Tag: models.Resource_Task, Data: task, RCType: models.Resource_Control_Type_Post}
-			data, _ := json.MarshalIndent(result, "", "  ")
-			err := models.Nats.Conn.Publish(subject, data)
-			logs.Debug("Send task data: %s.", string(data))
-			if err == nil {
-				logs.Info("Deliver Task to Nats Success, Subject: %s Id: %s, data: %v", subject, task.Id, result)
-			} else {
-				//更新 task 状态
-				task.Status = models.Task_Status_Deliver_Failed
-				task.Update()
-				logs.Error("Deliver Task to Nats Fail,  Subject: %s Id: %s, err: %s", subject, task.Id, err.Error())
+			switch subject {
+			case models.Subject_Cluster:
+				// todo add tasklog
+				if task.SystemTemplate.Type == models.TMP_Type_KubernetesVulnScan {
+					kubeVlunService := kubevuln.KubeVlunService{IsActive: true, Cluster: task.ClusterOBJ, Task: task}
+					result := kubeVlunService.ActiveOrDisableKubeScan()
+					if result.Code == http.StatusOK {
+						logs.Info("Deliver Task to cluster Success, ClusterName: %s, ClusterName: %s.", task.ClusterOBJ.Id, task.ClusterOBJ.Name)
+						task.Status = models.Task_Status_Deliver_Failed
+						task.Update()
+					} else {
+						logs.Error("Deliver Task to cluster failed, ClusterName: %s, ClusterName: %s.", task.ClusterOBJ.Id, task.ClusterOBJ.Name)
+						task.Status = models.Task_Status_Deliver_Failed
+						task.Update()
+					}
+				}
+			default:
+				result := models.NatsData{Type: models.Type_Control, Tag: models.Resource_Task, Data: task, RCType: models.Resource_Control_Type_Post}
+				data, _ := json.MarshalIndent(result, "", "  ")
+				err := models.Nats.Conn.Publish(subject, data)
+				logs.Debug("Send task data: %s.", string(data))
+				if err == nil {
+					logs.Info("Deliver Task to Nats Success, Subject: %s Id: %s, data: %v", subject, task.Id, result)
+				} else {
+					//更新 task 状态
+					task.Status = models.Task_Status_Deliver_Failed
+					task.Update()
+					logs.Error("Deliver Task to Nats Fail,  Subject: %s Id: %s, err: %s", subject, task.Id, err.Error())
+				}
 			}
+
 		}
 	}
 	logs.Info("################ Deliver Task <<<end>>> ################")

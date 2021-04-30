@@ -116,6 +116,9 @@ var (
 	AddImageBlockingErr             = 121
 	GetImageBlockingErr             = 122
 	LoginTypeErr                    = 123
+	ParseKubeVulnRawLogErr          = 124
+	AddKubeScanErr                  = 125
+	AddKubeVulnerabilitiesErr       = 126
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001

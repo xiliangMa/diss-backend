@@ -26,10 +26,10 @@ func (this *K8sClearService) ClearAll() {
 
 		// 检测成功
 		if this.CurrentCluster == nil {
-			msg = fmt.Sprintf("Clear Cluster: %s fail, Error: Not found cluster", param.Id)
+			msg = fmt.Sprintf("Clear ClusterOBJ: %s fail, Error: Not found cluster", param.Id)
 			logs.Error(msg)
 		} else {
-			msg = fmt.Sprintf("Clear Cluster: %s start......", this.CurrentCluster.Name)
+			msg = fmt.Sprintf("Clear ClusterOBJ: %s start......", this.CurrentCluster.Name)
 			logs.Info(msg)
 			// 更新同步状态未Clearing、并设置为禁止同步
 			this.CurrentCluster.IsSync = false
@@ -64,7 +64,7 @@ func (this *K8sClearService) ClearAll() {
 				this.ClearCluster()
 			}
 
-			msg = fmt.Sprintf("Clear Cluster: %s sucess......", this.CurrentCluster.Name)
+			msg = fmt.Sprintf("Clear ClusterOBJ: %s sucess......", this.CurrentCluster.Name)
 			logs.Info(msg)
 		}
 	}
@@ -86,7 +86,7 @@ func (this *K8sClearService) Check(cluster *models.Cluster) *models.Cluster {
 }
 
 func (this *K8sClearService) ClearCluster() {
-	msg := fmt.Sprintf("Clear Cluster, Cluster: %s ", this.CurrentCluster.Name)
+	msg := fmt.Sprintf("Clear ClusterOBJ, ClusterOBJ: %s ", this.CurrentCluster.Name)
 	logs.Info(msg)
 	if this.CurrentCluster.AuthType == models.Api_Auth_Type_KubeConfig {
 		if beego.AppConfig.String("RunMode") == "prod" {
@@ -109,7 +109,7 @@ func (this *K8sClearService) ClearNs() {
 	if models.GRM != nil && models.GRM.GoRoutineMap != nil && models.GRM.GoRoutineMap[watchType] != nil {
 		models.GRM.GoRoutineMap[watchType].(NameSpaceService).Close <- true
 	}
-	msg := fmt.Sprintf("Clear NameSpace, Cluster: %s ", this.CurrentCluster.Name)
+	msg := fmt.Sprintf("Clear NameSpace, ClusterOBJ: %s ", this.CurrentCluster.Name)
 	logs.Info(msg)
 
 	ns := models.NameSpace{}
@@ -123,7 +123,7 @@ func (this *K8sClearService) ClearNetworkPolicy() {
 	if models.GRM != nil && models.GRM.GoRoutineMap != nil && models.GRM.GoRoutineMap[watchType] != nil {
 		models.GRM.GoRoutineMap[watchType].(NetworkPolicyService).Close <- true
 	}
-	msg := fmt.Sprintf("Clear NetworkPolicy, Cluster: %s ", this.CurrentCluster.Name)
+	msg := fmt.Sprintf("Clear NetworkPolicy, ClusterOBJ: %s ", this.CurrentCluster.Name)
 	logs.Info(msg)
 
 	netpol := models.NetworkPolicy{}
@@ -137,7 +137,7 @@ func (this *K8sClearService) ClearDeployment() {
 	if models.GRM != nil && models.GRM.GoRoutineMap != nil && models.GRM.GoRoutineMap[watchType] != nil {
 		models.GRM.GoRoutineMap[watchType].(DeploymentService).Close <- true
 	}
-	msg := fmt.Sprintf("Clear Deployment, Cluster: %s ", this.CurrentCluster.Name)
+	msg := fmt.Sprintf("Clear Deployment, ClusterOBJ: %s ", this.CurrentCluster.Name)
 	logs.Info(msg)
 
 	deploy := models.Deployment{}
@@ -151,7 +151,7 @@ func (this *K8sClearService) ClearService() {
 	if models.GRM != nil && models.GRM.GoRoutineMap != nil && models.GRM.GoRoutineMap[watchType] != nil {
 		models.GRM.GoRoutineMap[watchType].(SVCService).Close <- true
 	}
-	msg := fmt.Sprintf("Clear Service, Cluster: %s ", this.CurrentCluster.Name)
+	msg := fmt.Sprintf("Clear Service, ClusterOBJ: %s ", this.CurrentCluster.Name)
 	logs.Info(msg)
 
 	svc := models.Service{}
@@ -166,7 +166,7 @@ func (this *K8sClearService) ClearPod() {
 		models.GRM.GoRoutineMap[watchType].(PodService).Close <- true
 	}
 
-	msg := fmt.Sprintf("Clear Pod, Cluster: %s ", this.CurrentCluster.Name)
+	msg := fmt.Sprintf("Clear Pod, ClusterOBJ: %s ", this.CurrentCluster.Name)
 	logs.Info(msg)
 
 	pod := models.Pod{}
@@ -175,7 +175,7 @@ func (this *K8sClearService) ClearPod() {
 }
 
 func (this *K8sClearService) ClearContainer() {
-	msg := fmt.Sprintf("Clear Container, Cluster: %s ", this.CurrentCluster.Name)
+	msg := fmt.Sprintf("Clear Container, ClusterOBJ: %s ", this.CurrentCluster.Name)
 	logs.Info(msg)
 	cc := models.ContainerConfig{}
 	cc.ClusterName = this.CurrentCluster.Name
@@ -193,7 +193,7 @@ func (this *K8sClearService) ClearNode() {
 	if models.GRM != nil && models.GRM.GoRoutineMap != nil && models.GRM.GoRoutineMap[watchType] != nil {
 		models.GRM.GoRoutineMap[watchType].(NodeService).Close <- true
 	}
-	msg := fmt.Sprintf("Clear node, Cluster %s ", this.CurrentCluster.Name)
+	msg := fmt.Sprintf("Clear node, ClusterOBJ %s ", this.CurrentCluster.Name)
 	logs.Info(msg)
 
 	hc := models.HostConfig{}

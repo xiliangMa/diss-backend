@@ -7,6 +7,7 @@ type SecurityCheckList struct {
 type SecurityCheck struct {
 	DockerCIS         bool             `description:"(required: false, 开启Docker基线检测)"`
 	KubenetesCIS      bool             `description:"(required: false, 开启K8s基线检测)"`
+	KubenetesScan     bool             `description:"(required: false, 开启K8s漏扫)"`
 	VirusScan         bool             `description:"(required: false, 开启病毒)"`
 	LeakScan          bool             `description:"(required: false, 开启漏洞)"`
 	HostImageVulnScan bool             `description:"(required: false, 主机镜像漏洞)"`
@@ -14,6 +15,7 @@ type SecurityCheck struct {
 	Host              *HostConfig      `description:"(required: false, 主机)"`
 	Container         *ContainerConfig `description:"(required: false, 容器)"`
 	Image             *ImageConfig     `description:"(required: false, 镜像)"`
+	Cluster           *Cluster         `description:"(required: false, 集群)"`
 	Type              string           `description:"(required: false, 类型 host、container、image)"`
 	Job               *Job             `description:"(required: false, 来源任务)"`
 }

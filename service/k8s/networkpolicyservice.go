@@ -78,7 +78,7 @@ Retry:
 					}
 				}
 
-				logs.Info("Watch >>> NetworkPolicy: %s <<<, >>> Cluster: %s <<<,  >>> NameSpace: %s <<<, >>> EventType: %s <<<", id, clusterId, ns, event.Type)
+				logs.Info("Watch >>> NetworkPolicy: %s <<<, >>> ClusterOBJ: %s <<<,  >>> NameSpace: %s <<<, >>> EventType: %s <<<", id, clusterId, ns, event.Type)
 				switch event.Type {
 				case watch.Added:
 					netpol.Add()

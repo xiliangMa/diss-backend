@@ -125,7 +125,7 @@ Retry:
 					}
 				}
 
-				logs.Info("Watch >>> Node: %s <<<, >>> Cluster: %s <<<, >>> EventType: %s <<<", id, clusterId, event.Type)
+				logs.Info("Watch >>> Node: %s <<<, >>> ClusterOBJ: %s <<<, >>> EventType: %s <<<", id, clusterId, event.Type)
 				switch event.Type {
 				case watch.Added:
 					hc.Add()
