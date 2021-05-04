@@ -328,18 +328,13 @@ func (this *NatsSubService) Save() error {
 			// hostconfig填充最新的基线结果个数
 			host := models.HostConfig{}
 			host.Id = benchMarkLog.HostId
-			hostConfig := host.Get()
-			if hostConfig != nil {
-				kubeCISCount := map[string]int{}
-				kubeCISCount["FailCount"] = benchMarkLog.FailCount
-				kubeCISCount["InfoCount"] = benchMarkLog.InfoCount
-				kubeCISCount["WarnCount"] = benchMarkLog.WarnCount
-				kubeCISCount["PassCount"] = benchMarkLog.PassCount
-				benchCountJson, _ := json.Marshal(kubeCISCount)
-				hostConfig.KubeCISCount = string(benchCountJson)
-
-				hostConfig.Update()
-			}
+			benchmarkSummary := models.MarkSummary{}
+			benchmarkSummary.FailCount = benchMarkLog.FailCount
+			benchmarkSummary.InfoCount = benchMarkLog.InfoCount
+			benchmarkSummary.PassCount = benchMarkLog.PassCount
+			benchmarkSummary.WarnCount = benchMarkLog.WarnCount
+			host.KubeCISUpdateTime = benchMarkLog.UpdateTime
+			host.UpdateHostCISCount(benchmarkSummary)
 			//metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil, Config: ""}
 			//this.ReceiveData(metricsResult)
 			// 上报es
@@ -746,7 +741,6 @@ func (this *NatsSubService) Save() error {
 					return errors.New(result.Message)
 				}
 			}
-
 		case models.Image_ControlStatus:
 
 			var obj map[string]interface{}
@@ -774,7 +768,6 @@ func (this *NatsSubService) Save() error {
 			for _, containerConfig := range list {
 				containerConfig.Delete()
 			}
-
 		}
 	}
 

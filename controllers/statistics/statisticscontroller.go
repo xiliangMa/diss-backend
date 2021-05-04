@@ -22,14 +22,14 @@ func (this *StatisticsController) GetAssetStatistics() {
 
 }
 
-// @Title GetBnechMarkProportionStatistics
+// @Title GetBenchMarkProportionStatistics
 // @Description Get BnechMark Proportion Statistics (安全基线占比：docker基线、kubernetes基线)
 // @Param token header string true "authToken"
 // @Success 200 {object} models.Result
 // @router /bmp [get]
-func (this *StatisticsController) GetBnechMarkProportionStatistics() {
+func (this *StatisticsController) GetBenchMarkProportionStatistics() {
 	statisticsService := ss.StatisticsService{nil, nil, nil}
-	this.Data["json"] = statisticsService.GetBnechMarkProportionStatistics()
+	this.Data["json"] = statisticsService.GetBenchMarkProportionStatistics()
 	this.ServeJSON(false)
 }
 

@@ -130,9 +130,15 @@ Retry:
 				case watch.Added:
 					hc.Add()
 					hi.Add()
+					if hc.IsInK8s {
+						hc.RestoreKubeBenchSummary()
+					}
 				case watch.Modified:
 					hc.Add()
 					hi.Add()
+					if hc.IsInK8s {
+						hc.RestoreKubeBenchSummary()
+					}
 				case watch.Deleted:
 					hc.Delete()
 					hi.Delete()

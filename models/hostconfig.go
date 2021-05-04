@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
@@ -37,7 +38,9 @@ type HostConfig struct {
 	KubernetesVer       string    `orm:"size(64)" description:"(kubernetes 版本)"`
 	NodeRole            string    `orm:"size(64)" description:"(集群主机角色)"`
 	DockerCISCount      string    `orm:"null;" description:"(docker基线结果个数)"`
+	DockerCISUpdateTime int64     `orm:"default(0)" description:"(docker基线更新时间)"`
 	KubeCISCount        string    `orm:"null;" description:"(k8s基线结果个数)"`
+	KubeCISUpdateTime   int64     `orm:"default(0)" description:"(k8s基线更新时间)"`
 	IsLicensed          bool      `orm:"default(false);" description:"(是否已经授权)"`
 	LicCount            bool      `orm:"-" description:"(是否获取授权个数操作)"`
 }
@@ -50,7 +53,7 @@ type HostConfigInterface interface {
 	Delete() Result
 	UpdateDynamic() Result
 	Count() int64
-	GetBnechMarkProportion() (int64, int64)
+	GetBenchMarkProportion() (int64, int64)
 	Get() *HostConfig
 }
 
@@ -195,6 +198,7 @@ func (this *HostConfig) Update() Result {
 		logs.Error("Update HostConfig: %s failed, code: %d, err: %s", this.HostName, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
+
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
@@ -244,7 +248,7 @@ func (this *HostConfig) Count() int64 {
 }
 
 // docker基线 / k8s 基线
-func (this *HostConfig) GetBnechMarkProportion() (int64, int64) {
+func (this *HostConfig) GetBenchMarkProportion() (int64, int64) {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	dockerBenchMarkCount, _ := o.QueryTable(utils.HostConfig).Count()
@@ -295,4 +299,47 @@ func (this *HostConfig) Delete() Result {
 	}
 	ResultData.Code = http.StatusOK
 	return ResultData
+}
+
+func (this *HostConfig) UpdateHostCISCount(benchMarkSummary MarkSummary) {
+	hostConfig := this.Get()
+	if hostConfig != nil {
+		kubeCISCount := map[string]int{}
+		kubeCISCount[CIS_FailCount] = benchMarkSummary.FailCount
+		kubeCISCount[CIS_InfoCount] = benchMarkSummary.InfoCount
+		kubeCISCount[CIS_PassCount] = benchMarkSummary.WarnCount
+		kubeCISCount[CIS_WarnCount] = benchMarkSummary.PassCount
+		benchCountJson, _ := json.Marshal(kubeCISCount)
+		hostConfig.KubeCISCount = string(benchCountJson)
+
+		hostConfig.Update()
+	}
+}
+
+// Restore kube result summary for renew cluster node or reopen license host
+func (this *HostConfig) RestoreKubeBenchSummary() {
+	kubeCountStr := this.KubeCISCount
+	benchmarkSummary := MarkSummary{}
+	_ = json.Unmarshal([]byte(kubeCountStr), &benchmarkSummary)
+	if benchmarkSummary.WarnCount == 0 && benchmarkSummary.InfoCount == 0 && benchmarkSummary.PassCount == 0 && benchmarkSummary.FailCount == 0 {
+		benchmarkQuery := BenchMarkLog{}
+		benchmarkQuery.HostId = this.Id
+		benchmarkQuery.Type = BMLT_K8s
+		benchmarkData := benchmarkQuery.List(0, 1)
+		if benchmarkData.Data != nil {
+			benchmarkMap := benchmarkData.Data.(map[string]interface{})
+			if benchmarkMap != nil {
+				benchmarkList := benchmarkMap["items"].([]*BenchMarkLog)
+				if len(benchmarkList) > 0 {
+					benchmarkSummary := MarkSummary{}
+					benchmarkSummary.FailCount = benchmarkList[0].FailCount
+					benchmarkSummary.InfoCount = benchmarkList[0].InfoCount
+					benchmarkSummary.PassCount = benchmarkList[0].PassCount
+					benchmarkSummary.WarnCount = benchmarkList[0].WarnCount
+					this.KubeCISUpdateTime = benchmarkList[0].UpdateTime
+					this.UpdateHostCISCount(benchmarkSummary)
+				}
+			}
+		}
+	}
 }

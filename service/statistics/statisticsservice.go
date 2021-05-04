@@ -33,12 +33,12 @@ func (this *StatisticsService) GetAssetStatistics() models.Result {
 	return ResultData
 }
 
-func (this *StatisticsService) GetBnechMarkProportionStatistics() models.Result {
+func (this *StatisticsService) GetBenchMarkProportionStatistics() models.Result {
 	var ResultData models.Result
 	data := make(map[string]interface{})
 	//docker 基线 / k8s 基线
 	hostConfig := new(models.HostConfig)
-	data["DockerBenchmarkCount"], data["K8sBenchmarkCount"] = hostConfig.GetBnechMarkProportion()
+	data["DockerBenchmarkCount"], data["K8sBenchmarkCount"] = hostConfig.GetBenchMarkProportion()
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
 	return ResultData
