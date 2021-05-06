@@ -44,8 +44,10 @@ func (this *DefaultDB) InitDB() {
 	orm.SetMaxOpenConns(DSAlias, 100)
 
 	this.registerModel()
+
+	isDev := beego.AppConfig.String("RunMode") == "dev"
 	//auto create db
-	err = orm.RunSyncdb(DSAlias, force, true)
+	err = orm.RunSyncdb(DSAlias, force, isDev)
 	if err != nil {
 		logs.Error("Auth Create table fail, >>> DSAlias: %s <<<, Err: %s", DSAlias, err)
 	}
