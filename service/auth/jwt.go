@@ -28,14 +28,22 @@ func (this *JwtService) CreateToken(name, pwd, userType string) (string, int) {
 	user := &models.UserAccessCredentials{}
 
 	if this.LoginType != models.Login_Type_LDAP {
-		user = loginUser.Get()
-		if user == nil {
-			return "User Not Found", utils.NoSuchUser
-		}
-		if beego.AppConfig.String("RunMode") != "dev" && userType != models.Login_Type_DEV {
-			match, err := utils.ComparePassword(pwd, user.Value)
-			if !match || err != nil {
-				return "Password Invalid", utils.SiginErr
+		if beego.AppConfig.String("RunMode") == "prod" {
+			user = loginUser.Get()
+			if user == nil {
+				return "User Not Found", utils.NoSuchUser
+			}
+			if userType == models.Login_Type_LOCAL {
+				match, err := utils.ComparePassword(pwd, user.Value)
+				if !match || err != nil {
+					return "Password Invalid", utils.SiginErr
+				}
+			} else if userType != models.Login_Type_DEV {
+				return "Login Type Error", utils.LoginTypeErr
+			}
+		} else {
+			if userType != models.Login_Type_LOCAL && userType != models.Login_Type_DEV {
+				return "Login Type Error", utils.LoginTypeErr
 			}
 		}
 	} else {

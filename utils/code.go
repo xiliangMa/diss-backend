@@ -115,6 +115,7 @@ var (
 	GetVulnerabilitiesErr           = 120
 	AddImageBlockingErr             = 121
 	GetImageBlockingErr             = 122
+	LoginTypeErr                    = 123
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001
