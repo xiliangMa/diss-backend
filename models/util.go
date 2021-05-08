@@ -110,6 +110,7 @@ var (
 	Sc_Type_Image     = "image"
 
 	// 任务状态
+	Task_Status_Created        = "Created"
 	Task_Status_Pending        = "Pending"
 	Task_Status_Running        = "Running"
 	Task_Status_Removing       = "Removing"
