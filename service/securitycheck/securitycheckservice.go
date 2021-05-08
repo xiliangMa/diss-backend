@@ -214,7 +214,7 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		task.Host = securityCheck.Host
 		task.Container = securityCheck.Container
 		task.Batch = this.Batch
-		task.Status = models.Task_Status_Pending
+		task.Status = models.Task_Status_Created
 		task.Account = securityCheck.Job.Account
 		task.Job = securityCheck.Job
 		task.Spec = securityCheck.Job.Spec
@@ -300,7 +300,7 @@ func (this *SecurityCheckService) genBenchmarkTask(securityCheck *models.Securit
 
 	task.Host = securityCheck.Host
 	task.Batch = this.Batch
-	task.Status = models.Task_Status_Pending
+	task.Status = models.Task_Status_Created
 	task.Account = securityCheck.Job.Account
 	task.Job = securityCheck.Job
 	task.Spec = securityCheck.Job.Spec
