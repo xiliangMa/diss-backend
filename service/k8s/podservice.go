@@ -28,7 +28,8 @@ func (this *PodService) List() (*v1.PodList, error) {
 func (this *PodService) Wtach() {
 	podWatch, err := this.ClientGo.ClientSet.CoreV1().Pods("").Watch(metav1.ListOptions{})
 	if err != nil {
-		panic(err)
+		logs.Error("Wtach pod error: %s  ", err)
+		return
 	}
 	// 开启 watch 事件
 Retry:

@@ -23,7 +23,8 @@ func (this *DeploymentService) List() (*v1.DeploymentList, error) {
 func (this *DeploymentService) Wtach() {
 	deployWatch, err := this.ClientGo.ClientSet.AppsV1().Deployments("").Watch(metav1.ListOptions{})
 	if err != nil {
-		panic(err)
+		logs.Error("Wtach deployment error: %s  ", err)
+		return
 	}
 	// 开启 watch 事件
 Retry:

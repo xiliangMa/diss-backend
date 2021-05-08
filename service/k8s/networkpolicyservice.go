@@ -28,7 +28,8 @@ func (this *NetworkPolicyService) Wtach() {
 	}
 	netpolWatch, err := this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies(ns).Watch(metav1.ListOptions{})
 	if err != nil {
-		panic(err)
+		logs.Error("Wtach networkPolicy error: %s  ", err)
+		return
 	}
 	// 开启 watch 事件
 Retry:
