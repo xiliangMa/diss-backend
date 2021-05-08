@@ -118,7 +118,7 @@ func (this *DefaultDB) InitSystemData() {
 		logs.Error("Init DefaultImageVulnScanSql fail, err: %s", err)
 	}
 
-	_, err = o.Raw(dbscript.DefaultDockerVirusScanSql).Exec()
+	_, err = o.Raw(dbscript.DefaultContainerVirusScanSql).Exec()
 	if err != nil {
 		logs.Error("Init DefaultDockerVirusScan fail, err: %s", err)
 	}
@@ -131,6 +131,12 @@ func (this *DefaultDB) InitSystemData() {
 	_, err = o.Raw(dbscript.DefaultKubeVulnScanSql).Exec()
 	if err != nil {
 		logs.Error("Init DefaultKubeVulnScanSql fail, err: %s", err)
+	}
+
+	_, err = o.Raw(dbscript.DefaultImageVirusScanSql).Exec()
+	if err != nil {
+		logs.Error("Init DefaultImageVirusScanSql fail, err: %s", err)
+
 	}
 
 	logs.Info("Init default system Job >>>>>>>>>>>>>>>>")
@@ -146,7 +152,7 @@ func (this *DefaultDB) InitSystemData() {
 		logs.Error("Init DefaultK8sBench Job fail, err: %s", err)
 	}
 
-	_, err = o.Raw(dbscript.DefaultDockerVirusScanJobSql).Exec()
+	_, err = o.Raw(dbscript.DefaultContainerVirusScanJobSql).Exec()
 	if err != nil {
 		logs.Error("Init DefaultDockerVirusScan Job fail, err: %s", err)
 	}
@@ -156,6 +162,10 @@ func (this *DefaultDB) InitSystemData() {
 		logs.Error("Init DefaultHostVirusScanJobSql Job fail, err: %s", err)
 	}
 
+	_, err = o.Raw(dbscript.DefaultImageVirusScanJobSql).Exec()
+	if err != nil {
+		logs.Error("Init DefaultImageVirusScanJobSql Job fail, err: %s", err)
+	}
 	_, err = o.Raw(dbscript.DefaultHostImageVlunScanJobSql).Exec()
 	if err != nil {
 		logs.Error("Init DefaultHostImageVlunScanJobSql Job fail, err: %s", err)

@@ -18,6 +18,7 @@ type SecurityCheck struct {
 	Cluster           *Cluster         `description:"(required: false, 集群)"`
 	Type              string           `description:"(required: false, 类型 host、container、image)"`
 	Job               *Job             `description:"(required: false, 来源任务)"`
+	PathList          string           `description:"(required: false, 目标目录列表 Path1,Path2,Path3)"`
 }
 
 type SecurityCheckParams struct {
@@ -33,6 +34,7 @@ type SecurityCheckParams struct {
 	ContainerIds      string `description:"(required: false, 容器id列表 ID1,ID2,ID3)"`
 	ImageIds          string `description:"(required: false, 镜像id列表 ID1,ID2,ID3)"`
 	ClusterIds        string `description:"(required: false, 集群id列表 ID1,ID2,ID3)"`
+	PathList          string `description:"(required: false, 目标目录列表 Path1,Path2,Path3)"`
 	Type              string `description:"(required: false, 类型 registry host、container、image)"`
 	JobId             string `description:"(required: false, JobId)"`
 }

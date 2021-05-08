@@ -30,6 +30,7 @@ type Task struct {
 	RunCount        int64            `orm:"" description:"(运行次数)"`
 	Action          string           `orm:"size(256)" description:"(操作类型标记)"`
 	ContainerHostId string           `orm:"size(128)" description:"(主机id)"`
+	PathList        string           `orm:"null;" description:"(要检查的路径集合)"`
 }
 
 type TaskLogInterface interface {

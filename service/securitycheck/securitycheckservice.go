@@ -134,13 +134,13 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 	//默认Job
 	Job_Type_BM_Docker := this.DefaultJob[models.TMP_Type_BM_Docker]
 	Job_Type_BM_K8S := this.DefaultJob[models.TMP_Type_BM_K8S]
-	Job_Type_DockerVS := this.DefaultJob[models.TMP_Type_DockerVS]
+	Job_Type_DockerVS := this.DefaultJob[models.TMP_Type_ContainerVS]
 	Job_Type_HostVS := this.DefaultJob[models.TMP_Type_HostVS]
 
 	// 默认模板
 	TMP_Type_BM_Docker_DT := this.DefaultTMP[models.TMP_Type_BM_Docker]
 	TMP_Type_BM_K8S_DT := this.DefaultTMP[models.TMP_Type_BM_K8S]
-	TMP_Type_DockerVS_DT := this.DefaultTMP[models.TMP_Type_DockerVS]
+	TMP_Type_DockerVS_DT := this.DefaultTMP[models.TMP_Type_ContainerVS]
 	TMP_Type_HostVS_DT := this.DefaultTMP[models.TMP_Type_HostVS]
 	//TMP_Type_LS_DT := defaultTMP[models.TMP_Type_LS]
 
@@ -189,9 +189,9 @@ func (this *SecurityCheckService) PrePareTask(securityCheck *models.SecurityChec
 		task.Id = uid.String()
 		if securityCheck.Type != models.SC_Type_Host {
 			//容器病毒
-			logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_DockerVS, uid)
+			logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_ContainerVS, uid)
 			task.SystemTemplate = TMP_Type_DockerVS_DT
-			task.Description = taskpre + models.TMP_Type_DockerVS
+			task.Description = taskpre + models.TMP_Type_ContainerVS
 			task.ContainerHostId = securityCheck.Container.HostId
 		} else {
 			//主机病毒

@@ -71,6 +71,7 @@ func (this *SecurityScanService) PrePare() {
 					Host:      host,
 					Type:      models.SC_Type_Host,
 					Job:       this.Job,
+					PathList:  this.SecurityCheckParams.PathList,
 				}
 				this.PrePareTask(&securityCheck)
 			}
@@ -83,6 +84,7 @@ func (this *SecurityScanService) PrePare() {
 					Container: object,
 					Type:      models.Sc_Type_Container,
 					Job:       this.Job,
+					PathList:  this.SecurityCheckParams.PathList,
 				}
 				this.PrePareTask(&securityCheck)
 			}
@@ -104,6 +106,16 @@ func (this *SecurityScanService) PrePare() {
 					Image:         image,
 					Type:          models.Sc_Type_Image,
 					Job:           this.Job,
+				}
+				this.PrePareTask(&securityCheck)
+			}
+			if this.SecurityCheckParams.VirusScan {
+				securityCheck := models.SecurityCheck{
+					VirusScan: this.SecurityCheckParams.VirusScan,
+					Image:     image,
+					Type:      models.Sc_Type_Image,
+					Job:       this.Job,
+					PathList:  this.SecurityCheckParams.PathList,
 				}
 				this.PrePareTask(&securityCheck)
 			}
@@ -131,8 +143,9 @@ func (this *SecurityScanService) PrePareTask(securityCheck *models.SecurityCheck
 	//默认Job
 	Job_Type_BM_Docker := this.DefaultJob[models.TMP_Type_BM_Docker]
 	Job_Type_BM_K8S := this.DefaultJob[models.TMP_Type_BM_K8S]
-	Job_Type_DockerVS := this.DefaultJob[models.TMP_Type_DockerVS]
+	Job_Type_ContainerVS := this.DefaultJob[models.TMP_Type_ContainerVS]
 	Job_Type_HostVS := this.DefaultJob[models.TMP_Type_HostVS]
+	Job_Type_ImageVS := this.DefaultJob[models.TMP_Type_ImageVS]
 	Job_Type_HostImageVulnScan := this.DefaultJob[models.TMP_Type_HostImageVulnScan]
 	Job_Type_ImageScan := this.DefaultJob[models.TMP_Type_ImageVulnScan]
 	Job_Type_KubeScan := this.DefaultJob[models.TMP_Type_KubernetesVulnScan]
@@ -154,7 +167,11 @@ func (this *SecurityScanService) PrePareTask(securityCheck *models.SecurityCheck
 		}
 		// 容器杀毒
 		if securityCheck.VirusScan && securityCheck.Type == models.Sc_Type_Container {
-			securityCheck.Job = Job_Type_DockerVS
+			securityCheck.Job = Job_Type_ContainerVS
+		}
+		// 镜像杀毒
+		if securityCheck.VirusScan && securityCheck.Type == models.Sc_Type_Image {
+			securityCheck.Job = Job_Type_ImageVS
 		}
 		// 主机镜像扫描
 		if securityCheck.HostImageVulnScan {
@@ -189,9 +206,9 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		// 杀毒
 		if this.SecurityCheckParams.Type == models.Sc_Type_Container {
 			// 容器杀毒
-			logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_DockerVS, uid)
-			task.SystemTemplate = this.DefaultTMP[models.TMP_Type_DockerVS]
-			task.Description = taskpre + models.TMP_Type_DockerVS
+			logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_ContainerVS, uid)
+			task.SystemTemplate = this.DefaultTMP[models.TMP_Type_ContainerVS]
+			task.Description = taskpre + models.TMP_Type_ContainerVS
 			task.Container = securityCheck.Container
 		} else if this.SecurityCheckParams.Type == models.SC_Type_Host {
 			// 主机病毒
@@ -199,8 +216,20 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 			logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_HostVS, uid)
 			task.SystemTemplate = this.DefaultTMP[models.TMP_Type_HostVS]
 			task.Description = taskpre + models.TMP_Type_HostVS
+		} else if this.SecurityCheckParams.Type == models.Sc_Type_Image {
+			// 主机病毒
+			task.Image = securityCheck.Image
+			logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_ImageVS, uid)
+			task.SystemTemplate = this.DefaultTMP[models.TMP_Type_ImageVS]
+			task.Description = taskpre + models.TMP_Type_ImageVS
 		}
-		task.Container = securityCheck.Container
+
+		if task.SystemTemplate.DefaultPathList != "" {
+			task.PathList = task.Job.SystemTemplate.DefaultPathList
+		}
+		if securityCheck.PathList != "" {
+			task.PathList = securityCheck.PathList
+		}
 	} else if securityCheck.DockerCIS {
 		//基线-Docker
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_BM_Docker, uid)
