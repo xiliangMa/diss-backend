@@ -96,7 +96,6 @@ func (this *ImageBlocking) GetIb() *ImageBlocking {
 	err := o.QueryTable(utils.ImageBlocking).SetCond(cond).RelatedSel().One(imageBlocking)
 
 	if err != nil {
-		logs.Error("Get ImageBlocking failed, code: %d, err: %s", utils.GetImageBlockingErr, err.Error())
 		return nil
 	}
 
