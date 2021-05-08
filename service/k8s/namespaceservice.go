@@ -24,7 +24,8 @@ func (this *NameSpaceService) List() (*v1.NamespaceList, error) {
 func (this *NameSpaceService) Wtach() {
 	nswatch, err := this.ClientGo.ClientSet.CoreV1().Namespaces().Watch(metav1.ListOptions{})
 	if err != nil {
-		panic(err)
+		logs.Error("Wtach namespace error: %s  ", err)
+		return
 	}
 	// 开启 watch 事件
 Retry:

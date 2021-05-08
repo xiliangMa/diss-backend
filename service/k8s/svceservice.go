@@ -23,7 +23,8 @@ func (this *SVCService) List() (*v1.ServiceList, error) {
 func (this *SVCService) Wtach() {
 	serviceWatch, err := this.ClientGo.ClientSet.CoreV1().Services("").Watch(metav1.ListOptions{})
 	if err != nil {
-		panic(err)
+		logs.Error("Wtach svc error: %s  ", err)
+		return
 	}
 	// 开启 watch 事件
 Retry:
