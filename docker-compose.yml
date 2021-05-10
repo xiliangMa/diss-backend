@@ -21,6 +21,7 @@ services:
       - /var/lib/diss/diss-backend/upload/kubernetes:/opt/diss-backend/upload/kubernetes
       - /var/lib/diss/diss-backend/upload/vuln:/opt/diss-backend/upload/vuln
       - /var/lib/diss/diss-backend/upload/probe:/opt/diss-backend/upload/probe
+      - /var/lib/diss/diss-backend/upload/virus:/opt/diss-backend/upload/virus
       - /var/log/diss/diss-backend:/opt/diss-backend/logs
       - ./conf:/opt/diss-backend/conf
     entrypoint:

@@ -16,6 +16,8 @@ func main() {
 	beego.SetStaticPath(utils.GetVulnDbUrl(), utils.GetVulnDbPath())
 	// probe driver
 	beego.SetStaticPath(utils.GetProbeDriverUrl(), utils.GetProbeDriverPath())
+	// virus
+	beego.SetStaticPath(utils.GetVirusrUrl(), utils.GetVirusPath())
 	beego.BConfig.WebConfig.DirectoryIndex = true
 	beego.BConfig.WebConfig.StaticDir["/"] = "swagger"
 	beego.Run()

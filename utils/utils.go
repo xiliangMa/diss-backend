@@ -260,3 +260,11 @@ func GetProbeDriverPath() string {
 func GetProbeDriverUrl() string {
 	return beego.AppConfig.String("system::ProbeDriverUrl")
 }
+
+func GetVirusPath() string {
+	return beego.AppConfig.String("system::VirusPath")
+}
+
+func GetVirusrUrl() string {
+	return beego.AppConfig.String("system::VirusUrl")
+}
