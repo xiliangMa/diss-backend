@@ -78,6 +78,7 @@ func init() {
 				&csecuritylog.VirusLogController{},
 				&csecuritylog.VulnerabilitiesLogController{},
 				&csecuritylog.WarningInfoController{},
+				&csecuritylog.KubeScanController{},
 			),
 		),
 		beego.NSNamespace("/v1/securityaudit",

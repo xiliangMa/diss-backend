@@ -119,6 +119,8 @@ var (
 	ParseKubeVulnRawLogErr          = 124
 	AddKubeScanErr                  = 125
 	AddKubeVulnerabilitiesErr       = 126
+	GetKubeScanErr                  = 127
+	DeleteKubeScanErr               = 128
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001

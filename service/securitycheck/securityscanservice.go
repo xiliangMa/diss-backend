@@ -220,8 +220,8 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_HostImageVulnScan]
 		task.Image = securityCheck.Image
 	} else if securityCheck.ImageVulnScan {
-		// 主机镜像扫描
-		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_HostImageVulnScan, uid)
+		// 仓库镜像扫描
+		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_ImageVulnScan, uid)
 		task.Description = taskpre + models.TMP_Type_ImageVulnScan
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_ImageVulnScan]
 		task.Image = securityCheck.Image
@@ -245,7 +245,7 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 	}
 	task.Name = taskpre + task.Id
 	task.Batch = this.Batch
-	task.Status = models.Task_Status_Pending
+	task.Status = models.Task_Status_Created
 	task.Account = securityCheck.Job.Account
 	task.Job = securityCheck.Job
 	task.Spec = securityCheck.Job.Spec
@@ -261,8 +261,7 @@ func (this *SecurityScanService) saveTaskLog(task *models.Task, securityCheck *m
 	taskLog.Task = string(taskRawInfo)
 	taskLog.Account = securityCheck.Job.Account
 	taskLog.Level = models.Log_level_Info
-	taskLog.RawLog = fmt.Sprintf("Add security check task, Id: %s, Type: %s, Batch: %v, KStatus: %s",
-		task.Id, task.Type, task.Batch, task.Status)
+	taskLog.RawLog = fmt.Sprintf("Add task success, Status: %s, Type: %s, Batch: %v, TaskId: %s.", task.Status, task.Type, task.Batch, task.Id)
 	taskLog.Add()
 }
 

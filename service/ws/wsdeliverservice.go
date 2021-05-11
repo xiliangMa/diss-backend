@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/gorilla/websocket"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/base"
 	"github.com/xiliangMa/diss-backend/service/kubevuln"
 	"net/http"
 )
@@ -18,8 +19,9 @@ type WSDeliverService struct {
 }
 
 func (this *WSDeliverService) DeliverTaskToNats() {
-	logs.Info("################ Deliver Task <<<start>>> ################")
+	logs.Info("################ Deliver Task start, ################")
 	for _, task := range this.CurrentBatchTaskList {
+		msg := ""
 		subject := ""
 		// 根据是host还是container类型的任务获得topic
 		if task.Host != nil {
@@ -34,7 +36,6 @@ func (this *WSDeliverService) DeliverTaskToNats() {
 			}
 		} else if task.Image != nil {
 			subject = task.Image.HostId
-			//task.Job = nil
 		} else if task.ClusterOBJ != nil {
 			subject = models.Subject_Cluster
 		}
@@ -42,19 +43,32 @@ func (this *WSDeliverService) DeliverTaskToNats() {
 		if subject != "" {
 			switch subject {
 			case models.Subject_Cluster:
-				// todo add tasklog
 				if task.SystemTemplate.Type == models.TMP_Type_KubernetesVulnScan {
 					kubeVlunService := kubevuln.KubeVlunService{IsActive: true, Cluster: task.ClusterOBJ, Task: task}
 					result := kubeVlunService.ActiveOrDisableKubeScan()
 					if result.Code == http.StatusOK {
-						logs.Info("Deliver Task to cluster Success, ClusterName: %s, ClusterName: %s.", task.ClusterOBJ.Id, task.ClusterOBJ.Name)
-						task.Status = models.Task_Status_Deliver_Failed
-						task.Update()
+						task.Status = models.Task_Status_Pending
+						msg = fmt.Sprintf("Update task success, Status: %s, ClusterId: %s, Type: %s, TaskId: %s. ", task.Status, task.ClusterOBJ.Id, task.Type, task.Id)
+						result.Message = msg
+						logs.Info("Deliver Task to cluster Success, TaskId: %s, ClusterName: %s.", task.Id, task.ClusterOBJ.Name)
+						taskService := base.TaskService{Task: task, Result: &result}
+						taskService.UpdateTaskStatus()
+
+						// 设置running状态
+						task.Status = models.Task_Status_Running
+						msg = fmt.Sprintf("Update task success, Status: %s, ClusterId: %s, Type: %s, TaskId: %s. ", task.Status, task.ClusterOBJ.Id, task.Type, task.Id)
+						result.Message = msg
+						taskService = base.TaskService{Task: task, Result: &result}
+						taskService.UpdateTaskStatus()
 					} else {
-						logs.Error("Deliver Task to cluster failed, ClusterName: %s, ClusterName: %s.", task.ClusterOBJ.Id, task.ClusterOBJ.Name)
 						task.Status = models.Task_Status_Deliver_Failed
-						task.Update()
+						msg = fmt.Sprintf("Update task failed, Status: %s, ClusterId: %s, Type: %s, TaskId: %s. ", task.Status, task.ClusterOBJ.Id, task.Type, task.Id)
+						result.Message = msg
+						logs.Error("Deliver Task to cluster failed, TaskId: %s, ClusterName: %s.", task.Id, task.ClusterOBJ.Name)
+						taskService := base.TaskService{Task: task, Result: &result}
+						taskService.UpdateTaskStatus()
 					}
+
 				}
 			default:
 				result := models.NatsData{Type: models.Type_Control, Tag: models.Resource_Task, Data: task, RCType: models.Resource_Control_Type_Post}
@@ -73,11 +87,11 @@ func (this *WSDeliverService) DeliverTaskToNats() {
 
 		}
 	}
-	logs.Info("################ Deliver Task <<<end>>> ################")
+	logs.Info("################ Deliver Task end, ################")
 }
 
 func (this *WSDeliverService) DeliverTask() {
-	logs.Info("################ Deliver Task <<<start>>> ################")
+	logs.Info("################ Deliver Task start, ################")
 	for _, task := range this.CurrentBatchTaskList {
 		if _, ok := this.Hub.DissClient[task.Host.Id]; ok {
 			client := this.Hub.DissClient[task.Host.Id]
@@ -112,5 +126,5 @@ func (this *WSDeliverService) DeliverTask() {
 			taskLog.Add()
 		}
 	}
-	logs.Info("################ Deliver Task <<<end>>> ################")
+	logs.Info("################ Deliver Task end, ################")
 }

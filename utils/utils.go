@@ -201,9 +201,9 @@ func GetKubeScanReportApi() string {
 
 func GetKubeScanReportUrl() string {
 	sechemes := "https://"
-	addr := GetHTTPSAddr()
+	ip := GetSystemIP()
 	port := GetHTTPSPort()
-	repotUri := fmt.Sprintf("%s%s:%s%s", sechemes, addr, port, GetKubeScanReportApi())
+	repotUri := fmt.Sprintf("%s%s:%s%s", sechemes, ip, port, GetKubeScanReportApi())
 	return repotUri
 }
 
@@ -267,4 +267,9 @@ func GetVirusPath() string {
 
 func GetVirusrUrl() string {
 	return beego.AppConfig.String("system::VirusUrl")
+}
+
+func GetSystemIP() string {
+	IP := beego.AppConfig.String("system::IP")
+	return IP
 }
