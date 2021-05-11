@@ -35,6 +35,8 @@ var (
 	RespCenter           = "resp_center"
 	ImageVulnerabilities = "image_vulnerabilities"
 	Vulnerabilities      = "vulnerabilities"
+	KubeScan             = "kube_scan"
+	KubeVulnerabilities  = "kube_vulnerabilities"
 
 	//security_log timescaledb
 	DcokerIds   = "docker_ids"
