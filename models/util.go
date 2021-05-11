@@ -313,4 +313,9 @@ var (
 
 	// Image Blocking operation
 	ClearImage = "ClearImage"
+
+	CIS_FailCount = "FailCount"
+	CIS_InfoCount = "InfoCount"
+	CIS_PassCount = "PassCount"
+	CIS_WarnCount = "WarnCount"
 )
