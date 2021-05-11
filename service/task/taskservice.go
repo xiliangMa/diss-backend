@@ -33,7 +33,7 @@ func (this *TaskService) RemoveTask() models.Result {
 		if err.Error() == string(utils.ResourceNotFoundErr) {
 			task.Delete()
 			msg := fmt.Sprintf("Delete Task success, status: %s, Id: %s", task.Status, task.Id)
-			logs.Error(msg)
+			logs.Info(msg)
 			taskRawInfo, _ := json.Marshal(task)
 			taskLog := models.TaskLog{Account: task.Account, RawLog: msg, Task: string(taskRawInfo), Level: models.Log_level_Info}
 			taskLog.Add()
