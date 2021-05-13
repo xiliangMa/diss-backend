@@ -201,7 +201,11 @@ func (this *ImageConfig) GetDBCountByType() Result {
 		cond = cond.And("host_id", this.HostId)
 	}
 
-	_, err = o.Raw(utils.GetDBCountSql(this.HostId)).Values(&dbCount)
+	fields := []string{}
+	if this.HostId != "" {
+		fields = append(fields, this.HostId, this.HostId, this.HostId, this.HostId, this.HostId, this.HostId, this.HostId, this.HostId)
+	}
+	_, err = o.Raw(utils.GetDBCountSql(this.HostId), fields).Values(&dbCount)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetImageConfigErr

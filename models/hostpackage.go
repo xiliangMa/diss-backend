@@ -79,15 +79,18 @@ func (this *HostPackage) List(from, limit int) Result {
 	sql := `SELECT * FROM ` + utils.HostPackage
 	countSql := `SELECT "count"(host_id) FROM ` + utils.HostPackage
 	filter := ""
-
+	fields := []string{}
 	if this.Type != "" {
-		filter = filter + ` type = '` + this.Type + `' and `
+		filter = filter + ` type = ? and `
+		fields = append(fields, this.Type)
 	}
 	if this.HostId != "" {
-		filter = filter + `host_id = '` + this.HostId + `' and `
+		filter = filter + ` host_id = ? and `
+		fields = append(fields, this.HostId)
 	}
 	if this.Name != "" {
-		filter = filter + `name like '%` + this.Name + `%' and `
+		filter = filter + `name like ? and `
+		fields = append(fields, "%"+this.Name+"%")
 	}
 
 	if filter != "" {
@@ -102,7 +105,7 @@ func (this *HostPackage) List(from, limit int) Result {
 		resultSql = resultSql + limitSql
 	}
 
-	_, err = o.Raw(resultSql).QueryRows(&hostPackageList)
+	_, err = o.Raw(resultSql, fields).QueryRows(&hostPackageList)
 
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -111,7 +114,7 @@ func (this *HostPackage) List(from, limit int) Result {
 		return ResultData
 	}
 
-	o.Raw(countSql).QueryRow(&total)
+	o.Raw(countSql, fields).QueryRow(&total)
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = hostPackageList
@@ -137,20 +140,22 @@ func (this *HostPackage) GetPackageCountByType() Result {
 	groupBySql := " GROUP BY type"
 	filter := " where "
 
+	fields := []string{}
 	if this.HostId != "" {
-		filter = filter + ` host_id = '` + this.HostId + `' `
+		filter = filter + ` host_id = ? `
+		fields = append(fields, this.HostId)
 		sql = sql + filter
 		countSql = countSql + filter
 	}
 	sql = sql + groupBySql
-	_, err = o.Raw(sql).Values(&packageCount)
+	_, err = o.Raw(sql, fields).Values(&packageCount)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetHostPackageErr
 		logs.Error("Get HostPackage count group type failed, code: %d, err: %s", utils.GetHostPackageErr, err.Error())
 		return ResultData
 	}
-	o.Raw(countSql).QueryRow(&total)
+	o.Raw(countSql, fields).QueryRow(&total)
 
 	data := make(map[string]interface{})
 	data["total"] = total

@@ -39,23 +39,29 @@ func (this *TaskLog) List(from, limit int) Result {
 	sql := ` select * from ` + utils.TaskLog + ` `
 	countSql := `select "count"(id) from ` + utils.TaskLog + ` `
 	filter := ""
+	fields := []string{}
 	if this.Id != "" {
-		filter = filter + `id = '` + this.Id + `' and `
+		filter = filter + `id = ? and `
+		fields = append(fields, this.Id)
 	}
 	if this.Account != "" {
-		filter = filter + `account = '` + this.Account + `' and `
+		filter = filter + `account = ? and `
+		fields = append(fields, this.Account)
 	}
 	if this.Task != "" {
-		filter = filter + `task like '%` + this.Task + `%' and `
+		filter = filter + `task like ? and `
+		fields = append(fields, "%"+this.Task+"%")
 	}
 	if this.RawLog != "" {
-		filter = filter + `raw_log like '%` + this.RawLog + `%' and `
+		filter = filter + `raw_log like ? and `
+		fields = append(fields, "%"+this.RawLog+"%")
 	}
 	if this.Level != "" {
-		filter = filter + `level = '` + this.Level + `' and `
+		filter = filter + `level = ? and `
+		fields = append(fields, this.Level)
 	}
 	if this.StartTime != 0 && this.EndTime != 0 {
-		filter = filter + `create_time BETWEEN ` + fmt.Sprintf("%v", this.StartTime) + ` and '` + fmt.Sprintf("%v", this.EndTime) + `' and `
+		filter = filter + `create_time BETWEEN ` + fmt.Sprintf("%v", this.StartTime) + ` and ` + fmt.Sprintf("%v", this.EndTime) + ` and `
 	}
 
 	if filter != "" {
@@ -70,7 +76,7 @@ func (this *TaskLog) List(from, limit int) Result {
 		limitSql := orderBySql + ` limit ` + strconv.Itoa(limit) + ` OFFSET ` + strconv.Itoa(from)
 		resultSql = resultSql + limitSql
 	}
-	_, err = o.Raw(resultSql).QueryRows(&taskLogList)
+	_, err = o.Raw(resultSql, fields).QueryRows(&taskLogList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetTaskLogErr
@@ -78,7 +84,7 @@ func (this *TaskLog) List(from, limit int) Result {
 		return ResultData
 	}
 
-	o.Raw(countSql).QueryRow(&total)
+	o.Raw(countSql, fields).QueryRow(&total)
 	data := make(map[string]interface{})
 	data["total"] = total
 	data["items"] = taskLogList

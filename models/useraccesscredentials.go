@@ -26,11 +26,14 @@ func (this *UserAccessCredentials) Get() *UserAccessCredentials {
 
 	sql := ` select * from ` + string(utils.UserAccessCredentials) + ` `
 	filter := ""
+	fields := []string{}
 	if this.UserName != "" {
-		filter = filter + `username = '` + this.UserName + `' and `
+		filter = filter + `username = ? and `
+		fields = append(fields, this.UserName)
 	}
 	if this.Value != "" {
-		filter = filter + `value = '` + this.Value + `' and `
+		filter = filter + `value = ? and `
+		fields = append(fields, this.Value)
 	}
 
 	if filter != "" {
@@ -38,7 +41,7 @@ func (this *UserAccessCredentials) Get() *UserAccessCredentials {
 	}
 	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
 	resultSql := sql
-	err := o.Raw(resultSql).QueryRow(&userAccessCredentials)
+	err := o.Raw(resultSql, fields).QueryRow(&userAccessCredentials)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.NotFoundUserAccessCredentialsErr
