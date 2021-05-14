@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strings"
 )
 
 type KubeScan struct {
@@ -15,6 +16,7 @@ type KubeScan struct {
 	//Services        []Services            `orm:"" description:"(服务列表)"`
 	Vulnerabilities []*KubeVulnerabilities `orm:"reverse(many);" description:"(漏洞列表)"`
 	Severity        string                 `orm:"-" description:"(等级，查询参数)"`
+	Latest          bool                   `orm:"-" description:"(最新一条，查询参数)"`
 }
 
 // todo add nodes and services info
@@ -67,7 +69,9 @@ func (this *KubeScan) Add() Result {
 	}
 	for _, kubeVuln := range this.Vulnerabilities {
 		kubeVuln.KubeVuln = this
-		kubeVuln.Add()
+		if !strings.Contains(kubeVuln.Location, Prefix_Kube_Scan) {
+			kubeVuln.Add()
+		}
 	}
 	o.Commit()
 	ResultData.Code = http.StatusOK
@@ -91,7 +95,10 @@ func (this *KubeScan) List(from, limit int) Result {
 	if this.ClusterId != "" {
 		cond = cond.And("cluster_id", this.ClusterId)
 	}
-	_, err = o.QueryTable(utils.KubeScan).SetCond(cond).Limit(limit, from).All(&KubeScanList)
+	if this.Latest {
+		limit = 1
+	}
+	_, err = o.QueryTable(utils.KubeScan).SetCond(cond).Limit(limit, from).OrderBy("-id").All(&KubeScanList)
 
 	if err != nil {
 		ResultData.Message = err.Error()

@@ -9,6 +9,7 @@ import (
 	"github.com/xiliangMa/diss-backend/service/base"
 	"github.com/xiliangMa/diss-backend/service/kubevuln"
 	"net/http"
+	"strings"
 )
 
 type WSDeliverService struct {
@@ -44,8 +45,14 @@ func (this *WSDeliverService) DeliverTaskToNats() {
 			switch subject {
 			case models.Subject_Cluster:
 				if task.SystemTemplate.Type == models.TMP_Type_KubernetesVulnScan {
-					kubeVlunService := kubevuln.KubeVlunService{IsActive: true, Cluster: task.ClusterOBJ, Task: task}
+					// 强制删除之前存在的job
+					kubeVlunService := kubevuln.KubeVlunService{IsActive: false, Cluster: task.ClusterOBJ, Task: task}
 					result := kubeVlunService.ActiveOrDisableKubeScan()
+					if result.Code != http.StatusOK && !strings.Contains(result.Message, "not found") {
+						return
+					}
+					kubeVlunService.IsActive = true
+					result = kubeVlunService.ActiveOrDisableKubeScan()
 					if result.Code == http.StatusOK {
 						task.Status = models.Task_Status_Pending
 						msg = fmt.Sprintf("Update task success, Status: %s, ClusterId: %s, Type: %s, TaskId: %s. ", task.Status, task.ClusterOBJ.Id, task.Type, task.Id)
