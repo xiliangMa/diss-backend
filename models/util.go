@@ -50,6 +50,7 @@ var (
 	Cluster_Scope_Operator_Status_Disabled    = "Disabled"
 	Cluster_Scope_Operator_Status_Disableing  = "Disabling"
 	Cluster_Scope_Operator_Status_Null        = ""
+	Prefix_Kube_Scan                          = "diss-kube-scan"
 
 	Cmd_History_Type_Host      = "Host"
 	Cmd_History_Type_Container = "Container"

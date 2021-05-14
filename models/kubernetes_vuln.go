@@ -5,6 +5,8 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strings"
+	"time"
 )
 
 type KubeScan struct {
@@ -14,7 +16,9 @@ type KubeScan struct {
 	//Nodes           []Nodes               `orm:"" description:"(节点列表)"`
 	//Services        []Services            `orm:"" description:"(服务列表)"`
 	Vulnerabilities []*KubeVulnerabilities `orm:"reverse(many);" description:"(漏洞列表)"`
+	CreateTime      int64                  `orm:"default(0)" description:"(创建时间)"`
 	Severity        string                 `orm:"-" description:"(等级，查询参数)"`
+	Latest          bool                   `orm:"-" description:"(最新一条，查询参数)"`
 }
 
 // todo add nodes and services info
@@ -40,6 +44,7 @@ type KubeVulnerabilities struct {
 	AvdReference  string    `orm:"" description:"(参考)" json:"avd_reference"`
 	Hunter        string    `orm:"size(64)" description:"(扫描组件)"`
 	KubeVuln      *KubeScan `orm:"rel(fk);null" description:"(集群扫描记录)"`
+	CreateTime    int64     `orm:"default(0)" description:"(创建时间)"`
 }
 
 type KubeScanInterface interface {
@@ -57,6 +62,8 @@ func (this *KubeScan) Add() Result {
 	o.Using(utils.DS_Default)
 	var ResultData Result
 	o.Begin()
+	createTime := time.Now().UnixNano()
+	this.CreateTime = createTime
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -67,7 +74,10 @@ func (this *KubeScan) Add() Result {
 	}
 	for _, kubeVuln := range this.Vulnerabilities {
 		kubeVuln.KubeVuln = this
-		kubeVuln.Add()
+		if !strings.Contains(kubeVuln.Location, Prefix_Kube_Scan) {
+			kubeVuln.CreateTime = createTime
+			kubeVuln.Add()
+		}
 	}
 	o.Commit()
 	ResultData.Code = http.StatusOK
@@ -91,7 +101,10 @@ func (this *KubeScan) List(from, limit int) Result {
 	if this.ClusterId != "" {
 		cond = cond.And("cluster_id", this.ClusterId)
 	}
-	_, err = o.QueryTable(utils.KubeScan).SetCond(cond).Limit(limit, from).All(&KubeScanList)
+	if this.Latest {
+		limit = 1
+	}
+	_, err = o.QueryTable(utils.KubeScan).SetCond(cond).Limit(limit, from).OrderBy("-id").All(&KubeScanList)
 
 	if err != nil {
 		ResultData.Message = err.Error()

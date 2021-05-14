@@ -17,7 +17,7 @@ items:
           - name: KUBEHUNTER_HTTP_DISPATCH_URL
             value: ""
           - name: TASK_ID
-            value: "9"
+            value: ""
           - name: CLUSTER_ID
             value: ""
         restartPolicy: Never
