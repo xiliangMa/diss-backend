@@ -115,14 +115,14 @@ func GetDBCountSql(hostId string) string {
 			db2.db2_count, 
 			hbase.hbase_count 
 			from 
-			(SELECT count(id) as mysql_count from ` + ImageConfig + ` WHERE name ilike '%mysql%' and host_id = '` + hostId + `') as mysql ,
-			(SELECT count(id) as oracle_count from ` + ImageConfig + ` WHERE name ilike '%oracle%' and host_id = '` + hostId + `') as oracle,
-			(SELECT count(id) as redis_count from ` + ImageConfig + ` WHERE name ilike '%redis%' and host_id = '` + hostId + `') as redis,
-			(SELECT count(id) as postgres_count from ` + ImageConfig + ` WHERE name ilike '%postgres%' and host_id = '` + hostId + `') as postgres,
-			(SELECT count(id) as mongodb_count from ` + ImageConfig + ` WHERE name ilike '%mongodb%' and host_id = '` + hostId + `') as mongodb,
-			(SELECT count(id) as memcache_count from ` + ImageConfig + ` WHERE name ilike '%memcache%' and host_id = '` + hostId + `') as memcache,
-			(SELECT count(id) as db2_count from ` + ImageConfig + ` WHERE name ilike '%db2%' and host_id = '` + hostId + `') as db2,
-			(SELECT count(id) as hbase_count from ` + ImageConfig + ` WHERE name ilike '%hbase%' and host_id = '` + hostId + `') as hbase;`
+			(SELECT count(id) as mysql_count from ` + ImageConfig + ` WHERE name ilike '%mysql%' and host_id = ?) as mysql ,
+			(SELECT count(id) as oracle_count from ` + ImageConfig + ` WHERE name ilike '%oracle%' and host_id = ?) as oracle,
+			(SELECT count(id) as redis_count from ` + ImageConfig + ` WHERE name ilike '%redis%' and host_id = ?) as redis,
+			(SELECT count(id) as postgres_count from ` + ImageConfig + ` WHERE name ilike '%postgres%' and host_id = ?) as postgres,
+			(SELECT count(id) as mongodb_count from ` + ImageConfig + ` WHERE name ilike '%mongodb%' and host_id = ?) as mongodb,
+			(SELECT count(id) as memcache_count from ` + ImageConfig + ` WHERE name ilike '%memcache%' and host_id = ?) as memcache,
+			(SELECT count(id) as db2_count from ` + ImageConfig + ` WHERE name ilike '%db2%' and host_id = ?) as db2,
+			(SELECT count(id) as hbase_count from ` + ImageConfig + ` WHERE name ilike '%hbase%' and host_id = ?) as hbase;`
 
 	return sqlByHostId
 }

@@ -58,7 +58,7 @@ func (this *ImagePackageVulnerabilities) List(from, limit int) Result {
 	var err error
 	var total int64 = 0
 	filter := ""
-
+	fields := []string{}
 	countSql := `select "count"(d.pkg_image_id) from (select a.*, b."link", b."severity", concat_ws(':', concat_ws('/', c."registry", c."repo"), c."tag") as pkg_image_name  from ` + utils.ImagePackageVulnerabilities +
 		` as a join ` + utils.FeedDataVulnerabilities +
 		` as b on a.vulnerability_id = b."id" and a.vulnerability_namespace_name = b."namespace_name" ` +
@@ -69,20 +69,25 @@ func (this *ImagePackageVulnerabilities) List(from, limit int) Result {
 		` join catalog_image_docker as c on a.pkg_image_id = c."imageId") as d `
 
 	if this.Severity != "" {
-		filter = filter + `d."severity" = '` + this.Severity + `' and `
+		filter = filter + `d."severity" = ? and `
+		fields = append(fields, this.Severity)
 	}
 
 	if this.PkgUserId != "" {
-		filter = filter + `d."pkg_user_id" = '` + this.PkgUserId + "' and "
+		filter = filter + `d."pkg_user_id" = ? and `
+		fields = append(fields, this.PkgUserId)
 	}
 	if this.PkgImageId != "" {
-		filter = filter + `d."pkg_image_id" = '` + this.PkgImageId + "' and "
+		filter = filter + `d."pkg_image_id" = ? and `
+		fields = append(fields, this.PkgImageId)
 	}
 	if this.VulnerabilityId != "" {
-		filter = filter + `d."vulnerability_id" like '%` + this.VulnerabilityId + `%' and `
+		filter = filter + `d."vulnerability_id" like ? and `
+		fields = append(fields, "%"+this.VulnerabilityId+"%")
 	}
 	if this.PkgImageName != "" {
-		filter = filter + `d."pkg_image_name" like '%` + this.PkgImageName + `%'`
+		filter = filter + `d."pkg_image_name" like ? `
+		fields = append(fields, "%"+this.PkgImageName+"%")
 	}
 
 	if filter != "" {
@@ -97,14 +102,14 @@ func (this *ImagePackageVulnerabilities) List(from, limit int) Result {
 		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
 		resultSql = resultSql + limitSql
 	}
-	_, err = o.Raw(resultSql).QueryRows(&ImagePackageVulnerabilitiesList)
+	_, err = o.Raw(resultSql, fields).QueryRows(&ImagePackageVulnerabilitiesList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetImagePackageVulnerabilitiesListErr
 		logs.Error("Get ImagePackageVulnerabilities List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
-	o.Raw(countSql).QueryRow(&total)
+	o.Raw(countSql, fields).QueryRow(&total)
 
 	data := make(map[string]interface{})
 	data["total"] = total
