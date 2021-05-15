@@ -100,6 +100,28 @@ var (
 
 	alter table public.virus_record owner to postgres;`
 
+	Tab_Create_ImageDetail = `create table public.image_detail
+	(
+		id text not null
+            constraint image_detail_pkey 
+                 primary key,
+		image_id text default ''::text not null,
+		name text default ''::text not null,
+		host_id text default ''::text not null,
+		host_name text default ''::text not null,
+		repo_tags text default ''::text not null,
+		repo_digests text default ''::text not null,
+		os text default ''::text not null,
+		size integer default 0 not null,
+		layers integer default 0 not null,
+		dockerfile text default ''::text not null,
+		create_time bigint default 0 not null,
+		modify_time bigint default 0 not null,
+		packages_json text default ''::text not null
+	);
+
+    alter table public.image_detail owner to postgres;`
+
 	Tab_Create_TaskLog = `CREATE TABLE "public"."task_log" (
 	  "id" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
 	  "account" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT 'admin'::character varying,

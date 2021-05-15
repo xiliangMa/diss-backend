@@ -27,3 +27,20 @@ func (this *ImageController) GetContainersList() {
 	this.Data["json"] = containerConfig.List(from, limit, false)
 	this.ServeJSON(false)
 }
+
+// @Title ImageDetail
+// @Description Get ImageDetail Info
+// @Param token header string true "authToken"
+// @Param body body models.ImageDetail false "镜像信息"
+// @Success 200 {object} models.Result
+// @router /imagedetail [post]
+func (this *ImageController) GetImageDetail() {
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+	imageDetail := new(models.ImageDetail)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &imageDetail)
+
+	this.Data["json"] = imageDetail.List(from, limit)
+	this.ServeJSON(false)
+
+}

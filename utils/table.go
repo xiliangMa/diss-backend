@@ -48,6 +48,7 @@ var (
 	HostPackage = "host_package"
 	VirusScan   = "virus_scan"
 	VirusRecord = "virus_record"
+	ImageDetail = "image_detail"
 
 	//Diss_api
 	Accounts                    = "accounts"

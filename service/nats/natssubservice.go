@@ -211,7 +211,7 @@ func (this *NatsSubService) Save() error {
 			imageInfoList := []models.ImageInfo{}
 			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &imageInfoList); err != nil {
-				logs.Error("Paraces %s error %s", ms.Tag, err)
+				logs.Error("Parses %s error %s", ms.Tag, err)
 				return err
 			}
 			size := len(imageInfoList)
@@ -223,6 +223,21 @@ func (this *NatsSubService) Save() error {
 			for _, imageInfo := range imageInfoList {
 				imageInfo.Add()
 			}
+			return nil
+		case models.Resource_ImageDetail:
+			imageDetail := models.ImageDetail{}
+			s, _ := json.Marshal(ms.Data)
+			if err := json.Unmarshal(s, &imageDetail); err != nil {
+				logs.Error("Parses %s error %s", ms.Tag, err)
+				return err
+			}
+
+			logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageDetail.HostId, models.Resource_ImageInfo, 1)
+
+			if result := imageDetail.Add(); result.Code != http.StatusOK {
+				return errors.New(result.Message)
+			}
+
 			return nil
 		case models.Resource_HostPs:
 			hostPsList := []models.HostPs{}

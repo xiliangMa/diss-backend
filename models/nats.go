@@ -8,6 +8,7 @@ const (
 	Resource_HostInfo               = "HostInfo"               // 主机详细数据
 	Resource_ImageConfig            = "ImageConfig"            // 镜像配置据
 	Resource_ImageInfo              = "ImageInfo"              // 镜像详细数据
+	Resource_ImageDetail            = "ImageDetail"            // 镜像详情
 	Resource_ContainerConfig        = "ContainerConfig"        // 容器配置数据
 	Resource_ContainerInfo          = "ContainerInfo"          // 容器详细数据
 	Resource_ContainerPs            = "ContainerPs"            // 容器进程数据

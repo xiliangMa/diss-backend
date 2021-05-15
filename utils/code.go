@@ -241,6 +241,8 @@ var (
 	AddWarningInfoListErr  = 1308
 	UpdateWarningInfoErr   = 1309
 	AddVirusLogErr         = 1310
+	AddImageDetailErr      = 1311
+	GetImageDetailErr      = 1312
 
 	// diss_api 1400-1500
 	GetAccountsErr                        = 1400
