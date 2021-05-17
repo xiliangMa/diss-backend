@@ -27,10 +27,10 @@ func (this *JwtService) CreateToken(name, pwd, userType string) (string, int) {
 	user := &models.UserAccessCredentials{}
 
 	if this.LoginType != models.Login_Type_LDAP {
-		if beego.AppConfig.String("RunMode") == "dev" {
+		if beego.AppConfig.String("RunMode") == "prod" {
 			user = loginUser.Get()
 			if user == nil {
-				return "UserName or Password Invalid", utils.NoSuchUser
+				return "UserName or Password Invalid", utils.SiginErr
 			}
 			if userType == models.Login_Type_LOCAL {
 				match, err := utils.ComparePassword(pwd, user.Value)
