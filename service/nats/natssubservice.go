@@ -10,6 +10,7 @@ import (
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/synccheck"
 	"github.com/xiliangMa/diss-backend/service/system/system"
+
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strings"
@@ -569,6 +570,20 @@ func (this *NatsSubService) Save() error {
 			}
 
 			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", vsLog.Type, ms.Tag, 1)
+
+		case models.Config_RuleDefineList:
+			ruleDefine := models.RuleDefine{}
+			s, _ := json.Marshal(ms.Data)
+			if err := json.Unmarshal(s, &ruleDefine); err != nil {
+				logs.Error("Parses %s error %s", ms.Tag, err)
+				return err
+			}
+
+			natsManager := models.Nats
+			natsPubService := NatsPubService{Conn: natsManager.Conn}
+			natsPubService.Type = ruleDefine.RuleType
+			natsPubService.ClientSubject = this.ClientSubject
+			natsPubService.RuleDefinePub()
 		}
 
 	case models.Type_Control:

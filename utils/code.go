@@ -227,7 +227,10 @@ var (
 	WarnWhitelistUnmarshalErr       = 1251
 	CheckFilePostErr                = 1252
 	CheckFileTypeErr                = 1253
-	NoSuchUser                      = 1254
+	AddRuleDefineErr                = 1254
+	EditRuleDefineErr               = 1255
+	GetRuleDefineErr                = 1256
+	DeleteRuleDefineErr             = 1257
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300

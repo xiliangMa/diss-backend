@@ -37,6 +37,7 @@ var (
 	Vulnerabilities      = "vulnerabilities"
 	KubeScan             = "kube_scan"
 	KubeVulnerabilities  = "kube_vulnerabilities"
+	RuleDefine           = "rule_define"
 
 	//security_log timescaledb
 	DcokerIds   = "docker_ids"
