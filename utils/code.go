@@ -225,6 +225,7 @@ var (
 	WarnWhitelistUnmarshalErr       = 1251
 	CheckFilePostErr                = 1252
 	CheckFileTypeErr                = 1253
+	NoSuchUser                      = 1254
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300
@@ -237,7 +238,7 @@ var (
 	GetWarningInfoListErr  = 1307
 	AddWarningInfoListErr  = 1308
 	UpdateWarningInfoErr   = 1309
-	NoSuchUser             = 1310
+	AddVirusLogErr         = 1310
 
 	// diss_api 1400-1500
 	GetAccountsErr                        = 1400

@@ -44,6 +44,8 @@ var (
 	UserEvent   = "user_event"
 	WarningInfo = "warning_info"
 	HostPackage = "host_package"
+	VirusScan   = "virus_scan"
+	VirusRecord = "virus_record"
 
 	//Diss_api
 	Accounts                    = "accounts"

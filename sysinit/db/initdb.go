@@ -154,7 +154,7 @@ func (this *DefaultDB) InitSystemData() {
 
 	_, err = o.Raw(dbscript.DefaultContainerVirusScanJobSql).Exec()
 	if err != nil {
-		logs.Error("Init DefaultDockerVirusScan Job fail, err: %s", err)
+		logs.Error("Init DefaultContainerVirusScanJobSql Job fail, err: %s", err)
 	}
 
 	_, err = o.Raw(dbscript.DefaultHostVirusScanJobSql).Exec()
@@ -166,6 +166,7 @@ func (this *DefaultDB) InitSystemData() {
 	if err != nil {
 		logs.Error("Init DefaultImageVirusScanJobSql Job fail, err: %s", err)
 	}
+
 	_, err = o.Raw(dbscript.DefaultHostImageVlunScanJobSql).Exec()
 	if err != nil {
 		logs.Error("Init DefaultHostImageVlunScanJobSql Job fail, err: %s", err)
