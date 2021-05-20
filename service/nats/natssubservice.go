@@ -8,6 +8,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/nats-io/stan.go"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/securitylog"
 	"github.com/xiliangMa/diss-backend/service/synccheck"
 	"github.com/xiliangMa/diss-backend/service/system/system"
 
@@ -569,21 +570,20 @@ func (this *NatsSubService) Save() error {
 				virusRecord.Add()
 			}
 
-			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", vsLog.Type, ms.Tag, 1)
-
-		case models.Config_RuleDefineList:
-			ruleDefine := models.RuleDefine{}
+			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", vsLog.HostId, ms.Tag, 1)
+		case models.Resource_SensitiveInfo:
+			sensiInfo := models.SensitiveInfo{}
 			s, _ := json.Marshal(ms.Data)
-			if err := json.Unmarshal(s, &ruleDefine); err != nil {
+			if err := json.Unmarshal(s, &sensiInfo); err != nil {
 				logs.Error("Parses %s error %s", ms.Tag, err)
 				return err
 			}
 
-			natsManager := models.Nats
-			natsPubService := NatsPubService{Conn: natsManager.Conn}
-			natsPubService.Type = ruleDefine.RuleType
-			natsPubService.ClientSubject = this.ClientSubject
-			natsPubService.RuleDefinePub()
+			sensiService := securitylog.SensitiveInfoService{}
+			sensiService.SensitiveInfo = sensiInfo
+			sensiService.AddFileList()
+
+			logs.Warn("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", sensiInfo.HostId, ms.Tag, len(sensiInfo.Files))
 		}
 
 	case models.Type_Control:
