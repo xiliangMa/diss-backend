@@ -94,8 +94,9 @@ var (
 	TMP_Type_KubernetesSecurityAudit = "KubernetesSecurityAudit"
 	TMP_Type_CommandSecurityAudit    = "CommandSecurityAudit"
 	//病毒扫描：
-	TMP_Type_DockerVS = "DockerVirusScan"
-	TMP_Type_HostVS   = "HostVirusScan"
+	TMP_Type_ContainerVS = "ContainerVirusScan"
+	TMP_Type_HostVS      = "HostVirusScan"
+	TMP_Type_ImageVS     = "ImageVirusScan"
 	//漏洞扫描
 	TMP_Type_LS = "SC_LeakScan"
 

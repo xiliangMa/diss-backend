@@ -150,7 +150,7 @@ func GetSyncSyslogFunc(exType string) func() {
 			}
 
 		case models.LogType_ContainerVirusLog:
-			dockerVirus := new(models.DockerVirus)
+			dockerVirus := new(models.VirusScan)
 			TEPointObj := new(models.TimeEdgePoint)
 			TEPointObj.EdgePointCode = exType
 			TEPinDB := TEPointObj.Get()
@@ -158,10 +158,11 @@ func GetSyncSyslogFunc(exType string) func() {
 				//timeTemplate1 := "2006-01-02T15:04:05Z"
 				//stamp, _ := time.ParseInLocation(timeTemplate1, TEPinDB[0].TimePointA, time.Local)
 				dockerVirus.CreatedAt = TEPinDB[0].TimePointA
+				dockerVirus.Type = models.TMP_Type_ContainerVS
 				loglist := dockerVirus.List(from, limit)
 				if loglist.Code == 200 && loglist.Data != nil {
 					mapdata := loglist.Data.(map[string]interface{})
-					for _, logitem := range mapdata["items"].([]*models.DockerVirus) {
+					for _, logitem := range mapdata["items"].([]*models.VirusScan) {
 						logitemJson, _ := json.Marshal(logitem)
 						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}
@@ -173,7 +174,7 @@ func GetSyncSyslogFunc(exType string) func() {
 			}
 
 		case models.LogType_ImageSecLog:
-			imageVirus := new(models.ImageVirus)
+			imageVirus := new(models.VirusScan)
 			TEPointObj := new(models.TimeEdgePoint)
 			TEPointObj.EdgePointCode = exType
 			TEPinDB := TEPointObj.Get()
@@ -181,10 +182,11 @@ func GetSyncSyslogFunc(exType string) func() {
 				//timeTemplate1 := "2006-01-02T15:04:05Z"
 				//stamp, _ := time.ParseInLocation(timeTemplate1, TEPinDB[0].TimePointA, time.Local)
 				imageVirus.CreatedAt = TEPinDB[0].TimePointA / 1e9
+				imageVirus.Type = models.TMP_Type_ImageVS
 				loglist := imageVirus.List(from, limit)
 				if loglist.Code == 200 && loglist.Data != nil {
 					mapdata := loglist.Data.(map[string]interface{})
-					for _, logitem := range mapdata["items"].([]*models.ImageVirus) {
+					for _, logitem := range mapdata["items"].([]*models.VirusScan) {
 						logitemJson, _ := json.Marshal(logitem)
 						GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 					}

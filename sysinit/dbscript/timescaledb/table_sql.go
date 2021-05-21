@@ -57,6 +57,49 @@ var (
 	-- ----------------------------
 	ALTER TABLE "public"."user_event" ADD CONSTRAINT "user_event_pkey" PRIMARY KEY ("id");`
 
+	Tab_Create_VirusScan = `CREATE TABLE virus_scan
+		(
+		id serial not null
+			constraint virus_scan_pkey
+				primary key,
+		name text default ''::text not null,
+		task_id varchar(64),
+		host_id varchar(128) default ''::text not null,
+		host_name varchar(128) default ''::text not null,
+		image_id varchar(256) default ''::text not null,
+		image_name text default ''::text not null,
+		container_id varchar(256) default ''::text not null,
+		container_name text default ''::text not null,
+		internal_addr varchar(256) default ''::text not null,
+		public_addr varchar(256) default ''::text not null,
+		type varchar(32) default ''::text not null,
+		raw_log text default ''::text not null,
+        created_at bigint
+		);
+	
+    alter table virus_scan owner to postgres;`
+
+	Tab_Create_VirusRecord = `create table public.virus_record
+	(
+		id serial not null
+			constraint virus_record_pkey
+				primary key,
+		virus_scan_id integer default 0 not null,
+		filename text default ''::text not null,
+		virus text default ''::text not null,
+		database text default ''::text not null,
+		type text default ''::text not null,
+		size bigint default 0 not null,
+		owner text default ''::text not null,
+		permission bigint default 0 not null
+			constraint virus_record_permission_check
+				check (permission >= 0),
+		modify_time bigint default 0 not null,
+		create_time bigint default 0 not null
+	);
+
+	alter table public.virus_record owner to postgres;`
+
 	Tab_Create_TaskLog = `CREATE TABLE "public"."task_log" (
 	  "id" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
 	  "account" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT 'admin'::character varying,

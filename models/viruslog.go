@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -9,6 +8,64 @@ import (
 	"strconv"
 	"strings"
 )
+
+type VirusScan struct {
+	Id            int    `description:"(id)"`
+	Name          string `description:"(本次扫描任务名)"`
+	TaskId        string `description:"(任务ID)"`
+	HostId        string `description:"(主机ID)"`
+	HostName      string `description:"(主机名称)"`
+	ImageId       string `description:"(镜像ID)"`
+	ImageName     string `description:"(镜像名称)"`
+	ContainerId   string `description:"(容器ID)"`
+	ContainerName string `description:"(容器名称)"`
+	InternalAddr  string `description:"(内网IP)"`
+	PublicAddr    string `description:"(外网IP)"`
+	Type          string `description:"(扫描类型，HostVirusScan, ImageVirusScan, ContainerVirusScan)"`
+	CreatedAt     int64  `description:"(创建时间)"`
+	Records       []VirusRecord
+	FileName      string
+}
+
+type VirusRecord struct {
+	Id          int    `description:"(Id)"`
+	VirusScanId int    `description:"(VirusScan Id)"`
+	Filename    string `description:"(感染文件名称)"`
+	Virus       string `description:"(感染病毒名称)"`
+	Database    string `description:"(命中病毒库)"`
+	Type        string `description:"(感染文件类型)"`
+	Size        int64  `description:"(感染文件大小)"`
+	Owner       string `description:"(感染文件所属用户)"`
+	Permission  uint32 `description:"(感染文件权限)"`
+	ModifyTime  int64  `description:"(感染文件最近修改时间)"`
+	CreateTime  int64  `description:"(感染文件创建时间)"`
+}
+
+type VirusScanRecord struct {
+	Id            int    `description:"(id)"`
+	Name          string `description:"(本次扫描任务名)"`
+	TaskId        string `description:"(任务ID)"`
+	HostId        string `description:"(主机ID)"`
+	HostName      string `description:"(主机名称)"`
+	ImageId       string `description:"(镜像ID)"`
+	ImageName     string `description:"(镜像名称)"`
+	ContainerId   string `description:"(容器ID)"`
+	ContainerName string `description:"(容器名称)"`
+	InternalAddr  string `description:"(内网IP)"`
+	PublicAddr    string `description:"(外网IP)"`
+	Type          string `description:"(扫描类型，HostVirusScan, ImageVirusScan, ContainerVirusScan)"`
+	CreatedAt     int64  `description:"(创建时间)"`
+	VirusScanId   int    `description:"(VirusScan Id)"`
+	Filename      string `description:"(感染文件名称)"`
+	Virus         string `description:"(感染病毒名称)"`
+	Database      string `description:"(命中病毒库)"`
+	FileType      string `description:"(感染文件类型)"`
+	Size          int64  `description:"(感染文件大小)"`
+	Owner         string `description:"(感染文件所属用户)"`
+	Permission    uint32 `description:"(感染文件权限)"`
+	ModifyTime    int64  `description:"(感染文件最近修改时间)"`
+	CreateTime    int64  `description:"(感染文件创建时间)"`
+}
 
 type ImageVirus struct {
 	ImageId     string `orm:"column(imageId)" description:"(镜像Id)"`
@@ -23,7 +80,7 @@ type ImageVirus struct {
 	LastUpdated int64  `description:"(更新时间)"`
 }
 
-type DockerVirus struct {
+type ContainerVirus struct {
 	HostId      string `description:"(主机id)"`
 	ContainerId string `description:"(容器id)"`
 	FileName    string `description:"(文件名)"`
@@ -35,48 +92,109 @@ type DockerVirus struct {
 	TargeType   string `description:"(类型)"`
 }
 
-type ImageVirusInterface interface {
+type VirusScanInterface interface {
+	Add() Result
 	List(from, limit int) Result
 }
 
-type DockerVirusInterface interface {
-	List(from, limit int) Result
-}
-
-/**
- 	select * from (
-	select a.*, concat_ws(':', concat_ws('/', b."registry", b."repo"), b."tag") as image_name from image_virus as a
-	JOIN catalog_image_docker as b ON  a."imageId" = b."imageId" )
-	as c  where c."userId" = 'admin' and c."image_name" like '%docker.io/openstack001/av-sample:2%' limit 20 OFFSET 0
-*/
-func (this *ImageVirus) List(from, limit int) Result {
+func (this *VirusScan) Add() Result {
+	insetSql := `INSERT INTO virus_scan(name, task_id, host_id, host_name, image_id, image_name, container_id, container_name, internal_addr, public_addr, type, created_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) Returning id`
 	o := orm.NewOrm()
-	o.Using(utils.DS_Diss_Api)
-	var imageVirusList []*ImageVirus = nil
+	o.Using(utils.DS_Security_Log)
+	var ResultData Result
+
+	var id int
+	o.Raw(insetSql,
+		this.Name,
+		this.TaskId,
+		this.HostId,
+		this.HostName,
+		this.ImageId,
+		this.ImageName,
+		this.ContainerId,
+		this.ContainerName,
+		this.InternalAddr,
+		this.PublicAddr,
+		this.Type,
+		this.CreatedAt).QueryRow(&id)
+
+	if id <= 0 {
+		ResultData.Code = utils.AddVirusLogErr
+		logs.Error("Add VirusScan failed, code: %d ", ResultData.Code)
+		return ResultData
+	}
+	this.Id = id
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+func (this *VirusScan) List(from, limit int) Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Security_Log)
+	var virusLogList []*VirusScanRecord = nil
 	var ResultData Result
 	var err error
 	var total int64 = 0
 
-	sql := ` select * from (select a.*, concat_ws(':', concat_ws('/', b."registry", b."repo"), b."tag") as image_name from image_virus as a
-	JOIN catalog_image_docker as b ON  a."imageId" = b."imageId" ) as c `
-	countSql := `select "count"(c."imageId") from (select a.*, concat_ws(':', concat_ws('/', b."registry", b."repo"), b."tag") as image_name from image_virus as a
-	JOIN catalog_image_docker as b ON  a."imageId" = b."imageId" ) as c `
-	filter := ""
-	if this.ImageDigest != "" {
-		filter = filter + `c."imageId" = '` + this.ImageId + "' and "
-	}
-	if this.UserId != "" {
-		filter = filter + `c."userId" = '` + this.UserId + "' and "
-	}
-	if this.Virus != "" {
-		filter = filter + `c."virus" like '%` + this.Virus + "%' and "
+	resType := "host_id"
+	if this.Type == TMP_Type_ImageVS {
+		resType = "image_id"
+	} else if this.Type == TMP_Type_ContainerVS {
+		resType = "container_id"
 	}
 
-	if this.CreatedAt != 0 {
-		filter = filter + `c."created_at" > ` + fmt.Sprintf("%v", this.CreatedAt) + " and "
+	sql := `select *, virus_record.type as file_type from virus_record join (select distinct on (` + resType + `) * from
+ (select distinct on(created_at) *  from virus_scan order by created_at desc) as filterdate) as virus_log
+    on virus_record.virus_scan_id = virus_log.id  `
+	countSql := `select count(virus_record.id) from virus_record join (select distinct on (` + resType + `) * from
+ (select distinct on(created_at) *  from virus_scan order by created_at desc) as filterdate) as virus_log
+    on virus_record.virus_scan_id = virus_log.id `
+	filter := ""
+	fields := []string{}
+	if this.Id != 0 {
+		filter = filter + `virus_log.id = ? and `
+		fields = append(fields, string(this.Id))
+	}
+	if this.Name != "" {
+		filter = filter + `.name like ? and `
+		fields = append(fields, "%"+this.Name+"%")
+	}
+	if this.HostId != "" {
+		filter = filter + `host_id = ? and `
+		fields = append(fields, this.HostId)
+	}
+	if this.HostName != "" {
+		filter = filter + `host_name like ? and `
+		fields = append(fields, "%"+this.HostName+"%")
+	}
+	if this.ImageId != "" {
+		filter = filter + `image_id = ? and `
+		fields = append(fields, this.ImageId)
 	}
 	if this.ImageName != "" {
-		filter = filter + `c."image_name" like '%` + this.ImageName + `%'`
+		filter = filter + `image_name like ? and `
+		fields = append(fields, "%"+this.ImageName+"%")
+	}
+	if this.ContainerId != "" {
+		filter = filter + `contaienr_id = ? and `
+		fields = append(fields, this.ContainerId)
+	}
+	if this.ContainerName != "" {
+		filter = filter + `container_name like ? and `
+		fields = append(fields, "%"+this.ContainerName+"%")
+	}
+	if this.Type != "" {
+		filter = filter + `virus_log.type = ? and `
+		fields = append(fields, this.Type)
+	}
+	if this.CreatedAt != 0 {
+		filter = filter + `virus_log.create_at  > this.CreatedAt and `
+	}
+	if this.FileName != "" {
+		filter = filter + `virus_record.filename  like ? and `
+		fields = append(fields, "%"+this.FileName+"%")
 	}
 
 	if filter != "" {
@@ -86,22 +204,23 @@ func (this *ImageVirus) List(from, limit int) Result {
 	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
 	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
 	resultSql := sql
+	logs.Warn("SQL+++++++", resultSql)
 	if from >= 0 && limit > 0 {
 		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
 		resultSql = resultSql + limitSql
 	}
-	_, err = o.Raw(resultSql).QueryRows(&imageVirusList)
+	_, err = o.Raw(resultSql, fields).QueryRows(&virusLogList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetImageVirusErr
-		logs.Error("Get ImageVirusErr List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error("Get VirusLogErr List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
-	o.Raw(countSql).QueryRow(&total)
+	o.Raw(countSql, fields).QueryRow(&total)
 	data := make(map[string]interface{})
 	data["total"] = total
-	data["items"] = imageVirusList
+	data["items"] = virusLogList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
@@ -111,80 +230,36 @@ func (this *ImageVirus) List(from, limit int) Result {
 	return ResultData
 }
 
-func (this *DockerVirus) List(from, limit int) Result {
+type VirusRecordInterface interface {
+	Add() Result
+}
+
+func (this *VirusRecord) Add() Result {
+	insetSql := `INSERT INTO virus_record(virus_scan_id, filename, virus, database, type, size, owner, permission, modify_time, create_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	o := orm.NewOrm()
-	o.Using(utils.DS_Diss_Api)
-	var dockerVirusList []*DockerVirus = nil
+	o.Using(utils.DS_Security_Log)
 	var ResultData Result
-	var err error
-	var total int64 = 0
 
-	filterSql := ""
-	countSql := `select "count"(host_id) from ` + utils.DockerVirus
-	sql := "select * from " + utils.DockerVirus
+	_, err := o.Raw(insetSql,
+		this.VirusScanId,
+		this.Filename,
+		this.Virus,
+		this.Database,
+		this.Type,
+		this.Size,
+		this.Owner,
+		this.Permission,
+		this.ModifyTime,
+		this.CreateTime).Exec()
 
-	// 根据 TargeType = host 和 HostId = All 判断是否是查询所有主机日志 如果不是则匹配其它所传入的条件
-	// 根据 TargeType = container 和 ContainerId = All 判断是否是查询所有容器日志 如果不是则匹配其它所传入的条件
-
-	if this.HostId != "" {
-		filterSql = filterSql + "host_id ilike '%" + this.HostId + "%' and "
-	}
-
-	if this.TargeType == IDLT_Host {
-
-		if this.FileName != "" {
-			filterSql = filterSql + "file_name ilike '%" + this.FileName + "%' and "
-		}
-
-		filterSql = filterSql + "container_id = '" + IDLT_Host + "' and "
-	}
-
-	if this.TargeType == IDLT_Docker {
-		if this.ContainerId != "" {
-			containerId := this.ContainerId
-			containerId = string([]byte(this.ContainerId)[:12])
-			filterSql = filterSql + "container_id ilike '%" + containerId + "%' and "
-		}
-
-		filterSql = filterSql + "container_id != '" + IDLT_Host + "' and "
-	}
-
-	if this.Virus != "" {
-		filterSql = filterSql + utils.DockerVirus + `."virus" like '%` + this.Virus + "%' and "
-	}
-
-	if this.CreatedAt != 0 {
-		filterSql = filterSql + `"created_at" > ` + fmt.Sprintf("%v", this.CreatedAt) + " and "
-	}
-
-	if filterSql != "" {
-		sql = sql + ` where ` + filterSql
-		countSql = countSql + ` where ` + filterSql
-	}
-	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
-	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
-	resultSql := sql
-	if from >= 0 && limit > 0 {
-		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
-		resultSql = resultSql + limitSql
-	}
-	_, err = o.Raw(resultSql).QueryRows(&dockerVirusList)
-	if err != nil {
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetDockerVirusErr
-		logs.Error("Get DockerVirus List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.AddVirusLogErr
+		logs.Error("Add VirusScan failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
-	o.Raw(countSql).QueryRow(&total)
-	data := make(map[string]interface{})
-	data[Result_Total] = total
-	data[Result_Items] = dockerVirusList
-
 	ResultData.Code = http.StatusOK
-	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
+	ResultData.Data = this
 	return ResultData
 }

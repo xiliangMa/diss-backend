@@ -22,7 +22,7 @@ type SystemTemplate struct {
 	SystemTemplateGroup      []*SystemTemplateGroup `orm:"rel(m2m);" description:"(策略组)"`
 	Job                      []*Job                 `orm:"reverse(many);null" description:"(job)"`
 	Task                     []*Task                `orm:"reverse(many);null" description:"(task)"`
-	ConfigMode               string                 `orm:"null;" description:"(配置形式，有target和checks两种)"`
+	ConfigMode               string                 `orm:"default(all);null" description:"(配置形式，如target、checks、group)"`
 	DefaultTargets           string                 `orm:"null;" description:"(默认的target枚举)"`
 	CheckMasterJson          string                 `orm:"null;" description:"(Master target的json内容)"`
 	CheckNodeJson            string                 `orm:"null;" description:"(Node target的json内容)"`
@@ -38,6 +38,9 @@ type SystemTemplate struct {
 	CheckIdsManagedServices  string                 `orm:"null;" description:"(选中的检查项Id列表-ManagedServices)"`
 	CheckIdsDocker           string                 `orm:"null;" description:"(选中的检查项Id列表-Docker)"`
 	CheckIdsDockerCheck      string                 `orm:"null;" description:"(选中的检查项Id列表-DockerCheck)"`
+	CheckIds                 string                 `orm:"null;" description:"(选中的检查项集合)"`
+	DefaultPathList          string                 `orm:"null;" description:"(默认的路径集合)"`
+	EngineCode               string                 `orm:"null;" description:"(使用的引擎编码)"`
 }
 
 type SystemTemplateGroup struct {

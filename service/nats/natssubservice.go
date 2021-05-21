@@ -13,6 +13,7 @@ import (
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type NatsSubService struct {
@@ -533,6 +534,26 @@ func (this *NatsSubService) Save() error {
 				vuln.Add()
 			}
 			return nil
+
+		case models.Resource_HostVS, models.Resource_ContainerVS, models.Resource_ImageVS:
+			vsLog := models.VirusScan{}
+			s, _ := json.Marshal(ms.Data)
+			if err := json.Unmarshal(s, &vsLog); err != nil {
+				logs.Error("Parses %s error %s", ms.Tag, err)
+				return err
+			}
+			createdTime := time.Now().UnixNano()
+			vsLog.CreatedAt = createdTime
+
+			vsLog.Add()
+
+			for _, virusRecord := range vsLog.Records {
+				virusRecord.VirusScanId = vsLog.Id
+				virusRecord.CreateTime = time.Now().UnixNano()
+				virusRecord.Add()
+			}
+
+			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", vsLog.Type, ms.Tag, 1)
 		}
 
 	case models.Type_Control:

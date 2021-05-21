@@ -82,7 +82,7 @@ func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 		}
 
 	case models.LogType_ContainerVirusLog:
-		dockerVirus := new(models.DockerVirus)
+		dockerVirus := new(models.ContainerVirus)
 		TEPointObj := new(models.TimeEdgePoint)
 		TEPointObj.EdgePointCode = exType
 		TEPinDB := TEPointObj.Get()
@@ -94,7 +94,7 @@ func Test_BenchmarkLog_list_timeranged(t *testing.T) {
 			limit = 30
 			if loglist.Code == 200 && loglist.Data != nil {
 				mapdata := loglist.Data.(map[string]interface{})
-				for _, logitem := range mapdata["items"].([]*models.DockerVirus) {
+				for _, logitem := range mapdata["items"].([]*models.ContainerVirus) {
 					logitemJson, _ := json.Marshal(logitem)
 					GlobalSyslog.SendSysLog(exType, models.Log_level_Info, string(logitemJson))
 				}

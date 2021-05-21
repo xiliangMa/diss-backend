@@ -76,6 +76,18 @@ func (this *SecurityLogDb) CreateOrUpdateDb() {
 		logs.Error("Create tab Table: %s fail, err: %s ", utils.TaskLog, err)
 	}
 
+	logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", utils.VirusScan)
+	_, err = o.Raw(timescaledb.Tab_Create_VirusScan).Exec()
+	if err != nil {
+		logs.Error("Create tab Table: %s fail, err: %s ", utils.VirusScan, err)
+	}
+
+	logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", utils.VirusRecord)
+	_, err = o.Raw(timescaledb.Tab_Create_VirusRecord).Exec()
+	if err != nil {
+		logs.Error("Create tab Table: %s fail, err: %s ", utils.VirusRecord, err)
+	}
+
 	logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", utils.WarningInfo)
 	_, err = o.Raw(timescaledb.Tab_Create_WarningInfo).Exec()
 	if err != nil {

@@ -40,7 +40,7 @@ func (this *BaseService) CheckHostLicense() (models.Result, []*models.HostConfig
 	hostList := []*models.HostConfig{}
 	ResultData := models.Result{Code: http.StatusOK}
 
-	if len(this.HostListInCluster) < 0 {
+	if len(this.HostListInCluster) <= 0 {
 		// 标准主机
 		if this.HostIds == "" {
 			logs.Warn("Check failed, Err: HostIds is null.")

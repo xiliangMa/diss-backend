@@ -28,6 +28,9 @@ const (
 	Resource_WarningInfo            = "WarningInfo"            // 告警
 	Resource_HostPackage            = "HostPackage"            // 主机包
 	Resource_ClientModuleControl    = "ClientModuleControl"    // 客户端模块控制
+	Resource_ContainerVS            = "ContainerVirusScan"     // 容器杀毒数据
+	Resource_HostVS                 = "HostVirusScan"          // 主机杀毒数据
+	Resource_ImageVS                = "ImageVirusScan"         // 镜像杀毒数据
 
 	// #################### （Type）Nats Type 通信类型
 	Type_Metric                     = "Metric"                 //指标类型

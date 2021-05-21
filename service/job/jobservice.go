@@ -81,7 +81,7 @@ func (this *JobService) BuildCheckList(job *models.Job) []*models.SecurityCheck 
 	targetType := job.SystemTemplate.Type //目标类型为检查模板的类型
 	resType := models.SC_Type_Host        // 资源类型包括 主机 容器 镜像
 	var secCheckList []*models.SecurityCheck
-	if (targetType == models.TMP_Type_IDS_Docker) || (targetType == models.TMP_Type_DockerVS) {
+	if (targetType == models.TMP_Type_IDS_Docker) || (targetType == models.TMP_Type_ContainerVS) {
 		resType = models.Sc_Type_Container
 	}
 	if (resType == models.SC_Type_Host) && (job.HostConfig != nil) {
@@ -108,7 +108,7 @@ func (this *JobService) SetTPLType(targetType, resType string) (seccheck *models
 	switch targetType {
 	case models.TMP_Type_BM_Docker, models.TMP_Type_BM_K8S:
 		seccheck.DockerCIS = true
-	case models.TMP_Type_DockerVS, models.TMP_Type_HostVS:
+	case models.TMP_Type_ContainerVS, models.TMP_Type_HostVS:
 		seccheck.VirusScan = true
 	case models.TMP_Type_LS:
 		seccheck.LeakScan = true
