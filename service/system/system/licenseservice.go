@@ -116,12 +116,14 @@ func (this *LicenseService) CheckLicenseFile(h *multipart.FileHeader) models.Res
 
 	// 如果传了试用版，重置授权为试用版文件
 	if strings.Contains(strings.ToLower(fName), "trial") {
-		err := os.Remove(this.LicStandFile)
-		if err != nil {
-			result.Code = utils.DeleteFileErr
-			message := "Delete file Error: " + this.LicStandFile
-			result.Message = message
-			return result
+		if _, err := os.Stat(this.LicStandFile); err == nil {
+			err := os.Remove(this.LicStandFile)
+			if err != nil {
+				result.Code = utils.DeleteFileErr
+				message := "Delete file Error: " + this.LicStandFile
+				result.Message = message
+				return result
+			}
 		}
 		this.LicType = models.LicType_TrialLicense
 		licFilename = models.LicType_TrialLicense + models.LicFile_Extension
