@@ -204,7 +204,7 @@ func (this *VirusScan) List(from, limit int) Result {
 	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
 	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
 	resultSql := sql
-	logs.Warn("SQL+++++++", resultSql)
+
 	if from >= 0 && limit > 0 {
 		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
 		resultSql = resultSql + limitSql
