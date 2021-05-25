@@ -320,4 +320,7 @@ var (
 	CIS_InfoCount = "InfoCount"
 	CIS_PassCount = "PassCount"
 	CIS_WarnCount = "WarnCount"
+
+	// RuleDefine Type
+	RuleType_Sensitive = "SensitiveRule"
 )

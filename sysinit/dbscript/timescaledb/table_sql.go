@@ -122,6 +122,26 @@ var (
 
     alter table public.image_detail owner to postgres;`
 
+	Tab_Create_SensitiveInfo = `create table public.sensitive_info
+	(
+		id serial not null
+			constraint sensitive_info_pkey
+				primary key,
+		image_id text default ''::text not null,
+		host_id text default ''::text not null,
+		host_name text default ''::text not null,
+		file_name text default ''::text not null,
+		m_d5 text default ''::text not null,
+		permission bigint default 0 not null
+			constraint sensitive_info_permission_check
+				check (permission >= 0),
+		file_type text default ''::text not null,
+		size bigint default 0 not null,
+		create_time bigint default 0 not null
+	);
+	
+	alter table public.sensitive_info owner to postgres;`
+
 	Tab_Create_TaskLog = `CREATE TABLE "public"."task_log" (
 	  "id" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
 	  "account" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT 'admin'::character varying,

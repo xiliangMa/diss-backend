@@ -32,16 +32,21 @@ const (
 	Resource_ContainerVS            = "ContainerVirusScan"     // 容器杀毒数据
 	Resource_HostVS                 = "HostVirusScan"          // 主机杀毒数据
 	Resource_ImageVS                = "ImageVirusScan"         // 镜像杀毒数据
+	Resource_SensitiveInfo          = "SensitiveInfo"          // 敏感信息数据
 
 	// #################### （Type）Nats Type 通信类型
 	Type_Metric                     = "Metric"                 //指标类型
 	Type_ReceiveState               = "ReceiveState"           //接收状态类型
 	Type_RequestState               = "RequestState"           //请求状态类型
 	Type_Control                    = "Control"                //控制类型
+	Type_Config                     = "Config"                 //配置类型
 	Resource_ContainerControl       = "ContainerControl"       // 容器控制
 	Resource_ContainerControlStatus = "ContainerControlStatus" // 响应中心状态
 	Image_Control                   = "ImageControl"           // 镜像阻断控制
 	Image_ControlStatus             = "ImageControlStatus"     // 镜像阻断控制状态
+
+	// #################### （Config）Nats Config 配置标识
+	Config_RuleDefineList = "RuleDefineList"
 
 	// #################### （ResourceControlType）Nats RCType  资源操作类型
 	Resource_Control_Type_Get    = "Get"
@@ -57,5 +62,4 @@ type NatsData struct {
 	Tag    string      `json:"tag"`     // 资源
 	RCType string      `json:"rc_type"` // ResourceControlType 资源操作类型 Get Post Delete Put
 	Data   interface{} `json:"data"`    // 数据
-	Config string      `json:"config"`  // 配置信息
 }

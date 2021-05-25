@@ -72,7 +72,7 @@ func (this *DefaultDB) registerModel() {
 		new(models.ContainerConfig), new(models.ContainerInfo), new(models.ContainerPs),
 		new(models.HostConfig), new(models.HostInfo), new(models.HostPs), new(models.ImageConfig), new(models.ImageBlocking),
 		new(models.ImageInfo), new(models.Groups), new(models.SysConfig))
-	orm.RegisterModel(new(models.LogConfig), new(models.TimeEdgePoint), new(models.WarningWhiteList), new(models.RespCenter))
+	orm.RegisterModel(new(models.LogConfig), new(models.TimeEdgePoint), new(models.WarningWhiteList), new(models.RespCenter), new(models.RuleDefine))
 	// license
 	orm.RegisterModel(new(models.LicenseConfig), new(models.LicenseModule), new(models.LicenseHistory))
 	// trivy

@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/nats"
 	css "github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
 	"io/ioutil"
@@ -207,5 +208,80 @@ func (this *SystemController) ImportWhiteList() {
 		}
 	}
 	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
+// @Title AddRuleDefine
+// @Description Add RuleDefine Item
+// @Param token header string true "authToken"
+// @Param body body models.RuleDefine false "规则定义"
+// @Success 200 {object} models.Result
+// @router /system/ruledefine [post]
+func (this *SystemController) AddRuleDefine() {
+	ruleDefine := new(models.RuleDefine)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &ruleDefine)
+	this.Data["json"] = ruleDefine.Add()
+
+	natsManager := models.Nats
+	natsPubService := nats.NatsPubService{Conn: natsManager.Conn}
+	natsPubService.Type = ruleDefine.RuleType
+	natsPubService.RuleDefinePub()
+
+	this.ServeJSON(false)
+}
+
+// @Title UpdateRuleDefine
+// @Description Update RuleDefine
+// @Param token header string true "authToken"
+// @Param id path string "" true "Id"
+// @Param body body models.RuleDefine false "规则定义"
+// @Success 200 {object} models.Result
+// @router /system/ruledefine/:id [put]
+func (this *SystemController) UpdateRuleDefine() {
+	id,_ := this.GetInt64(":id")
+	ruleDefine := new(models.RuleDefine)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &ruleDefine)
+	ruleDefine.Id = id
+	result := ruleDefine.Update()
+
+	natsManager := models.Nats
+	natsPubService := nats.NatsPubService{Conn: natsManager.Conn}
+	natsPubService.Type = ruleDefine.RuleType
+	natsPubService.RuleDefinePub()
+
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
+// @Title GetRuleDefine
+// @Description Get RuleDefine
+// @Param token header string true "authToken"
+// @Param body body models.RuleDefine false "规则定义"
+// @Success 200 {object} models.Result
+// @Param from query int 0 false "from"
+// @Param limit query int 20 false "limit"
+// @router /system/ruledefinelist [post]
+func (this *SystemController) GetRuleDefine() {
+	ruleDefine := new(models.RuleDefine)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &ruleDefine)
+
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+	this.Data["json"] = ruleDefine.List(from, limit)
+	this.ServeJSON(false)
+}
+
+// @Title DeleteRuleDefine
+// @Description Delete RuleDefine
+// @Param token header string true "authToken"
+// @Param id path string "" true "id"
+// @Success 200 {object} models.RuleDefine
+// @router /system/ruledefine/:id [delete]
+func (this *SystemController) DeleteRuleDefine() {
+	id,_ := this.GetInt64(":id")
+	ruledefine := new(models.RuleDefine)
+	ruledefine.Id = id
+
+	this.Data["json"] = ruledefine.Delete()
 	this.ServeJSON(false)
 }
