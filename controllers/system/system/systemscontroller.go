@@ -238,7 +238,7 @@ func (this *SystemController) AddRuleDefine() {
 // @Success 200 {object} models.Result
 // @router /system/ruledefine/:id [put]
 func (this *SystemController) UpdateRuleDefine() {
-	id,_ := this.GetInt64(":id")
+	id, _ := this.GetInt64(":id")
 	ruleDefine := new(models.RuleDefine)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &ruleDefine)
 	ruleDefine.Id = id
@@ -278,7 +278,7 @@ func (this *SystemController) GetRuleDefine() {
 // @Success 200 {object} models.RuleDefine
 // @router /system/ruledefine/:id [delete]
 func (this *SystemController) DeleteRuleDefine() {
-	id,_ := this.GetInt64(":id")
+	id, _ := this.GetInt64(":id")
 	ruledefine := new(models.RuleDefine)
 	ruledefine.Id = id
 
