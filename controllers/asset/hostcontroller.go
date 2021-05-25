@@ -25,17 +25,9 @@ type HostController struct {
 // @Success 200 {object} models.Result
 // @router / [post]
 func (this *HostController) GetHostConfigList() {
-	accountName := models.Account_Admin
-	user := this.GetString("user")
-	if user != models.Account_Admin && user != "" {
-		accountUsers := new(models.AccountUsers)
-		accountUsers.UserName = user
-		err, account := accountUsers.GetAccountByUser()
-		accountName = account
-		if err != nil {
-			this.Data["json"] = models.Result{Code: utils.NoAccountUsersErr, Data: nil, Message: err.Error()}
-			this.ServeJSON(false)
-		}
+	accountName := this.GetString("user")
+	if accountName != models.Account_Admin {
+		accountName = models.Account_Admin
 	}
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")

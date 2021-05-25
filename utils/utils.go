@@ -12,7 +12,6 @@ var (
 	// 数据库 ---- 数据源(和app.config 文件中的必须对应)
 	DS_Default      = "default"
 	DS_Security_Log = "security_log"
-	DS_Diss_Api     = "diss_api"
 	// 数据库 ----数据库驱动
 	DS_Driver_Postgres = "postgres"
 )

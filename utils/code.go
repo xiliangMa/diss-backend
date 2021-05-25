@@ -121,6 +121,7 @@ var (
 	AddKubeVulnerabilitiesErr       = 126
 	GetKubeScanErr                  = 127
 	DeleteKubeScanErr               = 128
+	GetImageVirusErr                = 129
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001
@@ -247,16 +248,4 @@ var (
 	AddImageDetailErr      = 1311
 	GetImageDetailErr      = 1312
 	AddSensitiveInfoErr    = 1311
-
-	// diss_api 1400-1500
-	GetAccountsErr                        = 1400
-	GetAccountUsersErr                    = 1401
-	NoAccountUsersErr                     = 1402
-	GetImageVirusErr                      = 1403
-	GetDockerVirusErr                     = 1404
-	GetImagePackageVulnerabilitiesListErr = 1405
-	GetFeedListErr                        = 1406
-	NotFoundUserAccessCredentialsErr      = 1407
-	GetImagePackageVulnerabilityInfoErr   = 1408
-	GetRegistriesErr                      = 1409
 )

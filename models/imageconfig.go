@@ -58,7 +58,6 @@ func (this *ImageConfig) Add() Result {
 	o.Using(utils.DS_Default)
 	var ResultData Result
 	var err error
-	var imageConfigList []*ImageConfig
 
 	cond := orm.NewCondition()
 	if this.HostId != "" {
@@ -70,25 +69,13 @@ func (this *ImageConfig) Add() Result {
 	if this.Name != "" {
 		cond = cond.And("name", this.Name)
 	}
-	_, err = o.QueryTable(utils.ImageConfig).SetCond(cond).All(&imageConfigList)
+
+	_, err = o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetContainerConfigErr
-		logs.Error("Get ContainerConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.AddImageConfigErr
+		logs.Error("Add ImageConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
-	}
-
-	if len(imageConfigList) != 0 {
-		// agent 或者 k8s 数据更新（因为没有diss-backend的关系数据，所以直接更新）
-		return this.Update()
-	} else {
-		_, err = o.Insert(this)
-		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
-			ResultData.Message = err.Error()
-			ResultData.Code = utils.AddImageConfigErr
-			logs.Error("Add ImageConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-			return ResultData
-		}
 	}
 
 	ResultData.Code = http.StatusOK

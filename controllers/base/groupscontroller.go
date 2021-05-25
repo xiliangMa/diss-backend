@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/utils"
 )
 
 // Groups（分组） object api list
@@ -85,17 +84,9 @@ func (this *GroupsController) DeleteGroup() {
 // @Success 200 {object} models.Result
 // @router /containers [post]
 func (this *GroupsController) GetContainersList() {
-	accountName := models.Account_Admin
-	user := this.GetString("user")
-	if user != models.Account_Admin && user != "" {
-		accountUsers := models.AccountUsers{}
-		accountUsers.UserName = user
-		err, account := accountUsers.GetAccountByUser()
-		accountName = account
-		if err != nil {
-			this.Data["json"] = models.Result{Code: utils.NoAccountUsersErr, Data: nil, Message: err.Error()}
-			this.ServeJSON(false)
-		}
+	accountName := this.GetString("user")
+	if accountName != models.Account_Admin {
+		accountName = models.Account_Admin
 	}
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")

@@ -881,25 +881,25 @@ func RunClientSub(clientSubject string) {
 }
 
 func RunClientSub_Image_Safe() {
-	natsManager := models.Nats
-	if natsManager != nil && natsManager.Conn != nil {
-		registries := models.Registries{}
-		registryList := registries.List()
-		if registryList == nil || len(registryList) == 0 {
-			return
-		}
-		for _, registry := range registryList {
-			libname := registry.Registry
-			imageSafeSubject := libname + `_` + models.Subject_Image_Safe
-
-			logs.Info("init nats subscribe:", imageSafeSubject)
-
-			natsManager.Conn.Subscribe(imageSafeSubject, func(m *stan.Msg) {
-				natsSubService := NatsSubService{Conn: natsManager.Conn, Message: m.Data, ClientSubject: libname}
-				natsSubService.Save()
-			}, stan.DurableName(imageSafeSubject))
-		}
-	}
+	//natsManager := models.Nats
+	//if natsManager != nil && natsManager.Conn != nil {
+	//	registries := models.Registries{}
+	//	registryList := registries.List()
+	//	if registryList == nil || len(registryList) == 0 {
+	//		return
+	//	}
+	//	for _, registry := range registryList {
+	//		libname := registry.Registry
+	//		imageSafeSubject := libname + `_` + models.Subject_Image_Safe
+	//
+	//		logs.Info("init nats subscribe:", imageSafeSubject)
+	//
+	//		natsManager.Conn.Subscribe(imageSafeSubject, func(m *stan.Msg) {
+	//			natsSubService := NatsSubService{Conn: natsManager.Conn, Message: m.Data, ClientSubject: libname}
+	//			natsSubService.Save()
+	//		}, stan.DurableName(imageSafeSubject))
+	//	}
+	//}
 }
 
 func RunClientSub_IDL(hostId string) {

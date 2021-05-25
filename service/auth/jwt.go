@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"time"
@@ -22,52 +20,7 @@ type JwtService struct {
 }
 
 func (this *JwtService) CreateToken(name, pwd, userType string) (string, int) {
-	//检测 diss-api 用户
-	loginUser := models.UserAccessCredentials{UserName: name}
-	user := &models.UserAccessCredentials{}
-
-	if this.LoginType != models.Login_Type_LDAP {
-		if beego.AppConfig.String("RunMode") == "prod" {
-			user = loginUser.Get()
-			if user == nil {
-				return "UserName or Password Invalid", utils.SiginErr
-			}
-			if userType == models.Login_Type_LOCAL {
-				match, err := utils.ComparePassword(pwd, user.Value)
-				if !match || err != nil {
-					return "UserName or Password Invalid", utils.SiginErr
-				}
-			} else if userType != models.Login_Type_DEV {
-				return "Login Type Error", utils.LoginTypeErr
-			}
-		} else {
-			if userType != models.Login_Type_LOCAL && userType != models.Login_Type_DEV {
-				return "Login Type Error", utils.LoginTypeErr
-			}
-		}
-	} else {
-		if !models.LM.Config.Enable {
-			return "LDAP is Disabled", utils.LDAPIsDisabledErr
-		}
-		ldapService := system.LDAPService{}
-		ldapService.LoginUser = models.LDAPUser{
-			UserName: name,
-			Password: pwd,
-		}
-		logined, err := ldapService.UserAuthentication()
-		if err != nil {
-			return err.Error(), utils.LDAPLoginErr
-		}
-		if logined {
-			user = &models.UserAccessCredentials{
-				UserName: ldapService.LoginUser.UserName,
-				Type:     models.Login_Type_LDAP,
-			}
-		} else {
-			user = nil
-		}
-	}
-	if user != nil || (name == beego.AppConfig.String("system::AdminUser") && pwd == beego.AppConfig.String("system::AdminPwd")) {
+	if name == beego.AppConfig.String("system::AdminUser") && pwd == beego.AppConfig.String("system::AdminPwd") {
 		// Create token
 		this.Token = jwt.New(jwt.SigningMethodHS256)
 

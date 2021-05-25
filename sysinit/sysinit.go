@@ -17,9 +17,6 @@ func init() {
 	securityLogDb := db.SecurityLogDb{}
 	securityLogDb.InitDB()
 
-	dissApiDB := db.DissApiDB{}
-	dissApiDB.InitDB()
-
 	//init logger
 	InitLogger()
 
@@ -35,7 +32,7 @@ func init() {
 	// ================= 初始化全局变量
 	// 1. NatsManager
 	models.Nats = models.NewNatsManager()
-	nats.RunClientSub_Image_Safe()
+	//nats.RunClientSub_Image_Safe()
 	nats.RunClientSub_IDL("")
 
 	// 2. WSManager

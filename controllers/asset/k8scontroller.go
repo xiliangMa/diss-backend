@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/utils"
 )
 
 // Asset K8S object api list
@@ -22,27 +21,16 @@ type K8SController struct {
 // @Success 200 {object} models.Result
 // @router /clusters [post]
 func (this *K8SController) GetClusters() {
-	accountName := models.Account_Admin
-	user := this.GetString("user")
-	if user != models.Account_Admin && user != "" && user != "all" {
-		accountUsers := models.AccountUsers{}
-		accountUsers.UserName = user
-		err, account := accountUsers.GetAccountByUser()
-		accountName = account
-		if err != nil {
-			this.Data["json"] = models.Result{Code: utils.NoAccountUsersErr, Data: nil, Message: err.Error()}
-			this.ServeJSON(false)
-		}
+	accountName := this.GetString("user")
+	if accountName != models.Account_Admin {
+		accountName = models.Account_Admin
 	}
 
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 	cluster := new(models.Cluster)
+	cluster.AccountName = accountName
 	json.Unmarshal(this.Ctx.Input.RequestBody, &cluster)
-	// 如果用户all， 直接根据租户查询
-	if user != "" && user != "all" {
-		cluster.AccountName = accountName
-	}
 	this.Data["json"] = cluster.ListByAccount(from, limit)
 	this.ServeJSON(false)
 
@@ -59,17 +47,9 @@ func (this *K8SController) GetClusters() {
 // @Success 200 {object} models.Result
 // @router /clusters/:clusterId/namespaces [post]
 func (this *K8SController) GetNameSpaces() {
-	user := this.GetString("user")
-	accountName := models.Account_Admin
-	if user != models.Account_Admin && user != "" && user != "all" {
-		accountUsers := models.AccountUsers{}
-		accountUsers.UserName = user
-		err, account := accountUsers.GetAccountByUser()
-		accountName = account
-		if err != nil {
-			this.Data["json"] = models.Result{Code: utils.NoAccountUsersErr, Data: nil, Message: err.Error()}
-			this.ServeJSON(false)
-		}
+	accountName := this.GetString("user")
+	if accountName != models.Account_Admin {
+		accountName = models.Account_Admin
 	}
 
 	clusterId := this.GetString(":clusterId")
@@ -79,10 +59,7 @@ func (this *K8SController) GetNameSpaces() {
 	ns := new(models.NameSpace)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &ns)
 	ns.ClusterId = clusterId
-	// 如果用户all， 直接根据租户查询
-	if user != "" && user != "all" {
-		ns.AccountName = accountName
-	}
+	ns.AccountName = accountName
 	this.Data["json"] = ns.List(from, limit)
 	this.ServeJSON(false)
 

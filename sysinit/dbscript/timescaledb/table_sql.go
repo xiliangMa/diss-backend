@@ -13,7 +13,7 @@ var (
 	  "type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT 'Host'::character varying
 	)
 	;
-	ALTER TABLE "public"."cmd_history" OWNER TO "postgres";
+	ALTER TABLE "public"."cmd_history" OWNER TO "diss";
 	
 	-- ----------------------------
 	-- Primary Key structure for table cmd_history
@@ -24,6 +24,8 @@ var (
 	  "id" varchar(256) COLLATE "pg_catalog"."default" NOT NULL,
 	  "host_id" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "host_name" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+
+
 	  "from" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "type" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "action" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
@@ -34,7 +36,7 @@ var (
 	  "time_nano" int8 NOT NULL DEFAULT 0
 	)
 	;
-	ALTER TABLE "public"."docker_event" OWNER TO "postgres";
+	ALTER TABLE "public"."docker_event" OWNER TO "diss";
 	
 	-- ----------------------------
 	-- Primary Key structure for table docker_event
@@ -50,7 +52,7 @@ var (
 	  "create_time" int8 NOT NULL DEFAULT 0
 	)
 	;
-	ALTER TABLE "public"."user_event" OWNER TO "postgres";
+	ALTER TABLE "public"."user_event" OWNER TO "diss";
 	
 	-- ----------------------------
 	-- Primary Key structure for table user_event
@@ -77,7 +79,7 @@ var (
         created_at bigint
 		);
 	
-    alter table virus_scan owner to postgres;`
+    alter table virus_scan owner to diss;`
 
 	Tab_Create_VirusRecord = `create table public.virus_record
 	(
@@ -98,7 +100,7 @@ var (
 		create_time bigint default 0 not null
 	);
 
-	alter table public.virus_record owner to postgres;`
+	alter table public.virus_record owner to diss;`
 
 	Tab_Create_ImageDetail = `create table public.image_detail
 	(
@@ -120,7 +122,7 @@ var (
 		packages_json text default ''::text not null
 	);
 
-    alter table public.image_detail owner to postgres;`
+    alter table public.image_detail owner to diss;`
 
 	Tab_Create_SensitiveInfo = `create table public.sensitive_info
 	(
@@ -140,7 +142,7 @@ var (
 		create_time bigint default 0 not null
 	);
 	
-	alter table public.sensitive_info owner to postgres;`
+	alter table public.sensitive_info owner to diss;`
 
 	Tab_Create_TaskLog = `CREATE TABLE "public"."task_log" (
 	  "id" varchar(64) COLLATE "pg_catalog"."default" NOT NULL,
@@ -151,7 +153,7 @@ var (
 	  "create_time" int8 NOT NULL DEFAULT 0
 	)
 	;
-	ALTER TABLE "public"."task_log" OWNER TO "postgres";
+	ALTER TABLE "public"."task_log" OWNER TO "diss";
 	
 	-- ----------------------------
 	-- Primary Key structure for table task_log
@@ -176,7 +178,7 @@ var (
 	  "mode" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying
 	)
 	;
-	ALTER TABLE "public"."warning_info" OWNER TO "postgres";
+	ALTER TABLE "public"."warning_info" OWNER TO "diss";
 	
 	-- ----------------------------
 	-- Primary Key structure for table warning_info
@@ -190,7 +192,7 @@ var (
 	  "host_id" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying
 	)
 	;
-	ALTER TABLE "public"."host_package" OWNER TO "postgres";
+	ALTER TABLE "public"."host_package" OWNER TO "diss";
 	
 	-- ----------------------------
 	-- Primary Key structure for table host_package

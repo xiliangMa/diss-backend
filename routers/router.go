@@ -9,7 +9,6 @@ import (
 	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/plugins/cors"
 	"github.com/xiliangMa/diss-backend/controllers"
-	caccounts "github.com/xiliangMa/diss-backend/controllers/accounts"
 	casset "github.com/xiliangMa/diss-backend/controllers/asset"
 	cbase "github.com/xiliangMa/diss-backend/controllers/base"
 	cjob "github.com/xiliangMa/diss-backend/controllers/job"
@@ -93,11 +92,6 @@ func init() {
 				&controllers.AuthController{},
 			),
 		),
-		beego.NSNamespace("/v1/accounts",
-			beego.NSInclude(
-				&caccounts.AccountsController{},
-			),
-		),
 		beego.NSNamespace("/v1/groups",
 			beego.NSInclude(
 				&cbase.GroupsController{},
@@ -158,7 +152,6 @@ func init() {
 				&csystem.SystemController{},
 				&csystem.IntegrationController{},
 				&csystem.LicenseController{},
-				&csystem.FeedsController{},
 				&csystem.RespCenterController{},
 				&csystem.VulnerabilityController{},
 				&csystem.ProbeDriverController{},
