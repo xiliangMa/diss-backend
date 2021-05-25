@@ -340,4 +340,8 @@ var (
 	Registry_Type_JFrogArtifactory = "JFrogArtifactory"
 	Registry_Type_Quay             = "Quay"
 	Registry_Type_TencentTCR       = "TencentTCR"
+
+	// Language
+	Language_Cn = "zh-cn"
+	Language_En = "en-us"
 )

@@ -598,19 +598,7 @@ func (this *NatsSubService) Save() error {
 			sensiService.AddFileList()
 
 			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", sensiInfo.HostId, ms.Tag, len(sensiInfo.Files))
-		case models.Config_RuleDefineList:
-			ruleDefine := models.RuleDefine{}
-			s, _ := json.Marshal(ms.Data)
-			if err := json.Unmarshal(s, &ruleDefine); err != nil {
-				logs.Error("Parses %s error %s", ms.Tag, err)
-				return err
-			}
 
-			natsManager := models.Nats
-			natsPubService := NatsPubService{Conn: natsManager.Conn}
-			natsPubService.Type = ruleDefine.Type
-			natsPubService.ClientSubject = this.ClientSubject
-			natsPubService.RuleDefinePub()
 		}
 
 	case models.Type_Control:
@@ -841,6 +829,22 @@ func (this *NatsSubService) Save() error {
 			for _, containerConfig := range list {
 				containerConfig.Delete()
 			}
+		}
+	case models.Type_Config:
+		switch ms.Tag {
+		case models.Config_RuleDefineList:
+			ruleDefine := models.RuleDefine{}
+			s, _ := json.Marshal(ms.Data)
+			if err := json.Unmarshal(s, &ruleDefine); err != nil {
+				logs.Error("Parses %s error %s", ms.Tag, err)
+				return err
+			}
+
+			natsManager := models.Nats
+			natsPubService := NatsPubService{Conn: natsManager.Conn}
+			natsPubService.Type = ruleDefine.Type
+			natsPubService.ClientSubject = this.ClientSubject
+			natsPubService.RuleDefinePub()
 		}
 	}
 

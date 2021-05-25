@@ -240,6 +240,10 @@ var (
 	EditRuleDefineErr               = 1255
 	GetRuleDefineErr                = 1256
 	DeleteRuleDefineErr             = 1257
+	AddVulnerabilityLibErr          = 1258
+	EditVulnerabilityLibErr         = 1259
+	GetVulnerabilityLibErr          = 1260
+	DeleteVulnerabilityLibErr       = 1261
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300

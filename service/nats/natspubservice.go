@@ -6,6 +6,7 @@ import (
 	"github.com/nats-io/stan.go"
 	"github.com/xiliangMa/diss-backend/models"
 	"net/http"
+	"strings"
 )
 
 type NatsPubService struct {
@@ -30,8 +31,30 @@ func (this *NatsPubService) RuleDefinePub() {
 	// 获取规则列表，并发送
 	ruledefineObj := models.RuleDefine{}
 	ruledefineObj.Type = this.Type
-	rulelist := ruledefineObj.List(0, 0)
-	natsData.Data = rulelist.Data
+	rulelist, _, _ := ruledefineObj.RuleDefineList(0, 0)
+
+	// 追加漏洞库规则
+	if strings.Contains(this.Type, models.RuleType_DockerVulnerability) {
+		vulnerLibObj := models.VulnerabilityLib{}
+		vulnerLibObj.Category = models.RuleType_DockerVulnerability
+		vulnerLibList, _, _ := vulnerLibObj.VulnerabilityList(0, 0)
+		if len(vulnerLibList) > 0 {
+			for _, vulnerLib := range vulnerLibList {
+				ruleDefine := models.RuleDefine{}
+				ruleDefine.Type = vulnerLib.Category
+				vulnerRule := models.VulnerRule{}
+				vulnerRule.AffectVersion = vulnerLib.SuiteVersions
+				vulnerRule.Component = vulnerLib.SubCategory
+				vulnerRule.CVE = vulnerLib.CVEId
+				vulnerRuleJson, _ := json.Marshal(vulnerRule)
+				ruleDefine.Info = string(vulnerRuleJson)
+
+				rulelist = append(rulelist, &ruleDefine)
+			}
+		}
+	}
+
+	natsData.Data = rulelist
 	rulesData, _ := json.Marshal(natsData)
 
 	if this.ClientSubject != "" {
