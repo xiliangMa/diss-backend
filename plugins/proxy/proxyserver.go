@@ -1,15 +1,22 @@
 package proxy
 
 import (
+	"bytes"
+	"crypto/tls"
+	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
 )
 
 type ProxyServer struct {
 	TargetUrl string
+	Token     string
+	Method    string
+	Body      interface{}
 	Err       chan string
 }
 
@@ -31,4 +38,36 @@ func (this *ProxyServer) StartServer() *http.Server {
 	go srv.ListenAndServeTLS("conf/ca.crt", "conf/server.key")
 	logs.Info("Start proxy server success, Port: %s.", port)
 	return srv
+}
+
+func (this *ProxyServer) Request(user string, pwd string) (*http.Response, error) {
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	cli := &http.Client{Transport: tr}
+
+	if this.Method == "" {
+		this.Method = "GET"
+	}
+
+	if !strings.Contains(this.TargetUrl, "http://") && !strings.Contains(this.TargetUrl, "https://") {
+		this.TargetUrl = "https://" + this.TargetUrl
+	}
+
+	var requestBody bytes.Buffer
+	if this.Body != nil {
+		json.NewEncoder(&requestBody).Encode(this.Body)
+	}
+
+	req, err := http.NewRequest(this.Method, this.TargetUrl, &requestBody)
+	req.SetBasicAuth(user, pwd)
+
+	req.Header.Add("content-type", "application/json; charset=utf-8")
+
+	if this.Token != "" {
+		req.Header.Add("x-auth-token", this.Token)
+	}
+
+	resp, err := cli.Do(req)
+	return resp, err
 }

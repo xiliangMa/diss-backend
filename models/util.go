@@ -323,4 +323,20 @@ var (
 
 	// RuleDefine Type
 	RuleType_Sensitive = "SensitiveRule"
+
+	//Registry Type
+	Registry_Type_Harbor           = "Harbor"
+	Registry_Type_DockerRegistry   = "DockerRegistry"
+	Registry_Type_AlibabaACR       = "AlibabaACR"
+	Registry_Type_AwsECR           = "AwsECR"
+	Registry_Type_AzureACR         = "AzureACR"
+	Registry_Type_ArtifactHub      = "ArtifactHub"
+	Registry_Type_DockerHub        = "DockerHub"
+	Registry_Type_GithubGHCR       = "GithubGHCR"
+	Registry_Type_Gitlab           = "Gitlab"
+	Registry_Type_GoogleGCR        = "GoogleGCR"
+	Registry_Type_HuaweiSWR        = "HuaweiSWR"
+	Registry_Type_JFrogArtifactory = "JFrogArtifactory"
+	Registry_Type_Quay             = "Quay"
+	Registry_Type_TencentTCR       = "TencentTCR"
 )

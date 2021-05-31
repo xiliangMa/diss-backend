@@ -122,6 +122,12 @@ var (
 	GetKubeScanErr                  = 127
 	DeleteKubeScanErr               = 128
 	GetImageVirusErr                = 129
+	AddRegistryErr                  = 130
+	GetRegistryErr                  = 131
+	DeleteRegistryErr               = 132
+	TestLinkRegistryErr             = 133
+	GetNamespacesErr                = 134
+	ImportImageErr                  = 135
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001
