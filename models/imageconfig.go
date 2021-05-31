@@ -3,8 +3,12 @@ package models
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
+	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strconv"
+	"strings"
+	"time"
 )
 
 type ImageConfig struct {
@@ -22,6 +26,8 @@ type ImageConfig struct {
 	GetLatestTask bool      `-" description:"(是否获取最新一个task、否则获取所有task列表)"`
 	TaskList      []*Task   `orm:"reverse(many);null" description:"(任务列表)"`
 	Registry      *Registry `orm:"rel(fk);default(null);null" description:"(仓库)"`
+	Type          string    `orm:"-" description:"(区分主机镜像还是仓库镜像)"`
+	Namespaces    string    `orm:"-" description:"(命名空间)"`
 }
 
 type ImageConfigInterface interface {
@@ -45,9 +51,16 @@ func (this *ImageConfig) Get() *ImageConfig {
 		cond = cond.And("image_id", this.ImageId)
 	}
 
+	if this.Name != "" {
+		cond = cond.And("name", this.Name)
+	}
+
+	if this.Registry != nil {
+		cond = cond.And("registry_id", this.Registry.Id)
+	}
+
 	err = o.QueryTable(utils.ImageConfig).SetCond(cond).RelatedSel().One(object)
 	if err != nil {
-		logs.Error("Get ImageConfig failed, code: %d, err: %s", err.Error(), utils.GetImageContentErr)
 		return nil
 	}
 	return object
@@ -68,6 +81,19 @@ func (this *ImageConfig) Add() Result {
 	}
 	if this.Name != "" {
 		cond = cond.And("name", this.Name)
+	}
+
+	if this.Registry != nil {
+		cond = cond.And("registry_id", this.Registry.Id)
+	}
+
+	if this.Id == "" {
+		uid, _ := uuid.NewV4()
+		this.Id = strconv.FormatInt(this.Registry.Id, 10) + "---" + uid.String() + "---" + this.Name
+	}
+
+	if this.CreateTime == 0 {
+		this.CreateTime = time.Now().UnixNano()
 	}
 
 	_, err = o.Insert(this)
@@ -105,6 +131,17 @@ func (this *ImageConfig) List(from, limit int) Result {
 	}
 	if this.Name != "" {
 		cond = cond.And("name__contains", this.Name)
+	}
+
+	// 根据type类型判断是主机镜像（type不为空）还是仓库镜像
+	if this.Type != "" {
+		cond = cond.And("registry_id__isnull", true)
+	} else {
+		cond = cond.And("registry_id__isnull", false)
+	}
+
+	if this.Registry != nil {
+		cond = cond.And("registry_id", this.Registry.Id)
 	}
 
 	_, err = o.QueryTable(utils.ImageConfig).RelatedSel().SetCond(cond).Limit(limit, from).All(&imageConfigList)
@@ -163,6 +200,10 @@ func (this *ImageConfig) Delete() Result {
 	if this.HostId != "" {
 		cond = cond.And("host_id", this.HostId)
 	}
+	if this.Id != "" {
+		cond = cond.And("id__in", strings.Split(this.Id, ","))
+	}
+
 	_, err := o.QueryTable(utils.ImageConfig).SetCond(cond).Delete()
 
 	if err != nil {
