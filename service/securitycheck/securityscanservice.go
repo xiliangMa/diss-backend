@@ -121,7 +121,20 @@ func (this *SecurityScanService) PrePare() {
 			}
 		}
 	case models.Sc_Type_Cluster:
+		// 下发任务到集群主机
+		if this.SecurityCheckParams.KubenetesCIS {
+			for _, host := range this.HostList {
+				securityCheck := models.SecurityCheck{
+					KubenetesScan: this.SecurityCheckParams.KubenetesCIS,
+					Host:          host,
+					Type:          models.SC_Type_Host,
+					Job:           this.Job,
+				}
+				this.PrePareTask(&securityCheck)
+			}
+		}
 		for _, cluster := range this.ClusterList {
+			// 下发任务到集群
 			if this.SecurityCheckParams.KubenetesScan {
 				securityCheck := models.SecurityCheck{
 					KubenetesScan: this.SecurityCheckParams.KubenetesScan,
