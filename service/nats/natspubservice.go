@@ -29,11 +29,11 @@ func (this *NatsPubService) RuleDefinePub() {
 
 	// 获取规则列表，并发送
 	ruledefineObj := models.RuleDefine{}
-	ruledefineObj.RuleType = this.Type
-	ruledefineObj.Enabled = true
+	ruledefineObj.Type = this.Type
 	rulelist := ruledefineObj.List(0, 0)
 	natsData.Data = rulelist.Data
 	rulesData, _ := json.Marshal(natsData)
+
 	if this.ClientSubject != "" {
 		this.PublishData(rulesData)
 	} else {

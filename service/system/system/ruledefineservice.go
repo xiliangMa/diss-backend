@@ -21,7 +21,7 @@ func (this *RuleDefineService) AddRule() models.Result {
 		}
 	}
 
-	result.Message = fmt.Sprintf("Added ruledefine success, name : %s ", ruledefineObj.RuleName)
+	result.Message = fmt.Sprintf("Added ruledefine success, name : %s ", ruledefineObj.Name)
 	result.Code = http.StatusOK
 	return result
 }
