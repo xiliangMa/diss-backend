@@ -16,7 +16,7 @@ type Task struct {
 	Spec            string           `orm:"" description:"(定时器)"`
 	Type            string           `orm:"" description:"(类型 重复执行 单次执行 )"`
 	Status          string           `orm:"null;" description:"(状态: 未开始、执行中、完成、暂停)"`
-	Batch           int64            `orm:"default(0);" description:"(任务批次)"`
+	Batch           int64            `orm:"default(0);" description:"(任务批次, 使用16位数据)"`
 	SystemTemplate  *SystemTemplate  `orm:"rel(fk);null;" description:"(系统模板)"`
 	Host            *HostConfig      `orm:"rel(fk);null;on_delete(do_nothing)"description:"(主机)"`
 	Container       *ContainerConfig `orm:"rel(fk);null;on_delete(do_nothing)" description:"(容器)"`

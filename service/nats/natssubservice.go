@@ -1,6 +1,7 @@
 package nats
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -638,7 +639,10 @@ func (this *NatsSubService) Save() error {
 				taskObj := models.Task{}
 				s, _ := json.Marshal(ms.Data)
 				logs.Debug("Receive task data: %s.", string(s))
-				err := json.Unmarshal(s, &taskList)
+				dec := json.NewDecoder(bytes.NewBuffer(s))
+				dec.UseNumber()
+				err := dec.Decode(&taskList)
+
 				if err != nil {
 					if err.Error() == "json: cannot unmarshal object into Go value of type []models.Task" {
 						err = json.Unmarshal(s, &taskObj)
