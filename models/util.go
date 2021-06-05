@@ -322,7 +322,8 @@ var (
 	CIS_WarnCount = "WarnCount"
 
 	// RuleDefine Type
-	RuleType_Sensitive = "SensitiveRule"
+	RuleType_Sensitive           = "SensitiveRule"
+	RuleType_DockerVulnerability = "DockerVulnerabilityRule"
 
 	//Registry Type
 	Registry_Type_Harbor           = "Harbor"
