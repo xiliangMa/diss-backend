@@ -598,7 +598,21 @@ func (this *NatsSubService) Save() error {
 			sensiService.AddFileList()
 
 			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", sensiInfo.HostId, ms.Tag, len(sensiInfo.Files))
+		case models.Resource_DockerVulnerability:
+			dockerVuln := models.DockerVulnerabilities{}
+			s, _ := json.Marshal(ms.Data)
+			if err := json.Unmarshal(s, &dockerVuln); err != nil {
+				logs.Error("Parses %s error %s", ms.Tag, err)
+				return err
+			}
 
+			dockerQuery := models.DockerVulnerabilities{}
+			dockerQuery.HostId = dockerVuln.HostId
+			dockerQuery.Delete()
+
+			dockerVuln.Add()
+
+			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", dockerVuln.HostId, ms.Tag, 1)
 		}
 
 	case models.Type_Control:
@@ -830,6 +844,7 @@ func (this *NatsSubService) Save() error {
 				containerConfig.Delete()
 			}
 		}
+
 	case models.Type_Config:
 		switch ms.Tag {
 		case models.Config_RuleDefineList:
