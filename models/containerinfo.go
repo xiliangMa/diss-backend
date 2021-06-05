@@ -45,25 +45,12 @@ func (this *ContainerInfo) Add() Result {
 	o.Using(utils.DS_Default)
 	var ResultData Result
 	var err error
-	var ContainerInfogList []*ContainerInfo
 
 	cond := orm.NewCondition()
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
 
-	_, err = o.QueryTable(utils.ContainerInfo).SetCond(cond).All(&ContainerInfogList)
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetContainerInfoErr
-		logs.Error("Get ContainerInfo failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-
-	if len(ContainerInfogList) != 0 {
-		// 更新前需要将绑定关系提取
-		return this.Update()
-	}
 	_, err = o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()

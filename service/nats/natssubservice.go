@@ -138,6 +138,10 @@ func (this *NatsSubService) Save() error {
 			size := len(containerConfigList)
 			if size != 0 {
 				logs.Info("Nats ############################ Sync agent data, >>>  HostName: %s, Type: %s, Size: %d <<<", containerConfigList[0].HostName, models.Resource_ContainerConfig, size)
+				// 删除主机上所有容器（不包括k8s下的相关容器）
+				deleteObj := containerConfigList[0]
+				deleteObj.PodId = ""
+				deleteObj.Delete()
 			}
 			for _, containerConfig := range containerConfigList {
 				containerConfig.AccountName = models.Account_Admin
@@ -154,8 +158,6 @@ func (this *NatsSubService) Save() error {
 					result.Message = "Image Blocking Operation Success"
 
 					this.ClientSubject = containerConfig.HostId
-					nd := models.NatsData{Code: result.Code, Type: models.Type_Control, Msg: result.Message, Tag: models.Image_Control, RCType: models.Resource_Control_Type_Delete, Data: ibg}
-					this.ReceiveData(nd)
 					continue
 				}
 				containerConfig.Add()
@@ -179,6 +181,10 @@ func (this *NatsSubService) Save() error {
 			size := len(containerInfoList)
 			if size != 0 {
 				logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerInfoList[0].HostId, models.Resource_ContainerInfo, size)
+				//删除主机上所有容器（不包括k8s下的相关容器）
+				deleteObj := containerInfoList[0]
+				deleteObj.PodId = ""
+				deleteObj.Delete()
 			}
 			for _, containerInfo := range containerInfoList {
 				containerInfo.Add()

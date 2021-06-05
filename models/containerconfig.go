@@ -44,33 +44,17 @@ func (this *ContainerConfig) Add() Result {
 	o.Using(utils.DS_Default)
 	var ResultData Result
 	var err error
-	var containerConfigList []*ContainerConfig
 
 	cond := orm.NewCondition()
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
-
-	_, err = o.QueryTable(utils.ContainerConfig).SetCond(cond).All(&containerConfigList)
-	if err != nil {
+	_, err = o.Insert(this)
+	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetContainerConfigErr
-		logs.Error("Get ContainerConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Code = utils.AddContainerConfigErr
+		logs.Error("Add ContainerConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
-	}
-
-	if len(containerConfigList) != 0 {
-		// 更新前需要将绑定关系提取
-		this.AccountName = containerConfigList[0].AccountName
-		return this.Update()
-	} else {
-		_, err = o.Insert(this)
-		if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
-			ResultData.Message = err.Error()
-			ResultData.Code = utils.AddContainerConfigErr
-			logs.Error("Add ContainerConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-			return ResultData
-		}
 	}
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
