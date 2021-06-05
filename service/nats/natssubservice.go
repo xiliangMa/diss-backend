@@ -139,8 +139,8 @@ func (this *NatsSubService) Save() error {
 			if size != 0 {
 				logs.Info("Nats ############################ Sync agent data, >>>  HostName: %s, Type: %s, Size: %d <<<", containerConfigList[0].HostName, models.Resource_ContainerConfig, size)
 				// 删除主机上所有容器（不包括k8s下的相关容器）
-				deleteObj := containerConfigList[0]
-				deleteObj.PodId = ""
+				deleteObj := new(models.ContainerConfig)
+				deleteObj.HostId = containerConfigList[0].HostId
 				deleteObj.Delete()
 			}
 			for _, containerConfig := range containerConfigList {
@@ -182,8 +182,8 @@ func (this *NatsSubService) Save() error {
 			if size != 0 {
 				logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", containerInfoList[0].HostId, models.Resource_ContainerInfo, size)
 				//删除主机上所有容器（不包括k8s下的相关容器）
-				deleteObj := containerInfoList[0]
-				deleteObj.PodId = ""
+				deleteObj := new(models.ContainerInfo)
+				deleteObj.HostId = containerInfoList[0].HostId
 				deleteObj.Delete()
 			}
 			for _, containerInfo := range containerInfoList {
@@ -209,7 +209,9 @@ func (this *NatsSubService) Save() error {
 			if size != 0 {
 				logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageConfigList[0].HostId, models.Resource_ImageConfig, len(imageConfigList))
 				//删除主机下的所有imageconfig
-				imageConfigList[0].Delete()
+				deleteObj := new(models.ImageConfig)
+				deleteObj.HostId = imageConfigList[0].HostId
+				deleteObj.Delete()
 			}
 
 			for _, imageConfig := range imageConfigList {
@@ -227,7 +229,9 @@ func (this *NatsSubService) Save() error {
 			if size != 0 {
 				logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageInfoList[0].HostId, models.Resource_ImageInfo, len(imageInfoList))
 				//删除主机下的所有imageginfo
-				imageInfoList[0].Delete()
+				deleteObj := new(models.ImageInfo)
+				deleteObj.HostId = imageInfoList[0].HostId
+				deleteObj.Delete()
 			}
 			for _, imageInfo := range imageInfoList {
 				imageInfo.Add()
