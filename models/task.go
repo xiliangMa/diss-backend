@@ -217,7 +217,14 @@ func (this *Task) GetUnFinishedTaskList() Result {
 	if this.Host != nil && this.Host.Id != "" {
 		cond = cond.And("host_id", this.Host.Id)
 	}
-	cond = cond.AndCond(cond.And("status", Task_Status_Created).Or("status", Task_Status_Pending).Or("status", Task_Status_Running).Or("status", Task_Status_Deliver_Failed))
+	cond = cond.AndCond(cond.And("status__in",
+		Task_Status_Created,
+		Task_Status_Pending,
+		Task_Status_Running,
+		Task_Status_Removing,
+		Task_Status_Deliver_Failed,
+		Task_Status_Received,
+		Task_Status_Receive_Failed))
 
 	total, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().All(&TaskList)
 	if err != nil {
