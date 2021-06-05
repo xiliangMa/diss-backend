@@ -11,13 +11,13 @@ import (
 
 type RuleDefine struct {
 	Id         int64  `orm:"pk;auto" description:"(Id)"`
-	RuleType   string `orm:"size(64)" description:"(规则类型：如敏感信息、告警信息)"`
-	RuleName   string `orm:"size(256)" description:"(规则名称)"`
-	RuleCode   string `orm:"size(64)" description:"(规则Code)"`
+	Type       string `orm:"size(64)" description:"(规则类型：如敏感信息、告警信息)"`
+	Name       string `orm:"size(256)" description:"(规则名称)"`
+	Code       string `orm:"size(64)" description:"(规则Code)"`
 	Desc       string `orm:"" description:"(规则描述)"`
-	RuleInfo   string `orm:"size(256)" description:"(规则定义)"`
-	Enabled    bool   `orm:"" description:"(是否启用)"`
-	IsAll      bool   `orm:"-" description:"(是否获取全部)"`
+	Info       string `orm:"size(256)" description:"(规则定义)"`
+	Level      int    `orm:"" description:"(等级：0查询全部 1系统级 2自定义)"`
+	Enabled    int    `orm:"" description:"(是否启用：0查询全部 1启用 2禁用)"`
 	SourceInfo string `orm:"size(256)" description:"(来源信息:来源的网址、漏洞编码等)" `
 	CreateTime int64  `orm:"" description:"(添加时间)"`
 	UpdateTime int64  `orm:"" description:"(修改时间)"`
@@ -37,6 +37,12 @@ func (this *RuleDefine) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 
+	if this.Enabled == 0 {
+		this.Enabled = 1
+	}
+	if this.Level == 0 {
+		this.Level = 2
+	}
 	this.CreateTime = time.Now().UnixNano()
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
@@ -56,7 +62,6 @@ func (this *RuleDefine) Update() Result {
 	var ResultData Result
 	ruleDefineObj := RuleDefine{}
 	ruleDefineObj.Id = this.Id
-	ruleDefineObj.IsAll = true
 
 	ruleList, total, _ := ruleDefineObj.RuleDefineList(0, 0)
 	if total > 0 {
@@ -67,7 +72,7 @@ func (this *RuleDefine) Update() Result {
 		if err != nil {
 			ResultData.Message = err.Error()
 			ResultData.Code = utils.EditRuleDefineErr
-			logs.Error("Edit RuleDefine %s failed, code: %d, err: %s", this.RuleName, ResultData.Code, ResultData.Message)
+			logs.Error("Edit RuleDefine %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
 			return ResultData
 		}
 
@@ -109,21 +114,24 @@ func (this *RuleDefine) RuleDefineList(from, limit int) (ruleLists []*RuleDefine
 	if this.Id != 0 {
 		cond = cond.And("id", this.Id)
 	}
-	if this.RuleType != "" {
-		ruleType := strings.Split(this.RuleType, ",")
-		cond = cond.And("RuleType__in", ruleType)
+	if this.Type != "" {
+		ruleType := strings.Split(this.Type, ",")
+		cond = cond.And("Type__in", ruleType)
 	}
-	if this.RuleName != "" {
-		cond = cond.And("RuleName__contains", this.RuleName)
+	if this.Name != "" {
+		cond = cond.And("Name__contains", this.Name)
 	}
-	if this.RuleCode != "" {
-		cond = cond.And("RuleCode__contains", this.RuleCode)
+	if this.Code != "" {
+		cond = cond.And("Code__contains", this.Code)
 	}
-	if this.RuleInfo != "" {
-		cond = cond.And("RuleInfo__contains", this.RuleInfo)
+	if this.Info != "" {
+		cond = cond.And("Info__contains", this.Info)
 	}
-	if !this.IsAll {
+	if this.Enabled != 0 {
 		cond = cond.And("enabled", this.Enabled)
+	}
+	if this.Level != 0 {
+		cond = cond.And("level", this.Level)
 	}
 
 	_, err = o.QueryTable(utils.RuleDefine).SetCond(cond).Limit(limit, from).OrderBy("-create_time").All(&ruleList)

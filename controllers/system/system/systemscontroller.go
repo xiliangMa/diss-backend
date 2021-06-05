@@ -224,7 +224,7 @@ func (this *SystemController) AddRuleDefine() {
 
 	natsManager := models.Nats
 	natsPubService := nats.NatsPubService{Conn: natsManager.Conn}
-	natsPubService.Type = ruleDefine.RuleType
+	natsPubService.Type = ruleDefine.Type
 	natsPubService.RuleDefinePub()
 
 	this.ServeJSON(false)
@@ -246,7 +246,7 @@ func (this *SystemController) UpdateRuleDefine() {
 
 	natsManager := models.Nats
 	natsPubService := nats.NatsPubService{Conn: natsManager.Conn}
-	natsPubService.Type = ruleDefine.RuleType
+	natsPubService.Type = ruleDefine.Type
 	natsPubService.RuleDefinePub()
 
 	this.Data["json"] = result

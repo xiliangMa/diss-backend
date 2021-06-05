@@ -1,6 +1,7 @@
 package nats
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -583,7 +584,20 @@ func (this *NatsSubService) Save() error {
 			sensiService.SensitiveInfo = sensiInfo
 			sensiService.AddFileList()
 
-			logs.Warn("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", sensiInfo.HostId, ms.Tag, len(sensiInfo.Files))
+			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", sensiInfo.HostId, ms.Tag, len(sensiInfo.Files))
+		case models.Config_RuleDefineList:
+			ruleDefine := models.RuleDefine{}
+			s, _ := json.Marshal(ms.Data)
+			if err := json.Unmarshal(s, &ruleDefine); err != nil {
+				logs.Error("Parses %s error %s", ms.Tag, err)
+				return err
+			}
+
+			natsManager := models.Nats
+			natsPubService := NatsPubService{Conn: natsManager.Conn}
+			natsPubService.Type = ruleDefine.Type
+			natsPubService.ClientSubject = this.ClientSubject
+			natsPubService.RuleDefinePub()
 		}
 
 	case models.Type_Control:
@@ -625,7 +639,10 @@ func (this *NatsSubService) Save() error {
 				taskObj := models.Task{}
 				s, _ := json.Marshal(ms.Data)
 				logs.Debug("Receive task data: %s.", string(s))
-				err := json.Unmarshal(s, &taskList)
+				dec := json.NewDecoder(bytes.NewBuffer(s))
+				dec.UseNumber()
+				err := dec.Decode(&taskList)
+
 				if err != nil {
 					if err.Error() == "json: cannot unmarshal object into Go value of type []models.Task" {
 						err = json.Unmarshal(s, &taskObj)
