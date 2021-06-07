@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"regexp"
+	"strings"
 )
 
 type timeUnix int64
@@ -22,6 +24,7 @@ const (
 )
 
 type AlibabaACRService struct {
+	ImageConfig *models.ImageConfig
 }
 
 type aliACRNamespaceResp struct {
@@ -81,18 +84,42 @@ type aliRepo struct {
 
 type aliTagResp struct {
 	Data struct {
-		Total    int `json:"total"`
-		PageSize int `json:"pageSize"`
-		Page     int `json:"page"`
-		Tags     []struct {
-			ImageUpdate int64  `json:"imageUpdate"`
-			ImageID     string `json:"imageId"`
-			Digest      string `json:"digest"`
-			ImageSize   int    `json:"imageSize"`
-			Tag         string `json:"tag"`
-			ImageCreate int64  `json:"imageCreate"`
-			Status      string `json:"status"`
-		} `json:"tags"`
+		Total    int         `json:"total"`
+		PageSize int         `json:"pageSize"`
+		Page     int         `json:"page"`
+		Tags     []tagDetail `json:"tags"`
+	} `json:"data"`
+	RequestID string `json:"requestId"`
+}
+
+type tagDetail struct {
+	ImageUpdate int64  `json:"imageUpdate"`
+	ImageID     string `json:"imageId"`
+	Digest      string `json:"digest"`
+	ImageSize   int    `json:"imageSize"`
+	Tag         string `json:"tag"`
+	ImageCreate int64  `json:"imageCreate"`
+	Status      string `json:"status"`
+}
+
+type aliLayers struct {
+	Data struct {
+		Image struct {
+			Layers []struct {
+				LayerCMD string `json:"layerCMD"`
+			} `json:"layers"`
+		} `json:"image"`
+	} `json:"data"`
+	RequestID string `json:"requestId"`
+}
+
+type aliManifest struct {
+	Data struct {
+		Manifest struct {
+			FsLayers []struct {
+				BlobSum string `json:"blobSum"`
+			} `json:"fsLayers"`
+		} `json:"manifest"`
 	} `json:"data"`
 	RequestID string `json:"requestId"`
 }
@@ -103,7 +130,7 @@ func getRegion(url string) (region string, err error) {
 	}
 	rs := regRegion.FindStringSubmatch(url)
 	if rs == nil {
-		return "", errors.New("Invalid Rgistry service url")
+		return "", errors.New("invalid registry service url")
 	}
 	return rs[2], nil
 }
@@ -116,18 +143,17 @@ func (this *AlibabaACRService) NewAuth(registry *models.Registry) (err error) {
 	var client *cr.Client
 	client, err = cr.NewClientWithAccessKey(region, registry.User, registry.Pwd)
 	if err != nil {
-		return err
+		return errors.New("incorrect authentication credentials")
 	}
 	var tokenRequest = cr.CreateGetAuthorizationTokenRequest()
 	domain := fmt.Sprintf(endpointTpl, region)
 	tokenRequest.SetDomain(domain)
 	tokenResponse, err := client.GetAuthorizationToken(tokenRequest)
 	if err != nil {
-		return
+		return errors.New("incorrect authentication credentials")
 	}
 	var v authorizationToken
 	json.Unmarshal(tokenResponse.GetHttpContentBytes(), &v)
-	logs.Info("authorizationToken %+v", v)
 	return nil
 }
 
@@ -140,19 +166,17 @@ func (this *AlibabaACRService) getClient(url string, user string, pwd string) (d
 
 }
 
-func (this *AlibabaACRService) Imports(imageConfig *models.ImageConfig) (err error) {
-	domain, client, err := this.getClient(imageConfig.Registry.Url, imageConfig.Registry.User, imageConfig.Registry.Pwd)
+func (this *AlibabaACRService) Imports() (err error) {
+	domain, client, err := this.getClient(this.ImageConfig.Registry.Url, this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 	if err != nil {
 		return
 	}
 	var repositories []aliRepo
-	if imageConfig.Namespaces != "" {
-		repos, e := this.listReposByNamespace(domain, imageConfig.Namespaces, client)
+	if this.ImageConfig.Namespaces != "" {
+		repos, e := this.listReposByNamespace(domain, this.ImageConfig.Namespaces, client)
 		if e != nil {
 			return
 		}
-
-		logs.Info("\nnamespace: %s \t repositories: %+v", imageConfig.Namespaces, repos)
 
 		for _, repo := range repos {
 			repositories = append(repositories, repo)
@@ -171,8 +195,6 @@ func (this *AlibabaACRService) Imports(imageConfig *models.ImageConfig) (err err
 				return
 			}
 
-			logs.Info("\nnamespace: %s \t repositories: %+v", ns, repos)
-
 			for _, repo := range repos {
 				repositories = append(repositories, repo)
 			}
@@ -186,13 +208,62 @@ func (this *AlibabaACRService) Imports(imageConfig *models.ImageConfig) (err err
 		if e != nil {
 			return fmt.Errorf("List tags for repo '%s' error: %v", repo.RepoName, err)
 		}
+
 		for _, tag := range tags {
-			logs.Info("RepoName: %v %v", repo.RepoName, tag)
 			public := repo.RepoDomainList.Public
-			imageConfig.Name = public + "/" + repo.RepoNamespace + "/" + repo.RepoName + ":" + tag
-			if ic := imageConfig.Get(); ic == nil {
-				imageConfig.Id = ""
-				imageConfig.Add()
+			this.ImageConfig.ImageId = "sha256:" + tag.ImageID
+			this.ImageConfig.Name = public + "/" + repo.RepoNamespace + "/" + repo.RepoName + ":" + tag.Tag
+			if ic := this.ImageConfig.Get(); ic == nil {
+				this.ImageConfig.Id = ""
+				this.ImageConfig.Size = utils.FormatFileSize(int64(tag.ImageSize))
+				this.ImageConfig.CreateTime = tag.ImageCreate * 1e6
+
+				this.ImageConfig.Add()
+
+				imageDetail := models.ImageDetail{}
+
+				imageDetail.ImageId = this.ImageConfig.ImageId
+				imageDetail.Name = this.ImageConfig.Name
+
+				if imd := imageDetail.Get(); imd == nil {
+
+					layer, l := this.getImageLayer(domain, repo, tag.Tag, client)
+					if l != nil {
+						return fmt.Errorf("getImageLayer error: %v", err)
+					}
+
+					manifest, m := this.getImageManifest(domain, repo, tag.Tag, client)
+					if m != nil {
+						return fmt.Errorf("getImageManifest error: %v", err)
+					}
+
+					array := make([]string, len(layer.Data.Image.Layers))
+					for i, v := range layer.Data.Image.Layers {
+						if v.LayerCMD != "" {
+							array[i] = v.LayerCMD
+						}
+					}
+
+					lenx := len(layer.Data.Image.Layers)
+					var buffer bytes.Buffer
+					re := regexp.MustCompile(`[\s\p{Zs}]{2,}`)
+					for i := 0; i < lenx-1; i++ {
+						j := lenx - (i + 1)
+						if array[j] != "" {
+							str := re.ReplaceAllString(array[j], "")
+							buffer.WriteString(str + "\n")
+						}
+					}
+					imageDetail.Layers = len(manifest.Data.Manifest.FsLayers)
+					imageDetail.Dockerfile = strings.TrimSpace(buffer.String())
+					imageDetail.RepoDigests = tag.Digest
+					imageDetail.CreateTime = tag.ImageCreate * 1e6
+					imageDetail.Size = this.ImageConfig.Size
+					if result := imageDetail.Add(); result.Code != http.StatusOK {
+						logs.Error("ImageDetail err: %s", errors.New(result.Message))
+						return errors.New(result.Message)
+					}
+				}
 			}
 		}
 	}
@@ -202,10 +273,8 @@ func (this *AlibabaACRService) Imports(imageConfig *models.ImageConfig) (err err
 
 func (this *AlibabaACRService) listNamespaces(domain string, c *cr.Client) (namespaces []string, err error) {
 
-	// list namespaces
 	var nsReq = cr.CreateGetNamespaceListRequest()
 	var nsResp = cr.CreateGetNamespaceListResponse()
-
 	nsReq.SetDomain(domain)
 	nsResp, err = c.GetNamespaceList(nsReq)
 	if err != nil {
@@ -249,7 +318,7 @@ func (this *AlibabaACRService) listReposByNamespace(domain string, namespace str
 	return
 }
 
-func (this *AlibabaACRService) getTags(domain string, repo aliRepo, c *cr.Client) (tags []string, err error) {
+func (this *AlibabaACRService) getTags(domain string, repo aliRepo, c *cr.Client) (tags []tagDetail, err error) {
 	var tagsReq = cr.CreateGetRepoTagsRequest()
 	var tagsResp = cr.CreateGetRepoTagsResponse()
 	tagsReq.SetDomain(domain)
@@ -265,9 +334,7 @@ func (this *AlibabaACRService) getTags(domain string, repo aliRepo, c *cr.Client
 
 		var resp = &aliTagResp{}
 		json.Unmarshal(tagsResp.GetHttpContentBytes(), resp)
-		for _, tag := range resp.Data.Tags {
-			tags = append(tags, tag.Tag)
-		}
+		tags = resp.Data.Tags
 
 		if resp.Data.Total-(resp.Data.Page*resp.Data.PageSize) <= 0 {
 			break
@@ -278,9 +345,9 @@ func (this *AlibabaACRService) getTags(domain string, repo aliRepo, c *cr.Client
 	return
 }
 
-func (this *AlibabaACRService) GetNamespaces(imageConfig *models.ImageConfig) models.Result {
+func (this *AlibabaACRService) GetNamespaces() models.Result {
 	var ResultData models.Result
-	domain, client, err := this.getClient(imageConfig.Registry.Url, imageConfig.Registry.User, imageConfig.Registry.Pwd)
+	domain, client, err := this.getClient(this.ImageConfig.Registry.Url, this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetNamespacesErr
@@ -295,4 +362,40 @@ func (this *AlibabaACRService) GetNamespaces(imageConfig *models.ImageConfig) mo
 	ResultData.Data = ns
 	return ResultData
 
+}
+
+func (this *AlibabaACRService) getImageLayer(domain string, repo aliRepo, tag string, c *cr.Client) (layers *aliLayers, err error) {
+
+	var layerRequest = cr.CreateGetImageLayerRequest()
+	var layerResponse = cr.CreateGetImageLayerResponse()
+	layerRequest.SetDomain(domain)
+	layerRequest.RepoNamespace = repo.RepoNamespace
+	layerRequest.RepoName = repo.RepoName
+	layerRequest.Tag = tag
+	layerResponse, err = c.GetImageLayer(layerRequest)
+
+	if err != nil {
+		return nil, err
+	}
+
+	json.Unmarshal(layerResponse.GetHttpContentBytes(), &layers)
+	return
+}
+
+func (this *AlibabaACRService) getImageManifest(domain string, repo aliRepo, tag string, c *cr.Client) (manifest *aliManifest, err error) {
+
+	var manifestRequest = cr.CreateGetImageManifestRequest()
+	var manifestResponse = cr.CreateGetImageManifestResponse()
+	manifestRequest.SetDomain(domain)
+	manifestRequest.RepoNamespace = repo.RepoNamespace
+	manifestRequest.RepoName = repo.RepoName
+	manifestRequest.Tag = tag
+	manifestResponse, err = c.GetImageManifest(manifestRequest)
+
+	if err != nil {
+		return nil, err
+	}
+
+	json.Unmarshal(manifestResponse.GetHttpContentBytes(), &manifest)
+	return
 }

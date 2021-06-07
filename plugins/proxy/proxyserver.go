@@ -50,7 +50,7 @@ func (this *ProxyServer) Request(user string, pwd string) (*http.Response, error
 		this.Method = "GET"
 	}
 
-	if !strings.Contains(this.TargetUrl, "http://") && !strings.Contains(this.TargetUrl, "https://") {
+	if !strings.HasPrefix(this.TargetUrl, "http://") && !strings.HasPrefix(this.TargetUrl, "https://") {
 		this.TargetUrl = "https://" + this.TargetUrl
 	}
 
@@ -60,14 +60,15 @@ func (this *ProxyServer) Request(user string, pwd string) (*http.Response, error
 	}
 
 	req, err := http.NewRequest(this.Method, this.TargetUrl, &requestBody)
-	req.SetBasicAuth(user, pwd)
 
-	req.Header.Add("content-type", "application/json; charset=utf-8")
+	req.Header.Add("content-type", "application/json")
 
 	if this.Token != "" {
 		req.Header.Add("x-auth-token", this.Token)
+		req.Header.Add("Authorization", "JWT "+this.Token)
+	} else {
+		req.SetBasicAuth(user, pwd)
 	}
-
 	resp, err := cli.Do(req)
 	return resp, err
 }

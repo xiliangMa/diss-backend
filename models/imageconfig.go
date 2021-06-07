@@ -3,7 +3,6 @@ package models
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
@@ -88,8 +87,7 @@ func (this *ImageConfig) Add() Result {
 	}
 
 	if this.Id == "" {
-		uid, _ := uuid.NewV4()
-		this.Id = strconv.FormatInt(this.Registry.Id, 10) + "---" + uid.String() + "---" + this.Name
+		this.Id = strconv.FormatInt(this.Registry.Id, 10) + "---" + this.ImageId + "---" + this.Name
 	}
 
 	if this.CreateTime == 0 {

@@ -12,7 +12,7 @@ import (
 )
 
 type ImageDetail struct {
-	Id           string        `description:"(数据库主键)"`
+	Id           string        `orm:"pk;" description:"(数据库主键)"`
 	ImageId      string        `description:"(镜像id)"`
 	Name         string        `description:"(镜像名)"`
 	HostId       string        `description:"(主机id)"`
@@ -20,13 +20,13 @@ type ImageDetail struct {
 	RepoTags     string        `description:"(RepoTags)"`
 	RepoDigests  string        `description:"(RepoDigests)"`
 	Os           string        `description:"(系统)"`
-	Size         int           `description:"(大小)"`
+	Size         string        `description:"(大小)"`
 	Layers       int           `description:"(Layers)"`
 	Dockerfile   string        `description:"(Dockerfile内容)"`
 	CreateTime   int64         `description:"(创建时间)"`
 	ModifyTime   int64         `description:"(更新时间)"`
 	PackagesJson string        `description:"(软件包列表)"`
-	Packages     []PackageInfo `description:"(镜像中软件包列表)"`
+	Packages     []PackageInfo `orm:"-" description:"(镜像中软件包列表)"`
 }
 
 type PackageInfo struct {
@@ -41,6 +41,7 @@ type ImageDetailInterface interface {
 	Add() Result
 	List(from, limit int) Result
 	Delete() Result
+	Get() *ImageDetail
 }
 
 func (this *ImageDetail) Add() Result {
@@ -196,4 +197,31 @@ func (this *ImageDetail) Delete() Result {
 	}
 	ResultData.Code = http.StatusOK
 	return ResultData
+}
+func (this *ImageDetail) Get() *ImageDetail {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Security_Log)
+	object := new(ImageDetail)
+	var err error
+	sql := "select * from " + utils.ImageDetail + " where "
+	cond := ""
+	if this.ImageId != "" {
+		cond = cond + " image_id = '" + this.ImageId + "' "
+	}
+
+	if cond != "" {
+		sql += " and " + cond
+	}
+
+	if this.Name != "" {
+		cond = cond + " name = '" + this.Name + "' "
+	}
+
+	sql += cond
+
+	err = o.Raw(sql).QueryRow(&object)
+	if err != nil {
+		return nil
+	}
+	return object
 }

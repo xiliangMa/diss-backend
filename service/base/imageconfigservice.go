@@ -18,10 +18,25 @@ type ImageConfigService struct {
 func (this *ImageConfigService) BatchImportImage() models.Result {
 	result := models.Result{}
 	if this.ImageConfig.Registry.Type == models.Registry_Type_Harbor || this.ImageConfig.Registry.Type == models.Registry_Type_DockerRegistry {
-		GeneralType(this.ImageConfig)
+		err := this.generalType()
+		if err != nil {
+			result.Message = err.Error()
+			result.Code = utils.ImportImageErr
+			logs.Error("Import Image failed, code: %d, err: %s", result.Code, result.Message)
+			return result
+		}
+	} else if this.ImageConfig.Registry.Type == models.Registry_Type_DockerHub {
+		dh := registry.DockerHubService{ImageConfig: this.ImageConfig}
+		err := dh.Imports()
+		if err != nil {
+			result.Message = err.Error()
+			result.Code = utils.ImportImageErr
+			logs.Error("Import Image failed, code: %d, err: %s", result.Code, result.Message)
+			return result
+		}
 	} else if this.ImageConfig.Registry.Type == models.Registry_Type_AlibabaACR {
-		acr := registry.AlibabaACRService{}
-		err := acr.Imports(this.ImageConfig)
+		acr := registry.AlibabaACRService{ImageConfig: this.ImageConfig}
+		err := acr.Imports()
 		if err != nil {
 			result.Message = err.Error()
 			result.Code = utils.ImportImageErr
@@ -29,8 +44,8 @@ func (this *ImageConfigService) BatchImportImage() models.Result {
 			return result
 		}
 	} else if this.ImageConfig.Registry.Type == models.Registry_Type_HuaweiSWR {
-		hw := registry.HuaweiSWRService{}
-		err := hw.Imports(this.ImageConfig)
+		hw := registry.HuaweiSWRService{ImageConfig: this.ImageConfig}
+		err := hw.Imports()
 		if err != nil {
 			result.Message = err.Error()
 			result.Code = utils.ImportImageErr
@@ -47,23 +62,34 @@ func (this *ImageConfigService) GetNamespaces() models.Result {
 	result := models.Result{}
 	switch this.ImageConfig.Registry.Type {
 	case models.Registry_Type_AlibabaACR:
-		ics := registry.AlibabaACRService{}
-		return ics.GetNamespaces(this.ImageConfig)
+		ics := registry.AlibabaACRService{ImageConfig: this.ImageConfig}
+		return ics.GetNamespaces()
+	case models.Registry_Type_DockerHub:
+		dh := registry.DockerHubService{ImageConfig: this.ImageConfig}
+		return dh.ListNamespaces()
 	case models.Registry_Type_HuaweiSWR:
-		hw := registry.HuaweiSWRService{}
-		return hw.ListNamespaces(this.ImageConfig)
+		hw := registry.HuaweiSWRService{ImageConfig: this.ImageConfig}
+		return hw.ListNamespaces()
 	}
 
 	return result
 }
 
-func GeneralType(imageConfig *models.ImageConfig) {
+func (this *ImageConfigService) generalType() (error error) {
+	imageConfig := this.ImageConfig
 	proxy := proxy.ProxyServer{TargetUrl: imageConfig.Registry.Url + "/v2/_catalog"}
-	resp, _ := proxy.Request(imageConfig.Registry.User, imageConfig.Registry.Pwd)
+	resp, err := proxy.Request(imageConfig.Registry.User, imageConfig.Registry.Pwd)
+
+	if err != nil {
+		return err
+	}
 
 	if resp.StatusCode == 200 {
 		defer resp.Body.Close()
-		body, _ := ioutil.ReadAll(resp.Body)
+		body, respErr := ioutil.ReadAll(resp.Body)
+		if respErr != nil {
+			return respErr
+		}
 		var cc map[string]interface{}
 		json.Unmarshal(body, &cc)
 
@@ -83,14 +109,13 @@ func GeneralType(imageConfig *models.ImageConfig) {
 					if tagObj["tags"] != nil {
 						for _, tag := range tagObj["tags"].([]interface{}) {
 							imageConfig.Name = in + ":" + tag.(string)
-							if ic := imageConfig.Get(); ic == nil {
-								imageConfig.Id = ""
-								imageConfig.Add()
-							}
+							cs := registry.CommonService{ImageConfig: imageConfig}
+							cs.AddDetail(false)
 						}
 					}
 				}
 			}
 		}
 	}
+	return
 }
