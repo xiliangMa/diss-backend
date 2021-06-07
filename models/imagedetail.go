@@ -40,6 +40,7 @@ type PackageInfo struct {
 type ImageDetailInterface interface {
 	Add() Result
 	List(from, limit int) Result
+	Delete() Result
 }
 
 func (this *ImageDetail) Add() Result {
@@ -158,5 +159,41 @@ func (this *ImageDetail) List(from, limit int) Result {
 	if total == 0 {
 		ResultData.Data = nil
 	}
+	return ResultData
+}
+
+func (this *ImageDetail) Delete() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Security_Log)
+	var ResultData Result
+
+	removeSQL := "Delete from " + utils.ImageDetail + " "
+	cond := ""
+	pre := ""
+
+	if this.HostId != "" {
+		cond = cond + "host_id = '" + this.HostId + "' "
+	}
+	if this.ImageId != "" {
+		if cond != "" {
+			pre = " And "
+		}
+		cond = cond + pre + " image_id = '" + this.ImageId + "' "
+	}
+
+	if cond != "" {
+		cond = " Where " + cond
+	}
+	removeSQL = removeSQL + cond
+
+	_, err := o.Raw(removeSQL).Exec()
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteImageDetailErr
+		logs.Error("Delete ImageDetail failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
 	return ResultData
 }

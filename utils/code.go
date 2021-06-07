@@ -128,6 +128,7 @@ var (
 	TestLinkRegistryErr             = 133
 	GetNamespacesErr                = 134
 	ImportImageErr                  = 135
+	DeleteImageDetailErr            = 136
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001

@@ -247,6 +247,9 @@ func (this *NatsSubService) Save() error {
 
 			logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageDetail.HostId, models.Resource_ImageInfo, 1)
 
+			if result := imageDetail.Delete(); result.Code != http.StatusOK {
+				return errors.New(result.Message)
+			}
 			if result := imageDetail.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
 			}
