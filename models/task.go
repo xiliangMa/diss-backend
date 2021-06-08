@@ -31,6 +31,7 @@ type Task struct {
 	Action          string           `orm:"size(256)" description:"(操作类型标记)"`
 	ContainerHostId string           `orm:"size(128)" description:"(主机id)"`
 	PathList        string           `orm:"null;" description:"(要检查的路径集合)"`
+	SearchHostId    string           `orm:"size(128)" description:"(任务搜索主机id)"`
 }
 
 type TaskLogInterface interface {
@@ -176,9 +177,22 @@ func (this *Task) Update() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
-
-	this.UpdateTime = time.Now().UnixNano()
-	_, err := o.Update(this)
+	task := new(Task)
+	cond := orm.NewCondition()
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	err := o.QueryTable(utils.Task).SetCond(cond).One(task)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.TaskNotExistErr
+		logs.Error("Update Task: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	task.UpdateTime = time.Now().UnixNano()
+	task.Status = this.Status
+	task.RunCount = this.RunCount
+	_, err = o.Update(task)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.EditTaskErr
@@ -215,7 +229,7 @@ func (this *Task) GetUnFinishedTaskList() Result {
 	cond := orm.NewCondition()
 
 	if this.Host != nil && this.Host.Id != "" {
-		cond = cond.And("host_id", this.Host.Id)
+		cond = cond.And("search_host_id", this.Host.Id)
 	}
 	cond = cond.AndCond(cond.And("status__in",
 		Task_Status_Created,

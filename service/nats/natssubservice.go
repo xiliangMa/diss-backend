@@ -629,7 +629,7 @@ func (this *NatsSubService) Save() error {
 				if result := task.GetUnFinishedTaskList(); result.Code != http.StatusOK {
 					metricsResult.Code = result.Code
 					metricsResult.Msg = result.Message
-					logs.Error("Nats ############################ Get un finished task list  fail, >>> HostId: %s, error: <<<", task.Host.Id, result.Message)
+					logs.Error("Nats ############################ Get task list  fail, >>> HostId: %s, error: <<<", task.Host.Id, result.Message)
 					return errors.New(result.Message)
 				} else {
 					metricsResult.Code = result.Code
@@ -639,12 +639,15 @@ func (this *NatsSubService) Save() error {
 						data := result.Data.(map[string]interface{})
 						total := data["total"]
 						if total != 0 {
-							logs.Info("Nats ############################  Get un finished task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, models.Resource_Task, total)
+							logs.Info("Nats ############################  Get task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, models.Resource_Task, total)
 						} else {
-							logs.Info("Nats ############################  Get un finished task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, models.Resource_Task, 0)
+							logs.Info("Nats ############################  Get task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, models.Resource_Task, 0)
 						}
 					}
+					logs.Error("===========", metricsResult)
+					this.ReceiveData(metricsResult)
 				}
+
 			case models.Resource_Control_Type_Put:
 				//更新任务状态
 				metricsResult := models.NatsData{Code: http.StatusOK, Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Put}

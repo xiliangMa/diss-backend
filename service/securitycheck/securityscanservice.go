@@ -223,18 +223,21 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 			task.SystemTemplate = this.DefaultTMP[models.TMP_Type_ContainerVS]
 			task.Description = taskpre + models.TMP_Type_ContainerVS
 			task.Container = securityCheck.Container
+			task.SearchHostId = securityCheck.Container.HostId
 		} else if this.SecurityCheckParams.Type == models.SC_Type_Host {
 			// 主机病毒
 			task.Host = securityCheck.Host
 			logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_HostVS, uid)
 			task.SystemTemplate = this.DefaultTMP[models.TMP_Type_HostVS]
 			task.Description = taskpre + models.TMP_Type_HostVS
+			task.SearchHostId = securityCheck.Host.Id
 		} else if this.SecurityCheckParams.Type == models.Sc_Type_Image {
-			// 主机病毒
+			// 镜像病毒
 			task.Image = securityCheck.Image
 			logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_ImageVS, uid)
 			task.SystemTemplate = this.DefaultTMP[models.TMP_Type_ImageVS]
 			task.Description = taskpre + models.TMP_Type_ImageVS
+			task.SearchHostId = securityCheck.Image.HostId
 		}
 
 		if task.SystemTemplate.DefaultPathList != "" {
@@ -249,24 +252,28 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		task.Description = taskpre + models.TMP_Type_BM_Docker
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_BM_Docker]
 		task.Host = securityCheck.Host
+		task.SearchHostId = securityCheck.Host.Id
 	} else if securityCheck.KubenetesCIS {
 		//基线-K8S
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_BM_K8S, uid)
 		task.Description = taskpre + models.TMP_Type_BM_K8S
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_BM_K8S]
 		task.Host = securityCheck.Host
+		task.SearchHostId = securityCheck.Host.Id
 	} else if securityCheck.HostImageVulnScan {
 		// 主机镜像扫描
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_HostImageVulnScan, uid)
 		task.Description = taskpre + models.TMP_Type_HostImageVulnScan
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_HostImageVulnScan]
 		task.Image = securityCheck.Image
+		task.SearchHostId = securityCheck.Image.HostId
 	} else if securityCheck.ImageVulnScan {
 		// 仓库镜像扫描
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_ImageVulnScan, uid)
 		task.Description = taskpre + models.TMP_Type_ImageVulnScan
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_ImageVulnScan]
 		task.Image = securityCheck.Image
+		task.SearchHostId = securityCheck.Image.HostId
 	} else if securityCheck.KubenetesScan {
 		//kubernetes 漏扫
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_KubernetesVulnScan, uid)
