@@ -235,7 +235,6 @@ func (this *Task) GetUnFinishedTaskList() Result {
 		Task_Status_Created,
 		Task_Status_Pending,
 		Task_Status_Running,
-		Task_Status_Removing,
 		Task_Status_Deliver_Failed,
 		Task_Status_Received,
 		Task_Status_Receive_Failed))
