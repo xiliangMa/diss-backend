@@ -36,7 +36,7 @@ func (this *Registry) Add() Result {
 	var err error
 
 	if r := this.Get(); r.Data != nil {
-		ResultData.Message = "Name or Url is already"
+		ResultData.Message = "Name is already"
 		ResultData.Code = utils.GetRegistryErr
 		logs.Error("Get Registry failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
@@ -72,10 +72,6 @@ func (this *Registry) Get() Result {
 
 	if this.Name != "" {
 		cond = cond.And("name", this.Name)
-	}
-
-	if this.Url != "" {
-		cond = cond.And("url", this.Url)
 	}
 
 	err := o.QueryTable(utils.Registry).SetCond(cond).RelatedSel().One(obj)

@@ -114,7 +114,7 @@ var (
 		repo_tags text default ''::text not null,
 		repo_digests text default ''::text not null,
 		os text default ''::text not null,
-		size integer default 0 not null,
+		size text default '' not null,
 		layers integer default 0 not null,
 		dockerfile text default ''::text not null,
 		create_time bigint default 0 not null,
