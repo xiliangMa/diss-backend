@@ -644,7 +644,6 @@ func (this *NatsSubService) Save() error {
 							logs.Info("Nats ############################  Get task list, >>> HostId: %s, Type: %s, task size:  %v <<<", task.Host.Id, models.Resource_Task, 0)
 						}
 					}
-					logs.Error("===========", metricsResult)
 					this.ReceiveData(metricsResult)
 				}
 
@@ -740,12 +739,7 @@ func (this *NatsSubService) Save() error {
 				if result := task.Delete(); result.Code != http.StatusOK {
 					metricsResult.Code = result.Code
 					metricsResult.Msg = result.Message
-					msg := ""
-					if task.Host == nil {
-						msg = fmt.Sprintf("Delete task fail, >>> HostName: %s, , task id: %s, error: %s <<<", task.Container.HostName, task.Id, result.Message)
-					} else {
-						msg = fmt.Sprintf("Delete task fail, >>> HostId: %s, , task id: %s, error: %s <<<", task.Host.Id, task.Id, result.Message)
-					}
+					msg := fmt.Sprintf("Delete task fail, >>> TaskId: %s, error: %s <<<", task.Id, result.Message)
 					logs.Error(msg)
 					taskRawInfo, _ := json.Marshal(task)
 					taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Error}
@@ -758,12 +752,7 @@ func (this *NatsSubService) Save() error {
 						jobService.SetJobDeactiveStatus()
 					}
 
-					msg := ""
-					if task.Host == nil {
-						msg = fmt.Sprintf("Delete task success, >>> HostName: %s, Type: %s, task id: %s<<<", task.Container.HostName, models.Resource_Task, task.Id)
-					} else {
-						msg = fmt.Sprintf("Delete task success, >>> HostId: %s, Type: %s, task id: %s<<<", task.Host.Id, models.Resource_Task, task.Id)
-					}
+					msg := fmt.Sprintf("Delete task success, >>> TaskId: %s<<<", models.Resource_Task, task.Id)
 					logs.Info(logTag + msg)
 					taskRawInfo, _ := json.Marshal(task)
 					taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Info}
@@ -867,8 +856,8 @@ func (this *NatsSubService) DeleteTask() error {
 	// 下发删除任务
 	subject := ""
 	// nats
-	if task.Host != nil {
-		subject = task.Host.Id
+	if task.SearchHostId != "" {
+		subject = task.SearchHostId
 	}
 	if task.Container != nil {
 		subject = task.Container.HostName
