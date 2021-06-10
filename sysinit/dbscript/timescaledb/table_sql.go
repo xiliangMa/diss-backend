@@ -11,8 +11,7 @@ var (
 	  "command" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
 	  "create_time" int8 NOT NULL DEFAULT 0,
 	  "type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT 'Host'::character varying
-	)
-	;
+	);
 	ALTER TABLE "public"."cmd_history" OWNER TO "diss";
 	
 	-- ----------------------------
@@ -34,8 +33,7 @@ var (
 	  "scope" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "time" int8 NOT NULL DEFAULT 0,
 	  "time_nano" int8 NOT NULL DEFAULT 0
-	)
-	;
+	);
 	ALTER TABLE "public"."docker_event" OWNER TO "diss";
 	
 	-- ----------------------------
@@ -50,8 +48,7 @@ var (
 	  "raw_log" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT 'null'::text,
 	  "model_type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "create_time" int8 NOT NULL DEFAULT 0
-	)
-	;
+	);
 	ALTER TABLE "public"."user_event" OWNER TO "diss";
 	
 	-- ----------------------------
@@ -114,7 +111,7 @@ var (
 		repo_tags text default ''::text not null,
 		repo_digests text default ''::text not null,
 		os text default ''::text not null,
-		size text default '' not null,
+		size text default ''::text not null,
 		layers integer default 0 not null,
 		dockerfile text default ''::text not null,
 		create_time bigint default 0 not null,
@@ -151,8 +148,7 @@ var (
 	  "raw_log" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
 	  "level" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT 'Info'::character varying,
 	  "create_time" int8 NOT NULL DEFAULT 0
-	)
-	;
+	);
 	ALTER TABLE "public"."task_log" OWNER TO "diss";
 	
 	-- ----------------------------
@@ -175,9 +171,10 @@ var (
 	  "update_time" int8 NOT NULL DEFAULT 0,
 	  "proposal" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
 	  "analysis" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
-	  "mode" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying
-	)
-	;
+	  "mode" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
+	  "container_id" varchar(256) default ''::text not null,
+      "container_name" text default ''::text not null
+	);
 	ALTER TABLE "public"."warning_info" OWNER TO "diss";
 	
 	-- ----------------------------
@@ -190,8 +187,7 @@ var (
 	  "name" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
 	  "type" varchar(32) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "host_id" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying
-	)
-	;
+	);
 	ALTER TABLE "public"."host_package" OWNER TO "diss";
 	
 	-- ----------------------------

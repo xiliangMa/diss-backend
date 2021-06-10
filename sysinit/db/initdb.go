@@ -62,7 +62,7 @@ func (this *DefaultDB) registerModel() {
 	// k8s
 	orm.RegisterModel(new(models.Cluster), new(models.NameSpace), new(models.Pod), new(models.Service),
 		new(models.Deployment), new(models.NetworkPolicy),
-		new(models.CmdHistory), new(models.WarningInfo), new(models.DockerEvent), new(models.TaskLog), new(models.HostPackage))
+		new(models.CmdHistory), new(models.DockerEvent), new(models.TaskLog), new(models.HostPackage))
 	// securitylog
 	orm.RegisterModel(new(models.BenchMarkLog))
 	// task
