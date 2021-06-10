@@ -30,8 +30,8 @@ type WarningInfo struct {
 	Proposal      string `orm:"size(256)" description:"(建议)"`
 	Analysis      string `orm:"size(256)" description:"(关联分析)"`
 	Mode          string `orm:"size(128)" description:"(方式)"`
-	ContainerId   string `orm:"-"`
-	ContainerName string `orm:"-"`
+	ContainerId   string `orm:"size(256)" description:"(容器id)"`
+	ContainerName string `orm:"size(256)" description:"(容器名称)"`
 	ImageName     string `orm:"-"`
 	Action        string `orm:"-" description:"(处理方式：isolation、pause、stop、kill)"`
 }
@@ -53,7 +53,7 @@ func (this *WarningInfo) List(from, limit int) Result {
 	sql := ` select * from ` + utils.WarningInfo + ` `
 	countSql := `select "count"(id) from ` + utils.WarningInfo + ` `
 	filter := ""
-	fields := []string{}
+	var fields []string
 	if this.Id != "" {
 		filter = filter + `id = ? and `
 		fields = append(fields, this.Id)
@@ -89,6 +89,12 @@ func (this *WarningInfo) List(from, limit int) Result {
 	if this.Level != "" {
 		filter = filter + `level = ? and `
 		fields = append(fields, this.Level)
+	}
+	if this.ContainerId != "" {
+		filter = filter + `container_id = '` + this.ContainerId + `' and `
+	}
+	if this.ContainerName != "" {
+		filter = filter + `container_name like '%` + this.ContainerName + `%' and `
 	}
 
 	if this.StartTime != 0 && this.EndTime != 0 {
@@ -134,7 +140,7 @@ func (this *WarningInfo) List(from, limit int) Result {
 }
 
 func (this *WarningInfo) Add() Result {
-	insertSql := `INSERT INTO ` + utils.WarningInfo + ` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`
+	insertSql := `INSERT INTO ` + utils.WarningInfo + ` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)`
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
@@ -163,7 +169,7 @@ func (this *WarningInfo) Add() Result {
 		this.CreateTime,
 		this.UpdateTime,
 		this.Proposal,
-		this.Analysis, this.Mode).Exec()
+		this.Analysis, this.Mode, this.ContainerId, this.ContainerName).Exec()
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
