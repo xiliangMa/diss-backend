@@ -8,23 +8,24 @@ import (
 )
 
 type ContainerConfig struct {
-	Id             string `orm:"pk;" description:"(id)"`
-	Name           string `orm:"" description:"(容器名)"`
-	NameSpaceName  string `orm:"" description:"(命名空间)"`
-	PodId          string `orm:"default(null)" description:"(pod id)"`
-	PodName        string `orm:"default(null)" description:"(pod 名)"`
-	HostName       string `orm:"" description:"(主机名)"`
-	HostId         string `orm:"" description:"(主机id)"`
-	AccountName    string `orm:"" description:"(租户)"`
-	ClusterName    string `orm:"" description:"(集群名)"`
-	SyncCheckPoint int64  `orm:"default(0);" description:"(同步检查点)"`
-	Status         string `orm:"default(null);" description:"(状态)"`
-	Command        string `orm:"default(null);" description:"(命令)"`
-	ImageName      string `orm:"default(null);" description:"(镜像名)"`
-	Age            string `orm:"null;" description:"(运行时长)"`
-	CreateTime     int64  `orm:"default(0);" description:"(创建时间);"`
-	UpdateTime     int64  `orm:"default(0);" description:"(更新时间);"`
-	Job            []*Job `orm:"rel(m2m);null;" description:"(job)"`
+	Id             string      `orm:"pk;" description:"(id)"`
+	Name           string      `orm:"" description:"(容器名)"`
+	NameSpaceName  string      `orm:"" description:"(命名空间)"`
+	PodId          string      `orm:"default(null)" description:"(pod id)"`
+	PodName        string      `orm:"default(null)" description:"(pod 名)"`
+	HostName       string      `orm:"" description:"(主机名)"`
+	HostId         string      `orm:"" description:"(主机id)"`
+	AccountName    string      `orm:"" description:"(租户)"`
+	ClusterName    string      `orm:"" description:"(集群名)"`
+	SyncCheckPoint int64       `orm:"default(0);" description:"(同步检查点)"`
+	Status         string      `orm:"default(null);" description:"(状态)"`
+	Command        string      `orm:"default(null);" description:"(命令)"`
+	ImageName      string      `orm:"default(null);" description:"(镜像名)"`
+	Age            string      `orm:"null;" description:"(运行时长)"`
+	CreateTime     int64       `orm:"default(0);" description:"(创建时间);"`
+	UpdateTime     int64       `orm:"default(0);" description:"(更新时间);"`
+	Job            []*Job      `orm:"rel(m2m);null;" description:"(job)"`
+	HostConfig     *HostConfig `orm:"rel(fk);null;" description:"(主机列表)"`
 }
 
 type ContainerConfigInterface interface {
@@ -108,7 +109,6 @@ func (this *ContainerConfig) List(from, limit int, groupSearch bool) Result {
 			cond = cond.AndCond(cond.And("status__contains", "Up").Or("status", Pod_Container_Statue_Running).Or("status", Pod_Container_Statue_Terminated))
 		case Container_Status_Pause:
 			cond = cond.AndNotCond(cond.And("status__contains", "Up").Or("status", Pod_Container_Statue_Running).Or("status", Pod_Container_Statue_Terminated))
-
 		}
 	}
 
@@ -169,7 +169,11 @@ func (this *ContainerConfig) Update() Result {
 func (this *ContainerConfig) Count() int64 {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	count, _ := o.QueryTable(utils.ContainerConfig).Count()
+	cond := orm.NewCondition()
+	if this.Status != "" {
+		cond = cond.And("status", this.Status)
+	}
+	count, _ := o.QueryTable(utils.ContainerConfig).SetCond(cond).Count()
 	return count
 }
 

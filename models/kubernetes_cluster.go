@@ -293,6 +293,10 @@ func (this *Cluster) Delete() Result {
 func (this *Cluster) Count() int64 {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	count, _ := o.QueryTable(utils.Cluster).Count()
+	cond := orm.NewCondition()
+	if this.Status != "" {
+		cond = cond.And("status", this.Status)
+	}
+	count, _ := o.QueryTable(utils.Cluster).SetCond(cond).Count()
 	return count
 }

@@ -14,19 +14,55 @@ type StatisticsService struct {
 func (this *StatisticsService) GetAssetStatistics() models.Result {
 	var ResultData models.Result
 	data := make(map[string]interface{})
-	data["ContainerCount"] = 0
-	data["HostCount"] = 0
-	data["ClusterCount"] = 0
 
 	//主机数
 	hostConfig := new(models.HostConfig)
-	data["HostCount"] = hostConfig.Count()
+	hc := make(map[string]int64)
+	hc["HostCount"] = hostConfig.Count()
+	hostConfig.Status = models.Host_Status_Normal
+	hc[models.Host_Status_Normal] = hostConfig.Count()
+	hostConfig.Status = models.Host_Status_Abnormal
+	hc[models.Host_Status_Abnormal] = hostConfig.Count()
+	data["HostConfig"] = hc
+
 	//容器数
 	containerConfig := new(models.ContainerConfig)
-	data["ContainerCount"] = containerConfig.Count()
+	cc := make(map[string]int64)
+	cc["ContainerCount"] = containerConfig.Count()
+	containerConfig.Status = "created"
+	cc["Created"] = containerConfig.Count()
+	containerConfig.Status = "running"
+	cc["Running"] = containerConfig.Count()
+	containerConfig.Status = "exited"
+	cc["Exited"] = containerConfig.Count()
+	data["ContainerConfig"] = cc
+
+	//镜像仓库
+	registry := new(models.Registry)
+	r := make(map[string]int64)
+	r["RegistryCount"] = registry.Count()
+	data["Registry"] = r
+
+	//镜像
+	imageConfig := new(models.ImageConfig)
+	ic := make(map[string]int64)
+	imageConfig.Type = models.All
+	ic["ImageCount"] = imageConfig.Count()
+	imageConfig.Type = "host"
+	ic["HostImage"] = imageConfig.Count()
+	imageConfig.Type = ""
+	ic["RegistryImage"] = imageConfig.Count()
+	data["ImageConfig"] = ic
+
 	//集群数
 	cluster := new(models.Cluster)
-	data["ClusterCount"] = cluster.Count()
+	cmap := make(map[string]int64)
+	cmap["ClusterCount"] = cluster.Count()
+	cluster.Status = models.Cluster_Status_Active
+	cmap[models.Cluster_Status_Active] = cluster.Count()
+	cluster.Status = models.Cluster_Status_Unavailable
+	cmap[models.Cluster_Status_Unavailable] = cluster.Count()
+	data["Cluster"] = cmap
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
