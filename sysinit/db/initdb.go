@@ -78,7 +78,7 @@ func (this *DefaultDB) registerModel() {
 	// trivy
 	orm.RegisterModel(new(models.ImageVulnerabilities), new(models.Vulnerabilities), new(models.Registry))
 	// kube-hunter
-	orm.RegisterModel(new(models.KubeScan), new(models.KubeVulnerabilities), new(models.VulnerabilityLib))
+	orm.RegisterModel(new(models.KubeScan), new(models.KubeVulnerabilities), new(models.VulnerabilityLib), new(models.DockerVulnerabilities))
 }
 
 func (this *DefaultDB) InitSystemData() {
@@ -133,6 +133,11 @@ func (this *DefaultDB) InitSystemData() {
 		logs.Error("Init DefaultKubeVulnScanSql fail, err: %s", err)
 	}
 
+	_, err = o.Raw(dbscript.DefaultDockerVulnScanSql).Exec()
+	if err != nil {
+		logs.Error("Init DefaultDockerVulnScanSql fail, err: %s", err)
+	}
+
 	_, err = o.Raw(dbscript.DefaultImageVirusScanSql).Exec()
 	if err != nil {
 		logs.Error("Init DefaultImageVirusScanSql fail, err: %s", err)
@@ -180,6 +185,11 @@ func (this *DefaultDB) InitSystemData() {
 	_, err = o.Raw(dbscript.DefaultKubeVlunScanJobSql).Exec()
 	if err != nil {
 		logs.Error("Init DefaultKubeVlunScanJobSql Job fail, err: %s", err)
+	}
+
+	_, err = o.Raw(dbscript.DefaultDockerVlunScanJobSql).Exec()
+	if err != nil {
+		logs.Error("Init DefaultDockerVlunScanJobSql Job fail, err: %s", err)
 	}
 
 	_, err = o.Raw(dbscript.WarningInfoConfig).Exec()

@@ -65,6 +65,15 @@ func (this *SecurityScanService) PrePare() {
 				}
 				this.PrePareTask(&securityCheck)
 			}
+			if this.SecurityCheckParams.DockerScan {
+				securityCheck := models.SecurityCheck{
+					DockerScan: this.SecurityCheckParams.DockerScan,
+					Host:       host,
+					Type:       models.SC_Type_Host,
+					Job:        this.Job,
+				}
+				this.PrePareTask(&securityCheck)
+			}
 			if this.SecurityCheckParams.VirusScan {
 				securityCheck := models.SecurityCheck{
 					VirusScan: this.SecurityCheckParams.VirusScan,
@@ -162,6 +171,7 @@ func (this *SecurityScanService) PrePareTask(securityCheck *models.SecurityCheck
 	Job_Type_HostImageVulnScan := this.DefaultJob[models.TMP_Type_HostImageVulnScan]
 	Job_Type_ImageScan := this.DefaultJob[models.TMP_Type_ImageVulnScan]
 	Job_Type_KubeScan := this.DefaultJob[models.TMP_Type_KubernetesVulnScan]
+	Job_Type_DockerScan := this.DefaultJob[models.TMP_Type_DockerVulnScan]
 
 	// 默认模板
 
@@ -197,6 +207,10 @@ func (this *SecurityScanService) PrePareTask(securityCheck *models.SecurityCheck
 		// 集群漏扫
 		if securityCheck.KubenetesScan {
 			securityCheck.Job = Job_Type_KubeScan
+		}
+		// Docker漏扫
+		if securityCheck.DockerScan {
+			securityCheck.Job = Job_Type_DockerScan
 		}
 	}
 
@@ -280,6 +294,12 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		task.Description = taskpre + models.TMP_Type_KubernetesVulnScan
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_KubernetesVulnScan]
 		task.ClusterOBJ = securityCheck.Cluster
+	} else if securityCheck.DockerScan {
+		//kubernetes 漏扫
+		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_DockerVulnScan, uid)
+		task.Description = taskpre + models.TMP_Type_DockerVulnScan
+		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_DockerVulnScan]
+		task.Host = securityCheck.Host
 	}
 
 	if securityCheck.Job.Type == "" {

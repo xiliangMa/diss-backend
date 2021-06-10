@@ -129,6 +129,9 @@ var (
 	GetNamespacesErr                = 134
 	ImportImageErr                  = 135
 	DeleteImageDetailErr            = 136
+	AddDockerVulnErr                = 137
+	GetDockerVulnErr                = 138
+	DeleteDockerVulnErr             = 139
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001

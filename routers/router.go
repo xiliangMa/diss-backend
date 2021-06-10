@@ -78,6 +78,7 @@ func init() {
 				&csecuritylog.VulnerabilitiesLogController{},
 				&csecuritylog.WarningInfoController{},
 				&csecuritylog.KubeScanController{},
+				&csecuritylog.DockerScanController{},
 				&csecuritylog.SensitiveInfoController{},
 			),
 		),

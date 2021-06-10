@@ -83,6 +83,7 @@ var (
 	TMP_Type_ImageVulnScan      = "ImageVulnScan"
 	TMP_Type_HostImageVulnScan  = "HostImageVulnScan"
 	TMP_Type_KubernetesVulnScan = "KubernetesVulnScan"
+	TMP_Type_DockerVulnScan     = "DockerVulnScan"
 	//基线扫描：
 	TMP_Type_BM_Docker = "DockerBenchMark"
 	TMP_Type_BM_K8S    = "KubernetesBenchMark"
