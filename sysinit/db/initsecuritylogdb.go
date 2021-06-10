@@ -52,63 +52,24 @@ func (this *SecurityLogDb) CreateOrUpdateDb() {
 	o.Using(dbName)
 	logs.Info("Create Or Update Db: %s data start................", dbName)
 
-	logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", utils.CmdHistory)
-	_, err := o.Raw(timescaledb.Tab_Create_CmdHistory).Exec()
-	if err != nil {
-		logs.Error("Create tab Table: %s fail, err: %s ", utils.CmdHistory, err)
-	}
+	table := make(map[string]string)
+	table[utils.CmdHistory] = timescaledb.Tab_Create_CmdHistory
+	table[utils.DockerEvent] = timescaledb.Tab_Create_DockerEvent
+	table[utils.UserEvent] = timescaledb.Tab_Create_UserEvent
+	table[utils.TaskLog] = timescaledb.Tab_Create_TaskLog
+	table[utils.VirusScan] = timescaledb.Tab_Create_VirusScan
+	table[utils.VirusRecord] = timescaledb.Tab_Create_VirusRecord
+	table[utils.ImageDetail] = timescaledb.Tab_Create_ImageDetail
+	table[utils.SensitiveInfo] = timescaledb.Tab_Create_SensitiveInfo
+	table[utils.WarningInfo] = timescaledb.Tab_Create_WarningInfo
+	table[utils.HostPackage] = timescaledb.Tab_Create_HostPackage
 
-	logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", utils.DockerEvent)
-	_, err = o.Raw(timescaledb.Tab_Create_DockerEvent).Exec()
-	if err != nil {
-		logs.Error("Create tab Table: %s fail, err: %s ", utils.DockerEvent, err)
-	}
-
-	logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", utils.UserEvent)
-	_, err = o.Raw(timescaledb.Tab_Create_UserEvent).Exec()
-	if err != nil {
-		logs.Error("Create tab Table: %s fail, err: %s ", utils.UserEvent, err)
-	}
-
-	logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", utils.TaskLog)
-	_, err = o.Raw(timescaledb.Tab_Create_TaskLog).Exec()
-	if err != nil {
-		logs.Error("Create tab Table: %s fail, err: %s ", utils.TaskLog, err)
-	}
-
-	logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", utils.VirusScan)
-	_, err = o.Raw(timescaledb.Tab_Create_VirusScan).Exec()
-	if err != nil {
-		logs.Error("Create tab Table: %s fail, err: %s ", utils.VirusScan, err)
-	}
-
-	logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", utils.VirusRecord)
-	_, err = o.Raw(timescaledb.Tab_Create_VirusRecord).Exec()
-	if err != nil {
-		logs.Error("Create tab Table: %s fail, err: %s ", utils.VirusRecord, err)
-	}
-
-	logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", utils.ImageDetail)
-	_, err = o.Raw(timescaledb.Tab_Create_ImageDetail).Exec()
-	if err != nil {
-		logs.Error("Create tab Table: %s fail, err: %s ", utils.ImageDetail, err)
-	}
-
-	logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", utils.SensitiveInfo)
-	_, err = o.Raw(timescaledb.Tab_Create_SensitiveInfo).Exec()
-	if err != nil {
-		logs.Error("Create tab Table: %s fail, err: %s ", utils.SensitiveInfo, err)
-	}
-
-	logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", utils.WarningInfo)
-	_, err = o.Raw(timescaledb.Tab_Create_WarningInfo).Exec()
-	if err != nil {
-		logs.Error("Create tab Table: %s fail, err: %s ", utils.WarningInfo, err)
-	}
-
-	logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", utils.HostPackage)
-	_, err = o.Raw(timescaledb.Tab_Create_HostPackage).Exec()
-	if err != nil {
-		logs.Error("Create tab Table: %s fail, err: %s ", utils.HostPackage, err)
+	for k, v := range table {
+		logs.Info("Create tab Table: %s >>>>>>>>>>>>>>>>", k)
+		sql := utils.InitTable(k, v)
+		_, err := o.Raw(sql).Exec()
+		if err != nil {
+			logs.Error("Create tab Table: %s fail, err: %s ", k, err)
+		}
 	}
 }

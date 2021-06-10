@@ -290,3 +290,20 @@ func FormatFileSize(fileSize int64) (size string) {
 		return fmt.Sprintf("%.1fEB", float64(fileSize)/float64(1024*1024*1024*1024*1024))
 	}
 }
+
+func InitTable(table string, sql string) (pre string) {
+	pre = `DO
+		$$
+		DECLARE
+			tableName varchar :='` + table + `';
+		BEGIN
+		IF NOT EXISTS (SELECT * FROM information_schema.columns WHERE table_name=tableName) THEN
+		` + sql + `
+		RAISE NOTICE 'Create Table % %', tableName, 'Success';
+		ELSE
+		RAISE NOTICE 'Already exists';
+		END IF;
+		END
+		$$`
+	return pre
+}
