@@ -282,3 +282,19 @@ func (this *ImageConfig) GetDBImageByType() Result {
 	}
 	return ResultData
 }
+
+func (this *ImageConfig) Count() int64 {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	cond := orm.NewCondition()
+	if this.Type != All {
+		if this.Type != "" {
+			cond = cond.And("registry_id__isnull", true)
+		} else {
+			cond = cond.And("registry_id__isnull", false)
+		}
+	}
+	count, _ := o.QueryTable(utils.ImageConfig).SetCond(cond).Count()
+	return count
+
+}

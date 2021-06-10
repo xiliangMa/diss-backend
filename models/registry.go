@@ -149,3 +149,10 @@ func (this *Registry) Delete() Result {
 	ResultData.Code = http.StatusOK
 	return ResultData
 }
+
+func (this *Registry) Count() int64 {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	count, _ := o.QueryTable(utils.Registry).Count()
+	return count
+}

@@ -43,6 +43,8 @@ type HostConfig struct {
 	KubeCISUpdateTime   int64     `orm:"default(0)" description:"(k8s基线更新时间)"`
 	IsLicensed          bool      `orm:"default(false);" description:"(是否已经授权)"`
 	LicCount            bool      `orm:"-" description:"(是否获取授权个数操作)"`
+	CreateTime          int64     `orm:"default(0)" description:"(上线时间)"`
+	OfflineTime         int64     `orm:"default(0)" description:"(离线时间)"`
 }
 
 type HostConfigInterface interface {
@@ -107,19 +109,19 @@ func (this *HostConfig) Add() error {
 func (this *HostConfig) Get() *HostConfig {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	HostConfig := new(HostConfig)
+	hostConfig := new(HostConfig)
 	var err error
 	cond := orm.NewCondition()
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
 
-	err = o.QueryTable(utils.HostConfig).SetCond(cond).RelatedSel().One(HostConfig)
+	err = o.QueryTable(utils.HostConfig).SetCond(cond).RelatedSel().One(hostConfig)
 	if err != nil {
 		logs.Error("GetHostConfig failed, code: %d, err: %s", err.Error(), utils.GetHostConfigErr)
 		return nil
 	}
-	return HostConfig
+	return hostConfig
 }
 
 func (this *HostConfig) List(from, limit int) Result {
@@ -165,6 +167,15 @@ func (this *HostConfig) BaseList(from, limit int) (error, int64, []*HostConfig) 
 	if this.HostName != "" {
 		cond = cond.And("host_name__contains", this.HostName)
 	}
+	if this.PublicAddr != "" {
+		cond = cond.And("public_addr__contains", this.PublicAddr)
+	}
+	if this.InternalAddr != "" {
+		cond = cond.And("internal_addr__contains", this.InternalAddr)
+	}
+	if this.HostName != "" {
+		cond = cond.And("host_name__contains", this.HostName)
+	}
 	if this.AccountName != "" && this.AccountName != Account_Admin {
 		cond = cond.And("account_name", this.AccountName)
 	}
@@ -173,6 +184,12 @@ func (this *HostConfig) BaseList(from, limit int) (error, int64, []*HostConfig) 
 	}
 	if this.ClusterName != "" {
 		cond = cond.And("cluster_name", this.ClusterName)
+	}
+	if this.Status != "" {
+		cond = cond.And("status", this.Status)
+	}
+	if this.IsLicensed {
+		cond = cond.And("is_licensed", this.IsLicensed)
 	}
 	if this.LicCount {
 		cond = cond.And("is_licensed", true)
@@ -242,6 +259,10 @@ func (this *HostConfig) Count() int64 {
 	}
 	if this.LicCount {
 		cond = cond.And("IsLicensed", true)
+	}
+
+	if this.Status != "" {
+		cond = cond.And("status", this.Status)
 	}
 	count, _ := o.QueryTable(utils.HostConfig).SetCond(cond).Count()
 	return count
