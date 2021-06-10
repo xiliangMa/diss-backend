@@ -39,6 +39,7 @@ var (
 	KubeVulnerabilities  = "kube_vulnerabilities"
 	RuleDefine           = "rule_define"
 	Registry             = "registry"
+	VulnerabiltyLib      = "vulnerability_lib"
 
 	//security_log timescaledb
 	DcokerIds     = "docker_ids"

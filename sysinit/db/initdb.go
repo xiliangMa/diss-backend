@@ -78,7 +78,7 @@ func (this *DefaultDB) registerModel() {
 	// trivy
 	orm.RegisterModel(new(models.ImageVulnerabilities), new(models.Vulnerabilities), new(models.Registry))
 	// kube-hunter
-	orm.RegisterModel(new(models.KubeScan), new(models.KubeVulnerabilities))
+	orm.RegisterModel(new(models.KubeScan), new(models.KubeVulnerabilities), new(models.VulnerabilityLib))
 }
 
 func (this *DefaultDB) InitSystemData() {

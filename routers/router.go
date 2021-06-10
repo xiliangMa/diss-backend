@@ -175,6 +175,7 @@ func init() {
 		beego.NSNamespace("/v1/securitycheck",
 			beego.NSInclude(
 				&csecuritycheck.SecurityCheckController{},
+				&csecuritycheck.SecurityLibController{},
 			),
 		),
 	)
