@@ -31,6 +31,7 @@ func (this *SystemController) UploadLogo() {
 	if result.Code != http.StatusOK {
 		logs.Error("Upload logo  fail, err: %s", result.Message)
 	} else {
+		logoService.SaveDefaultLogo(fpath)
 		err := this.SaveToFile(key, fpath)
 		if err != nil {
 			result.Code = utils.UploadLogoErr
@@ -40,6 +41,18 @@ func (this *SystemController) UploadLogo() {
 			result.Code = http.StatusOK
 		}
 	}
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
+// @Title Restore Default Logo
+// @Description Restore Default Logo
+// @Param token header string true "authToken"
+// @Success 200 {object} models.Result
+// @router /system/logo/restore [get]
+func (this *SystemController) RestoreDefaultLogo() {
+	logoService := new(css.LogoService)
+	result := logoService.RestoreLogo()
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }
@@ -220,13 +233,16 @@ func (this *SystemController) ImportWhiteList() {
 func (this *SystemController) AddRuleDefine() {
 	ruleDefine := new(models.RuleDefine)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &ruleDefine)
-	this.Data["json"] = ruleDefine.Add()
 
-	natsManager := models.Nats
-	natsPubService := nats.NatsPubService{Conn: natsManager.Conn}
-	natsPubService.Type = ruleDefine.Type
-	natsPubService.RuleDefinePub()
+	result := ruleDefine.Add()
+	if result.Code == http.StatusOK {
+		natsManager := models.Nats
+		natsPubService := nats.NatsPubService{Conn: natsManager.Conn}
+		natsPubService.Type = ruleDefine.Type
+		natsPubService.RuleDefinePub()
+	}
 
+	this.Data["json"] = result
 	this.ServeJSON(false)
 }
 
@@ -242,12 +258,14 @@ func (this *SystemController) UpdateRuleDefine() {
 	ruleDefine := new(models.RuleDefine)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &ruleDefine)
 	ruleDefine.Id = id
-	result := ruleDefine.Update()
 
-	natsManager := models.Nats
-	natsPubService := nats.NatsPubService{Conn: natsManager.Conn}
-	natsPubService.Type = ruleDefine.Type
-	natsPubService.RuleDefinePub()
+	result := ruleDefine.Update()
+	if result.Code == http.StatusOK {
+		natsManager := models.Nats
+		natsPubService := nats.NatsPubService{Conn: natsManager.Conn}
+		natsPubService.Type = ruleDefine.Type
+		natsPubService.RuleDefinePub()
+	}
 
 	this.Data["json"] = result
 	this.ServeJSON(false)

@@ -38,13 +38,13 @@ func (this *LogoService) Check(h *multipart.FileHeader) (models.Result, string) 
 		return result, fpath
 	}
 
-	fpath = fpath + beego.AppConfig.String("system::NewLogoName")
+	fpath = fpath + utils.GetLogoName()
 	result.Code = http.StatusOK
 	return result, fpath
 }
 
 func (this *LogoService) CheckLogoIsExist() models.Result {
-	newLogoPath := utils.GetLogoPath() + beego.AppConfig.String("system::NewLogoName")
+	newLogoPath := utils.GetLogoPath() + utils.GetLogoName()
 	var result models.Result
 	if _, err := os.Stat(newLogoPath); err != nil {
 		result.Code = utils.CheckLogoIsNotExistErr
@@ -52,8 +52,33 @@ func (this *LogoService) CheckLogoIsExist() models.Result {
 		return result
 	}
 	data := make(map[string]string)
-	data["url"] = "http://ip:port/" + beego.AppConfig.String("system::LogoUrl")
+	data["url"] = "http://ip:port/" + utils.GetLogoUrl()
 	result.Data = data
+	result.Code = http.StatusOK
+	return result
+}
+
+func (this *LogoService) SaveDefaultLogo(path string) {
+	defaultLogoPath := utils.GetLogoPath() + utils.GetDefaultLogoName()
+	if _, err := os.Stat(defaultLogoPath); err != nil {
+		fileService := base.FileService{}
+		_, _ = fileService.CopyFile(path, defaultLogoPath)
+	}
+}
+
+func (this *LogoService) RestoreLogo() models.Result {
+	defaultLogoPath := utils.GetLogoPath() + utils.GetDefaultLogoName()
+	newLogoPath := utils.GetLogoPath() + utils.GetLogoName()
+	var result models.Result
+	if _, err := os.Stat(defaultLogoPath); err != nil {
+		result.Code = utils.RestoreDefaultLogoErr
+		result.Message = "RestoreDefaultLogoErr"
+		return result
+
+	} else {
+		fileService := base.FileService{}
+		_, _ = fileService.CopyFile(defaultLogoPath, newLogoPath)
+	}
 	result.Code = http.StatusOK
 	return result
 }

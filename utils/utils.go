@@ -236,6 +236,10 @@ func GetLogoName() string {
 	return beego.AppConfig.String("system::NewLogoName")
 }
 
+func GetDefaultLogoName() string {
+	return beego.AppConfig.String("system::DefaultLogoName")
+}
+
 func GetLogoUrl() string {
 	return beego.AppConfig.String("system::LogoUrl")
 }
