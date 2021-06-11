@@ -33,18 +33,19 @@ type KubeScan struct {
 //}
 
 type KubeVulnerabilities struct {
-	Id            int       `orm:"pk;auto" description:"(Id)"`
-	Location      string    `orm:"" description:"(POD、服务、IP)"`
-	Vid           string    `orm:"size(32)" description:"(漏洞ID)"`
-	Category      string    `orm:"size(128)" description:"(类别)"`
-	Severity      string    `orm:"size(32)" description:"(级别)"`
-	Vulnerability string    `orm:"size(128)" description:"(漏洞名)"`
-	Description   string    `orm:"" description:"(漏洞描述)"`
-	Evidence      string    `orm:"" description:"(证据)"`
-	AvdReference  string    `orm:"" description:"(参考)" json:"avd_reference"`
-	Hunter        string    `orm:"size(64)" description:"(扫描组件)"`
-	KubeVuln      *KubeScan `orm:"rel(fk);null" description:"(集群扫描记录)"`
-	CreateTime    int64     `orm:"default(0)" description:"(创建时间)"`
+	Id               int               `orm:"pk;auto" description:"(Id)"`
+	Location         string            `orm:"" description:"(POD、服务、IP)"`
+	Vid              string            `orm:"size(32)" description:"(漏洞ID)"`
+	Category         string            `orm:"size(128)" description:"(类别)"`
+	Severity         string            `orm:"size(32)" description:"(级别)"`
+	Vulnerability    string            `orm:"size(128)" description:"(漏洞名)"`
+	Description      string            `orm:"" description:"(漏洞描述)"`
+	Evidence         string            `orm:"" description:"(证据)"`
+	AvdReference     string            `orm:"" description:"(参考)" json:"avd_reference"`
+	Hunter           string            `orm:"size(64)" description:"(扫描组件)"`
+	KubeVuln         *KubeScan         `orm:"rel(fk);null" description:"(集群扫描记录)"`
+	CreateTime       int64             `orm:"default(0)" description:"(创建时间)"`
+	VulnerabilityLib *VulnerabilityLib `orm:"rel(one);null" description:"(漏洞库数据)"`
 }
 
 type KubeScanInterface interface {
@@ -76,6 +77,13 @@ func (this *KubeScan) Add() Result {
 		kubeVuln.KubeVuln = this
 		if !strings.Contains(kubeVuln.Location, Prefix_Kube_Scan) {
 			kubeVuln.CreateTime = createTime
+			vulnerLibQuery := VulnerabilityLib{}
+			vulnerLibQuery.VId = kubeVuln.Vid
+			vulnerLibData, _ := vulnerLibQuery.Get()
+			if vulnerLibData != nil {
+				kubeVuln.VulnerabilityLib = vulnerLibData
+			}
+
 			kubeVuln.Add()
 		}
 	}
@@ -113,17 +121,13 @@ func (this *KubeScan) List(from, limit int) Result {
 		return ResultData
 	}
 
-	if this.Severity != "" {
-		for _, kubeScan := range KubeScanList {
-			cond2 := orm.NewCondition()
-			cond2 = cond2.And("kube_vuln_id", kubeScan.Id)
+	for _, kubeScan := range KubeScanList {
+		cond2 := orm.NewCondition()
+		cond2 = cond2.And("kube_vuln_id", kubeScan.Id)
+		if this.Severity != "" {
 			cond2 = cond2.And("severity", this.Severity)
-			_, err = o.QueryTable(utils.KubeVulnerabilities).SetCond(cond2).Limit(limit, from).All(&kubeScan.Vulnerabilities)
 		}
-	} else {
-		for _, kubeScan := range KubeScanList {
-			o.LoadRelated(kubeScan, "Vulnerabilities", true)
-		}
+		_, err = o.QueryTable(utils.KubeVulnerabilities).SetCond(cond2).Limit(0, 0).All(&kubeScan.Vulnerabilities)
 	}
 
 	if err != nil {
