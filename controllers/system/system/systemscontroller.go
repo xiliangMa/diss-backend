@@ -31,6 +31,7 @@ func (this *SystemController) UploadLogo() {
 	if result.Code != http.StatusOK {
 		logs.Error("Upload logo  fail, err: %s", result.Message)
 	} else {
+		logoService.SaveDefaultLogo(fpath)
 		err := this.SaveToFile(key, fpath)
 		if err != nil {
 			result.Code = utils.UploadLogoErr
@@ -40,6 +41,18 @@ func (this *SystemController) UploadLogo() {
 			result.Code = http.StatusOK
 		}
 	}
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
+// @Title Restore Default Logo
+// @Description Restore Default Logo
+// @Param token header string true "authToken"
+// @Success 200 {object} models.Result
+// @router /system/logo/restore [get]
+func (this *SystemController) RestoreDefaultLogo() {
+	logoService := new(css.LogoService)
+	result := logoService.RestoreLogo()
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }

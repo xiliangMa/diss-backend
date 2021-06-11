@@ -247,6 +247,7 @@ var (
 	EditVulnerabilityLibErr         = 1259
 	GetVulnerabilityLibErr          = 1260
 	DeleteVulnerabilityLibErr       = 1261
+	RestoreDefaultLogoErr           = 1262
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300
