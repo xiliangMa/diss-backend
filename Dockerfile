@@ -1,4 +1,4 @@
-FROM golang:1.12 as builder
+FROM golang:1.15 as builder
 MAINTAINER xiliangMa "xiliangMa@outlook.com"
 EXPOSE 8080
 EXPOSE 8088
