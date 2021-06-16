@@ -38,7 +38,7 @@ var (
 	WarningWhiteListConfig  = `DO $do$ BEGIN IF NOT EXISTS (SELECT from sys_config WHERE id='CDAE8EA6-FCFA-4981-B764-D2E1C98818B7') THEN INSERT INTO public.sys_config (id, key, value) VALUES ('CDAE8EA6-FCFA-4981-B764-D2E1C98818B7', 'WarnWhiteList', '{"Enable":true}'); END IF; END $do$;`
 
 	// default rules
-	DefaultSensitiveRule1 = `DO $do$ BEGIN IF NOT EXISTS (SELECT from rule_define WHERE id=1) THEN IINSERT INTO public.rule_define (id, type, name, code, "desc", info, level, enabled, source_info, create_time, update_time, risk_level) VALUES (1, 'SensitiveRule', 'AWS_SECRET_KEY', 'AWS_SECRET_KEY', '', '{"part":"contents","regex":"(?i)(aws_access_key_id|aws_secret_access_key)(.{0,20})?=.[0-9a-zA-Z/+]{20,40}","name":"AWS_SECRET_KEY"}', 1, 1, '', 1623078545998623000, 0, ''); END IF; END $do$;`
+	DefaultSensitiveRule1 = `DO $do$ BEGIN IF NOT EXISTS (SELECT from rule_define WHERE id=1) THEN INSERT INTO public.rule_define (id, type, name, code, "desc", info, level, enabled, source_info, create_time, update_time, risk_level) VALUES (1, 'SensitiveRule', 'AWS_SECRET_KEY', 'AWS_SECRET_KEY', '', '{"part":"contents","regex":"(?i)(aws_access_key_id|aws_secret_access_key)(.{0,20})?=.[0-9a-zA-Z/+]{20,40}","name":"AWS_SECRET_KEY"}', 1, 1, '', 1623078545998623000, 0, ''); END IF; END $do$;`
 
 	DefaultSensitiveRule2 = `DO $do$ BEGIN IF NOT EXISTS (SELECT from rule_define WHERE id=2) THEN INSERT INTO public.rule_define (id, type, name, code, "desc", info, level, enabled, source_info, create_time, update_time, risk_level) VALUES (2, 'SensitiveRule', 'PRIV_KEY', 'PRIV_KEY', '', '{"part":"contents","regex":"(?i)-+BEGIN(.*)PRIVATE KEY-+","name":"PRIV_KEY"}', 1, 1, '', 1623078667090320000, 0, ''); END IF; END $do$;`
 
