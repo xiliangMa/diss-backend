@@ -19,7 +19,7 @@ type DockerEventController struct {
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result
 // @router /dockerevents [post]
-func (this *DockerEventController) GetCmdHistorys() {
+func (this *DockerEventController) GetDockerEvents() {
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 

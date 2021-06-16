@@ -108,7 +108,7 @@ func (this *CmdHistory) List(from, limit int) Result {
 	if this.ContainerId != "" {
 		filter = filter + `container_id = '` + this.ContainerId + `' and `
 	}
-	if this.ContainerId != "" {
+	if this.ContainerName != "" {
 		filter = filter + `container_name like '%` + this.ContainerName + `%' and `
 	}
 	if this.Command != "" {
@@ -142,8 +142,8 @@ func (this *CmdHistory) List(from, limit int) Result {
 
 	o.Raw(countSql).QueryRow(&total)
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = cmdHistoryList
+	data[Result_Total] = total
+	data[Result_Items] = cmdHistoryList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
