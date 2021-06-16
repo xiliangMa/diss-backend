@@ -160,7 +160,7 @@ func (this *LicenseConfig) Add() Result {
 	licmodules := this.Modules
 	for _, licmodule := range licmodules {
 		uuidmodule, _ := uuid.NewV4()
-		tmplicmodule := LicenseModule{Id: uuidmodule.String(), LicenseConfig: this, LicenseCount: licmodule.LicenseCount, LicenseExpireAt: licmodule.LicenseExpireAt, ModuleCode: licmodule.ModuleCode}
+		tmplicmodule := LicenseModule{Id: uuidmodule.String(), LicenseConfig: this, LicenseCount: licmodule.LicenseCount, IsLicensedCount: licmodule.IsLicensedCount, LicenseExpireAt: licmodule.LicenseExpireAt, ModuleCode: licmodule.ModuleCode}
 		ResultData = tmplicmodule.Add()
 		if ResultData.Code != http.StatusOK && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 			logs.Warn("Add license Modules fail, code %s, error: %s ", ResultData.Code, ResultData.Message)
