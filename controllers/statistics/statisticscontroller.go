@@ -11,7 +11,7 @@ type StatisticsController struct {
 }
 
 // @Title GetAssetStatistics
-// @Description Get Asset Statistics (资产概况：主机数、容器数、镜像仓库、镜像、集群数)
+// @Description Get Asset Statistics (资产概况：主机数、容器数、镜像仓库、镜像、集群数、Pod)
 // @Param token header string true "authToken"
 // @Success 200 {object} models.Result
 // @router /asset [get]

@@ -20,6 +20,7 @@ type Pod struct {
 	KMetaData      string `orm:"" description:"(源数据)"`
 	KSpec          string `orm:"" description:"(Spec数据)"`
 	KStatus        string `orm:"" description:"(状态数据)"`
+	Status         string `orm:"" description:"(状态)"`
 }
 
 type PodInterface interface {
@@ -28,6 +29,7 @@ type PodInterface interface {
 	Update() Result
 	List(from, limit int) Result
 	EmptyDirtyData() error
+	Count() int64
 }
 
 func (this *Pod) Add() Result {
@@ -160,4 +162,15 @@ func (this *Pod) Delete() Result {
 	}
 	ResultData.Code = http.StatusOK
 	return ResultData
+}
+
+func (this *Pod) Count() int64 {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	cond := orm.NewCondition()
+	if this.Status != "" {
+		cond = cond.And("status", this.Status)
+	}
+	count, _ := o.QueryTable(utils.Pod).SetCond(cond).Count()
+	return count
 }

@@ -23,9 +23,6 @@ var (
 	Cluster_Type_Kubernets                    = "Kubernets"
 	Cluster_Type_OpenShift                    = "OpenShift"
 	Cluster_Type_Rancher                      = "Rancher"
-	Pod_Container_Statue_Running              = "Running"
-	Pod_Container_Statue_Terminated           = "Terminated"
-	Pod_Container_Statue_Waiting              = "Waiting"
 	Api_Auth_Type_KubeConfig                  = "KubeConfig"
 	Api_Auth_Type_BearerToken                 = "BearerToken"
 	Cluster_Data_AccountName                  = "Kubernetes"
@@ -345,4 +342,15 @@ var (
 	// Language
 	Language_Cn = "zh-cn"
 	Language_En = "en-us"
+
+	// 容器状态
+	Container_Status_Created    = "Created"
+	Container_Status_Pending    = "Pending"
+	Container_Status_Waiting    = "Waiting"
+	Container_Status_Running    = "Running"
+	Container_Status_Succeeded  = "Succeeded"
+	Container_Status_Terminated = "Terminated"
+	Container_Status_Failed     = "Failed"
+	Container_Status_Exited     = "Exited"
+	Container_Status_Unknown    = "Unknown"
 )

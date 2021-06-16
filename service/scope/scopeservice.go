@@ -83,7 +83,7 @@ func (this *ScopeService) UpdatetClusterScopeUrlAndStatus(isDelete bool) models.
 				// 更新状态
 				// 注意： 删除scope时由于只判断 pod 状态不能确定scope是否被删除完成。
 				// 需要判断 ns 是否存在，具体看 nsWatch 的代码
-				if podStatus == models.Pod_Container_Statue_Running {
+				if podStatus == models.Container_Status_Running {
 					this.Cluster.SocpeStatus = models.Cluster_Scope_Operator_Status_Actived
 					if isDelete {
 						this.Cluster.SocpeStatus = models.Cluster_Scope_Operator_Status_Disableing
