@@ -80,7 +80,7 @@ func (this *DockerHubService) Imports() (error error) {
 		for _, t := range tags.Results {
 			this.ImageConfig.Name = repo.Namespace + "/" + repo.Name + ":" + t.Name
 			cs := CommonService{ImageConfig: this.ImageConfig}
-			cs.AddDetail(true)
+			cs.AddDetail()
 		}
 	}
 	return

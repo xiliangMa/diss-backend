@@ -53,6 +53,28 @@ func (this *RegistryController) Add() {
 	this.ServeJSON(false)
 }
 
+// @Title Update
+// @Description Update Registry
+// @Param token header string true "authToken"
+// @Param body body models.Registry true "Registry"
+// @Success 200 {object} models.Result
+// @router /update [put]
+func (this *RegistryController) Update() {
+
+	registry := new(models.Registry)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &registry)
+
+	rs := base.RegistryService{Registry: registry}
+	if result := rs.Ping(); result.Data == nil {
+		this.Data["json"] = result
+		this.ServeJSON(false)
+		return
+	}
+
+	this.Data["json"] = registry.Update()
+	this.ServeJSON(false)
+}
+
 // @Title GetRegistry
 // @Description Registry
 // @Param token header string true "authToken"

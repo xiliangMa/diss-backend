@@ -132,6 +132,7 @@ var (
 	AddDockerVulnErr                = 137
 	GetDockerVulnErr                = 138
 	DeleteDockerVulnErr             = 139
+	UpdateRegistryErr               = 140
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001
