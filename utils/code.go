@@ -176,6 +176,22 @@ var (
 	NetworkPolicyExistErr            = 1027
 	NotFoundHostForClusterErr        = 1028
 	UpdateNetworkPolicyErr           = 1029
+	AddRoleErr                       = 1030
+	EditRoleErr                      = 1031
+	GetRoleErr                       = 1032
+	DeleteRoleErr                    = 1033
+	AddUserToRoleErr                 = 1034
+	AddUserErr                       = 1035
+	EditUserErr                      = 1036
+	GetUserErr                       = 1037
+	DeleteUserErr                    = 1038
+	AddModuleErr                     = 1039
+	EditModuleErr                    = 1040
+	GetModuleErr                     = 1041
+	DeleteModuleErr                  = 1042
+	AddPolicyErr                     = 1043
+	RemovePolicyErr                  = 1044
+	UserExistErr                     = 1045
 
 	//task job 1100-1200
 	AddTaskErr        = 1100

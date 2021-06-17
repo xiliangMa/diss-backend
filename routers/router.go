@@ -20,11 +20,11 @@ import (
 	cstatistics "github.com/xiliangMa/diss-backend/controllers/statistics"
 	"github.com/xiliangMa/diss-backend/controllers/system/report"
 	csystem "github.com/xiliangMa/diss-backend/controllers/system/system"
-	"github.com/xiliangMa/diss-backend/service/auth"
-
-	"net/http"
-
 	ws "github.com/xiliangMa/diss-backend/controllers/ws"
+	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/auth"
+	"github.com/xiliangMa/diss-backend/sysinit"
+	"net/http"
 )
 
 func init() {
@@ -37,6 +37,16 @@ func init() {
 		beego.NSNamespace("/v1/users",
 			beego.NSInclude(
 				&cbase.UserController{},
+			),
+		),
+		beego.NSNamespace("/v1/role",
+			beego.NSInclude(
+				&cbase.RoleController{},
+			),
+		),
+		beego.NSNamespace("/v1/module",
+			beego.NSInclude(
+				&cbase.ModuleController{},
 			),
 		),
 		beego.NSNamespace("/v1/statistics",
@@ -192,14 +202,17 @@ func init() {
 				ctx.Redirect(http.StatusUnauthorized, "/swagger")
 			}
 		}
-
 	}
 	beego.InsertFilter("/api/v1/*", beego.BeforeRouter, isLogin)
+
+	models.Enforcer = sysinit.InitCasbinAdaptor()
+	models.Enforcer.LoadPolicy()
+	//beego.InsertFilter("/api/v1/*", beego.BeforeRouter, plugins.NewAuthorizer(models.Enforcer))
 
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins:  true,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Authorization", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type", "token"},
+		AllowHeaders:     []string{"Origin", "Authorization", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type", "token", "module"},
 		ExposeHeaders:    []string{"Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
 		AllowCredentials: true,
 	}))

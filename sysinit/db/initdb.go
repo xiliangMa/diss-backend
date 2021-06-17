@@ -65,6 +65,8 @@ func (this *DefaultDB) registerModel() {
 	orm.RegisterModel(new(models.ImageVulnerabilities), new(models.Vulnerabilities), new(models.Registry))
 	// kube-hunter
 	orm.RegisterModel(new(models.KubeScan), new(models.KubeVulnerabilities), new(models.VulnerabilityLib), new(models.DockerVulnerabilities))
+	// user and auth
+	orm.RegisterModel(new(models.Role), new(models.User), new(models.Module))
 }
 
 func (this *DefaultDB) InitSystemData() {
