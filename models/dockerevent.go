@@ -96,8 +96,8 @@ func (this *DockerEvent) List(from, limit int) Result {
 
 	o.Raw(countSql).QueryRow(&total)
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = dockerEventList
+	data[Result_Total] = total
+	data[Result_Items] = dockerEventList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
