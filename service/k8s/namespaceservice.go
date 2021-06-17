@@ -1,6 +1,7 @@
 package k8s
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
@@ -18,11 +19,11 @@ type NameSpaceService struct {
 }
 
 func (this *NameSpaceService) List() (*v1.NamespaceList, error) {
-	return this.ClientGo.ClientSet.CoreV1().Namespaces().List(metav1.ListOptions{})
+	return this.ClientGo.ClientSet.CoreV1().Namespaces().List(context.Background(), metav1.ListOptions{})
 }
 
 func (this *NameSpaceService) Wtach() {
-	nswatch, err := this.ClientGo.ClientSet.CoreV1().Namespaces().Watch(metav1.ListOptions{})
+	nswatch, err := this.ClientGo.ClientSet.CoreV1().Namespaces().Watch(context.Background(), metav1.ListOptions{})
 	if err != nil {
 		logs.Error("Wtach namespace error: %s  ", err)
 		return

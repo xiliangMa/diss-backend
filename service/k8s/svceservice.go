@@ -1,6 +1,7 @@
 package k8s
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
@@ -17,11 +18,11 @@ type SVCService struct {
 }
 
 func (this *SVCService) List() (*v1.ServiceList, error) {
-	return this.ClientGo.ClientSet.CoreV1().Services("").List(metav1.ListOptions{})
+	return this.ClientGo.ClientSet.CoreV1().Services("").List(context.Background(), metav1.ListOptions{})
 }
 
 func (this *SVCService) Wtach() {
-	serviceWatch, err := this.ClientGo.ClientSet.CoreV1().Services("").Watch(metav1.ListOptions{})
+	serviceWatch, err := this.ClientGo.ClientSet.CoreV1().Services("").Watch(context.Background(), metav1.ListOptions{})
 	if err != nil {
 		logs.Error("Wtach svc error: %s  ", err)
 		return

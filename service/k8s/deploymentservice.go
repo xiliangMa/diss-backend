@@ -1,6 +1,7 @@
 package k8s
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
@@ -17,11 +18,11 @@ type DeploymentService struct {
 }
 
 func (this *DeploymentService) List() (*v1.DeploymentList, error) {
-	return this.ClientGo.ClientSet.AppsV1().Deployments("").List(metav1.ListOptions{})
+	return this.ClientGo.ClientSet.AppsV1().Deployments("").List(context.Background(), metav1.ListOptions{})
 }
 
 func (this *DeploymentService) Wtach() {
-	deployWatch, err := this.ClientGo.ClientSet.AppsV1().Deployments("").Watch(metav1.ListOptions{})
+	deployWatch, err := this.ClientGo.ClientSet.AppsV1().Deployments("").Watch(context.Background(), metav1.ListOptions{})
 	if err != nil {
 		logs.Error("Wtach deployment error: %s  ", err)
 		return

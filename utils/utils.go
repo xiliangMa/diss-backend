@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
@@ -310,4 +311,17 @@ func InitTable(table string, sql string) (pre string) {
 		END
 		$$`
 	return pre
+}
+
+func ToIndentJSON(obj interface{}) (string, error) {
+	bs, err := json.Marshal(obj)
+	if err != nil {
+		return "", err
+	}
+	buf := new(bytes.Buffer)
+	err = json.Indent(buf, bs, "", "\t")
+	if err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }

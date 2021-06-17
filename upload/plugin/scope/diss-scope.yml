@@ -4,7 +4,7 @@ items:
   - apiVersion: v1
     kind: Namespace
     metadata:
-      name: weave
+      name: diss-weave
       annotations:
         cloud.weave.works/version: v1.0.0-275-ge272995
   - apiVersion: v1
@@ -22,7 +22,7 @@ items:
           }
       labels:
         name: weave-scope
-      namespace: weave
+      namespace: diss-weave
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:
@@ -141,7 +141,7 @@ items:
     subjects:
       - kind: ServiceAccount
         name: weave-scope
-        namespace: weave
+        namespace: diss-weave
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -160,7 +160,7 @@ items:
         app: weave-scope
         weave-cloud-component: scope
         weave-scope-component: app
-      namespace: weave
+      namespace: diss-weave
     spec:
       replicas: 1
       revisionHistoryLimit: 2
@@ -209,7 +209,7 @@ items:
         app: weave-scope
         weave-cloud-component: scope
         weave-scope-component: app
-      namespace: weave
+      namespace: diss-weave
     spec:
       ports:
         - name: app
@@ -239,7 +239,7 @@ items:
         app: weave-scope
         weave-cloud-component: scope
         weave-scope-component: cluster-agent
-      namespace: weave
+      namespace: diss-weave
     spec:
       replicas: 1
       revisionHistoryLimit: 2
@@ -300,7 +300,7 @@ items:
         app: weave-scope
         weave-cloud-component: scope
         weave-scope-component: agent
-      namespace: weave
+      namespace: diss-weave
     spec:
       minReadySeconds: 5
       selector:

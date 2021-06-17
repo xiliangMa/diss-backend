@@ -1,6 +1,7 @@
 package k8s
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
@@ -22,11 +23,11 @@ func (this *PodService) List() (*v1.PodList, error) {
 	if this.Cluster != nil {
 		ns = this.Cluster.Name
 	}
-	return this.ClientGo.ClientSet.CoreV1().Pods(ns).List(metav1.ListOptions{})
+	return this.ClientGo.ClientSet.CoreV1().Pods(ns).List(context.Background(), metav1.ListOptions{})
 }
 
 func (this *PodService) Wtach() {
-	podWatch, err := this.ClientGo.ClientSet.CoreV1().Pods("").Watch(metav1.ListOptions{})
+	podWatch, err := this.ClientGo.ClientSet.CoreV1().Pods("").Watch(context.Background(), metav1.ListOptions{})
 	if err != nil {
 		logs.Error("Wtach pod error: %s  ", err)
 		return

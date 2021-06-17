@@ -36,15 +36,25 @@ func (this *ScopeService) ActiveOrDisableScope() models.Result {
 		return result
 	}
 
-	// 读取yml
-	f, err := os.Open(utils.GetScopeYml())
+	f, err := GetScopeYml()
 	if err != nil {
+		logs.Error("Open scope yml fail, ClusterName: %s, Err: %s", clusterName, result.Message)
 		result.Code = utils.OpenFileErr
 		result.Message = err.Error()
-		logs.Error("Open scope yml fail, ClusterName: %s, Err: %s", clusterName, result.Message)
 		return result
 	}
-
+	// 强制删除scope app
+	if this.IsActive {
+		kubernetesHandler := models.KubernetesHandler{ClientGo: &client, DymaicClient: &dymaicClient, IsActive: false, File: f}
+		kubernetesHandler.CreateOrDeleteResourceByYml()
+	}
+	f, err = GetScopeYml()
+	if err != nil {
+		logs.Error("Open scope yml fail, ClusterName: %s, Err: %s", clusterName, result.Message)
+		result.Code = utils.OpenFileErr
+		result.Message = err.Error()
+		return result
+	}
 	// 创建 scope app
 	kubernetesHandler := models.KubernetesHandler{ClientGo: &client, DymaicClient: &dymaicClient, IsActive: this.IsActive, File: f}
 	return kubernetesHandler.CreateOrDeleteResourceByYml()
@@ -105,4 +115,13 @@ func (this *ScopeService) CheckScopeIsDisable() {
 		this.Cluster.Update()
 	}
 
+}
+
+func GetScopeYml() (*os.File, error) {
+	// 读取yml
+	f, err := os.Open(utils.GetScopeYml())
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
 }

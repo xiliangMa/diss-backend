@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -10,7 +11,6 @@ import (
 	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/yaml"
@@ -95,7 +95,7 @@ func CreateK8sClient(params *ApiParams) ClientGo {
 }
 
 func (clientgo *ClientGo) GetNodes() (*v1.NodeList, error) {
-	return clientgo.ClientSet.CoreV1().Nodes().List(v12.ListOptions{})
+	return clientgo.ClientSet.CoreV1().Nodes().List(context.Background(), metav1.ListOptions{})
 }
 
 func InitClientHub() {
@@ -243,22 +243,22 @@ func (this *KubernetesHandler) CreateOrDeleteResourceByYml() Result {
 		// 创建 Resource
 		if this.IsActive {
 			if res == "namespaces" || res == "clusterroles" || res == "clusterrolebindings" {
-				_, err = this.DymaicClient.Interface.Resource(mapping.Resource).Create(&unstruct, metav1.CreateOptions{})
+				_, err = this.DymaicClient.Interface.Resource(mapping.Resource).Create(context.Background(), &unstruct, metav1.CreateOptions{})
 			} else {
 				if res == "jobs" {
 					newUnstruct, _ := this.UpdateKubeScanYml(unstruct)
-					_, err = this.DymaicClient.Interface.Resource(mapping.Resource).Namespace(namespace).Create(newUnstruct, metav1.CreateOptions{})
+					_, err = this.DymaicClient.Interface.Resource(mapping.Resource).Namespace(namespace).Create(context.Background(), newUnstruct, metav1.CreateOptions{})
 				} else {
-					_, err = this.DymaicClient.Interface.Resource(mapping.Resource).Namespace(namespace).Create(&unstruct, metav1.CreateOptions{})
+					_, err = this.DymaicClient.Interface.Resource(mapping.Resource).Namespace(namespace).Create(context.Background(), &unstruct, metav1.CreateOptions{})
 				}
 			}
 		} else {
 			operatorType = "Delete"
 			if res == "namespaces" || res == "clusterroles" || res == "clusterrolebindings" {
-				err = this.DymaicClient.Interface.Resource(mapping.Resource).Delete(unstruct.GetName(), &metav1.DeleteOptions{})
+				err = this.DymaicClient.Interface.Resource(mapping.Resource).Delete(context.Background(), unstruct.GetName(), metav1.DeleteOptions{})
 			} else {
 				propagationPolicy := metav1.DeletePropagationBackground
-				err = this.DymaicClient.Interface.Resource(mapping.Resource).Namespace(namespace).Delete(unstruct.GetName(), &metav1.DeleteOptions{PropagationPolicy: &propagationPolicy})
+				err = this.DymaicClient.Interface.Resource(mapping.Resource).Namespace(namespace).Delete(context.Background(), unstruct.GetName(), metav1.DeleteOptions{PropagationPolicy: &propagationPolicy})
 			}
 		}
 		if err != nil {
