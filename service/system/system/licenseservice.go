@@ -256,12 +256,7 @@ func (this *LicenseService) UpdateLicenseCountOfModules(count int64) models.Resu
 		dbLm.IsLicensedCount = count
 		result = dbLm.Update()
 	}
-	lm = models.LicenseModule{ModuleCode: models.TMP_Type_HostImageVulnScan}
-	dbLm = lm.Get()
-	if dbLm != nil && dbLm.Id != "" && dbLm.LicenseCount > 0 {
-		dbLm.IsLicensedCount = count
-		result = dbLm.Update()
-	}
+
 	return result
 }
 
