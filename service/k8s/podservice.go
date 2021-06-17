@@ -59,6 +59,7 @@ Retry:
 				pod.KMetaData = string(KMetaData)
 				pod.KSpec = string(KSpec)
 				pod.KStatus = string(KStatus)
+				pod.Status = string(object.Status.Phase)
 
 				logs.Info("Watch >>> Pod: %s <<<, >>> ClusterOBJ: %s <<<, >>> EventType: %s <<<", id, clusterName, event.Type)
 

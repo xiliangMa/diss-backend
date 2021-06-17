@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strings"
 )
 
 type ContainerConfig struct {
@@ -106,9 +107,9 @@ func (this *ContainerConfig) List(from, limit int, groupSearch bool) Result {
 	if this.Status != "" && this.Status != Container_Status_All {
 		switch this.Status {
 		case Container_Status_Run:
-			cond = cond.AndCond(cond.And("status__contains", "Up").Or("status", Pod_Container_Statue_Running).Or("status", Pod_Container_Statue_Terminated))
+			cond = cond.AndCond(cond.And("status__contains", "Up").Or("status", Container_Status_Running).Or("status", Container_Status_Terminated))
 		case Container_Status_Pause:
-			cond = cond.AndNotCond(cond.And("status__contains", "Up").Or("status", Pod_Container_Statue_Running).Or("status", Pod_Container_Statue_Terminated))
+			cond = cond.AndNotCond(cond.And("status__contains", "Up").Or("status", Container_Status_Running).Or("status", Container_Status_Terminated))
 		}
 	}
 
@@ -171,7 +172,7 @@ func (this *ContainerConfig) Count() int64 {
 	o.Using(utils.DS_Default)
 	cond := orm.NewCondition()
 	if this.Status != "" {
-		cond = cond.And("status", this.Status)
+		cond = cond.And("status", strings.ToLower(this.Status))
 	}
 	count, _ := o.QueryTable(utils.ContainerConfig).SetCond(cond).Count()
 	return count

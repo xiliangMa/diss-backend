@@ -19,8 +19,10 @@ func (this *StatisticsService) GetAssetStatistics() models.Result {
 	hostConfig := new(models.HostConfig)
 	hc := make(map[string]int64)
 	hc["HostCount"] = hostConfig.Count()
+
 	hostConfig.Status = models.Host_Status_Normal
 	hc[models.Host_Status_Normal] = hostConfig.Count()
+
 	hostConfig.Status = models.Host_Status_Abnormal
 	hc[models.Host_Status_Abnormal] = hostConfig.Count()
 	data["HostConfig"] = hc
@@ -29,12 +31,18 @@ func (this *StatisticsService) GetAssetStatistics() models.Result {
 	containerConfig := new(models.ContainerConfig)
 	cc := make(map[string]int64)
 	cc["ContainerCount"] = containerConfig.Count()
-	containerConfig.Status = "created"
-	cc["Created"] = containerConfig.Count()
-	containerConfig.Status = "running"
-	cc["Running"] = containerConfig.Count()
-	containerConfig.Status = "exited"
-	cc["Exited"] = containerConfig.Count()
+
+	containerConfig.Status = models.Container_Status_Created
+	cc[models.Container_Status_Created] = containerConfig.Count()
+
+	containerConfig.Status = models.Container_Status_Running
+	cc[models.Container_Status_Running] = containerConfig.Count()
+
+	containerConfig.Status = models.Container_Status_Terminated
+	cc[models.Container_Status_Terminated] = containerConfig.Count()
+
+	containerConfig.Status = models.Container_Status_Exited
+	cc[models.Container_Status_Exited] = containerConfig.Count()
 	data["ContainerConfig"] = cc
 
 	//镜像仓库
@@ -46,10 +54,13 @@ func (this *StatisticsService) GetAssetStatistics() models.Result {
 	//镜像
 	imageConfig := new(models.ImageConfig)
 	ic := make(map[string]int64)
+
 	imageConfig.Type = models.All
 	ic["ImageCount"] = imageConfig.Count()
+
 	imageConfig.Type = "host"
 	ic["HostImage"] = imageConfig.Count()
+
 	imageConfig.Type = ""
 	ic["RegistryImage"] = imageConfig.Count()
 	data["ImageConfig"] = ic
@@ -58,11 +69,33 @@ func (this *StatisticsService) GetAssetStatistics() models.Result {
 	cluster := new(models.Cluster)
 	cmap := make(map[string]int64)
 	cmap["ClusterCount"] = cluster.Count()
+
 	cluster.Status = models.Cluster_Status_Active
 	cmap[models.Cluster_Status_Active] = cluster.Count()
+
 	cluster.Status = models.Cluster_Status_Unavailable
 	cmap[models.Cluster_Status_Unavailable] = cluster.Count()
 	data["Cluster"] = cmap
+
+	// Pod
+	pod := new(models.Pod)
+	pmap := make(map[string]int64)
+	pmap["PodCount"] = pod.Count()
+	pod.Status = models.Container_Status_Pending
+	pmap[models.Container_Status_Pending] = pod.Count()
+
+	pod.Status = models.Container_Status_Running
+	pmap[models.Container_Status_Running] = pod.Count()
+
+	pod.Status = models.Container_Status_Succeeded
+	pmap[models.Container_Status_Succeeded] = pod.Count()
+
+	pod.Status = models.Container_Status_Failed
+	pmap[models.Container_Status_Failed] = pod.Count()
+
+	pod.Status = models.Container_Status_Unknown
+	pmap[models.Container_Status_Unknown] = pod.Count()
+	data["Pod"] = pmap
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
