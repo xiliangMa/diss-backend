@@ -138,21 +138,14 @@ func (this *VirusScan) List(from, limit int) Result {
 	var err error
 	var total int64 = 0
 
-	resType := "host_id"
-	if this.Type == TMP_Type_ImageVS {
-		resType = "image_id"
-	} else if this.Type == TMP_Type_ContainerVS {
-		resType = "container_id"
-	}
-
-	sql := `select *, virus_record.type as file_type from virus_record join (select distinct on (` + resType + `) * from
- (select distinct on(created_at) *  from virus_scan order by created_at desc) as filterdate) as virus_log
+	sql := `select *, virus_record.type as file_type from virus_record join 
+ (select distinct on(created_at) *  from virus_scan order by created_at desc) as virus_log
     on virus_record.virus_scan_id = virus_log.id  `
-	countSql := `select count(virus_record.id) from virus_record join (select distinct on (` + resType + `) * from
- (select distinct on(created_at) *  from virus_scan order by created_at desc) as filterdate) as virus_log
+	countSql := `select count(virus_record.id) from virus_record join
+ (select distinct on(created_at) *  from virus_scan order by created_at desc)  as virus_log
     on virus_record.virus_scan_id = virus_log.id `
 	filter := ""
-	fields := []string{}
+	var fields []string
 	if this.Id != 0 {
 		filter = filter + `virus_log.id = ? and `
 		fields = append(fields, string(this.Id))
@@ -219,8 +212,8 @@ func (this *VirusScan) List(from, limit int) Result {
 
 	o.Raw(countSql, fields).QueryRow(&total)
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = virusLogList
+	data[Result_Total] = total
+	data[Result_Items] = virusLogList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
