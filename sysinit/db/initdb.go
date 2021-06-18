@@ -201,30 +201,5 @@ func (this *DefaultDB) InitSystemData() {
 		logs.Error("Init DefaultLDAPClient Config fail, err: %s", err)
 	}
 
-	_, err = o.Raw(dbscript.DefaultSensitiveRule1).Exec()
-	if err != nil {
-		logs.Error("Init DefaultSensitiveRule1 Config fail, err: %s", err)
-	}
-
-	_, err = o.Raw(dbscript.DefaultSensitiveRule2).Exec()
-	if err != nil {
-		logs.Error("Init DefaultSensitiveRule2 Config fail, err: %s", err)
-	}
-
-	_, err = o.Raw(dbscript.DefaultSensitiveRule3).Exec()
-	if err != nil {
-		logs.Error("Init DefaultSensitiveRule1 Config fail, err: %s", err)
-	}
-
-	_, err = o.Raw(dbscript.DefaultSensitiveRule4).Exec()
-	if err != nil {
-		logs.Error("Init DefaultSensitiveRule4 Config fail, err: %s", err)
-	}
-
-	_, err = o.Raw(dbscript.DefaultSensitiveRule5).Exec()
-	if err != nil {
-		logs.Error("Init DefaultSensitiveRule5 Config fail, err: %s", err)
-	}
-
 	logs.Info("Init default data end................")
 }
