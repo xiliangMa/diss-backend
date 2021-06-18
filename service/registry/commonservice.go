@@ -19,13 +19,14 @@ type CommonService struct {
 
 var scheme = regexp.MustCompile("(https|http)://([-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])")
 
-func (this *CommonService) AddDetail(isPublic bool) {
+func (this *CommonService) AddDetail() {
 	var ref name.Reference
 	rs := scheme.FindStringSubmatch(this.ImageConfig.Registry.Url)
 	ref, _ = name.ParseReference(this.ImageConfig.Name)
 
-	if rs != nil && !isPublic {
+	if rs != nil && this.ImageConfig.Registry.Type != models.Registry_Type_DockerHub {
 		this.ImageConfig.Name = strings.Replace(rs[2], "/", "", 1) + "/" + this.ImageConfig.Name
+		ref, _ = name.ParseReference(this.ImageConfig.Name)
 		if rs[1] == "http" {
 			ref, _ = name.ParseReference(this.ImageConfig.Name, name.Insecure)
 		}

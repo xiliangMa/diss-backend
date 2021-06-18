@@ -25,6 +25,7 @@ type Registry struct {
 type RegistryInterface interface {
 	Add() Result
 	Get() Result
+	Update() Result
 	Delete() Result
 	List(from, limit int) Result
 }
@@ -45,7 +46,6 @@ func (this *Registry) Add() Result {
 	if this.CreateTime == 0 {
 		this.CreateTime = time.Now().UnixNano()
 	}
-
 	_, err = o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -155,4 +155,21 @@ func (this *Registry) Count() int64 {
 	o.Using(utils.DS_Default)
 	count, _ := o.QueryTable(utils.Registry).Count()
 	return count
+}
+
+func (this *Registry) Update() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+
+	_, err := o.Update(this)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.UpdateRegistryErr
+		logs.Error("Update Registry failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
 }

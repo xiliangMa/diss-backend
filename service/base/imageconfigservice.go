@@ -110,7 +110,7 @@ func (this *ImageConfigService) generalType() (error error) {
 						for _, tag := range tagObj["tags"].([]interface{}) {
 							imageConfig.Name = in + ":" + tag.(string)
 							cs := registry.CommonService{ImageConfig: imageConfig}
-							cs.AddDetail(false)
+							cs.AddDetail()
 						}
 					}
 				}
