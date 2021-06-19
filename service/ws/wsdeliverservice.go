@@ -36,7 +36,7 @@ func (this *WSDeliverService) DeliverTaskToNats() {
 				subject = task.Container.HostName
 			}
 		} else if task.Image != nil {
-			subject = task.Image.HostId
+			subject = task.SearchHostId
 		} else if task.ClusterOBJ != nil {
 			subject = models.Subject_Cluster
 		}

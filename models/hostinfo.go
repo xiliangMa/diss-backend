@@ -71,13 +71,13 @@ func (this *HostInfo) Add() error {
 		if this.PublicAddr != "" {
 			updateHostInfo.PublicAddr = this.PublicAddr
 		}
-		if this.InternalAddr != ""{
+		if this.InternalAddr != "" {
 			updateHostInfo.InternalAddr = this.InternalAddr
 		}
-		if this.DockerRuntime != ""{
+		if this.DockerRuntime != "" {
 			updateHostInfo.DockerRuntime = this.DockerRuntime
 		}
-		if this.DockerStatus != ""{
+		if this.DockerStatus != "" {
 			updateHostInfo.DockerStatus = this.DockerStatus
 		}
 		if this.ImageCount != 0 {

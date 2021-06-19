@@ -10,6 +10,7 @@ import (
 	"github.com/xiliangMa/diss-backend/service/ws"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strings"
 )
 
 type SecurityScanService struct {
@@ -134,10 +135,10 @@ func (this *SecurityScanService) PrePare() {
 		if this.SecurityCheckParams.KubenetesCIS {
 			for _, host := range this.HostList {
 				securityCheck := models.SecurityCheck{
-					KubenetesScan: this.SecurityCheckParams.KubenetesCIS,
-					Host:          host,
-					Type:          models.SC_Type_Host,
-					Job:           this.Job,
+					KubenetesCIS: this.SecurityCheckParams.KubenetesCIS,
+					Host:         host,
+					Type:         models.SC_Type_Host,
+					Job:          this.Job,
 				}
 				this.PrePareTask(&securityCheck)
 			}
@@ -287,7 +288,7 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		task.Description = taskpre + "仓库镜像漏洞扫描"
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_ImageVulnScan]
 		task.Image = securityCheck.Image
-		task.SearchHostId = securityCheck.Image.HostId
+		task.SearchHostId = strings.ToLower(utils.GetHostInfo().HostID)
 	} else if securityCheck.KubenetesScan {
 		//kubernetes 漏扫
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_KubernetesVulnScan, uid)

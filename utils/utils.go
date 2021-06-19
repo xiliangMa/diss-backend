@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
+	"github.com/shirou/gopsutil/host"
 	"strconv"
 )
 
@@ -324,4 +325,9 @@ func ToIndentJSON(obj interface{}) (string, error) {
 		return "", err
 	}
 	return buf.String(), nil
+}
+
+func GetHostInfo() *host.InfoStat {
+	info, _ := host.Info()
+	return info
 }
