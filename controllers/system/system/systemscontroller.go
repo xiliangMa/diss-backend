@@ -303,3 +303,21 @@ func (this *SystemController) DeleteRuleDefine() {
 	this.Data["json"] = ruledefine.Delete()
 	this.ServeJSON(false)
 }
+
+// @Title Version
+// @Description version
+// @Param token header string true "authToken"
+// @Param from query int 0 false "from"
+// @Param limit query int 20 false "limit"
+// @Success 200 {object} models.Result
+// @router /version [post]
+func (this *SystemController) Version() {
+	from, _ := this.GetInt("from")
+	limit, _ := this.GetInt("limit")
+
+	version := new(models.Version)
+
+	this.Data["json"] = version.List(from, limit)
+	this.ServeJSON(false)
+
+}
