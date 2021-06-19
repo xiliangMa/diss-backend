@@ -239,6 +239,10 @@ func (this *LicenseController) SetHostLicense() {
 	}
 	hostConfig.IsLicensed = licenseStatus
 	result = hostConfig.Update()
+
+	hs := sssystem.HostService{Host: *hostConfig}
+	hs.SendAuthorizationDetail()
+
 	// 检测并尝试从基线数据中，恢复k8s基线汇总数据
 	if hostConfig.IsInK8s {
 		hostConfig.RestoreKubeBenchSummary()

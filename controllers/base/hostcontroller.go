@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/service"
 	sssystem "github.com/xiliangMa/diss-backend/service/system/system"
 	"net/http"
 )
@@ -77,9 +76,9 @@ func (this *HostController) UpdateHost() {
 // @router /:hostId [delete]
 func (this *HostController) DeleteHost() {
 	hostId := this.GetString(":hostId")
-	hc := new(models.HostConfig)
+	hc := models.HostConfig{}
 	hc.Id = hostId
-	hs := service.HostService{Host: hc}
+	hs := sssystem.HostService{Host: hc}
 
 	result := hs.Delete()
 	if result.Code == http.StatusOK {

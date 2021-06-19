@@ -45,11 +45,13 @@ type HostConfig struct {
 	LicCount            bool      `orm:"-" description:"(是否获取授权个数操作)"`
 	CreateTime          int64     `orm:"default(0)" description:"(上线时间)"`
 	OfflineTime         int64     `orm:"default(0)" description:"(离线时间)"`
+	TaskStatus          string    `orm:"" description:"(任务状态)"`
 }
 
 type HostConfigInterface interface {
 	Add() error
 	List(from, limit int) Result
+
 	BaseList(from, limit int) (error, int64, []*HostConfig)
 	Update() Result
 	Delete() Result

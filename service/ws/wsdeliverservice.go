@@ -90,6 +90,26 @@ func (this *WSDeliverService) DeliverTaskToNats() {
 					task.Update()
 					logs.Error("Deliver Task to Nats Fail,  Subject: %s Id: %s, err: %s", subject, task.Id, err.Error())
 				}
+
+				if task.Host != nil {
+					hc := new(models.HostConfig)
+					hc.Id = task.Host.Id
+					hostConfig := hc.Get()
+					hostConfig.TaskStatus = task.Status
+					hostConfig.Update()
+				} else if task.Image != nil {
+					ic := new(models.ImageConfig)
+					ic.Id = task.Image.Id
+					imageConfig := ic.Get()
+					imageConfig.TaskStatus = task.Status
+					imageConfig.Update()
+				} else if task.Container != nil {
+					cc := new(models.ContainerConfig)
+					cc.Id = task.Container.Id
+					containerConfig := cc.Get()
+					containerConfig.TaskStatus = task.Status
+					containerConfig.Update()
+				}
 			}
 
 		}

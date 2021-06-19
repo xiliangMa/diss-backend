@@ -87,7 +87,7 @@ func (this *SensitiveInfo) List(from, limit int) Result {
 (select distinct on (res_time_filter.` + resType + `) * from
 (select ` + resType + `, create_time from ` + utils.SensitiveInfo + ` group by create_time,` + resType + ` order by create_time desc) as res_time_filter) as dist_res on sensitive_info.` + resType + ` = dist_res.` + resType + ` and sensitive_info.create_time = dist_res.create_time `
 	filter := ""
-	fields := []string{}
+	var fields []string
 	if this.Id != "" {
 		filter = filter + `id = ? and `
 		fields = append(fields, this.Id)
@@ -126,7 +126,7 @@ func (this *SensitiveInfo) List(from, limit int) Result {
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetWarningInfoListErr
-		logs.Error("Get WarningInfo list failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error("Get SensitiveInfo list failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 

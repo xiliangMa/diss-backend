@@ -3,7 +3,6 @@ package securitypolicy
 import (
 	"encoding/json"
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 )
 
@@ -23,9 +22,10 @@ type SensitiveInfoController struct {
 func (this *VirusLogController) GetSensitiveInfoList() {
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
+
 	sensiInfo := new(models.SensitiveInfo)
-	err := json.Unmarshal(this.Ctx.Input.RequestBody, &sensiInfo)
-	logs.Warn("err: ", err)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &sensiInfo)
+
 	this.Data["json"] = sensiInfo.List(from, limit)
 	this.ServeJSON(false)
 }

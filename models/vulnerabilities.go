@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strings"
 )
 
 type ImageVulnerabilities struct {
@@ -21,7 +22,7 @@ type ImageVulnerabilities struct {
 
 type Vulnerabilities struct {
 	Id                   int                   `orm:"pk;auto" description:"(Id)" description:"(id)"`
-	VulnerabilityID      string                `description:"(漏洞Id)"`
+	VulnerabilityID      string                `orm:"column(vulnerability_id)" description:"(漏洞Id)"`
 	PkgName              string                `orm:"size(128)" description:"(包名)"`
 	InstalledVersion     string                `orm:"size(64)" description:"(安装版本)"`
 	FixedVersion         string                `orm:"size(32)" description:"(已解决版本)"`
@@ -59,6 +60,9 @@ func (this *ImageVulnerabilities) Add() Result {
 		return ResultData
 	}
 	for _, vuln := range this.Vulnerabilities {
+		if strings.Contains(vuln.PkgName, "clamav") {
+			continue
+		}
 		vuln.ImageVulnerabilities = this
 		vuln.Add()
 	}
@@ -127,8 +131,8 @@ func (this *ImageVulnerabilities) List(from, limit int) Result {
 
 	total, _ := o.QueryTable(utils.ImageVulnerabilities).SetCond(cond).Count()
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = imageVulnerabilities
+	data[Result_Total] = total
+	data[Result_Items] = imageVulnerabilities
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
@@ -177,5 +181,47 @@ func (this *Vulnerabilities) Add() Result {
 	}
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
+	return ResultData
+}
+
+func (this *Vulnerabilities) List(from, limit int) Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var vulnerabilities []*Vulnerabilities
+	var ResultData Result
+	var err error
+	cond := orm.NewCondition()
+
+	if this.VulnerabilityID != "" {
+		cond = cond.And("vulnerability_id", this.VulnerabilityID)
+	}
+	if this.PkgName != "" {
+		cond = cond.And("pkg_name", this.PkgName)
+	}
+	if this.Severity != "" {
+		cond = cond.And("severity", this.Severity)
+	}
+
+	_, err = o.QueryTable(utils.Vulnerabilities).SetCond(cond).Limit(limit, from).All(&vulnerabilities)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetImageVulnerabilitiesErr
+		logs.Error("Get Vulnerabilities List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	for _, v := range vulnerabilities {
+		cond2 := orm.NewCondition()
+		cond2 = cond2.And("id", v.ImageVulnerabilities.Id)
+		_, err = o.QueryTable(utils.ImageVulnerabilities).SetCond(cond2).Limit(limit, from).All(v.ImageVulnerabilities)
+	}
+
+	total, _ := o.QueryTable(utils.Vulnerabilities).SetCond(cond).Count()
+	data := make(map[string]interface{})
+	data[Result_Total] = total
+	data[Result_Items] = vulnerabilities
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
 	return ResultData
 }
