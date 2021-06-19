@@ -44,7 +44,7 @@ func (this *SecurityCheckController) SecurityCheck2() {
 	params := new(models.SecurityCheckParams)
 	isSystem, _ := this.GetBool("isSystem")
 	json.Unmarshal(this.Ctx.Input.RequestBody, &params)
-	batch := time.Now().UnixNano()
+	batch := time.Now().UnixNano() / 1e3
 	securityScanService := securitycheck.SecurityScanService{SecurityCheckParams: params, Batch: batch, IsSystem: isSystem}
 	this.Data["json"] = securityScanService.DeliverTask()
 	this.ServeJSON(false)
