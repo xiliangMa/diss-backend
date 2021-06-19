@@ -56,7 +56,7 @@ func (this *JwtService) CheckToken(TokenStr string) (string, int) {
 	}
 
 	if _, ok := this.Token.Claims.(jwt.MapClaims); ok && this.Token.Valid {
-		return "", http.StatusOK
+		return TokenStr, http.StatusOK
 	} else {
 		this.Token = nil
 		return "AuthorizeErr", utils.AuthorizeErr
