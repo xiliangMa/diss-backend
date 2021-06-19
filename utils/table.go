@@ -41,6 +41,7 @@ var (
 	Registry              = "registry"
 	VulnerabiltyLib       = "vulnerability_lib"
 	DockerVulnerabilities = "docker_vulnerabilities"
+	Version               = "version"
 
 	//security_log timescaledb
 	DcokerIds     = "docker_ids"
