@@ -50,9 +50,8 @@ func (this *DisposalModeService) DisposalMode(dm *models.DisposalMode) models.Re
 					containerRespCenter.WarningInfoId = warningInfo.Id
 					containerRespCenter.Status = ""
 					containerRespCenter.Add()
-				} else {
-					warningInfo.Status = models.WarnInfoStatus
 				}
+				warningInfo.Status = models.WarnInfoStatus
 				warningInfo.Update()
 			}
 		}
