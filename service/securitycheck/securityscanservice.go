@@ -471,6 +471,7 @@ func (this *SecurityScanService) Check() models.Result {
 		ContainerIds: this.ContainerIds,
 		JobId:        this.SecurityCheckParams.JobId,
 		ClusterIds:   this.SecurityCheckParams.ClusterIds,
+		IsImageVuln:  this.ImageVulnScan,
 	}
 	// 1. 资源检查
 	// 镜像资源
@@ -505,6 +506,12 @@ func (this *SecurityScanService) Check() models.Result {
 		if ResultData.Code != http.StatusOK {
 			return ResultData
 		}
+	}
+
+	// 4. 镜像及容器所属主机授权检查
+	ResultData = baseService.CheckImageContainerOfHost(this.ImageList, this.ContainerList)
+	if ResultData.Code != http.StatusOK {
+		return ResultData
 	}
 
 	return ResultData
