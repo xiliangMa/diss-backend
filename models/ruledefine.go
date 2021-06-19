@@ -38,10 +38,10 @@ func (this *RuleDefine) Add() Result {
 	o.Using(utils.DS_Default)
 
 	if this.Enabled == 0 {
-		this.Enabled = 2
+		this.Enabled = 1
 	}
 	if this.Level == 0 {
-		this.Level = 1
+		this.Level = 2
 	}
 	this.CreateTime = time.Now().UnixNano()
 	_, err := o.Insert(this)
