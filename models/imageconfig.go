@@ -27,6 +27,7 @@ type ImageConfig struct {
 	Registry      *Registry `orm:"rel(fk);default(null);null" description:"(仓库)"`
 	Type          string    `orm:"-" description:"(区分主机镜像还是仓库镜像)"`
 	Namespaces    string    `orm:"-" description:"(命名空间)"`
+	TaskStatus    string    `orm:"" description:"(任务状态)"`
 }
 
 type ImageConfigInterface interface {

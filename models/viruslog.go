@@ -223,6 +223,64 @@ func (this *VirusScan) List(from, limit int) Result {
 	return ResultData
 }
 
+func (this *VirusRecord) List(from, limit int) Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Security_Log)
+	var virusLogList []*VirusScanRecord
+	var ResultData Result
+	var err error
+	var total int64 = 0
+
+	sql := `sselect vr.*,vs.image_id from virus_scan vs  join virus_record vr on vs.id = vr.virus_scan_id where vs.type = 'ImageVirusScan'  `
+	countSql := `select count(vr.id) from virus_scan vs  join virus_record vr on vs.id = vr.virus_scan_id where vs.type = 'ImageVirusScan' `
+	filter := ""
+	var fields []string
+	if this.Id != 0 {
+		filter = filter + `virus_log.id = ? and `
+		fields = append(fields, string(this.Id))
+	}
+	if this.Type != "" {
+		filter = filter + `vr.type = ? and `
+		fields = append(fields, this.Type)
+	}
+	if this.Filename != "" {
+		filter = filter + `vr.filename like ? and `
+		fields = append(fields, "%"+this.Filename+"%")
+	}
+
+	if filter != "" {
+		sql = sql + " where " + filter
+		countSql = countSql + " where " + filter
+	}
+	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
+	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
+	resultSql := sql
+
+	if from >= 0 && limit > 0 {
+		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
+		resultSql = resultSql + limitSql
+	}
+	_, err = o.Raw(resultSql, fields).QueryRows(&virusLogList)
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetImageVirusErr
+		logs.Error("Get VirusLogErr List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	o.Raw(countSql, fields).QueryRow(&total)
+	data := make(map[string]interface{})
+	data[Result_Total] = total
+	data[Result_Items] = virusLogList
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
+	return ResultData
+}
+
 type VirusRecordInterface interface {
 	Add() Result
 }

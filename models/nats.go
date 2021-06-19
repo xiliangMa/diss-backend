@@ -34,6 +34,7 @@ const (
 	Resource_ImageVS                = "ImageVirusScan"         // 镜像杀毒数据
 	Resource_SensitiveInfo          = "SensitiveInfo"          // 敏感信息数据
 	Resource_DockerVulnerability    = "DockerVulnerability"    // docker漏洞数据
+	Resource_Authorization          = "Authorization"
 
 	// #################### （Type）Nats Type 通信类型
 	Type_Metric                     = "Metric"                 //指标类型

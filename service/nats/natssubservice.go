@@ -12,7 +12,6 @@ import (
 	"github.com/xiliangMa/diss-backend/service/securitylog"
 	"github.com/xiliangMa/diss-backend/service/synccheck"
 	"github.com/xiliangMa/diss-backend/service/system/system"
-
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strings"
@@ -631,7 +630,7 @@ func (this *NatsSubService) Save() error {
 				if result := task.GetUnFinishedTaskList(); result.Code != http.StatusOK {
 					metricsResult.Code = result.Code
 					metricsResult.Msg = result.Message
-					logs.Error("Nats ############################ Get task list  fail, >>> HostId: %s, error: <<<", task.Host.Id, result.Message)
+					logs.Error("Nats ############################ Get task list  fail, >>> HostId: %s, Error: <<<", task.Host.Id, result.Message)
 					return errors.New(result.Message)
 				} else {
 					metricsResult.Code = result.Code
@@ -670,7 +669,6 @@ func (this *NatsSubService) Save() error {
 					}
 				}
 
-				logTag := "Nats ############################ "
 				for _, task := range taskList {
 					count := task.RunCount
 					// 更新任务次数
@@ -700,12 +698,10 @@ func (this *NatsSubService) Save() error {
 						if ms.Code != http.StatusOK {
 							result.Message = ms.Msg
 						}
-						msg = fmt.Sprintf("Update task Status: %s, fail, >>> Subject: %s, task id: %s, error: %s <<<", task.Status, this.ClientSubject, task.Id, result.Message)
-						logs.Error(logTag + msg)
+						msg = fmt.Sprintf("Update task Status: %s, fail, >>> Subject: %s, TaskId: %s, Error: %s <<<", task.Status, this.ClientSubject, task.Id, result.Message)
 						taskRawInfo, _ := json.Marshal(task)
 						taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Error}
 						taskLog.Add()
-						return errors.New(result.Message)
 					} else {
 						msg := ""
 						if task.Image != nil {
@@ -717,15 +713,33 @@ func (this *NatsSubService) Save() error {
 						}
 						if ms.Code != http.StatusOK {
 							result.Message = ms.Msg
-							msg = fmt.Sprintf("Update task failed, Status: %s >>> HostId: %s, Type: %s, task id: %s Error: %s <<<", task.Status, this.ClientSubject, models.Resource_Task, task.Id, result.Message)
+							msg = fmt.Sprintf("Update task failed, Status: %s >>> HostId: %s, Type: %s, TaskId: %s Error: %s <<<", task.Status, this.ClientSubject, models.Resource_Task, task.Id, result.Message)
 						} else {
 							msg = fmt.Sprintf("Update task success, Status: %s >>> HostId: %s, Type: %s, task id: %s <<<", task.Status, this.ClientSubject, models.Resource_Task, task.Id)
 						}
-
-						logs.Info(logTag + msg)
 						taskRawInfo, _ := json.Marshal(task)
 						taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Info}
 						taskLog.Add()
+					}
+
+					if task.Host != nil {
+						hc := new(models.HostConfig)
+						hc.Id = task.Host.Id
+						hostConfig := hc.Get()
+						hostConfig.TaskStatus = task.Status
+						hostConfig.Update()
+					} else if task.Image != nil {
+						ic := new(models.ImageConfig)
+						ic.Id = task.Image.Id
+						imageConfig := ic.Get()
+						imageConfig.TaskStatus = task.Status
+						imageConfig.Update()
+					} else if task.Container != nil {
+						cc := new(models.ContainerConfig)
+						cc.Id = task.Container.Id
+						containerConfig := cc.Get()
+						containerConfig.TaskStatus = task.Status
+						containerConfig.Update()
 					}
 				}
 			case models.Resource_Control_Type_Delete:
@@ -779,8 +793,6 @@ func (this *NatsSubService) Save() error {
 				return err
 			}
 
-			logs.Info("ContainerControlStatus Status : %s, data: %v", obj[models.StatusKey], cc)
-
 			if cc[models.WarningInfoId] == nil {
 				if err := mapstructure.Decode(cc, &wi); err != nil {
 					logs.Error("Parse %s error %s", ms.Tag, err)
@@ -829,8 +841,6 @@ func (this *NatsSubService) Save() error {
 				return err
 			}
 
-			logs.Info("ImageControlStatus obj : data: %v", obj)
-
 			imageControl := obj["ImageControl"]
 
 			if err := json.Unmarshal([]byte(imageControl.(string)), &cc); err != nil {
@@ -860,6 +870,20 @@ func (this *NatsSubService) Save() error {
 			natsPubService.Type = ruleDefine.Type
 			natsPubService.ClientSubject = this.ClientSubject
 			natsPubService.RuleDefinePub()
+
+		case models.Resource_Authorization:
+
+			config := models.HostConfig{}
+			s, _ := json.Marshal(ms.Data)
+
+			if err := json.Unmarshal(s, &config); err != nil {
+				logs.Error("Parses %s error %s", ms.Tag, err)
+				return err
+			}
+
+			hs := system.HostService{Host: config}
+			hs.SendAuthorizationDetail()
+
 		}
 	}
 
@@ -898,6 +922,26 @@ func (this *NatsSubService) DeleteTask() error {
 		return err
 	}
 	logs.Info("################ Delete Task <<<end>>> ################")
+
+	if task.Host != nil {
+		hc := new(models.HostConfig)
+		hc.Id = task.Host.Id
+		hostConfig := hc.Get()
+		hostConfig.TaskStatus = ""
+		hostConfig.Update()
+	} else if task.Image != nil {
+		ic := new(models.ImageConfig)
+		ic.Id = task.Image.Id
+		imageConfig := ic.Get()
+		imageConfig.TaskStatus = ""
+		imageConfig.Update()
+	} else if task.Container != nil {
+		cc := new(models.ContainerConfig)
+		cc.Id = task.Container.Id
+		containerConfig := cc.Get()
+		containerConfig.TaskStatus = ""
+		containerConfig.Update()
+	}
 	return nil
 }
 

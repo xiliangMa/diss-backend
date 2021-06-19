@@ -27,6 +27,7 @@ type ContainerConfig struct {
 	UpdateTime     int64       `orm:"default(0);" description:"(更新时间);"`
 	Job            []*Job      `orm:"rel(m2m);null;" description:"(job)"`
 	HostConfig     *HostConfig `orm:"rel(fk);null;" description:"(主机列表)"`
+	TaskStatus     string      `orm:"" description:"(任务状态)"`
 }
 
 type ContainerConfigInterface interface {
