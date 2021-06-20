@@ -50,14 +50,18 @@ func (this *HostService) SendAuthorizationDetail() models.Result {
 	result := models.Result{}
 	hc := this.Host.Get()
 
-	result.Code = http.StatusOK
-	subject := hc.Id
-	r := models.NatsData{Code: result.Code, Type: models.Type_Config, Msg: result.Message, Tag: models.Resource_Authorization, RCType: models.Resource_Control_Type_Put, Data: hc}
-	data, _ := json.MarshalIndent(r, "", "  ")
-	logs.Info("Publish success, subject: %s data : %s", subject, data)
-	err := models.Nats.Conn.Publish(subject, data)
-	if err != nil {
-		logs.Error("Nats ############################ received data from agent fail ############################", err)
+	if hc != nil {
+		result.Code = http.StatusOK
+		subject := hc.Id
+		r := models.NatsData{Code: result.Code, Type: models.Type_Config, Msg: result.Message, Tag: models.Resource_Authorization, RCType: models.Resource_Control_Type_Put, Data: hc}
+		data, _ := json.MarshalIndent(r, "", "  ")
+		logs.Info("Publish success, subject: %s data : %s", subject, data)
+		err := models.Nats.Conn.Publish(subject, data)
+		if err != nil {
+			logs.Error("Nats ############################ received data from agent fail ############################", err)
+		}
+	} else {
+		logs.Error("Host Authorization fail")
 	}
 	return result
 }

@@ -19,7 +19,7 @@ func (this *SensitiveInfoService) AddFileList() {
 		sensiInfo.Permission = fileinfo.Permission
 		sensiInfo.FileType = fileinfo.Type
 		sensiInfo.Size = fileinfo.Size
-
+		sensiInfo.Severity = "MEDIUM"
 		sensiInfo.Add()
 	}
 }

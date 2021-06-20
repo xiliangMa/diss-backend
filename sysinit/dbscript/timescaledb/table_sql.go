@@ -94,7 +94,8 @@ var (
 			constraint virus_record_permission_check
 				check (permission >= 0),
 		modify_time bigint default 0 not null,
-		create_time bigint default 0 not null
+		create_time bigint default 0 not null,
+		severity text default ''::text not null
 	);
 
 	alter table public.virus_record owner to diss;`
@@ -136,7 +137,8 @@ var (
 				check (permission >= 0),
 		file_type text default ''::text not null,
 		size bigint default 0 not null,
-		create_time bigint default 0 not null
+		create_time bigint default 0 not null,
+		severity text default ''::text not null
 	);
 	
 	alter table public.sensitive_info owner to diss;`

@@ -574,12 +574,11 @@ func (this *NatsSubService) Save() error {
 			}
 			createdTime := time.Now().UnixNano()
 			vsLog.CreatedAt = createdTime
-
 			vsLog.Add()
-
 			for _, virusRecord := range vsLog.Records {
 				virusRecord.VirusScanId = vsLog.Id
 				virusRecord.CreateTime = time.Now().UnixNano()
+				virusRecord.Severity = "MEDIUM"
 				virusRecord.Add()
 			}
 
@@ -881,9 +880,10 @@ func (this *NatsSubService) Save() error {
 				return err
 			}
 
+			logs.Info("HostConfig data : %+v", config)
+
 			hs := system.HostService{Host: config}
 			hs.SendAuthorizationDetail()
-
 		}
 	}
 

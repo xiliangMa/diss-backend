@@ -39,6 +39,7 @@ type VirusRecord struct {
 	Permission  uint32 `description:"(感染文件权限)"`
 	ModifyTime  int64  `description:"(感染文件最近修改时间)"`
 	CreateTime  int64  `description:"(感染文件创建时间)"`
+	Severity    string `orm:"size(32)" description:"(等级)"`
 }
 
 type VirusScanRecord struct {
@@ -230,26 +231,24 @@ func (this *VirusRecord) List(from, limit int) Result {
 	var ResultData Result
 	var err error
 	var total int64 = 0
+	var fields []string
 
-	sql := `sselect vr.*,vs.image_id from virus_scan vs  join virus_record vr on vs.id = vr.virus_scan_id where vs.type = 'ImageVirusScan'  `
+	sql := `select vr.*,vs.image_id from virus_scan vs  join virus_record vr on vs.id = vr.virus_scan_id where vs.type = 'ImageVirusScan'  `
 	countSql := `select count(vr.id) from virus_scan vs  join virus_record vr on vs.id = vr.virus_scan_id where vs.type = 'ImageVirusScan' `
 	filter := ""
-	var fields []string
-	if this.Id != 0 {
-		filter = filter + `virus_log.id = ? and `
-		fields = append(fields, string(this.Id))
-	}
-	if this.Type != "" {
-		filter = filter + `vr.type = ? and `
-		fields = append(fields, this.Type)
-	}
+
 	if this.Filename != "" {
 		filter = filter + `vr.filename like ? and `
 		fields = append(fields, "%"+this.Filename+"%")
 	}
 
+	if this.Severity != "" {
+		filter = filter + `vr.severity = ? and `
+		fields = append(fields, this.Severity)
+	}
+
 	if filter != "" {
-		sql = sql + " where " + filter
+		sql = sql + "where " + filter
 		countSql = countSql + " where " + filter
 	}
 	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
@@ -286,7 +285,7 @@ type VirusRecordInterface interface {
 }
 
 func (this *VirusRecord) Add() Result {
-	insetSql := `INSERT INTO virus_record(virus_scan_id, filename, virus, database, type, size, owner, permission, modify_time, create_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	insetSql := `INSERT INTO virus_record(virus_scan_id, filename, virus, database, type, size, owner, permission, modify_time, create_time,severity) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
@@ -301,7 +300,7 @@ func (this *VirusRecord) Add() Result {
 		this.Owner,
 		this.Permission,
 		this.ModifyTime,
-		this.CreateTime).Exec()
+		this.CreateTime, this.Severity).Exec()
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -313,4 +312,33 @@ func (this *VirusRecord) Add() Result {
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
+}
+
+func (this *VirusRecord) Count() int64 {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Security_Log)
+	var total int64
+	var fields []string
+	filter := ""
+
+	countSql := `select count(vr.id) from virus_scan vs  join virus_record vr on vs.id = vr.virus_scan_id `
+
+	if this.Type != "" {
+		filter = filter + `vs.type = ? and `
+		fields = append(fields, this.Type)
+	}
+
+	if this.Severity != "" {
+		filter = filter + `vr.severity = ? and `
+		fields = append(fields, this.Severity)
+	}
+
+	if filter != "" {
+		countSql = countSql + " where " + filter
+	}
+
+	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
+
+	o.Raw(countSql, fields).QueryRow(&total)
+	return total
 }
