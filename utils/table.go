@@ -42,6 +42,9 @@ var (
 	VulnerabiltyLib       = "vulnerability_lib"
 	DockerVulnerabilities = "docker_vulnerabilities"
 	Version               = "version"
+	Role                  = "role"
+	User                  = "user"
+	Module                = "module"
 
 	//security_log timescaledb
 	DcokerIds     = "docker_ids"

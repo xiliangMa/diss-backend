@@ -359,4 +359,8 @@ var (
 	SEVERITY_High     = "HIGH"
 	SEVERITY_Medium   = "MEDIUM"
 	SEVERITY_Low      = "LOW"
+
+	// Auth
+	System_Role           = "admin"
+	Permission_AuthManage = "AuthManage"
 )

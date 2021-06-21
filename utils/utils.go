@@ -2,12 +2,15 @@ package utils
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/shirou/gopsutil/host"
 	"strconv"
+	"strings"
 )
 
 var (
@@ -330,4 +333,17 @@ func ToIndentJSON(obj interface{}) (string, error) {
 func GetHostInfo() *host.InfoStat {
 	info, _ := host.Info()
 	return info
+}
+
+// 这个方法在Name字段加个前缀role_
+func GetRoleString(s string) string {
+	if strings.HasPrefix(s, "role_") {
+		return s
+	}
+	return fmt.Sprintf("role_%s", s)
+}
+
+func MD5(s string) string {
+	sum := md5.Sum([]byte(s))
+	return hex.EncodeToString(sum[:])
 }

@@ -1,9 +1,11 @@
 package auth
 
 import (
+	"encoding/base64"
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"time"
@@ -20,7 +22,14 @@ type JwtService struct {
 }
 
 func (this *JwtService) CreateToken(name, pwd, userType string) (string, int) {
-	if name == beego.AppConfig.String("system::AdminUser") && pwd == beego.AppConfig.String("system::AdminPwd") {
+	user := models.User{}
+	user.Name = name
+	password := utils.MD5(pwd)
+	passwordBase64 := base64.StdEncoding.EncodeToString([]byte(password))
+	user.Password = passwordBase64
+	_, count, _ := user.UserList(0, 1)
+
+	if count > 0 {
 		// Create token
 		this.Token = jwt.New(jwt.SigningMethodHS256)
 
