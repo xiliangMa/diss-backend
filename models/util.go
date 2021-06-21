@@ -353,4 +353,10 @@ var (
 	Container_Status_Failed     = "Failed"
 	Container_Status_Exited     = "Exited"
 	Container_Status_Unknown    = "Unknown"
+
+	// 风险等级
+	SEVERITY_Critical = "CRITICAL"
+	SEVERITY_High     = "HIGH"
+	SEVERITY_Medium   = "MEDIUM"
+	SEVERITY_Low      = "LOW"
 )

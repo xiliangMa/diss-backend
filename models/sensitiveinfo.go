@@ -22,6 +22,7 @@ type SensitiveInfo struct {
 	Size       int64  `description:"(文件大小)"`
 	CreateTime int64  `description:"(添加时间)"`
 	Files      []FileInfo
+	Severity   string `orm:"size(32)" description:"(等级)"`
 }
 
 //虚拟表，用于接收agent的文件列表
@@ -39,7 +40,7 @@ type SensitiveInfoInterface interface {
 }
 
 func (this *SensitiveInfo) Add() Result {
-	insertSql := `INSERT INTO ` + utils.SensitiveInfo + `(file_name, host_id, host_name, image_id, file_type, m_d5, permission, size, create_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	insertSql := `INSERT INTO ` + utils.SensitiveInfo + `(file_name, host_id, host_name, image_id, file_type, m_d5, permission, size, create_time, severity) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?,?)`
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
@@ -53,7 +54,7 @@ func (this *SensitiveInfo) Add() Result {
 		this.MD5,
 		this.Permission,
 		this.Size,
-		this.CreateTime).Exec()
+		this.CreateTime, this.Severity).Exec()
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -141,4 +142,29 @@ func (this *SensitiveInfo) List(from, limit int) Result {
 		ResultData.Data = nil
 	}
 	return ResultData
+}
+
+func (this *SensitiveInfo) Count() int64 {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Security_Log)
+	var total int64
+	var fields []string
+	filter := ""
+
+	countSql := `select count(id) from ` + utils.SensitiveInfo + ``
+
+	if this.Severity != "" {
+		filter = filter + `severity = ? and `
+		fields = append(fields, this.Severity)
+	}
+
+	if filter != "" {
+		countSql = countSql + " where " + filter
+	}
+
+	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
+
+	o.Raw(countSql, fields).QueryRow(&total)
+	return total
+
 }

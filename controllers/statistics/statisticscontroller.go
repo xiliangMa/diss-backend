@@ -19,7 +19,17 @@ func (this *StatisticsController) GetAssetStatistics() {
 	statisticsService := ss.StatisticsService{nil, nil, nil}
 	this.Data["json"] = statisticsService.GetAssetStatistics()
 	this.ServeJSON(false)
+}
 
+// @Title GetMirrorRiskStatistics
+// @Description Get Mirror Risk Statistics
+// @Param token header string true "authToken"
+// @Success 200 {object} models.Result
+// @router /mirrorrisk [get]
+func (this *StatisticsController) GetMirrorRiskStatistics() {
+	statisticsService := ss.StatisticsService{nil, nil, nil}
+	this.Data["json"] = statisticsService.GetMirrorRiskStatistics()
+	this.ServeJSON(false)
 }
 
 // @Title GetBenchMarkProportionStatistics

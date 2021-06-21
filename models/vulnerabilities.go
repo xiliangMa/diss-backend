@@ -225,3 +225,14 @@ func (this *Vulnerabilities) List(from, limit int) Result {
 	ResultData.Data = data
 	return ResultData
 }
+
+func (this *Vulnerabilities) Count() int64 {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	cond := orm.NewCondition()
+	if this.Severity != "" {
+		cond = cond.And("severity", this.Severity)
+	}
+	count, _ := o.QueryTable(utils.Vulnerabilities).SetCond(cond).Count()
+	return count
+}

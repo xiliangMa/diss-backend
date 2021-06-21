@@ -149,3 +149,93 @@ func (this *StatisticsService) GetGetOnlineProportionStatistics() models.Result 
 	ResultData.Data = data
 	return ResultData
 }
+
+func (this *StatisticsService) GetMirrorRiskStatistics() models.Result {
+
+	var ResultData models.Result
+	data := make(map[string]interface{})
+
+	h := make(map[string]int64)
+	vu := new(models.Vulnerabilities)
+
+	vu.Severity = models.SEVERITY_Critical
+	h[models.SEVERITY_Critical] = vu.Count()
+
+	vu.Severity = models.SEVERITY_High
+	h[models.SEVERITY_High] = vu.Count()
+
+	vu.Severity = models.SEVERITY_Medium
+	h[models.SEVERITY_Medium] = vu.Count()
+
+	vu.Severity = models.SEVERITY_Low
+	h[models.SEVERITY_Low] = vu.Count()
+
+	vr := make(map[string]int64)
+	virusRecord := new(models.VirusRecord)
+	virusRecord.Type = "ImageVirusScan"
+	virusRecord.Severity = models.SEVERITY_Critical
+	vr[models.SEVERITY_Critical] = virusRecord.Count()
+
+	virusRecord.Severity = models.SEVERITY_High
+	vr[models.SEVERITY_High] = virusRecord.Count()
+
+	virusRecord.Severity = models.SEVERITY_Medium
+	vr[models.SEVERITY_Medium] = virusRecord.Count()
+
+	virusRecord.Severity = models.SEVERITY_Low
+	vr[models.SEVERITY_Low] = virusRecord.Count()
+
+	si := make(map[string]int64)
+	sensitiveInfo := new(models.SensitiveInfo)
+
+	sensitiveInfo.Severity = models.SEVERITY_Critical
+	si[models.SEVERITY_Critical] = sensitiveInfo.Count()
+
+	sensitiveInfo.Severity = models.SEVERITY_High
+	si[models.SEVERITY_High] = sensitiveInfo.Count()
+
+	sensitiveInfo.Severity = models.SEVERITY_Medium
+	si[models.SEVERITY_Medium] = sensitiveInfo.Count()
+
+	sensitiveInfo.Severity = models.SEVERITY_Low
+	si[models.SEVERITY_Low] = sensitiveInfo.Count()
+
+	// 漏洞库
+	data["vuln"] = h
+	// 病毒库
+	data["virus"] = vr
+	//敏感信息
+	data["sensitive"] = si
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	return ResultData
+
+}
+
+//func getSeverity(m map[string]interface{}, i interface{}) {
+//
+//	var virusRecord struct{}
+//
+//	sensitiveInfo := new(models.SensitiveInfo)
+//
+//	switch i.(type) {
+//	case models.VirusRecord:
+//	case reflect.TypeOf(sensitiveInfo):
+//		v, _ := i.(models.SensitiveInfo)
+//		virusRecord = v
+//	}
+//	reflect.TypeOf(virusRecord)
+//
+//	virusRecord.Severity = models.SEVERITY_Critical
+//	m[models.SEVERITY_Critical] = virusRecord.Count()
+//
+//	virusRecord.Severity = models.SEVERITY_High
+//	m[models.SEVERITY_High] = virusRecord.Count()
+//
+//	virusRecord.Severity = models.SEVERITY_Medium
+//	m[models.SEVERITY_Medium] = virusRecord.Count()
+//
+//	virusRecord.Severity = models.SEVERITY_Low
+//	m[models.SEVERITY_Low] = virusRecord.Count()
+//}
