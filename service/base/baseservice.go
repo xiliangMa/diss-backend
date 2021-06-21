@@ -15,6 +15,7 @@ type BaseService struct {
 	ClusterIds        string
 	JobId             string
 	HostListInCluster []*models.HostConfig
+	IsImageVuln       bool
 }
 
 func (this *BaseService) CheckJobIsExist() (models.Result, *models.Job) {
@@ -53,6 +54,8 @@ func (this *BaseService) CheckHostLicense() (models.Result, []*models.HostConfig
 			data := object.Get()
 			if data == nil {
 				logs.Error("Check failed, Err: %s.", ResultData.Message)
+				ResultData.Code = utils.NotFoundHostForClusterErr
+				ResultData.Message = "Host " + hostId + " not fountd"
 				return ResultData, nil
 			}
 			if !data.IsLicensed {
@@ -162,4 +165,34 @@ func (this *BaseService) CheckClusterIsExist() (models.Result, []*models.Cluster
 
 	}
 	return ResultData, clusterList, hostList
+}
+
+func (this *BaseService) CheckImageContainerOfHost(imageList []*models.ImageConfig, containerList []*models.ContainerConfig) models.Result {
+	ResultData := models.Result{Code: http.StatusOK}
+
+	// 镜像仓库的主机信息需要获取管理端的主机ID
+	if this.IsImageVuln {
+		hostid := utils.GetHostInfo().HostID
+		this.HostIds = hostid
+		ResultData, _ = this.CheckHostLicense()
+		return ResultData
+	}
+
+	for index, image := range imageList {
+		if index < len(imageList)-1 && image.HostId != "" {
+			this.HostIds += image.HostId + ","
+		} else {
+			this.HostIds += image.HostId
+		}
+	}
+	for index, container := range containerList {
+		if index < len(containerList)-1 && container.HostId != "" {
+			this.HostIds += container.HostId + ","
+		} else {
+			this.HostIds += container.HostId
+		}
+	}
+
+	ResultData, _ = this.CheckHostLicense()
+	return ResultData
 }
