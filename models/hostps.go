@@ -10,14 +10,15 @@ import (
 type HostPs struct {
 	Id      string        `orm:"pk;" description:"(id)"`
 	HostId  string        `orm:"" description:"(主机id)"`
-	PID     string        `orm:"" description:"(PID)"`
+	PID     int           `orm:"column(pid)" description:"(PID)"`
 	User    string        `orm:"" description:"(用户)"`
-	CPU     string        `orm:"" description:"(CPU)"`
-	Mem     string        `orm:"" description:"(内存)"`
+	CPU     float64       `orm:"column(cpu)" description:"(CPU)"`
+	Mem     float64       `orm:"" description:"(内存)"`
 	Time    string        `orm:"" description:"(时间)"`
 	Start   string        `orm:"" description:"(运行时长 非mac)"`
 	Started string        `orm:"" description:"(运行时长 mac)"`
 	Command orm.TextField `orm:"" description:"(Command)"`
+	Sort    string        `orm:"-" description:"(排序)"`
 }
 
 type HostPsInterface interface {
@@ -41,7 +42,13 @@ func (this *HostPs) List(from, limit int) Result {
 		cond = cond.And("command__contains", this.Command)
 	}
 
-	_, err := o.QueryTable(utils.HostPs).SetCond(cond).Limit(limit, from).All(&hostPsList)
+	qs := o.QueryTable(utils.HostPs).SetCond(cond)
+
+	if this.Sort != "" {
+		qs = qs.OrderBy(this.Sort)
+	}
+
+	_, err := qs.Limit(limit, from).All(&hostPsList)
 
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -50,10 +57,10 @@ func (this *HostPs) List(from, limit int) Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.HostPs).SetCond(cond).Count()
+	total, _ := qs.Count()
 	data := make(map[string]interface{})
-	data["items"] = hostPsList
-	data["total"] = total
+	data[Result_Items] = hostPsList
+	data[Result_Total] = total
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
