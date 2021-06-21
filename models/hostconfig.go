@@ -120,7 +120,7 @@ func (this *HostConfig) Get() *HostConfig {
 
 	err = o.QueryTable(utils.HostConfig).SetCond(cond).RelatedSel().One(hostConfig)
 	if err != nil {
-		logs.Error("GetHostConfig failed, code: %d, err: %s", err.Error(), utils.GetHostConfigErr)
+		logs.Error("GetHostConfig failed, code: %d, err: %s", utils.GetHostConfigErr, err.Error())
 		return nil
 	}
 	return hostConfig

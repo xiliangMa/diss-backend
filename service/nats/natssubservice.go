@@ -126,7 +126,7 @@ func (this *NatsSubService) Save() error {
 				return err
 			}
 		case models.Resource_ContainerConfig:
-			containerConfigList := []models.ContainerConfig{}
+			var containerConfigList []models.ContainerConfig
 			CheckObject := new(models.ContainerConfig)
 			result := models.Result{}
 			s, _ := json.Marshal(ms.Data)
@@ -170,7 +170,7 @@ func (this *NatsSubService) Save() error {
 			}
 			return nil
 		case models.Resource_ContainerInfo:
-			containerInfoList := []models.ContainerInfo{}
+			var containerInfoList []models.ContainerInfo
 			CheckObject := new(models.ContainerInfo)
 			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &containerInfoList); err != nil {
@@ -198,7 +198,7 @@ func (this *NatsSubService) Save() error {
 			}
 			return nil
 		case models.Resource_ImageConfig:
-			imageConfigList := []models.ImageConfig{}
+			var imageConfigList []models.ImageConfig
 			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &imageConfigList); err != nil {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
@@ -218,7 +218,7 @@ func (this *NatsSubService) Save() error {
 			}
 			return nil
 		case models.Resource_ImageInfo:
-			imageInfoList := []models.ImageInfo{}
+			var imageInfoList []models.ImageInfo
 			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &imageInfoList); err != nil {
 				logs.Error("Parses %s error %s", ms.Tag, err)
@@ -255,7 +255,7 @@ func (this *NatsSubService) Save() error {
 
 			return nil
 		case models.Resource_HostPs:
-			hostPsList := []models.HostPs{}
+			var hostPsList []models.HostPs
 			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &hostPsList); err != nil {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
@@ -273,7 +273,7 @@ func (this *NatsSubService) Save() error {
 			}
 			return nil
 		case models.Resource_ContainerPs:
-			containerPsList := []models.ContainerPs{}
+			var containerPsList []models.ContainerPs
 			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &containerPsList); err != nil {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
@@ -549,7 +549,7 @@ func (this *NatsSubService) Save() error {
 
 			}
 		case models.Resource_HostImageVulnScan:
-			imageVulnList := []models.ImageVulnerabilities{}
+			var imageVulnList []models.ImageVulnerabilities
 			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &imageVulnList); err != nil {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
