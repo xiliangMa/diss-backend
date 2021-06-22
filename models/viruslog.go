@@ -149,11 +149,7 @@ func (this *VirusScan) List(from, limit int) Result {
 	var fields []string
 	if this.Id != 0 {
 		filter = filter + `virus_log.id = ? and `
-		fields = append(fields, string(this.Id))
-	}
-	if this.Name != "" {
-		filter = filter + `.name like ? and `
-		fields = append(fields, "%"+this.Name+"%")
+		fields = append(fields, string(rune(this.Id)))
 	}
 	if this.HostId != "" {
 		filter = filter + `host_id = ? and `

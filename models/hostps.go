@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strings"
 )
 
 type HostPs struct {
@@ -42,14 +43,13 @@ func (this *HostPs) List(from, limit int) Result {
 		cond = cond.And("command__contains", this.Command)
 	}
 
-	qs := o.QueryTable(utils.HostPs).SetCond(cond)
-
+	qs := o.QueryTable(utils.HostPs).SetCond(cond).OrderBy()
 	if this.Sort != "" {
-		qs = qs.OrderBy(this.Sort)
+		arr := strings.Split(this.Sort, ",")
+		qs = qs.OrderBy(arr[:]...)
 	}
 
 	_, err := qs.Limit(limit, from).All(&hostPsList)
-
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetHostPsErr

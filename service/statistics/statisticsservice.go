@@ -210,32 +210,4 @@ func (this *StatisticsService) GetMirrorRiskStatistics() models.Result {
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
 	return ResultData
-
 }
-
-//func getSeverity(m map[string]interface{}, i interface{}) {
-//
-//	var virusRecord struct{}
-//
-//	sensitiveInfo := new(models.SensitiveInfo)
-//
-//	switch i.(type) {
-//	case models.VirusRecord:
-//	case reflect.TypeOf(sensitiveInfo):
-//		v, _ := i.(models.SensitiveInfo)
-//		virusRecord = v
-//	}
-//	reflect.TypeOf(virusRecord)
-//
-//	virusRecord.Severity = models.SEVERITY_Critical
-//	m[models.SEVERITY_Critical] = virusRecord.Count()
-//
-//	virusRecord.Severity = models.SEVERITY_High
-//	m[models.SEVERITY_High] = virusRecord.Count()
-//
-//	virusRecord.Severity = models.SEVERITY_Medium
-//	m[models.SEVERITY_Medium] = virusRecord.Count()
-//
-//	virusRecord.Severity = models.SEVERITY_Low
-//	m[models.SEVERITY_Low] = virusRecord.Count()
-//}
