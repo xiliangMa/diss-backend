@@ -188,24 +188,45 @@ func (this *WarningInfo) Update() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
+	var fields []string
+	filter := ""
+	sql := `UPDATE ` + utils.WarningInfo + ` SET `
 
-	this.UpdateTime = time.Now().UnixNano()
 	if this.Status != "" {
-		_, err = o.Raw(`UPDATE `+utils.WarningInfo+` SET status=? WHERE id=?`, this.Status, this.Id).Exec()
+		filter = filter + `status = ? , `
+		fields = append(fields, this.Status)
+		//_, err = o.Raw(`UPDATE `+utils.WarningInfo+` SET status=? WHERE id=?`, this.Status, this.Id).Exec()
 	}
-
 	if this.Proposal != "" {
-		_, err = o.Raw(`UPDATE `+utils.WarningInfo+` SET proposal=? WHERE id=?`, this.Proposal, this.Id).Exec()
+		filter = filter + `proposal = ? , `
+		fields = append(fields, this.Proposal)
+		//_, err = o.Raw(`UPDATE `+utils.WarningInfo+` SET proposal=? WHERE id=?`, this.Proposal, this.Id).Exec()
 	}
-
-	if this.Proposal != "" && this.Status != "" {
-		_, err = o.Raw(`UPDATE `+utils.WarningInfo+` SET proposal=?,status=? WHERE id=?`, this.Proposal, this.Status, this.Id).Exec()
-	}
-
 	if this.Mode != "" {
-		_, err = o.Raw(`UPDATE `+utils.WarningInfo+` SET mode=? WHERE id=?`, this.Mode, this.Id).Exec()
+		filter = filter + `mode = ? , `
+		fields = append(fields, this.Mode)
+		//_, err = o.Raw(`UPDATE `+utils.WarningInfo+` SET mode=? WHERE id=?`, this.Mode, this.Id).Exec()
+	}
+	this.UpdateTime = time.Now().UnixNano()
+	if this.UpdateTime != 0 {
+		filter = filter + `update_time = ? , `
+		fields = append(fields, strconv.FormatInt(this.UpdateTime, 10))
+		//_, err = o.Raw(`UPDATE `+utils.WarningInfo+` SET mode=? WHERE id=?`, this.Mode, this.Id).Exec()
+	}
+	if filter != "" {
+		sql = sql + filter
+	}
+	sql = strings.TrimSuffix(strings.TrimSpace(sql), ",")
+	filter = ""
+	if this.Id != "" {
+		filter = filter + `id = ? `
+		fields = append(fields, this.Id)
 	}
 
+	if filter != "" {
+		sql = sql + " where " + filter
+	}
+	_, err = o.Raw(sql, fields).Exec()
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.UpdateWarningInfoErr

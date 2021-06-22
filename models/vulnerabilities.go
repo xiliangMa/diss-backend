@@ -6,6 +6,7 @@ import (
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type ImageVulnerabilities struct {
@@ -17,7 +18,7 @@ type ImageVulnerabilities struct {
 	Target          string             `orm:"size(128)" description:"(扫描镜像名)"`
 	Type            string             `orm:"size(32)" description:"(镜像系统类型)"`
 	Vulnerabilities []*Vulnerabilities `orm:"reverse(many);" description:"(漏洞列表)"`
-	Severity        string             `orm:"-" description:"(等级，查询参数)"`
+	CreateTime      int64              `description:"(感染文件创建时间)"`
 }
 
 type Vulnerabilities struct {
@@ -51,6 +52,7 @@ func (this *ImageVulnerabilities) Add() Result {
 	o.Using(utils.DS_Default)
 	var ResultData Result
 	o.Begin()
+	this.CreateTime = time.Now().UnixNano()
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -89,7 +91,7 @@ func (this *ImageVulnerabilities) List(from, limit int) Result {
 		cond = cond.And("host_id", this.HostId)
 	}
 	if this.ImageId != "" {
-		cond = cond.And("image_id", this.ImageId)
+		cond = cond.And("image_id__icontains", this.ImageId)
 	}
 	if this.TaskId != "" {
 		cond = cond.And("task_id", this.TaskId)
@@ -100,32 +102,12 @@ func (this *ImageVulnerabilities) List(from, limit int) Result {
 	if this.Type != "" {
 		cond = cond.And("type__icontains", this.Type)
 	}
-	_, err = o.QueryTable(utils.ImageVulnerabilities).SetCond(cond).Limit(limit, from).All(&imageVulnerabilities)
 
+	_, err = o.QueryTable(utils.ImageVulnerabilities).SetCond(cond).OrderBy("-create_time").Limit(limit, from).All(&imageVulnerabilities)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetImageVulnerabilitiesErr
 		logs.Error("Get ImageVulnerabilitiesErr List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-
-	if this.Severity != "" {
-		for _, vulnerabilities := range imageVulnerabilities {
-			cond2 := orm.NewCondition()
-			cond2 = cond2.And("image_vulnerabilities_id", vulnerabilities.Id)
-			cond2 = cond2.And("severity", this.Severity)
-			_, err = o.QueryTable(utils.Vulnerabilities).SetCond(cond2).Limit(limit, from).All(&vulnerabilities.Vulnerabilities)
-		}
-	} else {
-		for _, vulnerabilities := range imageVulnerabilities {
-			o.LoadRelated(vulnerabilities, "Vulnerabilities", true)
-		}
-	}
-
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetVulnerabilitiesErr
-		logs.Error("Get Vulnerabilities List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
@@ -200,6 +182,13 @@ func (this *Vulnerabilities) List(from, limit int) Result {
 	}
 	if this.Severity != "" {
 		cond = cond.And("severity", this.Severity)
+	}
+	if this.VulnerabilityID != "" {
+		cond = cond.And("vulnerability_id", this.VulnerabilityID)
+	}
+
+	if this.ImageVulnerabilities != nil {
+		cond = cond.And("image_vulnerabilities_id", this.ImageVulnerabilities.Id)
 	}
 
 	_, err = o.QueryTable(utils.Vulnerabilities).SetCond(cond).Limit(limit, from).All(&vulnerabilities)
