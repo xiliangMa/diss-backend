@@ -277,6 +277,14 @@ func GetVirusrUrl() string {
 	return beego.AppConfig.String("system::VirusUrl")
 }
 
+func GetPublicPath() string {
+	return beego.AppConfig.String("system::PublicPath")
+}
+
+func GetPublicUrl() string {
+	return beego.AppConfig.String("system::PublicUrl")
+}
+
 func GetSystemIP() string {
 	IP := beego.AppConfig.String("system::IP")
 	return IP
