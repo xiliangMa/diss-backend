@@ -19,7 +19,7 @@ func (this *DefaultDB) InitDB() {
 	// true: drop table 后再建表
 	force, _ := beego.AppConfig.Bool("Force")
 
-	DS := GetConn(DSAlias)
+	DS := utils.GetConn(DSAlias)
 	orm.RegisterDriver(driver, orm.DRPostgres)
 	err := orm.RegisterDataBase(DSAlias, driver, DS)
 	if err != nil {

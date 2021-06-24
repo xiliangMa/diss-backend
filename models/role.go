@@ -63,11 +63,13 @@ func (this *Role) AddUser() Result {
 	}
 
 	for _, user := range this.Users {
-		_, err := Enforcer.AddRoleForUser(user.Name, utils.GetRoleString(this.Code))
+		_, err := GlobalCasbin.Enforcer.AddRoleForUser(user.Name, utils.GetRoleString(this.Code))
 		if err != nil {
 			logs.Warn("Add User To Role failed, code: %d, error : %s", ResultData.Code, err)
 		}
 	}
+	GlobalCasbin.Enforcer.LoadPolicy()
+
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
@@ -85,11 +87,13 @@ func (this *Role) RemoveUser() Result {
 	}
 
 	for _, user := range this.Users {
-		_, err := Enforcer.DeleteRoleForUser(user.Name, utils.GetRoleString(this.Code))
+		_, err := GlobalCasbin.Enforcer.DeleteRoleForUser(user.Name, utils.GetRoleString(this.Code))
 		if err != nil {
 			logs.Warn("Remove User From Role failed, No User Info , code: %d, error : %s", ResultData.Code, err)
 		}
 	}
+	GlobalCasbin.Enforcer.LoadPolicy()
+
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
@@ -100,7 +104,7 @@ func (this *Role) PolicyList() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 
-	perm := Enforcer.GetPermissionsForUser(utils.GetRoleString(this.Code))
+	perm := GlobalCasbin.Enforcer.GetPermissionsForUser(utils.GetRoleString(this.Code))
 	modulelist := []string{}
 	for _, po := range perm {
 		modulelist = append(modulelist, po[1])
@@ -123,13 +127,13 @@ func (this *Role) AddPolicy() Result {
 	}
 
 	for _, module := range this.Modules {
-		_, err := Enforcer.AddPolicy(utils.GetRoleString(this.Code), module.Code, "-")
+		_, err := GlobalCasbin.Enforcer.AddPolicy(utils.GetRoleString(this.Code), module.Code, "-")
 
 		if err != nil {
 			logs.Warn("Add AddPolicy failed, code: %d, error : %s", ResultData.Code, err)
 		}
 	}
-	Enforcer.LoadPolicy()
+	GlobalCasbin.Enforcer.LoadPolicy()
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
@@ -148,12 +152,12 @@ func (this *Role) RemovePolicy() Result {
 	}
 
 	for _, module := range this.Modules {
-		_, err := Enforcer.RemovePolicy(utils.GetRoleString(this.Code), module.Code, "")
+		_, err := GlobalCasbin.Enforcer.RemovePolicy(utils.GetRoleString(this.Code), module.Code, "")
 		if err != nil {
 			logs.Warn("Add Policy failed, code: %d, error : %s", ResultData.Code, err)
 		}
 	}
-	Enforcer.LoadPolicy()
+	GlobalCasbin.Enforcer.LoadPolicy()
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
@@ -171,11 +175,27 @@ func (this *Role) UpdatePolicy() Result {
 		ResultData.Message = msg
 	}
 
+	// 更新修改时间
+	roleObj := Role{}
+	roleObj.Code = utils.GetRoleString(this.Code)
+	roleList, total, _ := roleObj.RoleList(0, 0)
+	if total > 0 {
+		roleData := roleList[0]
+		roleData.UpdateTime = time.Now().UnixNano()
+		_, err := o.Update(roleData)
+		if err != nil {
+			ResultData.Message = err.Error()
+			ResultData.Code = utils.EditRoleErr
+			logs.Error("Edit Role %s failed, code: %d, err: %s", this.Code, ResultData.Code, ResultData.Message)
+			return ResultData
+		}
+	}
+
 	// 移除之前的全部权限
-	modules := Enforcer.GetPermissionsForUser(utils.GetRoleString(this.Code))
+	modules := GlobalCasbin.Enforcer.GetPermissionsForUser(utils.GetRoleString(this.Code))
 	for _, mo := range modules {
 		if this.Code != utils.GetRoleString(System_Role) && mo[1] != Permission_AuthManage {
-			_, err := Enforcer.RemovePolicy(utils.GetRoleString(this.Code), mo[1], "")
+			_, err := GlobalCasbin.Enforcer.RemovePolicy(utils.GetRoleString(this.Code), mo[1], "")
 			if err != nil {
 				logs.Warn("Remove Policy failed, code: %d, error : %s", ResultData.Code, err)
 			}
@@ -184,13 +204,13 @@ func (this *Role) UpdatePolicy() Result {
 
 	// 添加新指定的权限
 	for _, module := range this.Modules {
-		_, err := Enforcer.AddPolicy(utils.GetRoleString(this.Code), module.Code, "-")
-		Enforcer.LoadPolicy()
+		_, err := GlobalCasbin.Enforcer.AddPolicy(utils.GetRoleString(this.Code), module.Code, "-")
+		GlobalCasbin.Enforcer.LoadPolicy()
 		if err != nil {
 			logs.Warn("Add AddPolicy failed, code: %d, error : %s", ResultData.Code, err)
 		}
 	}
-	Enforcer.LoadPolicy()
+	GlobalCasbin.Enforcer.LoadPolicy()
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
@@ -216,7 +236,6 @@ func (this *Role) Update() Result {
 			logs.Error("Edit Role %s failed, code: %d, err: %s", this.Code, ResultData.Code, ResultData.Message)
 			return ResultData
 		}
-
 	}
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this

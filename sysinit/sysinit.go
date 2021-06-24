@@ -61,4 +61,7 @@ func init() {
 
 	// 6. LDAPManager
 	models.LM = models.NewLDAPManager()
+
+	// init Casbin
+	InitCasbin()
 }

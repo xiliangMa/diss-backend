@@ -127,7 +127,7 @@ func (this *User) UserList(from, limit int) (userLists []*User, count int64, err
 
 	_, err = o.QueryTable(utils.User).SetCond(cond).Limit(limit, from).OrderBy("-create_time").All(&userList)
 	for _, user := range userList {
-		userRole, _ := Enforcer.GetRolesForUser(user.Name)
+		userRole, _ := GlobalCasbin.Enforcer.GetRolesForUser(user.Name)
 		if len(userRole) > 0 {
 			roleQuery := Role{Code: utils.GetRoleString(userRole[0])}
 			roleObj, count, _ := roleQuery.RoleList(0, 1)

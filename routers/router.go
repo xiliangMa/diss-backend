@@ -21,9 +21,7 @@ import (
 	"github.com/xiliangMa/diss-backend/controllers/system/report"
 	csystem "github.com/xiliangMa/diss-backend/controllers/system/system"
 	ws "github.com/xiliangMa/diss-backend/controllers/ws"
-	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/auth"
-	"github.com/xiliangMa/diss-backend/sysinit"
 	"net/http"
 )
 
@@ -205,9 +203,7 @@ func init() {
 	}
 	beego.InsertFilter("/api/v1/*", beego.BeforeRouter, isLogin)
 
-	models.Enforcer = sysinit.InitCasbinAdaptor()
-	models.Enforcer.LoadPolicy()
-	//beego.InsertFilter("/api/v1/*", beego.BeforeRouter, plugins.NewAuthorizer(models.Enforcer))
+	//beego.InsertFilter("/api/v1/*", beego.BeforeRouter, models.GlobalCasbin.CheckPermisson())
 
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins:  true,
