@@ -79,24 +79,35 @@ func (this *StatisticsController) GetHostBnechMarkSummaryStatistics() {
 	this.ServeJSON(false)
 }
 
-// @Title GetGetOnlineProportionStatistics
+// @Title GetOnlineProportionStatistics
 // @Description Get BnechMark Proportion Statistics (主机在线占比：Online / Offline)
 // @Param token header string true "authToken"
 // @Success 200 {object} models.Result
 // @router /onlineproportion [get]
-func (this *StatisticsController) GetGetOnlineProportionStatistics() {
+func (this *StatisticsController) GetOnlineProportionStatistics() {
 	statisticsService := ss.StatisticsService{nil, nil, nil}
-	this.Data["json"] = statisticsService.GetGetOnlineProportionStatistics()
+	this.Data["json"] = statisticsService.GetOnlineProportionStatistics()
 	this.ServeJSON(false)
 }
 
-// @Title GetGetDissProportionStatistics
+// @Title GetDissProportionStatistics
 // @Description Get Diss Proportion Statistics (安全容器占比：Safe / Unsafe)
 // @Param token header string true "authToken"
 // @Success 200 {object} models.Result
 // @router /dissproportion [get]
-func (this *StatisticsController) GetGetDissProportionStatistics() {
+func (this *StatisticsController) GetDissProportionStatistics() {
 	statisticsService := ss.StatisticsService{nil, nil, nil}
-	this.Data["json"] = statisticsService.GetGetDissProportionStatistics()
+	this.Data["json"] = statisticsService.GetDissProportionStatistics()
+	this.ServeJSON(false)
+}
+
+// @Title GetWarningStatistics
+// @Description Get Diss Proportion Statistics (安全容器占比：Safe / Unsafe)
+// @Param token header string true "authToken"
+// @Success 200 {object} models.Result
+// @router /warning [get]
+func (this *StatisticsController) GetWarningStatistics() {
+	statisticsService := ss.StatisticsService{nil, nil, nil}
+	this.Data["json"] = statisticsService.GetWarningStatistics()
 	this.ServeJSON(false)
 }

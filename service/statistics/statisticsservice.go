@@ -128,7 +128,7 @@ func (this *StatisticsService) GetHostBnechMarkSummaryStatistics(hostId string) 
 	bml.HostId = hostId
 	return bml.GetHostMarkSummary()
 }
-func (this *StatisticsService) GetGetDissProportionStatistics() models.Result {
+func (this *StatisticsService) GetDissProportionStatistics() models.Result {
 	var ResultData models.Result
 	data := make(map[string]interface{})
 	// safe / unsafe
@@ -139,7 +139,7 @@ func (this *StatisticsService) GetGetDissProportionStatistics() models.Result {
 	return ResultData
 }
 
-func (this *StatisticsService) GetGetOnlineProportionStatistics() models.Result {
+func (this *StatisticsService) GetOnlineProportionStatistics() models.Result {
 	var ResultData models.Result
 	data := make(map[string]interface{})
 	// Online / Offline
@@ -210,4 +210,62 @@ func (this *StatisticsService) GetMirrorRiskStatistics() models.Result {
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
 	return ResultData
+}
+
+func (this *StatisticsService) GetWarningStatistics() models.Result {
+
+	var ResultData models.Result
+	data := make(map[string]interface{})
+
+	wi := make(map[string]int64)
+	warningInfo := new(models.WarningInfo)
+
+	warningInfo.Type = models.ReverseShell
+	wi[models.ReverseShell] = warningInfo.Count()
+
+	warningInfo.Type = models.ContainerEscalation
+	wi[models.ContainerEscalation] = warningInfo.Count()
+
+	warningInfo.Type = models.Shell
+	wi[models.Shell] = warningInfo.Count()
+
+	warningInfo.Type = models.PrivilegeEscalation
+	wi[models.PrivilegeEscalation] = warningInfo.Count()
+
+	warningInfo.Type = models.VulnExploit
+	wi[models.VulnExploit] = warningInfo.Count()
+
+	warningInfo.Type = models.SuspiciousConnection
+	wi[models.SuspiciousConnection] = warningInfo.Count()
+
+	warningInfo.Type = models.SuspiciousProcess
+	wi[models.SuspiciousProcess] = warningInfo.Count()
+
+	warningInfo.Type = models.NetAttack
+	wi[models.NetAttack] = warningInfo.Count()
+
+	warningInfo.Type = models.K8sAudit
+	wi[models.K8sAudit] = warningInfo.Count()
+
+	warningInfo.Type = models.TrojanVirus
+	wi[models.TrojanVirus] = warningInfo.Count()
+
+	warningInfo.Type = models.SuspiciousLogin
+	wi[models.SuspiciousLogin] = warningInfo.Count()
+
+	warningInfo.Type = models.TypeScanning
+	wi[models.TypeScanning] = warningInfo.Count()
+
+	warningInfo.Type = models.BruteForce
+	wi[models.BruteForce] = warningInfo.Count()
+
+	warningInfo.Type = models.OTHER
+	wi[models.OTHER] = warningInfo.Count()
+
+	data["warningInfo"] = wi
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	return ResultData
+
 }

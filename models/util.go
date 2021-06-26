@@ -360,6 +360,22 @@ var (
 	SEVERITY_Medium   = "MEDIUM"
 	SEVERITY_Low      = "LOW"
 
+	// 入侵
+	ReverseShell         = "ALERT_TYPE_REVERSE_SHELL"
+	ContainerEscalation  = "ALERT_TYPE_CONTAINER_ESCALATION"
+	Shell                = "ALERT_TYPE_WEBSHELL"
+	PrivilegeEscalation  = "ALERT_TYPE_PRIVILEGE_ESCALATION"
+	VulnExploit          = "ALERT_TYPE_VULN_EXPLOIT"
+	SuspiciousConnection = "ALERT_TYPE_SUSPICIOUS_CONNECTION"
+	SuspiciousProcess    = "ALERT_TYPE_SUSPICIOUS_PROCESS"
+	NetAttack            = "ALERT_TYPE_NET_ATTACK"
+	K8sAudit             = "ALERT_TYPE_K8S_AUDIT"
+	TrojanVirus          = "ALERT_TYPE_TROJAN_VIRUS"
+	SuspiciousLogin      = "ALERT_TYPE_SUSPICIOUS_LOGIN"
+	TypeScanning         = "ALERT_TYPE_SCANNING"
+	BruteForce           = "ALERT_TYPE_BRUTE_FORCE"
+	OTHER                = "ALERT_TYPE_OTHER"
+
 	// Auth
 	System_Role           = "admin"
 	Permission_AuthManage = "AuthManage"
