@@ -16,7 +16,6 @@ type Mapper interface {
 	Table2Obj(string) string
 }
 
-// CacheMapper represents a cache mapper
 type CacheMapper struct {
 	oriMapper      Mapper
 	obj2tableCache map[string]string
@@ -25,14 +24,12 @@ type CacheMapper struct {
 	table2objMutex sync.RWMutex
 }
 
-// NewCacheMapper creates a cache mapper
 func NewCacheMapper(mapper Mapper) *CacheMapper {
 	return &CacheMapper{oriMapper: mapper, obj2tableCache: make(map[string]string),
 		table2objCache: make(map[string]string),
 	}
 }
 
-// Obj2Table implements Mapper
 func (m *CacheMapper) Obj2Table(o string) string {
 	m.obj2tableMutex.RLock()
 	t, ok := m.obj2tableCache[o]
@@ -48,7 +45,6 @@ func (m *CacheMapper) Obj2Table(o string) string {
 	return t
 }
 
-// Table2Obj implements Mapper
 func (m *CacheMapper) Table2Obj(t string) string {
 	m.table2objMutex.RLock()
 	o, ok := m.table2objCache[t]
@@ -64,17 +60,15 @@ func (m *CacheMapper) Table2Obj(t string) string {
 	return o
 }
 
-// SameMapper implements Mapper and provides same name between struct and
+// SameMapper implements IMapper and provides same name between struct and
 // database table
 type SameMapper struct {
 }
 
-// Obj2Table implements Mapper
 func (m SameMapper) Obj2Table(o string) string {
 	return o
 }
 
-// Table2Obj implements Mapper
 func (m SameMapper) Table2Obj(t string) string {
 	return t
 }
@@ -104,7 +98,6 @@ func snakeCasedName(name string) string {
 	return b2s(newstr)
 }
 
-// Obj2Table implements Mapper
 func (mapper SnakeMapper) Obj2Table(name string) string {
 	return snakeCasedName(name)
 }
@@ -134,7 +127,6 @@ func titleCasedName(name string) string {
 	return b2s(newstr)
 }
 
-// Table2Obj implements Mapper
 func (mapper SnakeMapper) Table2Obj(name string) string {
 	return titleCasedName(name)
 }
@@ -176,12 +168,10 @@ func gonicCasedName(name string) string {
 	return strings.ToLower(string(newstr))
 }
 
-// Obj2Table implements Mapper
 func (mapper GonicMapper) Obj2Table(name string) string {
 	return gonicCasedName(name)
 }
 
-// Table2Obj implements Mapper
 func (mapper GonicMapper) Table2Obj(name string) string {
 	newstr := make([]rune, 0)
 
@@ -244,17 +234,14 @@ type PrefixMapper struct {
 	Prefix string
 }
 
-// Obj2Table implements Mapper
 func (mapper PrefixMapper) Obj2Table(name string) string {
 	return mapper.Prefix + mapper.Mapper.Obj2Table(name)
 }
 
-// Table2Obj implements Mapper
 func (mapper PrefixMapper) Table2Obj(name string) string {
 	return mapper.Mapper.Table2Obj(name[len(mapper.Prefix):])
 }
 
-// NewPrefixMapper creates a prefix mapper
 func NewPrefixMapper(mapper Mapper, prefix string) PrefixMapper {
 	return PrefixMapper{mapper, prefix}
 }
@@ -265,17 +252,14 @@ type SuffixMapper struct {
 	Suffix string
 }
 
-// Obj2Table implements Mapper
 func (mapper SuffixMapper) Obj2Table(name string) string {
 	return mapper.Mapper.Obj2Table(name) + mapper.Suffix
 }
 
-// Table2Obj implements Mapper
 func (mapper SuffixMapper) Table2Obj(name string) string {
 	return mapper.Mapper.Table2Obj(name[:len(name)-len(mapper.Suffix)])
 }
 
-// NewSuffixMapper creates a suffix mapper
 func NewSuffixMapper(mapper Mapper, suffix string) SuffixMapper {
 	return SuffixMapper{mapper, suffix}
 }

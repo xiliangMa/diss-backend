@@ -79,7 +79,7 @@ func (eg *EngineGroup) Close() error {
 	return nil
 }
 
-// Context returned a group session
+// ContextHook returned a group session
 func (eg *EngineGroup) Context(ctx context.Context) *Session {
 	sess := eg.NewSession()
 	sess.isAutoClose = true
@@ -144,7 +144,6 @@ func (eg *EngineGroup) SetLogger(logger interface{}) {
 	}
 }
 
-// AddHook adds Hook
 func (eg *EngineGroup) AddHook(hook contexts.Hook) {
 	eg.Engine.AddHook(hook)
 	for i := 0; i < len(eg.slaves); i++ {
@@ -165,14 +164,6 @@ func (eg *EngineGroup) SetMapper(mapper names.Mapper) {
 	eg.Engine.SetMapper(mapper)
 	for i := 0; i < len(eg.slaves); i++ {
 		eg.slaves[i].SetMapper(mapper)
-	}
-}
-
-// SetTagIdentifier set the tag identifier
-func (eg *EngineGroup) SetTagIdentifier(tagIdentifier string) {
-	eg.Engine.SetTagIdentifier(tagIdentifier)
-	for i := 0; i < len(eg.slaves); i++ {
-		eg.slaves[i].SetTagIdentifier(tagIdentifier)
 	}
 }
 

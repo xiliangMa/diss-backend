@@ -42,7 +42,6 @@ var (
 // enumerate all the context keys
 var (
 	SessionIDKey      = "__xorm_session_id"
-	SessionKey        = "__xorm_session_key"
 	SessionShowSQLKey = "__xorm_show_sql"
 )
 

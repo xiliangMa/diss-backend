@@ -130,7 +130,7 @@ func (statement *Statement) BuildUpdates(tableValue reflect.Value,
 			}
 		}
 
-		if structConvert, ok := fieldValue.Interface().(convert.Conversion); ok && !fieldValue.IsNil() {
+		if structConvert, ok := fieldValue.Interface().(convert.Conversion); ok {
 			data, err := structConvert.ToDB()
 			if err != nil {
 				return nil, nil, err
@@ -204,7 +204,7 @@ func (statement *Statement) BuildUpdates(tableValue reflect.Value,
 					continue
 				}
 			} else {
-				if !col.IsJSON {
+				if !col.SQLType.IsJson() {
 					table, err := statement.tagParser.ParseWithCache(fieldValue)
 					if err != nil {
 						val = fieldValue.Interface()

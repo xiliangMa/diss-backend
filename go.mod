@@ -6,6 +6,8 @@ require (
 	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1140
 	github.com/astaxie/beego v1.12.0
+	github.com/casbin/casbin/v2 v2.31.5
+	github.com/casbin/xorm-adapter/v2 v2.3.2
 	github.com/dgrijalva/jwt-go v3.2.1-0.20180921172315-3af4c746e1c2+incompatible
 	github.com/go-ldap/ldap v3.0.3+incompatible
 	github.com/go-ole/go-ole v1.2.5 // indirect

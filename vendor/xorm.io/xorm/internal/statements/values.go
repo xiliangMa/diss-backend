@@ -36,21 +36,18 @@ func (statement *Statement) Value2Interface(col *schemas.Column, fieldValue refl
 		}
 	}
 
-	isNil := fieldValue.Kind() == reflect.Ptr && fieldValue.IsNil()
-	if !isNil {
-		if fieldConvert, ok := fieldValue.Interface().(convert.Conversion); ok {
-			data, err := fieldConvert.ToDB()
-			if err != nil {
-				return nil, err
-			}
-			if col.SQLType.IsBlob() {
-				return data, nil
-			}
-			if nil == data {
-				return nil, nil
-			}
-			return string(data), nil
+	if fieldConvert, ok := fieldValue.Interface().(convert.Conversion); ok {
+		data, err := fieldConvert.ToDB()
+		if err != nil {
+			return nil, err
 		}
+		if col.SQLType.IsBlob() {
+			return data, nil
+		}
+		if nil == data {
+			return nil, nil
+		}
+		return string(data), nil
 	}
 
 	fieldType := fieldValue.Type()
@@ -86,7 +83,7 @@ func (statement *Statement) Value2Interface(col *schemas.Column, fieldValue refl
 			return t.Float64, nil
 		}
 
-		if !col.IsJSON {
+		if !col.SQLType.IsJson() {
 			// !<winxxp>! 增加支持driver.Valuer接口的结构，如sql.NullString
 			if v, ok := fieldValue.Interface().(driver.Valuer); ok {
 				return v.Value()

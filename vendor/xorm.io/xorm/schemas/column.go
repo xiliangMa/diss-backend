@@ -13,7 +13,6 @@ import (
 	"time"
 )
 
-// enumerates all database mapping way
 const (
 	TWOSIDES = iota + 1
 	ONLYTODB
@@ -24,7 +23,7 @@ const (
 type Column struct {
 	Name            string
 	TableName       string
-	FieldName       string // Available only when parsed from a struct
+	FieldName       string // Avaiable only when parsed from a struct
 	SQLType         SQLType
 	IsJSON          bool
 	Length          int
@@ -52,7 +51,6 @@ type Column struct {
 func NewColumn(name, fieldName string, sqlType SQLType, len1, len2 int, nullable bool) *Column {
 	return &Column{
 		Name:            name,
-		IsJSON:          sqlType.IsJson(),
 		TableName:       "",
 		FieldName:       fieldName,
 		SQLType:         sqlType,

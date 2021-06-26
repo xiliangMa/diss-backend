@@ -38,7 +38,6 @@ func convertQuestionMark(sql, prefix string, start int) string {
 	return buf.String()
 }
 
-// Do implements Filter
 func (s *SeqFilter) Do(sql string) string {
 	return convertQuestionMark(sql, s.Prefix, s.Start)
 }

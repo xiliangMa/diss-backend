@@ -226,9 +226,6 @@ func CommentTagHandler(ctx *Context) error {
 // SQLTypeTagHandler describes SQL Type tag handler
 func SQLTypeTagHandler(ctx *Context) error {
 	ctx.col.SQLType = schemas.SQLType{Name: ctx.tagName}
-	if strings.EqualFold(ctx.tagName, "JSON") {
-		ctx.col.IsJSON = true
-	}
 	if len(ctx.params) > 0 {
 		if ctx.tagName == schemas.Enum {
 			ctx.col.EnumOptions = make(map[string]int)

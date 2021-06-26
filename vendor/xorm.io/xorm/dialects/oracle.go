@@ -802,10 +802,10 @@ func (db *oracle) Filters() []Filter {
 	}
 }
 
-type godrorDriver struct {
+type goracleDriver struct {
 }
 
-func (cfg *godrorDriver) Parse(driverName, dataSourceName string) (*URI, error) {
+func (cfg *goracleDriver) Parse(driverName, dataSourceName string) (*URI, error) {
 	db := &URI{DBType: schemas.ORACLE}
 	dsnPattern := regexp.MustCompile(
 		`^(?:(?P<user>.*?)(?::(?P<passwd>.*))?@)?` + // [user[:password]@]

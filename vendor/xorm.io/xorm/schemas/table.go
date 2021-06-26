@@ -58,7 +58,12 @@ func (table *Table) ColumnsSeq() []string {
 }
 
 func (table *Table) columnsByName(name string) []*Column {
-	return table.columnsMap[strings.ToLower(name)]
+	for k, cols := range table.columnsMap {
+		if strings.EqualFold(k, name) {
+			return cols
+		}
+	}
+	return nil
 }
 
 // GetColumn returns column according column name, if column not found, return nil
@@ -90,28 +95,23 @@ func (table *Table) PKColumns() []*Column {
 	return columns
 }
 
-// ColumnType returns a column's type
 func (table *Table) ColumnType(name string) reflect.Type {
 	t, _ := table.Type.FieldByName(name)
 	return t.Type
 }
 
-// AutoIncrColumn returns autoincrement column
 func (table *Table) AutoIncrColumn() *Column {
 	return table.GetColumn(table.AutoIncrement)
 }
 
-// VersionColumn returns version column's information
 func (table *Table) VersionColumn() *Column {
 	return table.GetColumn(table.Version)
 }
 
-// UpdatedColumn returns updated column's information
 func (table *Table) UpdatedColumn() *Column {
 	return table.GetColumn(table.Updated)
 }
 
-// DeletedColumn returns deleted column's information
 func (table *Table) DeletedColumn() *Column {
 	return table.GetColumn(table.Deleted)
 }
