@@ -22,8 +22,10 @@ type ContainerController struct {
 func (this *ContainerController) GetContainersList() {
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
+
 	containerConfig := new(models.ContainerConfig)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &containerConfig)
+
 	this.Data["json"] = containerConfig.List(from, limit, false)
 	this.ServeJSON(false)
 }
@@ -36,9 +38,10 @@ func (this *ContainerController) GetContainersList() {
 // @router /:containerId [delete]
 func (this *ContainerController) DeleteContainer() {
 	containerId := this.GetString(":containerId")
+
 	containerConfig := new(models.ContainerConfig)
-	//json.Unmarshal(this.Ctx.Input.RequestBody, &containerConfig)
 	containerConfig.Id = containerId
+
 	this.Data["json"] = containerConfig.Delete()
 	this.ServeJSON(false)
 }
@@ -52,9 +55,30 @@ func (this *ContainerController) DeleteContainer() {
 // @router /:containerId/info [post]
 func (this *ContainerController) GetContainerInfo() {
 	containerId := this.GetString(":containerId")
+
 	containerInfo := new(models.ContainerInfo)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &containerInfo)
+
 	containerInfo.Id = containerId
 	this.Data["json"] = containerInfo.List()
+	this.ServeJSON(false)
+}
+
+// @Title GetContainerPsList
+// @Description Get Container Ps  List
+// @Param token header string true "authToken"
+// @Param body body models.ContainerPs false "容器进程"
+// @Param from query int 0 false "from"
+// @Param limit query int 20 false "limit"
+// @Success 200 {object} models.Result
+// @router /ps [post]
+func (this *ContainerController) GetContainerPsList() {
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+
+	containerPs := new(models.ContainerPs)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &containerPs)
+
+	this.Data["json"] = containerPs.List(from, limit)
 	this.ServeJSON(false)
 }
