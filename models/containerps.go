@@ -5,20 +5,22 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strings"
 )
 
 type ContainerPs struct {
 	Id          string        `orm:"pk;" description:"(id)"`
 	HostId      string        `orm:"" description:"(主机id)"`
-	PID         string        `orm:"" description:"(PID)"`
+	PID         int           `orm:"column(pid)" description:"(PID)"`
 	User        string        `orm:"" description:"(用户)"`
 	ContainerId string        `orm:"" description:"(容器id)"`
-	CPU         string        `orm:"" description:"(CPU)"`
-	Mem         string        `orm:"" description:"(内存)"`
+	CPU         float64       `orm:"column(cpu)" description:"(CPU)"`
+	Mem         float64       `orm:"" description:"(内存)"`
 	Time        string        `orm:"" description:"(时间)"`
 	Start       string        `orm:"" description:"(运行时长 非mac)"`
 	Started     string        `orm:"" description:"(运行时长 mac)"`
 	Command     orm.TextField `orm:"" description:"(Command)"`
+	Sort        string        `orm:"-" description:"(排序)"`
 }
 
 type ContainerPsInterface interface {
@@ -26,7 +28,7 @@ type ContainerPsInterface interface {
 	Delete()
 	Edit()
 	Get()
-	List()
+	List(from, limit int) Result
 }
 
 func (this *ContainerPs) Add() Result {
@@ -37,6 +39,7 @@ func (this *ContainerPs) Add() Result {
 	var containerTopList []*ContainerPs
 	cond := orm.NewCondition()
 	cond = cond.And("id", this.Id)
+
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
@@ -74,16 +77,20 @@ func (this *ContainerPs) List(from, limit int) Result {
 	var ContainerList []*ContainerPs = nil
 	var ResultData Result
 	var err error
-
 	cond := orm.NewCondition()
+
 	if this.ContainerId != "" {
 		cond = cond.And("container_id", this.ContainerId)
 	}
 	if this.Command != "" {
 		cond = cond.And("command__icontains", this.Command)
 	}
-	_, err = o.QueryTable(utils.ContainerPs).SetCond(cond).Limit(limit, from).All(&ContainerList)
-
+	qs := o.QueryTable(utils.ContainerPs).SetCond(cond)
+	if this.Sort != "" {
+		arr := strings.Split(this.Sort, ",")
+		qs = qs.OrderBy(arr[:]...)
+	}
+	_, err = qs.Limit(limit, from).All(&ContainerList)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetContainerPsErr
@@ -91,16 +98,13 @@ func (this *ContainerPs) List(from, limit int) Result {
 		return ResultData
 	}
 
-	total, _ := o.QueryTable(utils.ContainerPs).SetCond(cond).Count()
+	total, _ := qs.Count()
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = ContainerList
+	data[Result_Total] = total
+	data[Result_Items] = ContainerList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
 }
 
@@ -136,7 +140,6 @@ func (this *ContainerPs) Delete() Result {
 	//	cond = cond.And("container_id", this.ContainerId)
 	//}
 	_, err := o.QueryTable(utils.ContainerPs).SetCond(cond).Delete()
-
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteContainerPsErr

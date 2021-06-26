@@ -118,8 +118,10 @@ func (this *K8SController) GetContainerConfig() {
 // @router /containers/:containerId [post]
 func (this *K8SController) GetContainerInfo() {
 	containerId := this.GetString(":containerId")
+
 	containerInfo := new(models.ContainerInfo)
 	containerInfo.Id = containerId
+
 	this.Data["json"] = containerInfo.List()
 	this.ServeJSON(false)
 
@@ -143,29 +145,8 @@ func (this *K8SController) GetContainerCmdHistorys() {
 	json.Unmarshal(this.Ctx.Input.RequestBody, &cmdHistory)
 	cmdHistory.ContainerId = containerId
 	cmdHistory.Type = models.Cmd_History_Type_Container
+
 	this.Data["json"] = cmdHistory.List(from, limit)
-	this.ServeJSON(false)
-
-}
-
-// @Title GetContainerPs
-// @Description Get Container Ps  List
-// @Param token header string true "authToken"
-// @Param containerId path string "" true "containerId"
-// @Param body body models.ContainerPs false "容器进程"
-// @Param from query int 0 false "from"
-// @Param limit query int 20 false "limit"
-// @Success 200 {object} models.Result
-// @router /containers/:containerId/containerps [post]
-func (this *K8SController) GetContainerPs() {
-	containerId := this.GetString(":containerId")
-	limit, _ := this.GetInt("limit")
-	from, _ := this.GetInt("from")
-
-	containerPs := new(models.ContainerPs)
-	json.Unmarshal(this.Ctx.Input.RequestBody, &containerPs)
-	containerPs.ContainerId = containerId
-	this.Data["json"] = containerPs.List(from, limit)
 	this.ServeJSON(false)
 
 }
@@ -197,9 +178,11 @@ func (this *K8SController) GetContainerImageInfo() {
 // @router /namespaces/:nsId/bindaccount [put]
 func (this *K8SController) BindAccount() {
 	nsId := this.GetString(":nsId")
+
 	NS := new(models.NameSpace)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &NS)
 	NS.Id = nsId
+
 	this.Data["json"] = NS.BindAccount()
 	this.ServeJSON(false)
 }
@@ -213,9 +196,11 @@ func (this *K8SController) BindAccount() {
 // @router /namespaces/:nsId/unbindaccount [delete]
 func (this *K8SController) UnBindAccount() {
 	nsId := this.GetString(":nsId")
+
 	NS := new(models.NameSpace)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &NS)
 	NS.Id = nsId
+
 	this.Data["json"] = NS.UnBindAccount()
 	this.ServeJSON(false)
 }
