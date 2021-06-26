@@ -12,21 +12,22 @@ import (
 )
 
 type ImageDetail struct {
-	Id           string        `orm:"pk;" description:"(数据库主键)"`
-	ImageId      string        `description:"(镜像id)"`
-	Name         string        `description:"(镜像名)"`
-	HostId       string        `description:"(主机id)"`
-	HostName     string        `description:"(主机名称)"`
-	RepoTags     string        `description:"(RepoTags)"`
-	RepoDigests  string        `description:"(RepoDigests)"`
-	Os           string        `description:"(系统)"`
-	Size         string        `description:"(大小)"`
-	Layers       int           `description:"(Layers)"`
-	Dockerfile   string        `description:"(Dockerfile内容)"`
-	CreateTime   int64         `description:"(创建时间)"`
-	ModifyTime   int64         `description:"(更新时间)"`
-	PackagesJson string        `description:"(软件包列表)"`
-	Packages     []PackageInfo `orm:"-" description:"(镜像中软件包列表)"`
+	Id            string        `orm:"pk;" description:"(数据库主键)"`
+	ImageId       string        `description:"(镜像id)"`
+	Name          string        `description:"(镜像名)"`
+	HostId        string        `description:"(主机id)"`
+	HostName      string        `description:"(主机名称)"`
+	RepoTags      string        `description:"(RepoTags)"`
+	RepoDigests   string        `description:"(RepoDigests)"`
+	Os            string        `description:"(系统)"`
+	Size          string        `description:"(大小)"`
+	Layers        int           `description:"(Layers)"`
+	Dockerfile    string        `description:"(Dockerfile内容)"`
+	CreateTime    int64         `description:"(创建时间)"`
+	ModifyTime    int64         `description:"(更新时间)"`
+	PackagesJson  string        `description:"(软件包列表)"`
+	ImageConfigId string        `description:"(镜像Id)"`
+	Packages      []PackageInfo `orm:"-" description:"(镜像中软件包列表)"`
 }
 
 type PackageInfo struct {
@@ -45,7 +46,7 @@ type ImageDetailInterface interface {
 }
 
 func (this *ImageDetail) Add() Result {
-	insetSql := `INSERT INTO ` + utils.ImageDetail + ` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	insetSql := `INSERT INTO ` + utils.ImageDetail + ` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
@@ -73,7 +74,7 @@ func (this *ImageDetail) Add() Result {
 		this.Dockerfile,
 		this.CreateTime,
 		this.ModifyTime,
-		this.PackagesJson).Exec()
+		this.PackagesJson, this.ImageConfigId).Exec()
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -98,7 +99,7 @@ func (this *ImageDetail) List(from, limit int) Result {
 	sql := ` select * from ` + utils.ImageDetail + ` `
 	countSql := `select count(id) from ` + utils.ImageDetail + ` `
 	filter := ""
-	fields := []string{}
+	var fields []string
 	if this.Id != "" {
 		filter = filter + `id = ? and `
 		fields = append(fields, this.Id)
@@ -150,16 +151,14 @@ func (this *ImageDetail) List(from, limit int) Result {
 		return ResultData
 	}
 
-	o.Raw(countSql, fields).QueryRow(&total)
+	_ = o.Raw(countSql, fields).QueryRow(&total)
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = imageDetailList
+
+	data[Result_Total] = total
+	data[Result_Items] = imageDetailList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
 }
 
@@ -168,27 +167,37 @@ func (this *ImageDetail) Delete() Result {
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
 
-	removeSQL := "Delete from " + utils.ImageDetail + " "
-	cond := ""
-	pre := ""
+	removeSQL := "delete from " + utils.ImageDetail + " "
+	var fields []string
+	filter := ""
+
+	if this.ImageId != "" {
+		filter = filter + `image_id = ? and `
+		fields = append(fields, this.ImageId)
+	}
+
+	if this.ImageConfigId != "" {
+
+		ids := strings.Split(this.ImageConfigId, ",")
+		var placeholder []string
+		for i := 0; i < len(ids); i++ {
+			placeholder = append(placeholder, "?")
+		}
+		filter = filter + `image_config_id in (` + strings.Join(placeholder, ",") + `) and `
+		fields = append(fields, ids...)
+	}
 
 	if this.HostId != "" {
-		cond = cond + "host_id = '" + this.HostId + "' "
-	}
-	if this.ImageId != "" {
-		if cond != "" {
-			pre = " And "
-		}
-		cond = cond + pre + " image_id = '" + this.ImageId + "' "
+		filter = filter + `host_id = ? and `
+		fields = append(fields, this.HostId)
 	}
 
-	if cond != "" {
-		cond = " Where " + cond
+	if filter != "" {
+		removeSQL = removeSQL + " where " + filter
 	}
-	removeSQL = removeSQL + cond
 
-	_, err := o.Raw(removeSQL).Exec()
-
+	removeSQL = strings.TrimSuffix(strings.TrimSpace(removeSQL), "and")
+	_, err := o.Raw(removeSQL, fields).Exec()
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteImageDetailErr
@@ -203,23 +212,31 @@ func (this *ImageDetail) Get() *ImageDetail {
 	o.Using(utils.DS_Security_Log)
 	object := new(ImageDetail)
 	var err error
+	var fields []string
+	filter := ""
 	sql := "select * from " + utils.ImageDetail + " where "
-	cond := ""
-	if this.ImageId != "" {
-		cond = cond + " image_id = '" + this.ImageId + "' "
-	}
 
-	if cond != "" {
-		sql += " and " + cond
+	if this.ImageId != "" {
+		filter = filter + `image_id = ? and `
+		fields = append(fields, this.ImageId)
 	}
 
 	if this.Name != "" {
-		cond = cond + " name = '" + this.Name + "' "
+		filter = filter + `name = ? and `
+		fields = append(fields, this.Name)
 	}
 
-	sql += cond
+	if this.ImageConfigId != "" {
+		filter = filter + `image_config_id = ? and `
+		fields = append(fields, this.ImageConfigId)
+	}
 
-	err = o.Raw(sql).QueryRow(&object)
+	if filter != "" {
+		sql = sql + " where " + filter
+	}
+
+	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
+	err = o.Raw(sql, fields).QueryRow(&object)
 	if err != nil {
 		return nil
 	}

@@ -117,7 +117,8 @@ var (
 		dockerfile text default ''::text not null,
 		create_time bigint default 0 not null,
 		modify_time bigint default 0 not null,
-		packages_json text default ''::text not null
+		packages_json text default ''::text not null,
+		image_config_id text default ''::text not null
 	);
 
     alter table public.image_detail owner to diss;`
