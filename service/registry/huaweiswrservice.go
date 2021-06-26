@@ -156,13 +156,12 @@ func (this *HuaweiSWRService) ListNamespaces() models.Result {
 
 		var namespaces []string
 		var namespacesData hwNamespaceList
-		e = json.Unmarshal(body, &namespacesData)
+		json.Unmarshal(body, &namespacesData)
 		if e != nil {
 			ResultData.Message = e.Error()
 			ResultData.Code = utils.GetNamespacesErr
 			return ResultData
 		}
-
 		for _, namespaceData := range namespacesData.Namespace {
 			namespaces = append(namespaces, namespaceData.Name)
 		}
@@ -200,6 +199,7 @@ func (this *HuaweiSWRService) Imports() (error error) {
 
 				imageDetail.ImageId = this.ImageConfig.ImageId
 				imageDetail.Name = this.ImageConfig.Name
+				imageDetail.ImageConfigId = this.ImageConfig.Id
 
 				if imd := imageDetail.Get(); imd == nil {
 					imageDetail.Layers = len(mf.Layers)
@@ -224,9 +224,7 @@ func (this *HuaweiSWRService) getRepos(token string) (hw []*hwRepo, err error) {
 	if this.ImageConfig.Namespaces != "" {
 		path += "?namespace=" + this.ImageConfig.Namespaces
 	}
-
 	urls := fmt.Sprintf("swr-api.%s"+path, this.ImageConfig.Registry.Url)
-
 	proxy := proxy.ProxyServer{TargetUrl: urls, Token: token}
 	resp, err := proxy.Request(this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 	if err != nil {
