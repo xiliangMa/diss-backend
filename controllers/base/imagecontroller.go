@@ -38,29 +38,30 @@ func (this *ImageController) GetImagesList() {
 // @Success 200 {object} models.Result
 // @router / [delete]
 func (this *ImageController) DeleteImage() {
-	imageId := this.GetString("imageId")
+	ids := this.GetString("imageId")
+
+	imageDetail := new(models.ImageDetail)
+	imageDetail.ImageConfigId = ids
+	imageDetail.Delete()
 
 	imageConfig := new(models.ImageConfig)
-	imageConfig.Id = imageId
+	imageConfig.Id = ids
 
 	this.Data["json"] = imageConfig.Delete()
 	this.ServeJSON(false)
 }
 
-// @Title GetImageInfo
-// @Description Get Image Info
+// @Title GetImage
+// @Description Get Image
 // @Param token header string true "authToken"
-// @Param imageId path string "" true "imageId"
-// @Param body body models.ImageInfo false "镜像详细信息"
+// @Param body body models.ImageConfig false "镜像信息"
 // @Success 200 {object} models.Result
-// @router /:imageId/info [post]
-func (this *ImageController) GetImageInfo() {
-	imageId := this.GetString(":imageId")
-	imageInfo := new(models.ImageInfo)
-	json.Unmarshal(this.Ctx.Input.RequestBody, &imageInfo)
+// @router /get [post]
+func (this *ImageController) GetImage() {
+	imageConfig := new(models.ImageConfig)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &imageConfig)
 
-	imageInfo.ImageId = imageId
-	this.Data["json"] = imageInfo.List()
+	this.Data["json"] = imageConfig.Get()
 	this.ServeJSON(false)
 }
 

@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
+	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
@@ -11,23 +12,22 @@ import (
 )
 
 type ImageConfig struct {
-	Id            string    `orm:"pk;" description:"(镜像id   k8s拿不到镜像id, 用主机id+镜像名称填充)"`
-	ImageId       string    `orm:"" description:"(镜像id)"`
-	HostId        string    `orm:"" description:"(主机id)"`
-	HostName      string    `orm:"" description:"(主机名称)"`
-	Name          string    `orm:"" description:"(镜像名)"`
-	Size          string    `orm:"" description:"(大小)"`
-	OS            string    `orm:"" description:"(镜像名)"`
-	DissStatus    int8      `orm:"" description:"(安全状态)"`
-	Age           string    `orm:"default(null);" description:"(运行时长)"`
-	CreateTime    int64     `orm:"default(0)" description:"(创建时间)"`
-	DBType        string    `-" description:"(数据库类型 Mysql Oracle Redis Postgres Mongodb Memcache DB2 Hbase)"`
-	GetLatestTask bool      `-" description:"(是否获取最新一个task、否则获取所有task列表)"`
-	TaskList      []*Task   `orm:"reverse(many);null" description:"(任务列表)"`
-	Registry      *Registry `orm:"rel(fk);default(null);null" description:"(仓库)"`
-	Type          string    `orm:"-" description:"(区分主机镜像还是仓库镜像)"`
-	Namespaces    string    `orm:"-" description:"(命名空间)"`
-	TaskStatus    string    `orm:"" description:"(任务状态)"`
+	Id             string    `orm:"pk;" description:"(镜像id   k8s拿不到镜像id, 用主机id+镜像名称填充)"`
+	ImageId        string    `orm:"" description:"(镜像id)"`
+	HostId         string    `orm:"" description:"(主机id)"`
+	HostName       string    `orm:"" description:"(主机名称)"`
+	Name           string    `orm:"" description:"(镜像名)"`
+	Size           string    `orm:"" description:"(大小)"`
+	OS             string    `orm:"column(os)" description:"(镜像名)"`
+	DissStatus     int8      `orm:"" description:"(安全状态)"`
+	Age            string    `orm:"default(null);" description:"(运行时长)"`
+	CreateTime     int64     `orm:"default(0)" description:"(创建时间)"`
+	TaskList       []*Task   `orm:"reverse(many);null" description:"(任务列表)"`
+	Registry       *Registry `orm:"rel(fk);default(null);null" description:"(仓库)"`
+	Type           string    `orm:"-" description:"(区分主机镜像还是仓库镜像)"`
+	Namespaces     string    `orm:"-" description:"(命名空间)"`
+	TaskStatus     string    `orm:"" description:"(任务状态)"`
+	SecurityStatus string    `orm:"" description:"(是否受信 unknown Trustee NotTrustee)"`
 }
 
 type ImageConfigInterface interface {
@@ -47,6 +47,10 @@ func (this *ImageConfig) Get() *ImageConfig {
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
+	if this.HostId != "" {
+		cond = cond.And("host_id", this.HostId)
+	}
+
 	if this.ImageId != "" {
 		cond = cond.And("image_id", this.ImageId)
 	}
@@ -82,15 +86,16 @@ func (this *ImageConfig) Add() Result {
 	if this.Name != "" {
 		cond = cond.And("name", this.Name)
 	}
-
 	if this.Registry != nil {
 		cond = cond.And("registry_id", this.Registry.Id)
 	}
-
 	if this.Id == "" {
 		this.Id = strconv.FormatInt(this.Registry.Id, 10) + "---" + this.ImageId + "---" + this.Name
 	}
-
+	if this.Id != "" {
+		uuid, _ := uuid.NewV4()
+		this.Id = uuid.String() + this.Id
+	}
 	if this.CreateTime == 0 {
 		this.CreateTime = time.Now().UnixNano()
 	}
@@ -145,11 +150,7 @@ func (this *ImageConfig) List(from, limit int) Result {
 
 	_, err = o.QueryTable(utils.ImageConfig).RelatedSel().SetCond(cond).Limit(limit, from).All(&imageConfigList)
 	for _, image := range imageConfigList {
-		if this.GetLatestTask {
-			o.LoadRelated(image, "TaskList", 1, 1, 0, "-update_time")
-		} else {
-			o.LoadRelated(image, "TaskList", 1, limit, 0, "-update_time")
-		}
+		o.LoadRelated(image, "TaskList", 1, 1, 0, "-update_time")
 	}
 
 	if err != nil {
@@ -202,15 +203,14 @@ func (this *ImageConfig) Delete() Result {
 	if this.Id != "" {
 		cond = cond.And("id__in", strings.Split(this.Id, ","))
 	}
-
 	_, err := o.QueryTable(utils.ImageConfig).SetCond(cond).Delete()
-
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteImageInfoErr
 		logs.Error("Delete ImageConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
+
 	ResultData.Code = http.StatusOK
 	return ResultData
 }
@@ -261,9 +261,6 @@ func (this *ImageConfig) GetDBImageByType() Result {
 	cond := orm.NewCondition()
 	if this.HostId != "" {
 		cond = cond.And("host_id", this.HostId)
-	}
-	if this.DBType != "" {
-		cond = cond.And("name__icontains", this.DBType)
 	}
 	_, err = o.QueryTable(utils.ImageConfig).SetCond(cond).All(&imageList)
 	if err != nil {
