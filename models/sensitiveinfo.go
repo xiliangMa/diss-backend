@@ -81,12 +81,10 @@ func (this *SensitiveInfo) List(from, limit int) Result {
 		resType = "image_id"
 	}
 
-	sql := `select * from ` + utils.SensitiveInfo + ` join
-(select distinct on (res_time_filter.` + resType + `) * from
-(select ` + resType + `, create_time from ` + utils.SensitiveInfo + ` group by create_time,` + resType + ` order by sensitive_info.create_time desc) as res_time_filter) as dist_res on sensitive_info.` + resType + ` = dist_res.` + resType + ` and sensitive_info.create_time = dist_res.create_time `
-	countSql := `select count(id) from ` + utils.SensitiveInfo + ` join
-(select distinct on (res_time_filter.` + resType + `) * from
-(select ` + resType + `, create_time from ` + utils.SensitiveInfo + ` group by create_time,` + resType + ` order by create_time desc) as res_time_filter) as dist_res on sensitive_info.` + resType + ` = dist_res.` + resType + ` and sensitive_info.create_time = dist_res.create_time `
+	sql := `select * from ` + utils.SensitiveInfo + ` join (select distinct on (res_time_filter.` + resType + `) * from
+		(select ` + resType + `, create_time from ` + utils.SensitiveInfo + ` group by create_time,` + resType + ` order by sensitive_info.create_time desc) as res_time_filter) as dist_res on sensitive_info.` + resType + ` = dist_res.` + resType + ` and sensitive_info.create_time = dist_res.create_time `
+	countSql := `select count(id) from ` + utils.SensitiveInfo + ` join (select distinct on (res_time_filter.` + resType + `) * from
+		(select ` + resType + `, create_time from ` + utils.SensitiveInfo + ` group by create_time,` + resType + ` order by create_time desc) as res_time_filter) as dist_res on sensitive_info.` + resType + ` = dist_res.` + resType + ` and sensitive_info.create_time = dist_res.create_time `
 	filter := ""
 	var fields []string
 	if this.Id != "" {
@@ -103,8 +101,18 @@ func (this *SensitiveInfo) List(from, limit int) Result {
 	}
 
 	if this.FileName != "" {
-		filter = filter + `name like ? and `
+		filter = filter + `file_name like ? and `
 		fields = append(fields, "%"+this.FileName+"%")
+	}
+
+	if this.Severity != "" {
+		filter = filter + `severity = ? and `
+		fields = append(fields, this.Severity)
+	}
+
+	if this.MD5 != "" {
+		filter = filter + `m_d5 like ? and `
+		fields = append(fields, "%"+this.MD5+"%")
 	}
 
 	if this.FileType != "" {
@@ -138,9 +146,6 @@ func (this *SensitiveInfo) List(from, limit int) Result {
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
 }
 
@@ -164,7 +169,7 @@ func (this *SensitiveInfo) Count() int64 {
 
 	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
 
-	o.Raw(countSql, fields).QueryRow(&total)
+	_ = o.Raw(countSql, fields).QueryRow(&total)
 	return total
 
 }
