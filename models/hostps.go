@@ -43,7 +43,7 @@ func (this *HostPs) List(from, limit int) Result {
 		cond = cond.And("command__contains", this.Command)
 	}
 
-	qs := o.QueryTable(utils.HostPs).SetCond(cond).OrderBy()
+	qs := o.QueryTable(utils.HostPs).SetCond(cond)
 	if this.Sort != "" {
 		arr := strings.Split(this.Sort, ",")
 		qs = qs.OrderBy(arr[:]...)
@@ -59,8 +59,8 @@ func (this *HostPs) List(from, limit int) Result {
 
 	total, _ := qs.Count()
 	data := make(map[string]interface{})
-	data[Result_Items] = hostPsList
 	data[Result_Total] = total
+	data[Result_Items] = hostPsList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
