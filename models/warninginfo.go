@@ -238,3 +238,28 @@ func (this *WarningInfo) Update() Result {
 	ResultData.Data = this
 	return ResultData
 }
+
+func (this *WarningInfo) Count() int64 {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Security_Log)
+	var total int64
+	var fields []string
+	filter := ""
+
+	countSql := `select count(id) from ` + utils.WarningInfo + ``
+
+	if this.Type != "" {
+		filter = filter + `type = ? and `
+		fields = append(fields, this.Type)
+	}
+
+	if filter != "" {
+		countSql = countSql + " where " + filter
+	}
+
+	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
+
+	_ = o.Raw(countSql, fields).QueryRow(&total)
+	return total
+
+}
