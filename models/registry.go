@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -42,6 +43,8 @@ func (this *Registry) Add() Result {
 		logs.Error("Get Registry failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
+
+	this.Url = strings.TrimRight(this.Url, "/")
 
 	if this.CreateTime == 0 {
 		this.CreateTime = time.Now().UnixNano()
@@ -161,6 +164,8 @@ func (this *Registry) Update() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
+
+	this.Url = strings.TrimRight(this.Url, "/")
 
 	_, err := o.Update(this)
 	if err != nil {

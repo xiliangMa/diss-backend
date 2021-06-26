@@ -121,7 +121,6 @@ func (this *RegistryController) Ping() {
 	rs := base.RegistryService{Registry: registry}
 
 	this.Data["json"] = rs.Ping()
-
 	this.ServeJSON(false)
 }
 
@@ -135,6 +134,5 @@ func (this *RegistryController) TypeInfos() {
 	rs := base.RegistryService{}
 
 	this.Data["json"] = rs.TypeInfos()
-
 	this.ServeJSON(false)
 }

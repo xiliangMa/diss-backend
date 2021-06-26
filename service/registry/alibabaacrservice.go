@@ -96,7 +96,7 @@ type tagDetail struct {
 	ImageUpdate int64  `json:"imageUpdate"`
 	ImageID     string `json:"imageId"`
 	Digest      string `json:"digest"`
-	ImageSize   int    `json:"imageSize"`
+	ImageSize   int64  `json:"imageSize"`
 	Tag         string `json:"tag"`
 	ImageCreate int64  `json:"imageCreate"`
 	Status      string `json:"status"`
@@ -106,7 +106,8 @@ type aliLayers struct {
 	Data struct {
 		Image struct {
 			Layers []struct {
-				LayerCMD string `json:"layerCMD"`
+				LayerInstruction string `json:"layerInstruction"`
+				LayerCMD         string `json:"layerCMD"`
 			} `json:"layers"`
 		} `json:"image"`
 	} `json:"data"`
@@ -116,9 +117,10 @@ type aliLayers struct {
 type aliManifest struct {
 	Data struct {
 		Manifest struct {
-			FsLayers []struct {
-				BlobSum string `json:"blobSum"`
-			} `json:"fsLayers"`
+			Layers []struct {
+				Digest string `json:"digest"`
+				Size   string `json:"size"`
+			} `json:"layers"`
 		} `json:"manifest"`
 	} `json:"data"`
 	RequestID string `json:"requestId"`
@@ -171,7 +173,7 @@ func (this *AlibabaACRService) Imports() (err error) {
 	if err != nil {
 		return
 	}
-	var repositories []aliRepo
+	var aliRepoData []aliRepo
 	if this.ImageConfig.Namespaces != "" {
 		repos, e := this.listReposByNamespace(domain, this.ImageConfig.Namespaces, client)
 		if e != nil {
@@ -179,10 +181,10 @@ func (this *AlibabaACRService) Imports() (err error) {
 		}
 
 		for _, repo := range repos {
-			repositories = append(repositories, repo)
+			aliRepoData = append(aliRepoData, repo)
 		}
 	} else {
-		namespaces, e := this.listNamespaces(domain, client)
+		namespaces, e := this.GetNamespaces(domain, client)
 		if e != nil {
 			return
 		}
@@ -196,12 +198,12 @@ func (this *AlibabaACRService) Imports() (err error) {
 			}
 
 			for _, repo := range repos {
-				repositories = append(repositories, repo)
+				aliRepoData = append(aliRepoData, repo)
 			}
 		}
 	}
 
-	for _, r := range repositories {
+	for _, r := range aliRepoData {
 		repo := r
 
 		tags, e := this.getTags(domain, repo, client)
@@ -215,15 +217,15 @@ func (this *AlibabaACRService) Imports() (err error) {
 			this.ImageConfig.Name = public + "/" + repo.RepoNamespace + "/" + repo.RepoName + ":" + tag.Tag
 			if ic := this.ImageConfig.Get(); ic == nil {
 				this.ImageConfig.Id = ""
-				this.ImageConfig.Size = utils.FormatFileSize(int64(tag.ImageSize))
+				this.ImageConfig.Size = utils.FormatFileSize(tag.ImageSize)
 				this.ImageConfig.CreateTime = tag.ImageCreate * 1e6
 
 				this.ImageConfig.Add()
 
 				imageDetail := models.ImageDetail{}
-
 				imageDetail.ImageId = this.ImageConfig.ImageId
 				imageDetail.Name = this.ImageConfig.Name
+				imageDetail.ImageConfigId = this.ImageConfig.Id
 
 				if imd := imageDetail.Get(); imd == nil {
 
@@ -237,28 +239,22 @@ func (this *AlibabaACRService) Imports() (err error) {
 						return fmt.Errorf("getImageManifest error: %v", err)
 					}
 
-					array := make([]string, len(layer.Data.Image.Layers))
-					for i, v := range layer.Data.Image.Layers {
-						if v.LayerCMD != "" {
-							array[i] = v.LayerCMD
-						}
-					}
-
 					lenx := len(layer.Data.Image.Layers)
 					var buffer bytes.Buffer
-					re := regexp.MustCompile(`[\s\p{Zs}]{2,}`)
-					for i := 0; i < lenx-1; i++ {
-						j := lenx - (i + 1)
-						if array[j] != "" {
-							str := re.ReplaceAllString(array[j], "")
-							buffer.WriteString(str + "\n")
-						}
+					for i, j := 0, lenx-1; i < j; i, j = i+1, j-1 {
+						layer.Data.Image.Layers[i], layer.Data.Image.Layers[j] = layer.Data.Image.Layers[j], layer.Data.Image.Layers[i]
 					}
-					imageDetail.Layers = len(manifest.Data.Manifest.FsLayers)
+					re := regexp.MustCompile(`[\s\p{Zs}]{2,}`)
+					for _, layers := range layer.Data.Image.Layers {
+						str := re.ReplaceAllString(layers.LayerCMD, "")
+						buffer.WriteString(layers.LayerInstruction + " " + str + "\n")
+					}
+					imageDetail.Layers = len(manifest.Data.Manifest.Layers)
 					imageDetail.Dockerfile = strings.TrimSpace(buffer.String())
 					imageDetail.RepoDigests = tag.Digest
 					imageDetail.CreateTime = tag.ImageCreate * 1e6
 					imageDetail.Size = this.ImageConfig.Size
+
 					if result := imageDetail.Add(); result.Code != http.StatusOK {
 						logs.Error("ImageDetail err: %s", errors.New(result.Message))
 						return errors.New(result.Message)
@@ -271,7 +267,7 @@ func (this *AlibabaACRService) Imports() (err error) {
 	return nil
 }
 
-func (this *AlibabaACRService) listNamespaces(domain string, c *cr.Client) (namespaces []string, err error) {
+func (this *AlibabaACRService) GetNamespaces(domain string, c *cr.Client) (namespaces []string, err error) {
 
 	var nsReq = cr.CreateGetNamespaceListRequest()
 	var nsResp = cr.CreateGetNamespaceListResponse()
@@ -345,14 +341,14 @@ func (this *AlibabaACRService) getTags(domain string, repo aliRepo, c *cr.Client
 	return
 }
 
-func (this *AlibabaACRService) GetNamespaces() models.Result {
+func (this *AlibabaACRService) ListNamespaces() models.Result {
 	var ResultData models.Result
 	domain, client, err := this.getClient(this.ImageConfig.Registry.Url, this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetNamespacesErr
 	}
-	ns, err := this.listNamespaces(domain, client)
+	ns, err := this.GetNamespaces(domain, client)
 
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -372,8 +368,8 @@ func (this *AlibabaACRService) getImageLayer(domain string, repo aliRepo, tag st
 	layerRequest.RepoNamespace = repo.RepoNamespace
 	layerRequest.RepoName = repo.RepoName
 	layerRequest.Tag = tag
-	layerResponse, err = c.GetImageLayer(layerRequest)
 
+	layerResponse, err = c.GetImageLayer(layerRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -390,8 +386,9 @@ func (this *AlibabaACRService) getImageManifest(domain string, repo aliRepo, tag
 	manifestRequest.RepoNamespace = repo.RepoNamespace
 	manifestRequest.RepoName = repo.RepoName
 	manifestRequest.Tag = tag
-	manifestResponse, err = c.GetImageManifest(manifestRequest)
+	manifestRequest.SchemaVersion = requests.NewInteger(2)
 
+	manifestResponse, err = c.GetImageManifest(manifestRequest)
 	if err != nil {
 		return nil, err
 	}

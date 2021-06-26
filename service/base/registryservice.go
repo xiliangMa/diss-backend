@@ -8,6 +8,7 @@ import (
 	"github.com/xiliangMa/diss-backend/service/registry"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strings"
 )
 
 type RegistryService struct {
@@ -16,42 +17,24 @@ type RegistryService struct {
 
 func (this *RegistryService) Ping() models.Result {
 	var ResultData models.Result
-
-	if this.Registry.Type == models.Registry_Type_Harbor || this.Registry.Type == models.Registry_Type_DockerRegistry {
-		err := ping(this.Registry)
-		if err != nil {
-			ResultData.Message = err.Error()
-			ResultData.Code = utils.TestLinkRegistryErr
-			logs.Error("Test link failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-			return ResultData
-		}
+	var err error
+	if this.Registry.Type == models.Registry_Type_Harbor || this.Registry.Type == models.Registry_Type_DockerRegistry || this.Registry.Type == models.Registry_Type_JFrogArtifactory {
+		err = ping(this.Registry)
 	} else if this.Registry.Type == models.Registry_Type_DockerHub {
 		dh := registry.DockerHubService{}
-		_, err := dh.Auth(this.Registry.Url, this.Registry.User, this.Registry.Pwd)
-		if err != nil {
-			ResultData.Message = "Incorrect authentication credentials"
-			ResultData.Code = utils.TestLinkRegistryErr
-			logs.Error("Test link failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-			return ResultData
-		}
+		_, err = dh.Auth(this.Registry.Url, this.Registry.User, this.Registry.Pwd)
 	} else if this.Registry.Type == models.Registry_Type_AlibabaACR {
 		acr := registry.AlibabaACRService{}
-		err := acr.NewAuth(this.Registry)
-		if err != nil {
-			ResultData.Message = err.Error()
-			ResultData.Code = utils.TestLinkRegistryErr
-			logs.Error("Test link failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-			return ResultData
-		}
+		err = acr.NewAuth(this.Registry)
 	} else if this.Registry.Type == models.Registry_Type_HuaweiSWR {
 		hw := registry.HuaweiSWRService{}
-		_, err := hw.Auth(this.Registry.Url, this.Registry.User, this.Registry.Pwd)
-		if err != nil {
-			ResultData.Message = err.Error()
-			ResultData.Code = utils.TestLinkRegistryErr
-			logs.Error("Test link failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-			return ResultData
-		}
+		_, err = hw.Auth(this.Registry.Url, this.Registry.User, this.Registry.Pwd)
+	}
+	if err != nil {
+		ResultData.Message = "Bad credentials"
+		ResultData.Code = utils.TestLinkRegistryErr
+		logs.Error("Test link failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
 	}
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this.Registry
@@ -60,14 +43,14 @@ func (this *RegistryService) Ping() models.Result {
 
 func ping(registry *models.Registry) (error error) {
 
-	proxy := proxy.ProxyServer{TargetUrl: registry.Url + "/v2/_catalog"}
+	proxy := proxy.ProxyServer{TargetUrl: strings.TrimRight(registry.Url, "/") + "/v2/"}
 	resp, err := proxy.Request(registry.User, registry.Pwd)
 
 	if err != nil {
 		return err
 	}
 
-	if resp.StatusCode == 401 {
+	if resp.StatusCode != 200 {
 		return errors.New(resp.Status)
 	}
 	return

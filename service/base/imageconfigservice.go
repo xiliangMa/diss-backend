@@ -2,6 +2,7 @@ package base
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/plugins/proxy"
@@ -17,41 +18,27 @@ type ImageConfigService struct {
 
 func (this *ImageConfigService) BatchImportImage() models.Result {
 	result := models.Result{}
+	var err error
 	if this.ImageConfig.Registry.Type == models.Registry_Type_Harbor || this.ImageConfig.Registry.Type == models.Registry_Type_DockerRegistry {
-		err := this.generalType()
-		if err != nil {
-			result.Message = err.Error()
-			result.Code = utils.ImportImageErr
-			logs.Error("Import Image failed, code: %d, err: %s", result.Code, result.Message)
-			return result
-		}
+		err = this.generalType(this.ImageConfig.Registry.Url)
 	} else if this.ImageConfig.Registry.Type == models.Registry_Type_DockerHub {
 		dh := registry.DockerHubService{ImageConfig: this.ImageConfig}
-		err := dh.Imports()
-		if err != nil {
-			result.Message = err.Error()
-			result.Code = utils.ImportImageErr
-			logs.Error("Import Image failed, code: %d, err: %s", result.Code, result.Message)
-			return result
-		}
+		err = dh.Imports()
 	} else if this.ImageConfig.Registry.Type == models.Registry_Type_AlibabaACR {
 		acr := registry.AlibabaACRService{ImageConfig: this.ImageConfig}
-		err := acr.Imports()
-		if err != nil {
-			result.Message = err.Error()
-			result.Code = utils.ImportImageErr
-			logs.Error("Import Image failed, code: %d, err: %s", result.Code, result.Message)
-			return result
-		}
+		err = acr.Imports()
 	} else if this.ImageConfig.Registry.Type == models.Registry_Type_HuaweiSWR {
 		hw := registry.HuaweiSWRService{ImageConfig: this.ImageConfig}
-		err := hw.Imports()
-		if err != nil {
-			result.Message = err.Error()
-			result.Code = utils.ImportImageErr
-			logs.Error("Import Image failed, code: %d, err: %s", result.Code, result.Message)
-			return result
-		}
+		err = hw.Imports()
+	} else if this.ImageConfig.Registry.Type == models.Registry_Type_JFrogArtifactory {
+		url := fmt.Sprintf("%s/artifactory/api/docker/%s", this.ImageConfig.Registry.Url, this.ImageConfig.Namespaces)
+		err = this.generalType(url)
+	}
+	if err != nil {
+		result.Message = err.Error()
+		result.Code = utils.ImportImageErr
+		logs.Error("Import Image failed, code: %d, err: %s", result.Code, result.Message)
+		return result
 	}
 
 	result.Code = http.StatusOK
@@ -63,21 +50,24 @@ func (this *ImageConfigService) GetNamespaces() models.Result {
 	switch this.ImageConfig.Registry.Type {
 	case models.Registry_Type_AlibabaACR:
 		ics := registry.AlibabaACRService{ImageConfig: this.ImageConfig}
-		return ics.GetNamespaces()
+		return ics.ListNamespaces()
 	case models.Registry_Type_DockerHub:
 		dh := registry.DockerHubService{ImageConfig: this.ImageConfig}
 		return dh.ListNamespaces()
 	case models.Registry_Type_HuaweiSWR:
 		hw := registry.HuaweiSWRService{ImageConfig: this.ImageConfig}
 		return hw.ListNamespaces()
+	case models.Registry_Type_JFrogArtifactory:
+		hw := registry.JFrogArtifactoryService{ImageConfig: this.ImageConfig}
+		return hw.ListRepositories()
 	}
 
 	return result
 }
 
-func (this *ImageConfigService) generalType() (error error) {
+func (this *ImageConfigService) generalType(url string) (error error) {
 	imageConfig := this.ImageConfig
-	proxy := proxy.ProxyServer{TargetUrl: imageConfig.Registry.Url + "/v2/_catalog"}
+	proxy := proxy.ProxyServer{TargetUrl: url + "/v2/_catalog"}
 	resp, err := proxy.Request(imageConfig.Registry.User, imageConfig.Registry.Pwd)
 
 	if err != nil {
@@ -97,7 +87,7 @@ func (this *ImageConfigService) generalType() (error error) {
 			for _, imageName := range cc["repositories"].([]interface{}) {
 
 				in := imageName.(string)
-				proxy.TargetUrl = imageConfig.Registry.Url + "/v2/" + in + "/tags/list"
+				proxy.TargetUrl = url + "/v2/" + in + "/tags/list"
 				tags, _ := proxy.Request(imageConfig.Registry.User, imageConfig.Registry.Pwd)
 
 				if tags.StatusCode == 200 {

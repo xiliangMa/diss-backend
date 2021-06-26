@@ -8,6 +8,7 @@ import (
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"regexp"
 	"strings"
@@ -25,7 +26,11 @@ func (this *CommonService) AddDetail() {
 	ref, _ = name.ParseReference(this.ImageConfig.Name)
 
 	if rs != nil && this.ImageConfig.Registry.Type != models.Registry_Type_DockerHub {
-		this.ImageConfig.Name = strings.Replace(rs[2], "/", "", 1) + "/" + this.ImageConfig.Name
+		if this.ImageConfig.Namespaces != "" {
+			this.ImageConfig.Name = strings.Replace(rs[2], "/", "", 1) + "/" + this.ImageConfig.Namespaces + "/" + this.ImageConfig.Name
+		} else {
+			this.ImageConfig.Name = strings.Replace(rs[2], "/", "", 1) + "/" + this.ImageConfig.Name
+		}
 		ref, _ = name.ParseReference(this.ImageConfig.Name)
 		if rs[1] == "http" {
 			ref, _ = name.ParseReference(this.ImageConfig.Name, name.Insecure)
@@ -45,30 +50,39 @@ func (this *CommonService) AddDetail() {
 
 		digest, _ := img.Digest()
 
-		this.ImageConfig.Id = ""
+		layer, _ := img.Layers()
 
+		var sum int64
+
+		for _, l := range layer {
+			size, _ := l.Size()
+			sum += size
+		}
+
+		this.ImageConfig.Id = ""
 		this.ImageConfig.ImageId = hash.String()
+		this.ImageConfig.Size = utils.FormatFileSize(sum)
 		this.ImageConfig.CreateTime = cf.Created.UnixNano()
 		this.ImageConfig.Add()
 
 		imageDetail := models.ImageDetail{}
-
 		imageDetail.ImageId = hash.String()
-
 		imageDetail.Name = this.ImageConfig.Name
+		imageDetail.ImageConfigId = this.ImageConfig.Id
 
 		if imd := imageDetail.Get(); imd == nil {
-			Layer, _ := img.Layers()
-			imageDetail.Layers = len(Layer)
+			imageDetail.Layers = len(layer)
 			imageDetail.RepoDigests = digest.String()
-
+			imageDetail.Size = this.ImageConfig.Size
 			imageDetail.CreateTime = cf.Created.UnixNano()
 
 			var buffer bytes.Buffer
-			re := regexp.MustCompile(`[\s\p{Zs}]{2,}`)
+			var trimnop = regexp.MustCompile(`^/bin/sh\s+-c\s+#\(nop\)\s+`)
+			var trimrun = regexp.MustCompile(`^(RUN\s+){0,1}/bin/sh\s+-c\s+`)
 			for _, h := range cf.History {
-				str := re.ReplaceAllString(h.CreatedBy, "")
-				buffer.WriteString(str + "\n")
+				tmpstr := trimnop.ReplaceAllString(h.CreatedBy, "")
+				tmpstrs := trimrun.ReplaceAllString(tmpstr, "RUN ")
+				buffer.WriteString(tmpstrs + "\n")
 			}
 			imageDetail.Dockerfile = strings.TrimSpace(buffer.String())
 			if result := imageDetail.Add(); result.Code != http.StatusOK {
