@@ -5,7 +5,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"strings"
+	"regexp"
 	"time"
 )
 
@@ -61,13 +61,31 @@ func (this *ImageVulnerabilities) Add() Result {
 		o.Rollback()
 		return ResultData
 	}
+
+	var severityStatus = ""
+	re := regexp.MustCompile(`(clam|trivy|koala|syft)`)
 	for _, vuln := range this.Vulnerabilities {
-		if strings.Contains(vuln.PkgName, "clamav") {
+		if re.FindString(vuln.PkgName) != "" {
 			continue
+		}
+		if severityStatus == "" && vuln.Severity == SEVERITY_High || vuln.Severity == SEVERITY_Critical {
+			severityStatus = "Trustee"
 		}
 		vuln.ImageVulnerabilities = this
 		vuln.Add()
 	}
+	config := ImageConfig{}
+	config.Id = this.ImageId
+	imageConfig := config.Get()
+	if imageConfig != nil {
+		if severityStatus != "" {
+			imageConfig.SecurityStatus = "Trustee"
+		} else {
+			imageConfig.SecurityStatus = "NotTrustee"
+		}
+		imageConfig.Update()
+	}
+
 	o.Commit()
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
@@ -187,10 +205,6 @@ func (this *Vulnerabilities) List(from, limit int) Result {
 		cond = cond.And("vulnerability_id", this.VulnerabilityID)
 	}
 
-	if this.ImageVulnerabilities != nil {
-		cond = cond.And("image_vulnerabilities_id", this.ImageVulnerabilities.Id)
-	}
-
 	_, err = o.QueryTable(utils.Vulnerabilities).SetCond(cond).Limit(limit, from).All(&vulnerabilities)
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -200,9 +214,7 @@ func (this *Vulnerabilities) List(from, limit int) Result {
 	}
 
 	for _, v := range vulnerabilities {
-		cond2 := orm.NewCondition()
-		cond2 = cond2.And("id", v.ImageVulnerabilities.Id)
-		_, err = o.QueryTable(utils.ImageVulnerabilities).SetCond(cond2).Limit(limit, from).All(v.ImageVulnerabilities)
+		o.LoadRelated(v, "ImageVulnerabilities", 1, 1, 0)
 	}
 
 	total, _ := o.QueryTable(utils.Vulnerabilities).SetCond(cond).Count()
