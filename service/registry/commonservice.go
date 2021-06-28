@@ -16,6 +16,7 @@ import (
 
 type CommonService struct {
 	ImageConfig *models.ImageConfig
+	Token       string
 }
 
 var scheme = regexp.MustCompile("(https|http)://([-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])")
@@ -26,7 +27,7 @@ func (this *CommonService) AddDetail() {
 	ref, _ = name.ParseReference(this.ImageConfig.Name)
 
 	if rs != nil && this.ImageConfig.Registry.Type != models.Registry_Type_DockerHub {
-		if this.ImageConfig.Namespaces != "" {
+		if this.ImageConfig.Namespaces != "" && this.ImageConfig.Registry.Type != models.Registry_Type_AwsECR {
 			this.ImageConfig.Name = strings.Replace(rs[2], "/", "", 1) + "/" + this.ImageConfig.Namespaces + "/" + this.ImageConfig.Name
 		} else {
 			this.ImageConfig.Name = strings.Replace(rs[2], "/", "", 1) + "/" + this.ImageConfig.Name
@@ -38,6 +39,10 @@ func (this *CommonService) AddDetail() {
 	}
 	if ic := this.ImageConfig.Get(); ic == nil {
 		want := authn.AuthConfig{Username: this.ImageConfig.Registry.User, Password: this.ImageConfig.Registry.Pwd}
+		if this.Token != "" {
+			want = authn.AuthConfig{Auth: this.Token}
+		}
+
 		img, errs := remote.Image(ref, remote.WithAuth(authn.FromConfig(want)))
 
 		if errs != nil {
