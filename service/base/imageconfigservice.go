@@ -19,6 +19,7 @@ type ImageConfigService struct {
 func (this *ImageConfigService) BatchImportImage() models.Result {
 	result := models.Result{}
 	var err error
+
 	if this.ImageConfig.Registry.Type == models.Registry_Type_Harbor || this.ImageConfig.Registry.Type == models.Registry_Type_DockerRegistry {
 		err = this.generalType(this.ImageConfig.Registry.Url)
 	} else if this.ImageConfig.Registry.Type == models.Registry_Type_DockerHub {
@@ -33,6 +34,9 @@ func (this *ImageConfigService) BatchImportImage() models.Result {
 	} else if this.ImageConfig.Registry.Type == models.Registry_Type_JFrogArtifactory {
 		url := fmt.Sprintf("%s/artifactory/api/docker/%s", this.ImageConfig.Registry.Url, this.ImageConfig.Namespaces)
 		err = this.generalType(url)
+	} else if this.ImageConfig.Registry.Type == models.Registry_Type_AwsECR {
+		ae := registry.AwsECRService{ImageConfig: this.ImageConfig}
+		err = ae.Imports()
 	}
 	if err != nil {
 		result.Message = err.Error()
@@ -60,6 +64,9 @@ func (this *ImageConfigService) GetNamespaces() models.Result {
 	case models.Registry_Type_JFrogArtifactory:
 		hw := registry.JFrogArtifactoryService{ImageConfig: this.ImageConfig}
 		return hw.ListRepositories()
+	case models.Registry_Type_AwsECR:
+		ae := registry.AwsECRService{ImageConfig: this.ImageConfig}
+		return ae.ListRepositories()
 	}
 
 	return result
@@ -89,7 +96,6 @@ func (this *ImageConfigService) generalType(url string) (error error) {
 				in := imageName.(string)
 				proxy.TargetUrl = url + "/v2/" + in + "/tags/list"
 				tags, _ := proxy.Request(imageConfig.Registry.User, imageConfig.Registry.Pwd)
-
 				if tags.StatusCode == 200 {
 					defer tags.Body.Close()
 					t, _ := ioutil.ReadAll(tags.Body)

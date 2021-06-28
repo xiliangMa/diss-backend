@@ -29,6 +29,9 @@ func (this *RegistryService) Ping() models.Result {
 	} else if this.Registry.Type == models.Registry_Type_HuaweiSWR {
 		hw := registry.HuaweiSWRService{}
 		_, err = hw.Auth(this.Registry.Url, this.Registry.User, this.Registry.Pwd)
+	} else if this.Registry.Type == models.Registry_Type_AwsECR {
+		ae := registry.AwsECRService{}
+		_, err = ae.Auth(this.Registry.Url, this.Registry.User, this.Registry.Pwd)
 	}
 	if err != nil {
 		ResultData.Message = "Bad credentials"

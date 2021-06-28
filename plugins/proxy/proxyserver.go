@@ -66,6 +66,7 @@ func (this *ProxyServer) Request(user string, pwd string) (*http.Response, error
 	if this.Token != "" {
 		req.Header.Add("x-auth-token", this.Token)
 		req.Header.Add("Authorization", "JWT "+this.Token)
+		req.Header.Set("Authorization", "Basic "+this.Token)
 	} else {
 		req.SetBasicAuth(user, pwd)
 	}
