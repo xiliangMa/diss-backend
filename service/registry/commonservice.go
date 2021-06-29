@@ -43,10 +43,10 @@ func (this *CommonService) AddDetail() {
 			want = authn.AuthConfig{Auth: this.Token}
 		}
 
-		img, errs := remote.Image(ref, remote.WithAuth(authn.FromConfig(want)))
+		img, err := remote.Image(ref, remote.WithAuth(authn.FromConfig(want)))
 
-		if errs != nil {
-			logs.Error("remote Image err : %s", errs)
+		if err != nil {
+			logs.Error("remote Image err : %s", err)
 		}
 
 		hash, _ := img.ConfigName()

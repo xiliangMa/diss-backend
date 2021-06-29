@@ -63,7 +63,7 @@ func (this *DockerHubService) Auth(url string, user string, pwd string) (token s
 	json.Unmarshal(body, &cc)
 
 	value := cc["token"].(string)
-	return value, nil
+	return "JWT " + value, nil
 }
 
 func (this *DockerHubService) Imports() (error error) {
@@ -95,8 +95,8 @@ func (this *DockerHubService) ListNamespaces() models.Result {
 		return ResultData
 	}
 
-	urls := fmt.Sprintf("%s/v2/repositories/namespaces/", this.ImageConfig.Registry.Url)
-	proxy := proxy.ProxyServer{TargetUrl: urls, Token: token}
+	url := fmt.Sprintf("%s/v2/repositories/namespaces/", this.ImageConfig.Registry.Url)
+	proxy := proxy.ProxyServer{TargetUrl: url, Token: token}
 	resp, _ := proxy.Request(this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 
 	defer resp.Body.Close()
@@ -124,8 +124,8 @@ func (this *DockerHubService) getRepos(token string) (dh *dhRepos, err error) {
 		path = path + "/" + this.ImageConfig.Namespaces + "/?page_size=10000"
 	}
 
-	urls := fmt.Sprintf("%s"+path, this.ImageConfig.Registry.Url)
-	proxy := proxy.ProxyServer{TargetUrl: urls, Token: token}
+	url := fmt.Sprintf("%s"+path, this.ImageConfig.Registry.Url)
+	proxy := proxy.ProxyServer{TargetUrl: url, Token: token}
 	resp, err := proxy.Request(this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 	if err != nil {
 		return nil, err

@@ -57,7 +57,7 @@ func (this *AwsECRService) ListRepositories() models.Result {
 		return ResultData
 	}
 	urls := fmt.Sprintf("%s/v2/_catalog", *authorizationData.ProxyEndpoint)
-	proxy := proxy.ProxyServer{TargetUrl: urls, Token: *authorizationData.AuthorizationToken}
+	proxy := proxy.ProxyServer{TargetUrl: urls, Token: "Basic " + *authorizationData.AuthorizationToken}
 	resp, _ := proxy.Request(this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 
 	defer resp.Body.Close()
@@ -83,7 +83,7 @@ func (this *AwsECRService) Imports() (error error) {
 	}
 	this.ImageConfig.Registry.Url = *authorizationData.ProxyEndpoint
 	urls := fmt.Sprintf("%s/v2/%s/tags/list", this.ImageConfig.Registry.Url, this.ImageConfig.Namespaces)
-	proxy := proxy.ProxyServer{TargetUrl: urls, Token: *authorizationData.AuthorizationToken}
+	proxy := proxy.ProxyServer{TargetUrl: urls, Token: "Basic " + *authorizationData.AuthorizationToken}
 	tags, _ := proxy.Request(this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 	if tags.StatusCode == 200 {
 		defer tags.Body.Close()
