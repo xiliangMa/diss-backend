@@ -6,6 +6,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"time"
 )
 
 type WarningWhiteList struct {
@@ -18,6 +19,7 @@ type WarningWhiteList struct {
 	Enabled         bool   `orm:"" description:"(是否启用)"`
 	IsAll           bool   `orm:"-" description:"(是否获取全部)"`
 	WarningInfoId   string `orm:"size(128)" description:"(外键id)" `
+	CreateTime      int64  `orm:"" description:"(创建时间)"`
 }
 
 type WarningWhiteListInterface interface {
@@ -35,6 +37,7 @@ func (this *WarningWhiteList) Add() Result {
 
 	uid, _ := uuid.NewV4()
 	this.Id = uid.String()
+	this.CreateTime = time.Now().UnixNano()
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -112,7 +115,7 @@ func (this *WarningWhiteList) WhiteList(from, limit int) (whiteLists []*WarningW
 		cond = cond.And("enabled", this.Enabled)
 	}
 
-	_, err = o.QueryTable(utils.WarningWhiteList).SetCond(cond).Limit(limit, from).All(&warnList)
+	_, err = o.QueryTable(utils.WarningWhiteList).SetCond(cond).Limit(limit, from).OrderBy("-create_time").All(&warnList)
 
 	total, _ := o.QueryTable(utils.WarningWhiteList).SetCond(cond).Count()
 	return warnList, total, err

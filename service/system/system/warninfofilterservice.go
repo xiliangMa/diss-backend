@@ -1,6 +1,7 @@
 package system
 
 import (
+	"encoding/json"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -19,14 +20,15 @@ func (this *WariningFilterService) CheckFromWhiteListItem() bool {
 	rule = strings.Replace(rule, models.WarnWhiteListCnTrans_ContainerName[0], models.WarnWhiteListCnTrans_ContainerName[1], 1)
 	rule = strings.Replace(rule, models.WarnWhiteListCnTrans_CmdLine[0], models.WarnWhiteListCnTrans_CmdLine[1], 1)
 
-	info := []byte(this.Info)
-	rulelines := strings.Split(rule, "\n")
-	for _, ruleline := range rulelines {
-		onerule := strings.Split(ruleline, "=")
-		if len(onerule) > 1 && onerule[1] != "" {
-			val := strings.ReplaceAll(onerule[1], ".", "\\.")
-			whitelistRegex := regexp.MustCompile(`"` + onerule[0] + `":".*` + val + `.*"`)
-			match := whitelistRegex.Match(info)
+	warnRule := []byte(rule)
+	rulelines := map[string]string{}
+	json.Unmarshal(warnRule, &rulelines)
+
+	for rulekey, ruleitem := range rulelines {
+		if ruleitem != "" {
+			val := strings.ReplaceAll(ruleitem, ".", "\\.")
+			whitelistRegex := regexp.MustCompile(`"` + rulekey + `":".*` + val + `.*"`)
+			match := whitelistRegex.Match([]byte(this.Info))
 			if !match {
 				return false
 			}
