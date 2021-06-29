@@ -32,6 +32,9 @@ type Task struct {
 	ContainerHostId string           `orm:"size(128)" description:"(主机id)"`
 	PathList        string           `orm:"null;" description:"(要检查的路径集合)"`
 	SearchHostId    string           `orm:"size(128)" description:"(任务搜索主机id)"`
+	ScanStatus      string           `orm:"" description:"(扫描状态)"`
+	VirusStatus     string           `orm:"" description:"(杀毒状态)"`
+	SecurityStatus  string           `orm:"" description:"(是否受信 unknown Trustee NotTrustee)"`
 }
 
 type TaskLogInterface interface {
@@ -58,10 +61,8 @@ func (this *Task) Get() *Task {
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
-
 	err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().One(task)
 	if err != nil {
-		logs.Error("Get Task failed, code: %d, err: %s", err.Error(), utils.GetHostConfigErr)
 		return nil
 	}
 	return task
@@ -191,6 +192,11 @@ func (this *Task) Update() Result {
 	}
 	task.UpdateTime = time.Now().UnixNano()
 	task.Status = this.Status
+	task.VirusStatus = this.VirusStatus
+	task.ScanStatus = this.ScanStatus
+	if this.SecurityStatus != "" {
+		task.SecurityStatus = this.SecurityStatus
+	}
 	task.RunCount = this.RunCount
 	_, err = o.Update(task)
 	if err != nil {

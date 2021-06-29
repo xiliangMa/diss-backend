@@ -74,19 +74,19 @@ func (this *ImageVulnerabilities) Add() Result {
 		vuln.ImageVulnerabilities = this
 		vuln.Add()
 	}
-	config := ImageConfig{}
-	config.Id = this.ImageId
-	imageConfig := config.Get()
-	if imageConfig != nil {
+	o.Commit()
+	task := Task{}
+	task.Id = this.TaskId
+	t := task.Get()
+	if t != nil {
 		if severityStatus != "" {
-			imageConfig.SecurityStatus = "Trustee"
+			t.SecurityStatus = "Trustee"
 		} else {
-			imageConfig.SecurityStatus = "NotTrustee"
+			t.SecurityStatus = "NotTrustee"
 		}
-		imageConfig.Update()
+		t.Update()
 	}
 
-	o.Commit()
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData

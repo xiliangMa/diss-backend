@@ -3,7 +3,6 @@ package models
 import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
@@ -12,22 +11,21 @@ import (
 )
 
 type ImageConfig struct {
-	Id             string    `orm:"pk;" description:"(镜像id   k8s拿不到镜像id, 用主机id+镜像名称填充)"`
-	ImageId        string    `orm:"" description:"(镜像id)"`
-	HostId         string    `orm:"" description:"(主机id)"`
-	HostName       string    `orm:"" description:"(主机名称)"`
-	Name           string    `orm:"" description:"(镜像名)"`
-	Size           string    `orm:"" description:"(大小)"`
-	OS             string    `orm:"column(os)" description:"(镜像名)"`
-	DissStatus     int8      `orm:"" description:"(安全状态)"`
-	Age            string    `orm:"default(null);" description:"(运行时长)"`
-	CreateTime     int64     `orm:"default(0)" description:"(创建时间)"`
-	TaskList       []*Task   `orm:"reverse(many);null" description:"(任务列表)"`
-	Registry       *Registry `orm:"rel(fk);default(null);null" description:"(仓库)"`
-	Type           string    `orm:"-" description:"(区分主机镜像还是仓库镜像)"`
-	Namespaces     string    `orm:"-" description:"(命名空间)"`
-	TaskStatus     string    `orm:"" description:"(任务状态)"`
-	SecurityStatus string    `orm:"" description:"(是否受信 unknown Trustee NotTrustee)"`
+	Id         string    `orm:"pk;" description:"(镜像id   k8s拿不到镜像id, 用主机id+镜像名称填充)"`
+	ImageId    string    `orm:"" description:"(镜像id)"`
+	HostId     string    `orm:"" description:"(主机id)"`
+	HostName   string    `orm:"" description:"(主机名称)"`
+	Name       string    `orm:"" description:"(镜像名)"`
+	Size       string    `orm:"" description:"(大小)"`
+	OS         string    `orm:"column(os)" description:"(镜像名)"`
+	DissStatus int8      `orm:"" description:"(安全状态)"`
+	Age        string    `orm:"default(null);" description:"(运行时长)"`
+	CreateTime int64     `orm:"default(0)" description:"(创建时间)"`
+	TaskList   []*Task   `orm:"reverse(many);null" description:"(任务列表)"`
+	Registry   *Registry `orm:"rel(fk);default(null);null" description:"(仓库)"`
+	Type       string    `orm:"-" description:"(区分主机镜像还是仓库镜像)"`
+	Namespaces string    `orm:"-" description:"(命名空间)"`
+	VirusScan  bool      `orm:"-" description:"(区分杀毒还是扫描)"`
 }
 
 type ImageConfigInterface interface {
@@ -92,10 +90,6 @@ func (this *ImageConfig) Add() Result {
 	if this.Id == "" {
 		this.Id = strconv.FormatInt(this.Registry.Id, 10) + "---" + this.ImageId + "---" + this.Name
 	}
-	if this.Id != "" {
-		uuid, _ := uuid.NewV4()
-		this.Id = uuid.String() + this.Id
-	}
 	if this.CreateTime == 0 {
 		this.CreateTime = time.Now().UnixNano()
 	}
@@ -136,21 +130,31 @@ func (this *ImageConfig) List(from, limit int) Result {
 	if this.Name != "" {
 		cond = cond.And("name__contains", this.Name)
 	}
-
 	// 根据type类型判断是主机镜像（type不为空）还是仓库镜像
 	if this.Type != "" {
 		cond = cond.And("registry_id__isnull", true)
 	} else {
 		cond = cond.And("registry_id__isnull", false)
 	}
-
 	if this.Registry != nil {
 		cond = cond.And("registry_id", this.Registry.Id)
 	}
 
-	_, err = o.QueryTable(utils.ImageConfig).RelatedSel().SetCond(cond).Limit(limit, from).All(&imageConfigList)
+	_, err = o.QueryTable(utils.ImageConfig).RelatedSel().SetCond(cond).OrderBy("-create_time").Limit(limit, from).All(&imageConfigList)
 	for _, image := range imageConfigList {
-		o.LoadRelated(image, "TaskList", 1, 1, 0, "-update_time")
+		cond2 := orm.NewCondition()
+		var task []*Task
+		if this.VirusScan {
+			cond2 = cond2.And("image_id", image.Id)
+			cond2 = cond2.AndNot("virus_status", "")
+			_, err = o.QueryTable(utils.Task).RelatedSel().SetCond(cond2).OrderBy("-update_time").Limit(1, 0).All(&task)
+			image.TaskList = task
+		} else {
+			cond2 = cond2.And("image_id", image.Id)
+			cond2 = cond2.AndNot("scan_status", "")
+			_, err = o.QueryTable(utils.Task).RelatedSel().SetCond(cond2).OrderBy("-update_time").Limit(1, 0).All(&task)
+			image.TaskList = task
+		}
 	}
 
 	if err != nil {
@@ -162,8 +166,8 @@ func (this *ImageConfig) List(from, limit int) Result {
 
 	total, _ := o.QueryTable(utils.ImageConfig).SetCond(cond).Count()
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = imageConfigList
+	data[Result_Total] = total
+	data[Result_Items] = imageConfigList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
@@ -228,7 +232,7 @@ func (this *ImageConfig) GetDBCountByType() Result {
 		cond = cond.And("host_id", this.HostId)
 	}
 
-	fields := []string{}
+	var fields []string
 	if this.HostId != "" {
 		fields = append(fields, this.HostId, this.HostId, this.HostId, this.HostId, this.HostId, this.HostId, this.HostId, this.HostId)
 	}
@@ -242,13 +246,10 @@ func (this *ImageConfig) GetDBCountByType() Result {
 
 	total, _ = o.QueryTable(utils.ImageConfig).SetCond(cond).Count()
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = dbCount
+	data[Result_Total] = total
+	data[Result_Items] = dbCount
 
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
 }
 
@@ -271,13 +272,10 @@ func (this *ImageConfig) GetDBImageByType() Result {
 	}
 	total, _ := o.QueryTable(utils.ImageConfig).SetCond(cond).Count()
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = imageList
+	data[Result_Total] = total
+	data[Result_Items] = imageList
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
 }
 

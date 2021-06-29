@@ -28,6 +28,7 @@ type HostConfig struct {
 	ClusterId           string    `orm:"size(128);default(null);" description:"(集群id)"`
 	ClusterName         string    `orm:"size(128);default(null);" description:"(集群名)"`
 	Label               string    `orm:"size(32);default(null);" description:"(标签)"`
+	TaskList            []*Task   `orm:"reverse(many);null" description:"(任务列表)"`
 	Job                 []*Job    `orm:"rel(m2m);null;" description:"(job)"`
 	IsEnableHeartBeat   bool      `orm:"default(false);" description:"(是否开启心跳上报)"`
 	IsEnableDockerEvent bool      `orm:"default(false);" description:"(是否开启容器审计上报)"`
@@ -45,7 +46,6 @@ type HostConfig struct {
 	LicCount            bool      `orm:"-" description:"(是否获取授权个数操作)"`
 	CreateTime          int64     `orm:"default(0)" description:"(上线时间)"`
 	OfflineTime         int64     `orm:"default(0)" description:"(离线时间)"`
-	TaskStatus          string    `orm:"" description:"(任务状态)"`
 }
 
 type HostConfigInterface interface {
@@ -135,12 +135,9 @@ func (this *HostConfig) List(from, limit int) Result {
 		ResultData.Code = utils.GetHostConfigErr
 	}
 	data := make(map[string]interface{})
-	data["items"] = list
-	data["total"] = total
+	data[Result_Items] = list
+	data[Result_Total] = total
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	ResultData.Code = http.StatusOK
 	return ResultData
 }
@@ -198,8 +195,10 @@ func (this *HostConfig) BaseList(from, limit int) (error, int64, []*HostConfig) 
 	}
 	_, err = o.QueryTable(utils.HostConfig).SetCond(cond).Limit(limit, from).OrderBy("-host_name").RelatedSel().All(&list)
 	if err != nil {
-		logs.Error("GetHostConfig failed, code: %d, err: %s", utils.GetHostConfigErr, err.Error())
 		return err, 0, nil
+	}
+	for _, l := range list {
+		o.LoadRelated(l, "TaskList", 1, 1, 0, "-update_time")
 	}
 	total, _ := o.QueryTable(utils.HostConfig).SetCond(cond).Count()
 	return nil, total, list
