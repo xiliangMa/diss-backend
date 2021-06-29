@@ -89,7 +89,7 @@ func (ns hwNamespace) metadata() map[string]interface{} {
 
 func (this *HuaweiSWRService) Auth(url string, user string, pwd string) (token string, error error) {
 
-	authUrl := fmt.Sprintf("iam.%s/v3/auth/tokens", url)
+	authUrl := fmt.Sprintf("https://iam.%s/v3/auth/tokens", url)
 
 	var u = make(map[string]interface{})
 	u["name"] = user
@@ -146,7 +146,7 @@ func (this *HuaweiSWRService) ListNamespaces() models.Result {
 		return ResultData
 	}
 
-	urls := fmt.Sprintf("swr-api.%s/v2/manage/namespaces", this.ImageConfig.Registry.Url)
+	urls := fmt.Sprintf("https://swr-api.%s/v2/manage/namespaces", this.ImageConfig.Registry.Url)
 	proxy := proxy.ProxyServer{TargetUrl: urls, Token: token}
 	resp, _ := proxy.Request(this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 
@@ -224,7 +224,7 @@ func (this *HuaweiSWRService) getRepos(token string) (hw []*hwRepo, err error) {
 	if this.ImageConfig.Namespaces != "" {
 		path += "?namespace=" + this.ImageConfig.Namespaces
 	}
-	urls := fmt.Sprintf("swr-api.%s"+path, this.ImageConfig.Registry.Url)
+	urls := fmt.Sprintf("https://swr-api.%s"+path, this.ImageConfig.Registry.Url)
 	proxy := proxy.ProxyServer{TargetUrl: urls, Token: token}
 	resp, err := proxy.Request(this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 	if err != nil {
@@ -245,7 +245,7 @@ func (this *HuaweiSWRService) getTags(token string, repo string) (hw []hwTags, e
 		path = path + "/" + this.ImageConfig.Namespaces + "/repos/" + repo + "/tags"
 	}
 
-	urls := fmt.Sprintf("swr-api.%s"+path, this.ImageConfig.Registry.Url)
+	urls := fmt.Sprintf("https://swr-api.%s"+path, this.ImageConfig.Registry.Url)
 	proxy := proxy.ProxyServer{TargetUrl: urls, Token: token}
 	resp, err := proxy.Request(this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 	if err != nil {
