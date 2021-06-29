@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"net/http"
@@ -51,7 +52,7 @@ func (this *ProxyServer) Request(user string, pwd string) (*http.Response, error
 	}
 
 	if !strings.HasPrefix(this.TargetUrl, "http://") && !strings.HasPrefix(this.TargetUrl, "https://") {
-		this.TargetUrl = "https://" + this.TargetUrl
+		return nil, errors.New("Invalid Scheme")
 	}
 
 	var requestBody bytes.Buffer
@@ -65,8 +66,7 @@ func (this *ProxyServer) Request(user string, pwd string) (*http.Response, error
 
 	if this.Token != "" {
 		req.Header.Add("x-auth-token", this.Token)
-		req.Header.Add("Authorization", "JWT "+this.Token)
-		req.Header.Set("Authorization", "Basic "+this.Token)
+		req.Header.Add("Authorization", this.Token)
 	} else {
 		req.SetBasicAuth(user, pwd)
 	}

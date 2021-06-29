@@ -74,7 +74,8 @@ func (this *ImageConfigService) GetNamespaces() models.Result {
 
 func (this *ImageConfigService) generalType(url string) (error error) {
 	imageConfig := this.ImageConfig
-	proxy := proxy.ProxyServer{TargetUrl: url + "/v2/_catalog"}
+	proxy := proxy.ProxyServer{}
+	proxy.TargetUrl = fmt.Sprintf("%s/v2/_catalog", url)
 	resp, err := proxy.Request(imageConfig.Registry.User, imageConfig.Registry.Pwd)
 
 	if err != nil {
@@ -93,8 +94,8 @@ func (this *ImageConfigService) generalType(url string) (error error) {
 		if cc["repositories"] != nil {
 			for _, imageName := range cc["repositories"].([]interface{}) {
 
-				in := imageName.(string)
-				proxy.TargetUrl = url + "/v2/" + in + "/tags/list"
+				name := imageName.(string)
+				proxy.TargetUrl = fmt.Sprintf("%s/v2/%s/tags/list", url, name)
 				tags, _ := proxy.Request(imageConfig.Registry.User, imageConfig.Registry.Pwd)
 				if tags.StatusCode == 200 {
 					defer tags.Body.Close()
@@ -104,7 +105,7 @@ func (this *ImageConfigService) generalType(url string) (error error) {
 
 					if tagObj["tags"] != nil {
 						for _, tag := range tagObj["tags"].([]interface{}) {
-							imageConfig.Name = in + ":" + tag.(string)
+							imageConfig.Name = name + ":" + tag.(string)
 							cs := registry.CommonService{ImageConfig: imageConfig}
 							cs.AddDetail()
 						}

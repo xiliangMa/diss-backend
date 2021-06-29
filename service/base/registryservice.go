@@ -34,7 +34,7 @@ func (this *RegistryService) Ping() models.Result {
 		_, err = ae.Auth(this.Registry.Url, this.Registry.User, this.Registry.Pwd)
 	}
 	if err != nil {
-		ResultData.Message = "Bad credentials"
+		ResultData.Message = err.Error()
 		ResultData.Code = utils.TestLinkRegistryErr
 		logs.Error("Test link failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
