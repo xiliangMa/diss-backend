@@ -25,9 +25,9 @@ type ContainerConfig struct {
 	Age            string      `orm:"null;" description:"(运行时长)"`
 	CreateTime     int64       `orm:"default(0);" description:"(创建时间);"`
 	UpdateTime     int64       `orm:"default(0);" description:"(更新时间);"`
+	TaskList       []*Task     `orm:"reverse(many);null" description:"(任务列表)"`
 	Job            []*Job      `orm:"rel(m2m);null;" description:"(job)"`
 	HostConfig     *HostConfig `orm:"rel(fk);null;" description:"(主机列表)"`
-	TaskStatus     string      `orm:"" description:"(任务状态)"`
 }
 
 type ContainerConfigInterface interface {
@@ -135,19 +135,19 @@ func (this *ContainerConfig) List(from, limit int, groupSearch bool) Result {
 	}
 
 	total, _ := o.QueryTable(utils.ContainerConfig).SetCond(cond).Count()
-	data := make(map[string]interface{})
-	data["total"] = total
+
 	for _, containerConfig := range ContainerList {
+		o.LoadRelated(containerConfig, "TaskList", 1, 1, 0, "-update_time")
 		if containerConfig.AccountName == "" {
 			containerConfig.AccountName = this.AccountName
 		}
 	}
-	data["items"] = ContainerList
+	data := make(map[string]interface{})
+	data[Result_Total] = total
+	data[Result_Items] = ContainerList
+
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
 }
 

@@ -210,9 +210,7 @@ func (this *NatsSubService) Save() error {
 				deleteObj.HostId = imageConfigList[0].HostId
 				deleteObj.Delete()
 			}
-
 			for _, imageConfig := range imageConfigList {
-				imageConfig.SecurityStatus = "unknown"
 				imageConfig.Add()
 			}
 			return nil
@@ -243,19 +241,11 @@ func (this *NatsSubService) Save() error {
 				return err
 			}
 			logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageDetail.HostId, models.Resource_ImageDetail, 1)
-			imageConfig := models.ImageConfig{}
-			imageConfig.HostId = imageDetail.HostId
-			imageConfig.ImageId = imageDetail.ImageId
-			imageConfig.Name = imageDetail.Name
-			img := imageConfig.Get()
-			if img != nil {
-				imageDetail.ImageConfigId = img.Id
-				detail := imageDetail.Get()
-				if detail == nil {
-					if result := imageDetail.Add(); result.Code != http.StatusOK {
-						return errors.New(result.Message)
-					}
-				}
+			if result := imageDetail.Delete(); result.Code != http.StatusOK {
+				return errors.New(result.Message)
+			}
+			if result := imageDetail.Add(); result.Code != http.StatusOK {
+				return errors.New(result.Message)
 			}
 			return nil
 		case models.Resource_HostPs:
@@ -654,7 +644,7 @@ func (this *NatsSubService) Save() error {
 			case models.Resource_Control_Type_Put:
 				//更新任务状态
 				metricsResult := models.NatsData{Code: http.StatusOK, Type: models.Type_Control, Tag: models.Resource_Task, RCType: models.Resource_Control_Type_Put}
-				taskList := []models.Task{}
+				var taskList []models.Task
 				taskObj := models.Task{}
 				s, _ := json.Marshal(ms.Data)
 				logs.Debug("Receive task data: %s.", string(s))
@@ -687,6 +677,21 @@ func (this *NatsSubService) Save() error {
 						}
 					}
 					metricsResult.Data = task
+					if task.Host != nil {
+						if strings.HasSuffix(task.SystemTemplate.Type, "VirusScan") {
+							task.VirusStatus = task.Status
+						}
+					} else if task.Image != nil {
+						if strings.HasSuffix(task.SystemTemplate.Type, "VirusScan") {
+							task.VirusStatus = task.Status
+						} else {
+							task.ScanStatus = task.Status
+						}
+					} else if task.Container != nil {
+						if strings.HasSuffix(task.SystemTemplate.Type, "VirusScan") {
+							task.VirusStatus = task.Status
+						}
+					}
 					if result := task.Update(); result.Code != http.StatusOK {
 						metricsResult.Code = result.Code
 						metricsResult.Msg = result.Message
@@ -723,32 +728,6 @@ func (this *NatsSubService) Save() error {
 						taskRawInfo, _ := json.Marshal(task)
 						taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Info}
 						taskLog.Add()
-					}
-
-					if task.Host != nil {
-						hc := new(models.HostConfig)
-						hc.Id = task.Host.Id
-						hostConfig := hc.Get()
-						if hostConfig != nil {
-							hostConfig.TaskStatus = task.Status
-							hostConfig.Update()
-						}
-					} else if task.Image != nil {
-						ic := new(models.ImageConfig)
-						ic.Id = task.Image.Id
-						imageConfig := ic.Get()
-						if imageConfig != nil {
-							imageConfig.TaskStatus = task.Status
-							imageConfig.Update()
-						}
-					} else if task.Container != nil {
-						cc := new(models.ContainerConfig)
-						cc.Id = task.Container.Id
-						containerConfig := cc.Get()
-						if containerConfig != nil {
-							containerConfig.TaskStatus = task.Status
-							containerConfig.Update()
-						}
 					}
 				}
 			case models.Resource_Control_Type_Delete:
@@ -930,32 +909,6 @@ func (this *NatsSubService) DeleteTask() error {
 		return err
 	}
 	logs.Info("################ Delete Task <<<end>>> ################")
-
-	if task.Host != nil {
-		hc := new(models.HostConfig)
-		hc.Id = task.Host.Id
-		hostConfig := hc.Get()
-		if hostConfig != nil {
-			hostConfig.TaskStatus = ""
-			hostConfig.Update()
-		}
-	} else if task.Image != nil {
-		ic := new(models.ImageConfig)
-		ic.Id = task.Image.Id
-		imageConfig := ic.Get()
-		if imageConfig != nil {
-			imageConfig.TaskStatus = ""
-			imageConfig.Update()
-		}
-	} else if task.Container != nil {
-		cc := new(models.ContainerConfig)
-		cc.Id = task.Container.Id
-		containerConfig := cc.Get()
-		if containerConfig != nil {
-			containerConfig.TaskStatus = ""
-			containerConfig.Update()
-		}
-	}
 	return nil
 }
 

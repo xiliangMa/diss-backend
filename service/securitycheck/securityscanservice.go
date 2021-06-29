@@ -239,6 +239,7 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 			task.Description = taskpre + "容器病毒查杀"
 			task.Container = securityCheck.Container
 			task.SearchHostId = securityCheck.Container.HostId
+			task.VirusStatus = models.Task_Status_Created
 		} else if this.SecurityCheckParams.Type == models.SC_Type_Host {
 			// 主机病毒
 			task.Host = securityCheck.Host
@@ -246,6 +247,7 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 			task.SystemTemplate = this.DefaultTMP[models.TMP_Type_HostVS]
 			task.Description = taskpre + "主机病毒查杀"
 			task.SearchHostId = securityCheck.Host.Id
+			task.VirusStatus = models.Task_Status_Created
 		} else if this.SecurityCheckParams.Type == models.Sc_Type_Image {
 			// 镜像病毒
 			task.Image = securityCheck.Image
@@ -253,6 +255,7 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 			task.SystemTemplate = this.DefaultTMP[models.TMP_Type_ImageVS]
 			task.Description = taskpre + "镜像病毒查杀"
 			task.SearchHostId = securityCheck.Image.HostId
+			task.VirusStatus = models.Task_Status_Created
 		}
 
 		if task.SystemTemplate.DefaultPathList != "" {
@@ -268,6 +271,8 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_BM_Docker]
 		task.Host = securityCheck.Host
 		task.SearchHostId = securityCheck.Host.Id
+		task.ScanStatus = models.Task_Status_Created
+		task.SecurityStatus = "unknown"
 	} else if securityCheck.KubenetesCIS {
 		//基线-K8S
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_BM_K8S, uid)
@@ -275,6 +280,8 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_BM_K8S]
 		task.Host = securityCheck.Host
 		task.SearchHostId = securityCheck.Host.Id
+		task.ScanStatus = models.Task_Status_Created
+		task.SecurityStatus = "unknown"
 	} else if securityCheck.HostImageVulnScan {
 		// 主机镜像扫描
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_HostImageVulnScan, uid)
@@ -282,6 +289,8 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_HostImageVulnScan]
 		task.Image = securityCheck.Image
 		task.SearchHostId = securityCheck.Image.HostId
+		task.ScanStatus = models.Task_Status_Created
+		task.SecurityStatus = "unknown"
 	} else if securityCheck.ImageVulnScan {
 		// 仓库镜像扫描
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_ImageVulnScan, uid)
@@ -289,6 +298,8 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_ImageVulnScan]
 		task.Image = securityCheck.Image
 		task.SearchHostId = strings.ToLower(utils.GetHostInfo().HostID)
+		task.ScanStatus = models.Task_Status_Created
+		task.SecurityStatus = "unknown"
 	} else if securityCheck.KubenetesScan {
 		//kubernetes 漏扫
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_KubernetesVulnScan, uid)
@@ -301,6 +312,8 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		task.Description = taskpre + "Docker漏洞扫描"
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_DockerVulnScan]
 		task.Host = securityCheck.Host
+		task.ScanStatus = models.Task_Status_Created
+		task.SecurityStatus = "unknown"
 	}
 
 	if securityCheck.Job.Type == "" {
@@ -313,9 +326,9 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 	if this.ClusterCheckObject != nil {
 		task.ClusterId = this.ClusterCheckObject.Id
 	}
+	task.Status = models.Task_Status_Created
 	task.Name = taskpre + task.Id
 	task.Batch = this.Batch
-	task.Status = models.Task_Status_Created
 	task.Account = securityCheck.Job.Account
 	task.Job = securityCheck.Job
 	task.Spec = securityCheck.Job.Spec
@@ -361,7 +374,7 @@ func (this *SecurityScanService) GetCurrentBatchTask() []*models.Task {
 			this.CurrentBatchTaskList = taskList
 		}
 	}
-	logs.Info("Get Current Batch Task List: %v", this.CurrentBatchTaskList)
+	logs.Info("Get Current Batch Task List: %+v", this.CurrentBatchTaskList)
 	return this.CurrentBatchTaskList
 }
 
@@ -381,7 +394,7 @@ func (this *SecurityScanService) DeliverTask() models.Result {
 	go wsDelive.DeliverTaskToNats()
 	ResultData.Code = http.StatusOK
 	data := make(map[string]interface{})
-	data["items"] = this.CurrentBatchTaskList
+	data[models.Result_Items] = this.CurrentBatchTaskList
 	ResultData.Data = data
 	return ResultData
 }
