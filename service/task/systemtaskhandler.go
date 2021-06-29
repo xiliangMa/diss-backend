@@ -31,16 +31,12 @@ func (this *SystemCheckHandler) SystemCheck() {
 				host.Update()
 				logs.Warn("Heartbeat abnormal, HostId: %s, Duration: %v Minutes", host.Id, sub)
 			} else {
-				if host.Diss == models.Diss_NotInstalled {
-					host.Diss = models.Diss_Installed
-					host.DissStatus = models.Diss_status_Safe
-					host.Status = models.Host_Status_Normal
-					host.CreateTime = time.Now().UnixNano()
-					host.Update()
-				}
-
+				host.Diss = models.Diss_Installed
+				host.DissStatus = models.Diss_status_Safe
+				host.Status = models.Host_Status_Normal
+				host.CreateTime = time.Now().UnixNano()
+				host.Update()
 			}
 		}
-
 	}
 }
