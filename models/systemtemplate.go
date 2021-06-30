@@ -77,8 +77,16 @@ func (this *SystemTemplate) Get() (SystemTemplate, error) {
 	cond := orm.NewCondition()
 	template := SystemTemplate{}
 
-	cond = cond.And("type", this.Type)
-	cond = cond.And("version", this.Version)
+	if this.Type != "" {
+		cond = cond.And("type", this.Type)
+	}
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	if this.Version != "" {
+		cond = cond.And("version", this.Version)
+	}
+
 	err := o.QueryTable(utils.SYSTemplate).SetCond(cond).One(&template)
 	if err != nil {
 		errMsg := fmt.Sprintf("Get SystemTemplate failed, code: %d, err: %s", utils.GetSYSTemplateErr, err.Error())
