@@ -32,7 +32,9 @@ func (this *SecurityScanService) PrePare() {
 	logs.Info("################ PrePare work <<<start>>> ################")
 	// 获取系统Job、模版信息
 	this.PrePareDefaultJob()
-	this.PrePareDefaultTMP()
+	if this.IsSystem {
+		this.PrePareDefaultTMP()
+	}
 
 	// 构建检查对象、并生成task
 	logs.Info("PrePare task start ......")
@@ -177,7 +179,7 @@ func (this *SecurityScanService) PrePareTask(securityCheck *models.SecurityCheck
 	// 默认模板
 
 	// 针对资产管理里的安全检测，使用系统默认Job
-	if this.IsSystem && securityCheck.Job == nil {
+	if securityCheck.Job == nil {
 		// 基线
 		if securityCheck.DockerCIS {
 			securityCheck.Job = Job_Type_BM_Docker
@@ -185,6 +187,10 @@ func (this *SecurityScanService) PrePareTask(securityCheck *models.SecurityCheck
 		if securityCheck.KubenetesCIS {
 			securityCheck.Job = Job_Type_BM_K8S
 		}
+	}
+
+	if this.IsSystem && securityCheck.Job == nil {
+
 		// 主机杀毒
 		if securityCheck.VirusScan && securityCheck.Type == models.SC_Type_Host {
 			securityCheck.Job = Job_Type_HostVS
@@ -223,7 +229,7 @@ func (this *SecurityScanService) PrePareTask(securityCheck *models.SecurityCheck
 
 func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 	taskpre := "系统任务-"
-	if securityCheck.Job.JobLevel == models.Job_Level_User {
+	if securityCheck.Job.JobLevel == models.Job_Level_User || this.SecurityCheckParams.TemplateId != "" {
 		taskpre = "用户任务-"
 	}
 	task := new(models.Task)
@@ -268,7 +274,19 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		//基线-Docker
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_BM_Docker, uid)
 		task.Description = taskpre + "Docker基线扫描"
-		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_BM_Docker]
+		if this.IsSystem {
+			task.SystemTemplate = this.DefaultTMP[models.TMP_Type_BM_Docker]
+		} else {
+			/// 非系统类型，使用自定义的模板
+			templalteQuery := models.SystemTemplate{}
+			templalteQuery.Id = this.SecurityCheckParams.TemplateId
+			templateObj, err := templalteQuery.Get()
+			if err != nil {
+				logs.Error(err.Error())
+				return
+			}
+			task.SystemTemplate = &templateObj
+		}
 		task.Host = securityCheck.Host
 		task.SearchHostId = securityCheck.Host.Id
 		task.ScanStatus = models.Task_Status_Created
@@ -277,7 +295,20 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		//基线-K8S
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_BM_K8S, uid)
 		task.Description = taskpre + "Kubernetes基线扫描"
-		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_BM_K8S]
+		if this.IsSystem {
+			task.SystemTemplate = this.DefaultTMP[models.TMP_Type_BM_K8S]
+		} else {
+			/// 非系统类型，使用自定义的模板
+			templalteQuery := models.SystemTemplate{}
+			templalteQuery.Id = this.SecurityCheckParams.TemplateId
+			templateObj, err := templalteQuery.Get()
+			if err != nil {
+				logs.Error(err.Error())
+				return
+			}
+			task.SystemTemplate = &templateObj
+		}
+
 		task.Host = securityCheck.Host
 		task.SearchHostId = securityCheck.Host.Id
 		task.ScanStatus = models.Task_Status_Created
@@ -506,7 +537,7 @@ func (this *SecurityScanService) Check() models.Result {
 	}
 
 	// 2. job检查
-	if !this.IsSystem {
+	if !this.SecurityCheckParams.DockerCIS && !this.SecurityCheckParams.KubenetesCIS && !this.IsSystem {
 		ResultData, this.Job = baseService.CheckJobIsExist()
 		if ResultData.Code != http.StatusOK {
 			return ResultData
