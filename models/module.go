@@ -9,12 +9,13 @@ import (
 )
 
 type Module struct {
-	Id         int    `orm:"auto;pk" description:"模块ID"`
-	Name       string `orm:"unique" description:"模块名"`
-	Code       string `description:"模块密码"`
-	Role       *Role  `orm:"rel(fk);null" description:"角色"`
-	CreateTime int64  `orm:"default(0);" description:"(创建时间)"`
-	UpdateTime int64  `orm:"default(0)" description:"(更新时间)"`
+	Id          int    `orm:"auto;pk" description:"模块ID"`
+	Name        string `orm:"unique" description:"模块名"`
+	Description string `orm:"size(64)" description:"描述"`
+	Code        string `description:"模块密码"`
+	Role        *Role  `orm:"rel(fk);null" description:"角色"`
+	CreateTime  int64  `orm:"default(0);" description:"(创建时间)"`
+	UpdateTime  int64  `orm:"default(0)" description:"(更新时间)"`
 }
 
 type ModuleInterface interface {
@@ -31,6 +32,7 @@ func (this *Module) Add() Result {
 	o.Using(utils.DS_Default)
 
 	this.CreateTime = time.Now().UnixNano()
+	this.UpdateTime = time.Now().UnixNano()
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()

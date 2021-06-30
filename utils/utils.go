@@ -9,6 +9,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/shirou/gopsutil/host"
+	"math/rand"
 	"strconv"
 	"strings"
 )
@@ -354,4 +355,10 @@ func GetRoleString(s string) string {
 func MD5(s string) string {
 	sum := md5.Sum([]byte(s))
 	return hex.EncodeToString(sum[:])
+}
+
+func GenRandomString(n int) string {
+	randBytes := make([]byte, n/2)
+	rand.Read(randBytes)
+	return fmt.Sprintf("%x", randBytes)
 }

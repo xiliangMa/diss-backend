@@ -19,3 +19,9 @@ func Test_GetTimeFromNow(t *testing.T) {
 
 	t.Log("\n Now:", now, "\n", "Timepoint:", timepoint)
 }
+
+func Test_GetRandStr(t *testing.T) {
+	randStr := GenRandomString(8)
+
+	t.Log("Rand Str: ", randStr)
+}

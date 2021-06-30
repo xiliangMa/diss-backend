@@ -93,3 +93,50 @@ func (this *UserController) DeleteUser() {
 	this.Data["json"] = result
 	this.ServeJSON(false)
 }
+
+// @Title AddUser
+// @Description Add User
+// @Param token header string true "authToken"
+// @Param body body models.User false "用户信息"
+// @Success 200 {object} models.Result
+// @router /role [post]
+func (this *UserController) AddRoleForUser() {
+	user := new(models.User)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &user)
+
+	this.Data["json"] = user.AddRole()
+	this.ServeJSON(false)
+}
+
+// @Title UpdateUser
+// @Description Update User
+// @Param token header string true "authToken"
+// @Param userId path string "" true "userId"
+// @Param body body models.User true "用户信息"
+// @Success 200 {object} models.Result
+// @router /role [put]
+func (this *UserController) UpdateRoleForUser() {
+	userId, _ := this.GetInt(":userId")
+	user := new(models.User)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &user)
+	user.Id = userId
+	this.Data["json"] = user.UpdateRole()
+	this.ServeJSON(false)
+}
+
+// @Title DeleteUser
+// @Description Delete User
+// @Param token header string true "authToken"
+// @Param userId path string "" true "userId"
+// @Success 200 {object} models.Result
+// @router /user [delete]
+func (this *UserController) RemoveRoleUser() {
+	userId, _ := this.GetInt(":userId")
+	user := new(models.User)
+	user.Id = userId
+
+	result := user.RemoveRole()
+
+	this.Data["json"] = result
+	this.ServeJSON(false)
+}
