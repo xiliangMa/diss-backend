@@ -344,7 +344,9 @@ func (this *SecurityScanService) saveTaskLog(task *models.Task, securityCheck *m
 	taskLog.Task = string(taskRawInfo)
 	taskLog.Account = securityCheck.Job.Account
 	taskLog.Level = models.Log_level_Info
-	taskLog.RawLog = fmt.Sprintf("Add task success, Status: %s, Type: %s, Batch: %v, TaskId: %s.", task.Status, task.Type, task.Batch, task.Id)
+	//msg := fmt.Sprintf("Add task success, Status: %s, Type: %s, Batch: %v, TaskId: %s.", task.Status, task.Type, task.Batch, task.Id)
+	msg := fmt.Sprintf("创建任务成功, 状态: 已创建,  批次: %v, 任务ID: %s.", task.Batch, task.Id)
+	taskLog.RawLog = msg
 	taskLog.Add()
 }
 

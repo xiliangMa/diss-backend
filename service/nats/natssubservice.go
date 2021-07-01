@@ -523,6 +523,12 @@ func (this *NatsSubService) Save() error {
 					}
 				}
 
+				wi := warningInfo.Get()
+				if wi != nil {
+					wi.UpdateTime = warningInfo.CreateTime
+					wi.Update()
+					warningInfo.Status = "duplicate"
+				}
 				if result := warningInfo.Add(); result.Code != http.StatusOK {
 					return errors.New(result.Message)
 				}
@@ -719,11 +725,28 @@ func (this *NatsSubService) Save() error {
 						} else if task.Container != nil {
 							this.ClientSubject = task.Container.HostName
 						}
+
+						status := ""
+						switch task.Status {
+						case models.Task_Status_Received:
+							status = "已接收"
+						case models.Task_Status_Pending:
+							status = "队列中"
+						case models.Task_Status_Running:
+							status = "执行中"
+						case models.Task_Status_Finished:
+							status = "完成"
+						case models.Task_Status_Failed:
+							status = "失败"
+						}
+
 						if ms.Code != http.StatusOK {
 							result.Message = ms.Msg
-							msg = fmt.Sprintf("Update task failed, Status: %s >>> HostId: %s, Type: %s, TaskId: %s Error: %s <<<", task.Status, this.ClientSubject, models.Resource_Task, task.Id, result.Message)
+							msg = fmt.Sprintf("更新任务失败, 状态: %s >>> 主机ID: %s, 任务ID: %s 失败原因: %s <<<", status, this.ClientSubject, task.Id, result.Message)
+							//msg = fmt.Sprintf("Update task failed, Status: %s >>> HostId: %s, Type: %s, TaskId: %s Error: %s <<<", task.Status, this.ClientSubject, models.Resource_Task, task.Id, result.Message)
 						} else {
-							msg = fmt.Sprintf("Update task success, Status: %s >>> HostId: %s, Type: %s, task id: %s <<<", task.Status, this.ClientSubject, models.Resource_Task, task.Id)
+							//msg = fmt.Sprintf("Update task success, Status: %s >>> HostId: %s, Type: %s, task id: %s <<<", task.Status, this.ClientSubject, models.Resource_Task, task.Id)
+							msg = fmt.Sprintf("更新任务成功, 状态: %s >>> 主机ID: %s, 任务ID: %s <<<", status, this.ClientSubject, task.Id)
 						}
 						taskRawInfo, _ := json.Marshal(task)
 						taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Info}
