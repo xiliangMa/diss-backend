@@ -12,6 +12,15 @@ type SystemTemplateService struct {
 func (this *SystemTemplateService) AddSystemTemplate() models.Result {
 	var ResultData models.Result
 
+	// 检查重名
+	sysTemplateQuery := models.SystemTemplate{Name: this.SystemTemplate.Name}
+	sysTemplateObj, _ := sysTemplateQuery.Get()
+	if sysTemplateObj.Id != "" {
+		ResultData.Message = "Template Name is Exist"
+		ResultData.Code = utils.SYSTemplateExistErr
+		return ResultData
+	}
+
 	// 基线模板自动填充配置的预置json串
 	if this.SystemTemplate.Type == models.TMP_Type_BM_Docker || this.SystemTemplate.Type == models.TMP_Type_BM_K8S {
 		benchTemplate, err := this.SystemTemplate.Get()

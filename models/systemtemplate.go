@@ -86,6 +86,9 @@ func (this *SystemTemplate) Get() (SystemTemplate, error) {
 	if this.Version != "" {
 		cond = cond.And("version", this.Version)
 	}
+	if this.Name != "" {
+		cond = cond.And("name", this.Name)
+	}
 
 	err := o.QueryTable(utils.SYSTemplate).SetCond(cond).One(&template)
 	if err != nil {

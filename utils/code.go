@@ -156,6 +156,7 @@ var (
 	AddRoleForUserErr               = 161
 	ChangeRoleForUserErr            = 162
 	RemoveRoleForUserErr            = 163
+	SYSTemplateExistErr             = 164
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001
