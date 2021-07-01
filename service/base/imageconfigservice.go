@@ -22,22 +22,31 @@ func (this *ImageConfigService) BatchImportImage() models.Result {
 
 	if this.ImageConfig.Registry.Type == models.Registry_Type_Harbor || this.ImageConfig.Registry.Type == models.Registry_Type_DockerRegistry {
 		err = this.generalType(this.ImageConfig.Registry.Url)
-	} else if this.ImageConfig.Registry.Type == models.Registry_Type_DockerHub {
+	} else {
+		if this.ImageConfig.Namespaces == "" {
+			result.Message = "NamespacesNotEmpty"
+			result.Code = utils.GetNamespacesErr
+			return result
+		}
+	}
+	switch this.ImageConfig.Registry.Type {
+	case models.Registry_Type_DockerHub:
 		dh := registry.DockerHubService{ImageConfig: this.ImageConfig}
 		err = dh.Imports()
-	} else if this.ImageConfig.Registry.Type == models.Registry_Type_AlibabaACR {
+	case models.Registry_Type_AlibabaACR:
 		acr := registry.AlibabaACRService{ImageConfig: this.ImageConfig}
 		err = acr.Imports()
-	} else if this.ImageConfig.Registry.Type == models.Registry_Type_HuaweiSWR {
+	case models.Registry_Type_HuaweiSWR:
 		hw := registry.HuaweiSWRService{ImageConfig: this.ImageConfig}
 		err = hw.Imports()
-	} else if this.ImageConfig.Registry.Type == models.Registry_Type_JFrogArtifactory {
+	case models.Registry_Type_JFrogArtifactory:
 		url := fmt.Sprintf("%s/artifactory/api/docker/%s", this.ImageConfig.Registry.Url, this.ImageConfig.Namespaces)
 		err = this.generalType(url)
-	} else if this.ImageConfig.Registry.Type == models.Registry_Type_AwsECR {
+	case models.Registry_Type_AwsECR:
 		ae := registry.AwsECRService{ImageConfig: this.ImageConfig}
 		err = ae.Imports()
 	}
+
 	if err != nil {
 		result.Message = err.Error()
 		result.Code = utils.ImportImageErr
