@@ -158,7 +158,6 @@ var (
 	-- Primary Key structure for table task_log
 	-- ----------------------------
 	ALTER TABLE "public"."task_log" ADD CONSTRAINT "task_log_pkey" PRIMARY KEY ("id");`
-
 	Tab_Create_WarningInfo = `CREATE TABLE "public"."warning_info" (
 	  "id" varchar(128) COLLATE "pg_catalog"."default" NOT NULL,
 	  "name" varchar(256) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
@@ -176,7 +175,11 @@ var (
 	  "analysis" text COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::text,
 	  "mode" varchar(128) COLLATE "pg_catalog"."default" NOT NULL DEFAULT ''::character varying,
 	  "container_id" varchar(256) default ''::text not null,
-      "container_name" text default ''::text not null
+      "container_name" text default ''::text not null,
+	  "ip" varchar(256) default ''::text not null,
+	  "process_name" varchar(256) default ''::text not null,
+	  "pid" int8 NOT NULL DEFAULT 0,
+	  "ppid" int8 NOT NULL DEFAULT 0
 	);
 	ALTER TABLE "public"."warning_info" OWNER TO "diss";
 	

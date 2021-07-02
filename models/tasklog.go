@@ -31,7 +31,7 @@ type TaskLog1Interface interface {
 func (this *TaskLog) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
-	var taskLogList []*TaskLog = nil
+	var taskLogList []*TaskLog
 	var ResultData Result
 	var err error
 	var total int64 = 0
@@ -39,7 +39,7 @@ func (this *TaskLog) List(from, limit int) Result {
 	sql := ` select * from ` + utils.TaskLog + ` `
 	countSql := `select "count"(id) from ` + utils.TaskLog + ` `
 	filter := ""
-	fields := []string{}
+	var fields []string
 	if this.Id != "" {
 		filter = filter + `id = ? and `
 		fields = append(fields, this.Id)
@@ -86,8 +86,8 @@ func (this *TaskLog) List(from, limit int) Result {
 
 	o.Raw(countSql, fields).QueryRow(&total)
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = taskLogList
+	data[Result_Total] = total
+	data[Result_Items] = taskLogList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data

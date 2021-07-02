@@ -32,6 +32,10 @@ type WarningInfo struct {
 	Mode          string `orm:"size(128)" description:"(方式)"`
 	ContainerId   string `orm:"size(256)" description:"(容器id)"`
 	ContainerName string `orm:"size(256)" description:"(容器名称)"`
+	Ip            string `orm:"" description:"(ip)"`
+	ProcessName   string `orm:"" description:"(进程名)"`
+	Pid           int    `orm:"" description:"(进程id)"`
+	Ppid          int    `orm:"" description:"(进程父id)"`
 	ImageName     string `orm:"-"`
 	Action        string `orm:"-" description:"(处理方式：isolation、pause、stop、kill)"`
 }
@@ -39,6 +43,7 @@ type WarningInfo struct {
 type WarningInfoInterface interface {
 	List(from, limit int) Result
 	Add() Result
+	Get() *WarningInfo
 	Update() Result
 }
 
@@ -48,15 +53,31 @@ func (this *WarningInfo) List(from, limit int) Result {
 	var WarningInfoList []*WarningInfo = nil
 	var ResultData Result
 	var err error
-	var total int64 = 0
+	var total int64
 
 	sql := ` select * from ` + utils.WarningInfo + ` `
 	countSql := `select "count"(id) from ` + utils.WarningInfo + ` `
 	filter := ""
-	var fields []string
+	var fields []interface{}
 	if this.Id != "" {
 		filter = filter + `id = ? and `
 		fields = append(fields, this.Id)
+	}
+	if this.Ip != "" {
+		filter = filter + `ip = ? and `
+		fields = append(fields, this.Ip)
+	}
+	if this.ProcessName != "" {
+		filter = filter + `process_name like ? and `
+		fields = append(fields, "%"+this.ProcessName+"%")
+	}
+	if this.Pid != 0 {
+		filter = filter + `pid = ? and `
+		fields = append(fields, this.Pid)
+	}
+	if this.Ppid != 0 {
+		filter = filter + `ppid = ? and `
+		fields = append(fields, this.Ppid)
 	}
 	if this.HostName != "" {
 		filter = filter + `host_name like ? and `
@@ -96,6 +117,8 @@ func (this *WarningInfo) List(from, limit int) Result {
 	if this.ContainerName != "" {
 		filter = filter + `container_name like '%` + this.ContainerName + `%' and `
 	}
+
+	filter = filter + `status != 'duplicate' and `
 
 	if this.StartTime != 0 && this.EndTime != 0 {
 		//startTime, _ := time.ParseInLocation("2006-01-02T15:04:05", this.StartTime, time.Local)
@@ -140,7 +163,7 @@ func (this *WarningInfo) List(from, limit int) Result {
 }
 
 func (this *WarningInfo) Add() Result {
-	insertSql := `INSERT INTO ` + utils.WarningInfo + ` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)`
+	insertSql := `INSERT INTO ` + utils.WarningInfo + ` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?)`
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
@@ -169,7 +192,14 @@ func (this *WarningInfo) Add() Result {
 		this.CreateTime,
 		this.UpdateTime,
 		this.Proposal,
-		this.Analysis, this.Mode, this.ContainerId, this.ContainerName).Exec()
+		this.Analysis,
+		this.Mode,
+		this.ContainerId,
+		this.ContainerName,
+		this.Ip,
+		this.ProcessName,
+		this.Pid,
+		this.Ppid).Exec()
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -188,30 +218,29 @@ func (this *WarningInfo) Update() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
-	var fields []string
+	var fields []interface{}
 	filter := ""
 	sql := `UPDATE ` + utils.WarningInfo + ` SET `
 
 	if this.Status != "" {
 		filter = filter + `status = ? , `
 		fields = append(fields, this.Status)
-		//_, err = o.Raw(`UPDATE `+utils.WarningInfo+` SET status=? WHERE id=?`, this.Status, this.Id).Exec()
 	}
 	if this.Proposal != "" {
 		filter = filter + `proposal = ? , `
 		fields = append(fields, this.Proposal)
-		//_, err = o.Raw(`UPDATE `+utils.WarningInfo+` SET proposal=? WHERE id=?`, this.Proposal, this.Id).Exec()
 	}
 	if this.Mode != "" {
 		filter = filter + `mode = ? , `
 		fields = append(fields, this.Mode)
-		//_, err = o.Raw(`UPDATE `+utils.WarningInfo+` SET mode=? WHERE id=?`, this.Mode, this.Id).Exec()
 	}
-	this.UpdateTime = time.Now().UnixNano()
 	if this.UpdateTime != 0 {
 		filter = filter + `update_time = ? , `
-		fields = append(fields, strconv.FormatInt(this.UpdateTime, 10))
-		//_, err = o.Raw(`UPDATE `+utils.WarningInfo+` SET mode=? WHERE id=?`, this.Mode, this.Id).Exec()
+		fields = append(fields, this.UpdateTime)
+	} else {
+		this.UpdateTime = time.Now().UnixNano()
+		filter = filter + `update_time = ? , `
+		fields = append(fields, this.UpdateTime)
 	}
 	if filter != "" {
 		sql = sql + filter
@@ -261,5 +290,49 @@ func (this *WarningInfo) Count() int64 {
 
 	_ = o.Raw(countSql, fields).QueryRow(&total)
 	return total
+
+}
+
+func (this *WarningInfo) Get() *WarningInfo {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Security_Log)
+	var warningInfo WarningInfo
+	var fields []interface{}
+	filter := ""
+
+	sql := `select * from ` + utils.WarningInfo + ``
+
+	if this.ProcessName != "" {
+		filter = filter + `process_name = ? and `
+		fields = append(fields, this.ProcessName)
+	}
+
+	if this.Pid != 0 {
+		filter = filter + `pid = ? and `
+		fields = append(fields, this.Pid)
+	}
+
+	if this.Ppid != 0 {
+		filter = filter + `ppid = ? and `
+		fields = append(fields, this.Ppid)
+	}
+
+	if this.ContainerId != "" {
+		filter = filter + `container_id = ? and `
+		fields = append(fields, this.ContainerId)
+	}
+
+	if filter != "" {
+		sql = sql + " where status != 'duplicate' and " + filter
+	}
+
+	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
+
+	err := o.Raw(sql, fields).QueryRow(&warningInfo)
+	if err != nil {
+		return nil
+	}
+
+	return &warningInfo
 
 }
