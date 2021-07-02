@@ -7,6 +7,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -39,6 +40,13 @@ func (this *User) Add() Result {
 
 	userQuery := User{}
 	userQuery.Name = this.Name
+	passwordLen := strings.Count(this.Password, "")
+	if passwordLen < PasswordLength+1 {
+		ResultData.Message = fmt.Sprintf("Password need >= %d digits, code: %d", PasswordLength, utils.PasswordLengthErr)
+		ResultData.Code = utils.PasswordLengthErr
+		logs.Error(ResultData.Message)
+		return ResultData
+	}
 
 	_, count, _ := userQuery.UserList(0, 1)
 	if count > 0 {
@@ -79,6 +87,14 @@ func (this *User) Update() Result {
 	var ResultData Result
 	userObj := User{}
 	userObj.Id = this.Id
+
+	passwordLen := strings.Count(this.Password, "")
+	if passwordLen < PasswordLength+1 {
+		ResultData.Message = fmt.Sprintf("Password need >= %d digits, code: %d", PasswordLength, utils.PasswordLengthErr)
+		ResultData.Code = utils.PasswordLengthErr
+		logs.Error(ResultData.Message)
+		return ResultData
+	}
 
 	userList, total, _ := userObj.UserList(0, 1)
 	if total > 0 {

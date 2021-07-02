@@ -379,4 +379,6 @@ var (
 	// Auth
 	System_Role           = "admin"
 	Permission_AuthManage = "AuthManage"
+
+	PasswordLength = 8
 )
