@@ -94,11 +94,8 @@ func (this *RuleDefine) List(from, limit int) Result {
 	}
 
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = ruleList
-	if total == 0 {
-		ResultData.Data = nil
-	}
+	data[Result_Total] = total
+	data[Result_Items] = ruleList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
@@ -134,7 +131,7 @@ func (this *RuleDefine) RuleDefineList(from, limit int) (ruleLists []*RuleDefine
 		cond = cond.And("level", this.Level)
 	}
 
-	_, err = o.QueryTable(utils.RuleDefine).SetCond(cond).Limit(limit, from).OrderBy("-create_time").All(&ruleList)
+	_, err = o.QueryTable(utils.RuleDefine).SetCond(cond).Limit(limit, from).OrderBy("-id").All(&ruleList)
 
 	total, _ := o.QueryTable(utils.RuleDefine).SetCond(cond).Count()
 	return ruleList, total, err
@@ -149,7 +146,7 @@ func (this *RuleDefine) Delete() Result {
 	if this.Id != 0 {
 		cond = cond.And("id", this.Id)
 	} else {
-		ResultData.Message = "No RuleDefineList Id."
+		ResultData.Message = "No RuleDefineList Id"
 		ResultData.Code = utils.DeleteRuleDefineErr
 		return ResultData
 	}
