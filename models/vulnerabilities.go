@@ -95,41 +95,26 @@ func (this *ImageVulnerabilities) Add() Result {
 func (this *ImageVulnerabilities) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var imageVulnerabilities []*ImageVulnerabilities
+	imageVulnerabilities := new(ImageVulnerabilities)
+	var vulnerabilities []*Vulnerabilities
 	var ResultData Result
-	var err error
 	cond := orm.NewCondition()
-	if this.Id != 0 {
-		cond = cond.And("id", this.Id)
-	}
-	if this.RegistryId != 0 {
-		cond = cond.And("registry_id", this.RegistryId)
-	}
-	if this.HostId != "" {
-		cond = cond.And("host_id", this.HostId)
-	}
 	if this.ImageId != "" {
-		cond = cond.And("image_id__icontains", this.ImageId)
+		cond = cond.And("image_id", this.ImageId)
 	}
-	if this.TaskId != "" {
-		cond = cond.And("task_id", this.TaskId)
-	}
-	if this.Target != "" {
-		cond = cond.And("target__icontains", this.Target)
-	}
-	if this.Type != "" {
-		cond = cond.And("type__icontains", this.Type)
-	}
-
-	_, err = o.QueryTable(utils.ImageVulnerabilities).SetCond(cond).OrderBy("-create_time").Limit(limit, from).All(&imageVulnerabilities)
+	err := o.QueryTable(utils.ImageVulnerabilities).SetCond(cond).One(imageVulnerabilities)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetImageVulnerabilitiesErr
 		logs.Error("Get ImageVulnerabilitiesErr List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
+	vuln := orm.NewCondition()
+	vuln = vuln.And("image_vulnerabilities_id", imageVulnerabilities.Id)
+	_, err = o.QueryTable(utils.Vulnerabilities).SetCond(vuln).Limit(limit, from).All(&vulnerabilities)
+	total, _ := o.QueryTable(utils.Vulnerabilities).SetCond(vuln).Count()
+	imageVulnerabilities.Vulnerabilities = vulnerabilities
 
-	total, _ := o.QueryTable(utils.ImageVulnerabilities).SetCond(cond).Count()
 	data := make(map[string]interface{})
 	data[Result_Total] = total
 	data[Result_Items] = imageVulnerabilities
