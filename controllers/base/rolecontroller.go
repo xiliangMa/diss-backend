@@ -49,11 +49,11 @@ func (this *RoleController) AddRole() {
 // @Param body body models.Role false "角色及用户信息"
 // @Success 200 {object} models.Result
 // @router /binduser [post]
-func (this *RoleController) AddUserToRole() {
+func (this *RoleController) AddUsersToRole() {
 	role := new(models.Role)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &role)
 
-	this.Data["json"] = role.AddUser()
+	this.Data["json"] = role.AddUsers()
 	this.ServeJSON(false)
 }
 
@@ -63,11 +63,11 @@ func (this *RoleController) AddUserToRole() {
 // @Param body body models.Role false "角色及用户信息"
 // @Success 200 {object} models.Result
 // @router /user [delete]
-func (this *RoleController) RemoveUserOfRole() {
+func (this *RoleController) RemoveUsersFromRole() {
 	role := new(models.Role)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &role)
 
-	this.Data["json"] = role.RemoveUser()
+	this.Data["json"] = role.RemoveUsers()
 	this.ServeJSON(false)
 }
 

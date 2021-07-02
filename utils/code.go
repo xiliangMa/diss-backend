@@ -135,6 +135,27 @@ var (
 	UpdateRegistryErr               = 140
 	GetVersionErr                   = 141
 	AddVersionErr                   = 142
+	AddRoleErr                      = 143
+	EditRoleErr                     = 144
+	GetRoleErr                      = 145
+	DeleteRoleErr                   = 146
+	AddUserErr                      = 147
+	EditUserErr                     = 148
+	GetUserErr                      = 149
+	DeleteUserErr                   = 150
+	AddModuleErr                    = 151
+	EditModuleErr                   = 152
+	GetModuleErr                    = 153
+	DeleteModuleErr                 = 154
+	AddPolicyErr                    = 155
+	RemovePolicyErr                 = 156
+	UserExistErr                    = 157
+	AddUserToRoleErr                = 158
+	ChangeUserInRoleErr             = 159
+	RemoveUserFromRoleErr           = 160
+	AddRoleForUserErr               = 161
+	ChangeRoleForUserErr            = 162
+	RemoveRoleForUserErr            = 163
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001
@@ -176,22 +197,6 @@ var (
 	NetworkPolicyExistErr            = 1027
 	NotFoundHostForClusterErr        = 1028
 	UpdateNetworkPolicyErr           = 1029
-	AddRoleErr                       = 1030
-	EditRoleErr                      = 1031
-	GetRoleErr                       = 1032
-	DeleteRoleErr                    = 1033
-	AddUserToRoleErr                 = 1034
-	AddUserErr                       = 1035
-	EditUserErr                      = 1036
-	GetUserErr                       = 1037
-	DeleteUserErr                    = 1038
-	AddModuleErr                     = 1039
-	EditModuleErr                    = 1040
-	GetModuleErr                     = 1041
-	DeleteModuleErr                  = 1042
-	AddPolicyErr                     = 1043
-	RemovePolicyErr                  = 1044
-	UserExistErr                     = 1045
 
 	//task job 1100-1200
 	AddTaskErr        = 1100

@@ -11,21 +11,25 @@ import (
 )
 
 type User struct {
-	Id         int    `orm:"auto;pk" description:"用户ID"`
-	Name       string `orm:"unique" description:"用户名"`
-	DispName   string `orm:"size(64)" description:"显示名"`
-	Password   string `description:"用户密码"`
-	Role       *Role  `orm:"rel(fk);null" description:"角色"`
-	CreateTime int64  `orm:"default(0);" description:"(创建时间)"`
-	UpdateTime int64  `orm:"default(0)" description:"(更新时间)"`
+	Id          int    `orm:"auto;pk" description:"用户ID"`
+	Name        string `orm:"unique" description:"用户名"`
+	DispName    string `orm:"size(64)" description:"显示名"`
+	Description string `orm:"size(64)" description:"描述"`
+	Password    string `description:"用户密码"`
+	Role        *Role  `orm:"rel(fk);null" description:"角色"`
+	CreateTime  int64  `orm:"default(0);" description:"(创建时间)"`
+	UpdateTime  int64  `orm:"default(0)" description:"(更新时间)"`
 }
 
 type UserInterface interface {
-	List(from, limit int) Result
 	Add() Result
 	Update() Result
-	Delete() Result
+	List(from, limit int) Result
 	UserList() ([]*User, int64, error)
+	Delete() Result
+	AddRole() Result
+	RemoveRole() Result
+	UpdateRole() Result
 }
 
 func (this *User) Add() Result {
@@ -45,9 +49,18 @@ func (this *User) Add() Result {
 	}
 
 	this.CreateTime = time.Now().UnixNano()
+	this.UpdateTime = time.Now().UnixNano()
 	password := utils.MD5(this.Password)
 	passwordBase64 := base64.StdEncoding.EncodeToString([]byte(password))
 	this.Password = passwordBase64
+
+	// 同时指定了角色的处理
+	if this.Role != nil {
+		ResultData = this.AddRole()
+		if ResultData.Code != http.StatusOK {
+			return ResultData
+		}
+	}
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -72,6 +85,15 @@ func (this *User) Update() Result {
 		userData := userList[0]
 		this.CreateTime = userData.CreateTime
 		this.UpdateTime = time.Now().UnixNano()
+
+		// 同时指定了角色的处理
+		if this.Role != nil {
+			ResultData = this.UpdateRole()
+			if ResultData.Code != http.StatusOK {
+				return ResultData
+			}
+		}
+
 		_, err := o.Update(this)
 		if err != nil {
 			ResultData.Message = err.Error()
@@ -164,5 +186,105 @@ func (this *User) Delete() Result {
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK
+	return ResultData
+}
+
+func (this *User) AddRole() Result {
+	var ResultData Result
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+
+	if this.Role == nil {
+		ResultData.Code = utils.AddRoleForUserErr
+		msg := fmt.Sprintf("Add Role for User failed, No Role Info , code: %d", ResultData.Code)
+		ResultData.Message = msg
+	}
+
+	roleQuery := Role{Id: this.Role.Id}
+	roleObj, count, _ := roleQuery.RoleList(0, 1)
+	if count > 0 {
+		this.Role = roleObj[0]
+		_, err := GlobalCasbin.Enforcer.AddRoleForUser(this.Name, utils.GetRoleString(this.Role.Code))
+		if err != nil {
+			logs.Warn("Add Role For User failed, code: %d, error : %s", ResultData.Code, err)
+		}
+		GlobalCasbin.Enforcer.LoadPolicy()
+	} else {
+		ResultData.Code = utils.GetRoleErr
+		ResultData.Message = fmt.Sprintf("Relate Role failed when add user, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error(ResultData.Message)
+		return ResultData
+	}
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+func (this *User) RemoveRole() Result {
+	var ResultData Result
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+
+	if this.Role == nil {
+		ResultData.Code = utils.RemoveRoleForUserErr
+		msg := fmt.Sprintf("Remove Role for User failed, No Role Info , code: %d", ResultData.Code)
+		ResultData.Message = msg
+	}
+
+	roleQuery := Role{Id: this.Role.Id}
+	_, count, _ := roleQuery.RoleList(0, 1)
+	if count > 0 {
+		_, err := GlobalCasbin.Enforcer.DeleteRoleForUser(this.Name, utils.GetRoleString(this.Role.Code))
+		if err != nil {
+			logs.Warn("Remove User From Role failed, No User Info , code: %d, error : %s", ResultData.Code, err)
+		}
+		GlobalCasbin.Enforcer.LoadPolicy()
+		this.Role = nil
+	} else {
+		ResultData.Code = utils.GetRoleErr
+		ResultData.Message = fmt.Sprintf("Relate Role failed when add user, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error(ResultData.Message)
+		return ResultData
+	}
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+func (this *User) UpdateRole() Result {
+	var ResultData Result
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+
+	if this.Role == nil {
+		ResultData.Code = utils.ChangeRoleForUserErr
+		msg := fmt.Sprintf("Change Role for User failed, No User Info , code: %d", ResultData.Code)
+		ResultData.Message = msg
+	}
+
+	roleQuery := Role{Id: this.Role.Id}
+	roleObj, count, _ := roleQuery.RoleList(0, 1)
+	if count > 0 {
+		this.Role = roleObj[0]
+		_, err := GlobalCasbin.Enforcer.DeleteRolesForUser(this.Name)
+		if err != nil {
+			logs.Warn("Remove Role For User failed, , code: %d, error : %s", ResultData.Code, err)
+		}
+		_, err = GlobalCasbin.Enforcer.AddRoleForUser(this.Name, utils.GetRoleString(this.Role.Code))
+		if err != nil {
+			logs.Warn("Add Role For User failed, code: %d, error : %s", ResultData.Code, err)
+		}
+		GlobalCasbin.Enforcer.LoadPolicy()
+	} else {
+		ResultData.Code = utils.GetRoleErr
+		ResultData.Message = fmt.Sprintf("Relate Role failed when add user, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error(ResultData.Message)
+		return ResultData
+	}
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
 	return ResultData
 }

@@ -20,7 +20,7 @@ type CasbinManager struct {
 func NewCasbinManager() *CasbinManager {
 	DSAlias := utils.DS_Default
 	DS := utils.GetConn(DSAlias)
-	adaptor, err := xormadapter.NewAdapter("postgres", DS)
+	adaptor, err := xormadapter.NewAdapter("postgres", DS, true)
 	if err != nil {
 		logs.Error("Create casbin adapter failed, err: %s.", err)
 		return nil

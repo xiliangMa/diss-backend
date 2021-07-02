@@ -10,23 +10,24 @@ import (
 )
 
 type Role struct {
-	Id         int       `orm:"auto;pk" description:"角色ID"`
-	Code       string    `orm:"unique"  description:"角色代码"`
-	DispName   string    `orm:"size(64)" description:"显示名"`
-	Users      []*User   `orm:"reverse(many)" description:"用户列表"` //这里的关联不用在orm，用于casbin
-	Modules    []*Module `orm:"reverse(many)" description:"模块列表"` //这里的关联不用在orm，用于casbin
-	CreateTime int64     `orm:"default(0);" description:"(创建时间)"`
-	UpdateTime int64     `orm:"default(0)" description:"(更新时间)"`
+	Id          int       `orm:"auto;pk" description:"角色ID"`
+	Code        string    `orm:"unique"  description:"角色代码"`
+	DispName    string    `orm:"size(64)" description:"显示名"`
+	Description string    `orm:"size(64)" description:"描述"`
+	Users       []*User   `orm:"reverse(many)" description:"用户列表"` // 以casbin中的关联优先
+	Modules     []*Module `orm:"reverse(many)" description:"模块列表"` // 使用casbin中的关联，ORM中不做关联操作
+	CreateTime  int64     `orm:"default(0);" description:"(创建时间)"`
+	UpdateTime  int64     `orm:"default(0)" description:"(更新时间)"`
 }
 
 type RoleInterface interface {
-	List(from, limit int) Result
 	Add() Result
+	List(from, limit int) Result
+	RoleList() ([]*Role, int64, error)
 	Update() Result
 	Delete() Result
-	RoleList() ([]*Role, int64, error)
-	AddUser() Result
-	RemoveUser() Result
+	AddUsers() Result
+	RemoveUsers() Result
 	PolicyList() Result
 	AddPolicy() Result
 	RemovePolicy() Result
@@ -39,6 +40,10 @@ func (this *Role) Add() Result {
 	o.Using(utils.DS_Default)
 
 	this.CreateTime = time.Now().UnixNano()
+	this.UpdateTime = time.Now().UnixNano()
+	if this.Code == "" {
+		this.Code = utils.GetRoleString(utils.GenRandomString(8))
+	}
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -51,7 +56,100 @@ func (this *Role) Add() Result {
 	return ResultData
 }
 
-func (this *Role) AddUser() Result {
+func (this *Role) List(from, limit int) Result {
+	var ResultData Result
+
+	roleList, total, err := this.RoleList(from, limit)
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetRoleErr
+		logs.Error("Get Role failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+	}
+
+	data := make(map[string]interface{})
+	data["total"] = total
+	data["items"] = roleList
+	if total == 0 {
+		ResultData.Data = nil
+	}
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	return ResultData
+}
+
+func (this *Role) RoleList(from, limit int) (roleLists []*Role, count int64, err error) {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var roleList []*Role = nil
+	cond := orm.NewCondition()
+
+	if this.Id != 0 {
+		cond = cond.And("id", this.Id)
+	}
+	if this.Code != "" {
+		cond = cond.And("Code", this.Code)
+	}
+
+	_, err = o.QueryTable(utils.Role).SetCond(cond).RelatedSel().Limit(limit, from).OrderBy("-create_time").All(&roleList)
+
+	total, _ := o.QueryTable(utils.Role).SetCond(cond).Count()
+	return roleList, total, err
+}
+
+func (this *Role) Update() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+	roleObj := Role{}
+	roleObj.Id = this.Id
+
+	roleList, total, _ := roleObj.RoleList(0, 0)
+	if total > 0 {
+		roleData := roleList[0]
+		this.CreateTime = roleData.CreateTime
+		this.UpdateTime = time.Now().UnixNano()
+		_, err := o.Update(this)
+		if err != nil {
+			ResultData.Message = err.Error()
+			ResultData.Code = utils.EditRoleErr
+			logs.Error("Edit Role %s failed, code: %d, err: %s", this.Code, ResultData.Code, ResultData.Message)
+			return ResultData
+		}
+	}
+	ResultData.Code = http.StatusOK
+	ResultData.Data = this
+	return ResultData
+}
+
+func (this *Role) Delete() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+	cond := orm.NewCondition()
+
+	if this.Id != 0 {
+		cond = cond.And("id", this.Id)
+	} else {
+		ResultData.Message = "No RoleList Id."
+		ResultData.Code = utils.DeleteRoleErr
+		return ResultData
+	}
+
+	_, err := o.QueryTable(utils.Role).SetCond(cond).Delete()
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteRoleErr
+		logs.Error("Delete Role failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	return ResultData
+}
+
+func (this *Role) AddUsers() Result {
 	var ResultData Result
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
@@ -75,13 +173,13 @@ func (this *Role) AddUser() Result {
 	return ResultData
 }
 
-func (this *Role) RemoveUser() Result {
+func (this *Role) RemoveUsers() Result {
 	var ResultData Result
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 
 	if len(this.Users) < 1 {
-		ResultData.Code = utils.AddUserToRoleErr
+		ResultData.Code = utils.RemoveUserFromRoleErr
 		msg := fmt.Sprintf("Remove User From Role failed, No User Info , code: %d", ResultData.Code)
 		ResultData.Message = msg
 	}
@@ -214,98 +312,5 @@ func (this *Role) UpdatePolicy() Result {
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
-	return ResultData
-}
-
-func (this *Role) Update() Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
-	var ResultData Result
-	roleObj := Role{}
-	roleObj.Id = this.Id
-
-	roleList, total, _ := roleObj.RoleList(0, 0)
-	if total > 0 {
-		roleData := roleList[0]
-		this.CreateTime = roleData.CreateTime
-		this.UpdateTime = time.Now().UnixNano()
-		_, err := o.Update(this)
-		if err != nil {
-			ResultData.Message = err.Error()
-			ResultData.Code = utils.EditRoleErr
-			logs.Error("Edit Role %s failed, code: %d, err: %s", this.Code, ResultData.Code, ResultData.Message)
-			return ResultData
-		}
-	}
-	ResultData.Code = http.StatusOK
-	ResultData.Data = this
-	return ResultData
-}
-
-func (this *Role) List(from, limit int) Result {
-	var ResultData Result
-
-	roleList, total, err := this.RoleList(from, limit)
-
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetRoleErr
-		logs.Error("Get Role failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-	}
-
-	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = roleList
-	if total == 0 {
-		ResultData.Data = nil
-	}
-
-	ResultData.Code = http.StatusOK
-	ResultData.Data = data
-	return ResultData
-}
-
-func (this *Role) RoleList(from, limit int) (roleLists []*Role, count int64, err error) {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
-	var roleList []*Role = nil
-	cond := orm.NewCondition()
-
-	if this.Id != 0 {
-		cond = cond.And("id", this.Id)
-	}
-	if this.Code != "" {
-		cond = cond.And("Code", this.Code)
-	}
-
-	_, err = o.QueryTable(utils.Role).SetCond(cond).RelatedSel().Limit(limit, from).OrderBy("-create_time").All(&roleList)
-
-	total, _ := o.QueryTable(utils.Role).SetCond(cond).Count()
-	return roleList, total, err
-}
-
-func (this *Role) Delete() Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Default)
-	var ResultData Result
-	cond := orm.NewCondition()
-
-	if this.Id != 0 {
-		cond = cond.And("id", this.Id)
-	} else {
-		ResultData.Message = "No RoleList Id."
-		ResultData.Code = utils.DeleteRoleErr
-		return ResultData
-	}
-
-	_, err := o.QueryTable(utils.Role).SetCond(cond).Delete()
-
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.DeleteRoleErr
-		logs.Error("Delete Role failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-	ResultData.Code = http.StatusOK
 	return ResultData
 }
