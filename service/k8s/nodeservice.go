@@ -85,7 +85,7 @@ Retry:
 				hi.OS = os
 				hi.Kernel = nStatusNodeinfo.KernelVersion
 				hi.Architecture = nStatusNodeinfo.Architecture
-				hi.DockerRuntime = nStatusNodeinfo.ContainerRuntimeVersion
+				hi.DockerRuntime = strings.Replace(nStatusNodeinfo.ContainerRuntimeVersion, "docker://", "", 1)
 				hi.KubeletVer = nStatusNodeinfo.KubeletVersion
 				hi.Kubeproxy = nStatusNodeinfo.KubeProxyVersion
 				hi.KubernetesVer = nStatusNodeinfo.KubeletVersion
