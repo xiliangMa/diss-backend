@@ -39,6 +39,15 @@ func (this *Role) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 
+	// 检查重名
+	roleQuery := Role{DispName: this.DispName}
+	roleObj, _ := roleQuery.Get()
+	if roleObj != nil && roleObj.Id != 0 {
+		ResultData.Message = "Role Name is Exist"
+		ResultData.Code = utils.RoleExistErr
+		return ResultData
+	}
+
 	this.CreateTime = time.Now().UnixNano()
 	this.UpdateTime = time.Now().UnixNano()
 	if this.Code == "" {
@@ -96,6 +105,27 @@ func (this *Role) RoleList(from, limit int) (roleLists []*Role, count int64, err
 
 	total, _ := o.QueryTable(utils.Role).SetCond(cond).Count()
 	return roleList, total, err
+}
+
+func (this *Role) Get() (*Role, error) {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var role *Role
+	cond := orm.NewCondition()
+
+	if this.Id != 0 {
+		cond = cond.And("id", this.Id)
+	}
+	if this.Code != "" {
+		cond = cond.And("Code", this.Code)
+	}
+	if this.DispName != "" {
+		cond = cond.And("DispName", this.DispName)
+	}
+
+	err := o.QueryTable(utils.Role).SetCond(cond).RelatedSel().One(&role)
+
+	return role, err
 }
 
 func (this *Role) Update() Result {

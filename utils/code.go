@@ -158,6 +158,7 @@ var (
 	RemoveRoleForUserErr            = 163
 	SYSTemplateExistErr             = 164
 	PasswordLengthErr               = 165
+	RoleExistErr                    = 166
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001
