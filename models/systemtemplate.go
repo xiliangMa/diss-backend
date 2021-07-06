@@ -68,14 +68,14 @@ type SystemTemplateGroupInterface interface {
 	List() Result
 	Delete() Result
 	Update() Result
-	Get() (SystemTemplate, error)
+	Get() (*SystemTemplate, error)
 }
 
-func (this *SystemTemplate) Get() (SystemTemplate, error) {
+func (this *SystemTemplate) Get() (*SystemTemplate, error) {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	cond := orm.NewCondition()
-	template := SystemTemplate{}
+	var template *SystemTemplate
 
 	if this.Type != "" {
 		cond = cond.And("type", this.Type)

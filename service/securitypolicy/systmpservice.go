@@ -15,7 +15,7 @@ func (this *SystemTemplateService) AddSystemTemplate() models.Result {
 	// 检查重名
 	sysTemplateQuery := models.SystemTemplate{Name: this.SystemTemplate.Name}
 	sysTemplateObj, _ := sysTemplateQuery.Get()
-	if sysTemplateObj.Id != "" {
+	if sysTemplateObj != nil && sysTemplateObj.Id != "" {
 		ResultData.Message = "Template Name is Exist"
 		ResultData.Code = utils.SYSTemplateExistErr
 		return ResultData
@@ -23,6 +23,7 @@ func (this *SystemTemplateService) AddSystemTemplate() models.Result {
 
 	// 基线模板自动填充配置的预置json串
 	if this.SystemTemplate.Type == models.TMP_Type_BM_Docker || this.SystemTemplate.Type == models.TMP_Type_BM_K8S {
+		this.SystemTemplate.Name = ""
 		benchTemplate, err := this.SystemTemplate.Get()
 		if err != nil {
 			ResultData.Message = err.Error()
@@ -38,8 +39,8 @@ func (this *SystemTemplateService) AddSystemTemplate() models.Result {
 			this.SystemTemplate.CheckManagedServicesJson = benchTemplate.CheckManagedServicesJson
 			this.SystemTemplate.Commands = benchTemplate.Commands
 		}
+		ResultData = benchTemplate.Add()
 	}
-	ResultData = this.SystemTemplate.Add()
 
 	return ResultData
 }

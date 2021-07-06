@@ -290,12 +290,12 @@ func (this *User) UpdateRole() Result {
 		}
 		_, err = GlobalCasbin.Enforcer.AddRoleForUser(this.Name, utils.GetRoleString(this.Role.Code))
 		if err != nil {
-			logs.Warn("Add Role For User failed, code: %d, error : %s", ResultData.Code, err)
+			logs.Warn("Update Role For User failed, code: %d, error : %s", ResultData.Code, err)
 		}
 		GlobalCasbin.Enforcer.LoadPolicy()
 	} else {
 		ResultData.Code = utils.GetRoleErr
-		ResultData.Message = fmt.Sprintf("Relate Role failed when add user, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		ResultData.Message = fmt.Sprintf("Relate Role failed when update user, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		logs.Error(ResultData.Message)
 		return ResultData
 	}
