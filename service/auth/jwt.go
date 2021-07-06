@@ -21,13 +21,15 @@ type JwtService struct {
 	LoginType string
 }
 
-func (this *JwtService) CreateToken(name, pwd, userType string) (string, int) {
-	user := models.User{}
+func (this *JwtService) CreateToken(name, pwd, userType string) models.Result {
+	result := models.Result{Code: http.StatusOK}
+	data := make(map[string]interface{})
+	var user models.User
 	user.Name = name
 	password := utils.MD5(pwd)
 	passwordBase64 := base64.StdEncoding.EncodeToString([]byte(password))
 	user.Password = passwordBase64
-	_, count, _ := user.UserList(0, 1)
+	userList, count, _ := user.UserList(0, 1)
 
 	if count > 0 {
 		// Create token
@@ -42,11 +44,20 @@ func (this *JwtService) CreateToken(name, pwd, userType string) (string, int) {
 
 		t, err := this.Token.SignedString([]byte("secret"))
 		if err != nil {
-			return err.Error(), utils.SiginErr
+			result.Code = utils.SiginErr
+			result.Message = err.Error()
+			return result
 		}
-		return t, http.StatusOK
+		user = *userList[0]
+		user.Password = ""
+		data["token"] = t
+		data["user"] = user
+		result.Data = data
+		return result
 	}
-	return http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized
+	result.Code = http.StatusUnauthorized
+	result.Message = http.StatusText(http.StatusUnauthorized)
+	return result
 }
 
 func (this *JwtService) CheckToken(TokenStr string) (string, int) {

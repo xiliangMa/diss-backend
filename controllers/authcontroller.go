@@ -21,19 +21,12 @@ type AuthController struct {
 // @Success 200 {object} models.Result
 // @router /login [post]
 func (this *AuthController) Login() {
-	ResultData := models.Result{Code: http.StatusOK}
 	name := this.GetString("name")
 	pwd := this.GetString("pwd")
 	loginType := this.GetString("loginType")
 	jwtService := auth.JwtService{}
-	result, code := jwtService.CreateToken(name, pwd, loginType)
-	ResultData.Code = code
-	if code != http.StatusOK {
-		ResultData.Message = result
-	} else {
-		ResultData.Data = result
-	}
-	this.Data["json"] = ResultData
+	result := jwtService.CreateToken(name, pwd, loginType)
+	this.Data["json"] = result
 	this.ServeJSON(false)
 }
 
