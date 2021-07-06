@@ -90,8 +90,8 @@ func (this *ContainerService) AddContainer() {
 		ccob.Status = strings.ToLower(status)
 		ccob.ClusterName = clusterName
 		ccob.Age = "Up " + created.String()
-		ccob.CreateTime = startTime.Unix()
-		ccob.UpdateTime = startTime.Unix()
+		ccob.CreateTime = startTime.UnixNano()
+		ccob.UpdateTime = startTime.UnixNano()
 		ccob.AccountName = models.Account_Admin
 
 		//同步 containerinfo
