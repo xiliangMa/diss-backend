@@ -11,8 +11,9 @@ import (
 
 type Role struct {
 	Id          int       `orm:"auto;pk" description:"角色ID"`
-	Code        string    `orm:"unique"  description:"角色代码"`
+	Name        string    `orm:"size(64)" description:"角色名"`
 	DispName    string    `orm:"size(64)" description:"显示名"`
+	Code        string    `orm:"size(64);unique"  description:"角色代码"`
 	Description string    `orm:"size(64)" description:"描述"`
 	Users       []*User   `orm:"reverse(many)" description:"用户列表"` // 以casbin中的关联优先
 	Modules     []*Module `orm:"reverse(many)" description:"模块列表"` // 使用casbin中的关联，ORM中不做关联操作
@@ -40,10 +41,10 @@ func (this *Role) Add() Result {
 	o.Using(utils.DS_Default)
 
 	// 检查重名
-	roleQuery := Role{DispName: this.DispName}
+	roleQuery := Role{Name: this.Name}
 	roleObj, _ := roleQuery.Get()
 	if roleObj != nil && roleObj.Id != 0 {
-		ResultData.Message = "Role Name is Exist"
+		ResultData.Message = "Role is Exist"
 		ResultData.Code = utils.RoleExistErr
 		return ResultData
 	}
@@ -110,7 +111,7 @@ func (this *Role) RoleList(from, limit int) (roleLists []*Role, count int64, err
 func (this *Role) Get() (*Role, error) {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var role *Role
+	var role Role
 	cond := orm.NewCondition()
 
 	if this.Id != 0 {
@@ -119,13 +120,11 @@ func (this *Role) Get() (*Role, error) {
 	if this.Code != "" {
 		cond = cond.And("Code", this.Code)
 	}
-	if this.DispName != "" {
-		cond = cond.And("DispName", this.DispName)
+	if this.Name != "" {
+		cond = cond.And("name", this.Name)
 	}
-
 	err := o.QueryTable(utils.Role).SetCond(cond).RelatedSel().One(&role)
-
-	return role, err
+	return &role, err
 }
 
 func (this *Role) Update() Result {
