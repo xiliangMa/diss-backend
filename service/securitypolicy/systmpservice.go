@@ -30,7 +30,7 @@ func (this *SystemTemplateService) AddSystemTemplate() models.Result {
 			ResultData.Code = utils.GetSYSTemplateErr
 			return ResultData
 		}
-		if benchTemplate.Id != "" {
+		if benchTemplate != nil && benchTemplate.Id != "" {
 			this.SystemTemplate.CheckMasterJson = benchTemplate.CheckMasterJson
 			this.SystemTemplate.CheckNodeJson = benchTemplate.CheckNodeJson
 			this.SystemTemplate.CheckControlPlaneJson = benchTemplate.CheckControlPlaneJson
@@ -38,6 +38,7 @@ func (this *SystemTemplateService) AddSystemTemplate() models.Result {
 			this.SystemTemplate.CheckPoliciesJson = benchTemplate.CheckPoliciesJson
 			this.SystemTemplate.CheckManagedServicesJson = benchTemplate.CheckManagedServicesJson
 			this.SystemTemplate.Commands = benchTemplate.Commands
+			benchTemplate.IsDefault = this.SystemTemplate.IsDefault
 		}
 		ResultData = benchTemplate.Add()
 	}
