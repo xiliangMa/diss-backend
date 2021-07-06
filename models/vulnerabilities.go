@@ -40,6 +40,7 @@ type Vulnerabilities struct {
 type ImageVulnerabilitiesInterface interface {
 	Add() Result
 	List(from, limit int) Result
+	ScanList(from, limit int) Result
 	Delete() Result
 }
 
@@ -69,7 +70,7 @@ func (this *ImageVulnerabilities) Add() Result {
 			continue
 		}
 		if severityStatus == "" && vuln.Severity == SEVERITY_High || vuln.Severity == SEVERITY_Critical {
-			severityStatus = "Trustee"
+			severityStatus = "NotTrustee"
 		}
 		vuln.ImageVulnerabilities = this
 		vuln.Add()
@@ -80,15 +81,62 @@ func (this *ImageVulnerabilities) Add() Result {
 	t := task.Get()
 	if t != nil {
 		if severityStatus != "" {
-			t.SecurityStatus = "Trustee"
-		} else {
 			t.SecurityStatus = "NotTrustee"
+		} else {
+			t.SecurityStatus = "Trustee"
 		}
 		t.Update()
 	}
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
+	return ResultData
+}
+
+func (this *ImageVulnerabilities) ScanList(from, limit int) Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var imageVulnerabilities []*ImageVulnerabilities
+	var ResultData Result
+	var err error
+	cond := orm.NewCondition()
+	if this.Id != 0 {
+		cond = cond.And("id", this.Id)
+	}
+	if this.RegistryId != 0 {
+		cond = cond.And("registry_id", this.RegistryId)
+	}
+	if this.HostId != "" {
+		cond = cond.And("host_id", this.HostId)
+	}
+	if this.ImageId != "" {
+		cond = cond.And("image_id__icontains", this.ImageId)
+	}
+	if this.TaskId != "" {
+		cond = cond.And("task_id", this.TaskId)
+	}
+	if this.Target != "" {
+		cond = cond.And("target__icontains", this.Target)
+	}
+	if this.Type != "" {
+		cond = cond.And("type__icontains", this.Type)
+	}
+
+	_, err = o.QueryTable(utils.ImageVulnerabilities).SetCond(cond).OrderBy("-create_time").Limit(limit, from).All(&imageVulnerabilities)
+	total, _ := o.QueryTable(utils.ImageVulnerabilities).SetCond(cond).Count()
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetImageVulnerabilitiesErr
+		logs.Error("Get ImageVulnerabilitiesErr List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	data := make(map[string]interface{})
+	data[Result_Total] = total
+	data[Result_Items] = imageVulnerabilities
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
 	return ResultData
 }
 
@@ -107,7 +155,6 @@ func (this *ImageVulnerabilities) List(from, limit int) Result {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetImageVulnerabilitiesErr
 		logs.Error("Get ImageVulnerabilitiesErr List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
 	}
 	vuln := orm.NewCondition()
 	vuln = vuln.And("image_vulnerabilities_id", imageVulnerabilities.Id)
@@ -121,9 +168,6 @@ func (this *ImageVulnerabilities) List(from, limit int) Result {
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
 }
 
