@@ -283,7 +283,7 @@ func (this *WarningInfo) Count() int64 {
 	}
 
 	if filter != "" {
-		countSql = countSql + " where " + filter
+		countSql = countSql + " where status != 'duplicate' and status = '未处理' and " + filter
 	}
 
 	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")

@@ -96,18 +96,19 @@ func (this *BenchMarkLog) List(from, limit int) Result {
 		cond = cond.And("update_time__gte", this.UpdateTime)
 	}
 
+	if this.InternalAddr != "" {
+		cond = cond.And("internal_addr__contains", this.InternalAddr)
+	}
+
 	if this.TaskId != "" {
 		cond = cond.And("task_id", this.TaskId)
 	}
 
 	isInfo := this.IsInfo
 	if isInfo {
-
 		_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Limit(limit, from).OrderBy("-update_time").All(&BenchMarkLogList)
-
 	} else {
 		fields := []string{"id", "bench_mark_name", "level", "project_name", "host_name", "host_id", "internal_addr", "public_addr", "o_s", "update_time", "fail_count", "warn_count", "pass_count", "info_count", "type", "result", "task_id"}
-
 		_, err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Limit(limit, from).OrderBy("-update_time").
 			All(&BenchMarkLogList, fields...)
 	}
@@ -116,7 +117,6 @@ func (this *BenchMarkLog) List(from, limit int) Result {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetBenchMarkLogErr
 		logs.Error("Get BenchMarkLog List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
 	}
 	var total int64
 	if this.UpdateTime == 0 {
@@ -125,14 +125,11 @@ func (this *BenchMarkLog) List(from, limit int) Result {
 		total, _ = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Filter("update_time__gte", this.UpdateTime).Count()
 	}
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = BenchMarkLogList
+	data[Result_Total] = total
+	data[Result_Items] = BenchMarkLogList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
 }
 
