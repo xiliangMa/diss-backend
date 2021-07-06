@@ -26,7 +26,7 @@ func (this *VulnerabilitiesLogController) GetVulnerabilitiesScan() {
 	imageVulnerabilities := new(models.ImageVulnerabilities)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &imageVulnerabilities)
 
-	this.Data["json"] = imageVulnerabilities.List(from, limit)
+	this.Data["json"] = imageVulnerabilities.ScanList(from, limit)
 	this.ServeJSON(false)
 }
 
@@ -46,5 +46,24 @@ func (this *VulnerabilitiesLogController) GetVulnerabilities() {
 	json.Unmarshal(this.Ctx.Input.RequestBody, &vulnerabilities)
 
 	this.Data["json"] = vulnerabilities.List(from, limit)
+	this.ServeJSON(false)
+}
+
+// @Title GetImageVulnerabilities
+// @Description Get ImageVulnerabilities
+// @Param token header string true "authToken"
+// @Param body body models.ImageVulnerabilities false "漏洞"
+// @Param from query int 0 false "from"
+// @Param limit query int 20 false "limit"
+// @Success 200 {object} models.Result
+// @router /imageVulnerabilities [post]
+func (this *VulnerabilitiesLogController) GetImageVulnerabilities() {
+	limit, _ := this.GetInt("limit")
+	from, _ := this.GetInt("from")
+
+	imageVulnerabilities := new(models.ImageVulnerabilities)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &imageVulnerabilities)
+
+	this.Data["json"] = imageVulnerabilities.List(from, limit)
 	this.ServeJSON(false)
 }
