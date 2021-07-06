@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
+	"net/http"
 )
 
 // Asset image object api list
@@ -35,12 +36,12 @@ func (this *ImageController) GetContainersList() {
 // @Success 200 {object} models.Result
 // @router /imagedetail [post]
 func (this *ImageController) GetImageDetail() {
-	limit, _ := this.GetInt("limit")
-	from, _ := this.GetInt("from")
 	imageDetail := new(models.ImageDetail)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &imageDetail)
 
-	this.Data["json"] = imageDetail.List(from, limit)
+	result := models.Result{Code: http.StatusOK}
+	result.Data = imageDetail.Get()
+	this.Data["json"] = result
 	this.ServeJSON(false)
 
 }

@@ -7,7 +7,6 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -88,96 +87,16 @@ func (this *ImageDetail) Add() Result {
 	return ResultData
 }
 
-func (this *ImageDetail) List(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
-	var imageDetailList []*ImageDetail = nil
-	var ResultData Result
-	var err error
-	var total int64 = 0
-
-	sql := ` select * from ` + utils.ImageDetail + ` `
-	countSql := `select count(id) from ` + utils.ImageDetail + ` `
-	filter := ""
-	var fields []string
-	if this.Id != "" {
-		filter = filter + `id = ? and `
-		fields = append(fields, this.Id)
-	}
-	if this.Name != "" {
-		filter = filter + `name like ? and `
-		fields = append(fields, "%"+this.Name+"%")
-	}
-	if this.HostId != "" {
-		filter = filter + `host_id = ? and `
-		fields = append(fields, this.HostId)
-	}
-	if this.HostName != "" {
-		filter = filter + `host_name like ? and `
-		fields = append(fields, "%"+this.HostName+"%")
-	}
-	if this.ImageId != "" {
-		filter = filter + `image_id = ? and `
-		fields = append(fields, this.ImageId)
-	}
-	if this.RepoTags != "" {
-		filter = filter + `repo_tags like ? and `
-		fields = append(fields, "%"+this.RepoTags+"%")
-	}
-	if this.Os != "" {
-		filter = filter + `contaienr_id = ? and `
-		fields = append(fields, this.Os)
-	}
-	if this.CreateTime != 0 {
-		filter = filter + `create_at  > this.CreateTime and `
-	}
-
-	if filter != "" {
-		sql = sql + " where " + filter
-		countSql = countSql + " where " + filter
-	}
-	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
-	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
-	resultSql := sql
-	if from >= 0 && limit > 0 {
-		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
-		resultSql = resultSql + limitSql
-	}
-	_, err = o.Raw(resultSql, fields).QueryRows(&imageDetailList)
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetImageDetailErr
-		logs.Error("Get ImageDetail List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-
-	_ = o.Raw(countSql, fields).QueryRow(&total)
-	data := make(map[string]interface{})
-
-	data[Result_Total] = total
-	data[Result_Items] = imageDetailList
-
-	ResultData.Code = http.StatusOK
-	ResultData.Data = data
-	return ResultData
-}
-
 func (this *ImageDetail) Delete() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
 
-	removeSQL := "delete from " + utils.ImageDetail + " "
+	removeSQL := "delete from " + utils.ImageDetail
 	var fields []string
 	filter := ""
 
-	if this.ImageId != "" {
-		filter = filter + `image_id = ? and `
-		fields = append(fields, this.ImageId)
-	}
-
 	if this.ImageConfigId != "" {
-
 		ids := strings.Split(this.ImageConfigId, ",")
 		var placeholder []string
 		for i := 0; i < len(ids); i++ {
@@ -186,12 +105,6 @@ func (this *ImageDetail) Delete() Result {
 		filter = filter + `image_config_id in (` + strings.Join(placeholder, ",") + `) and `
 		fields = append(fields, ids...)
 	}
-
-	if this.HostId != "" {
-		filter = filter + `host_id = ? and `
-		fields = append(fields, this.HostId)
-	}
-
 	if filter != "" {
 		removeSQL = removeSQL + " where " + filter
 	}
@@ -214,17 +127,7 @@ func (this *ImageDetail) Get() *ImageDetail {
 	var err error
 	var fields []string
 	filter := ""
-	sql := "select * from " + utils.ImageDetail + " where "
-
-	if this.ImageId != "" {
-		filter = filter + `image_id = ? and `
-		fields = append(fields, this.ImageId)
-	}
-
-	if this.Name != "" {
-		filter = filter + `name = ? and `
-		fields = append(fields, this.Name)
-	}
+	sql := "select * from " + utils.ImageDetail
 
 	if this.ImageConfigId != "" {
 		filter = filter + `image_config_id = ? and `

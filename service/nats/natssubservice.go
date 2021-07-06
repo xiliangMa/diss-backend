@@ -110,6 +110,11 @@ func (this *NatsSubService) Save() error {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
+			hostConfig.Status = models.Host_Status_Normal
+			hostConfig.Diss = models.Diss_Installed
+			hostConfig.DissStatus = models.Diss_status_Safe
+			hostConfig.CreateTime = time.Now().UnixNano()
+			hostConfig.IsEnableHeartBeat = true
 			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s <<<", hostConfig.Id, models.Resource_HostConfig)
 			if err := hostConfig.Add(); err != nil {
 				return err
@@ -240,7 +245,8 @@ func (this *NatsSubService) Save() error {
 				logs.Error("Parses %s error %s", ms.Tag, err)
 				return err
 			}
-			logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s, Size: %d <<<", imageDetail.HostId, models.Resource_ImageDetail, 1)
+			imageDetail.ImageConfigId = imageDetail.HostId + "---" + imageDetail.ImageId + "---" + imageDetail.Name
+			logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", imageDetail.HostId, models.Resource_ImageDetail)
 			if result := imageDetail.Delete(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
 			}
@@ -523,12 +529,15 @@ func (this *NatsSubService) Save() error {
 					}
 				}
 
-				wi := warningInfo.Get()
-				if wi != nil {
-					wi.UpdateTime = warningInfo.CreateTime
-					wi.Update()
-					warningInfo.Status = "duplicate"
+				if warningInfo.Type != "ALERT_TYPE_BRUTE_FORCE" {
+					wi := warningInfo.Get()
+					if wi != nil {
+						wi.UpdateTime = warningInfo.CreateTime
+						wi.Update()
+						warningInfo.Status = "duplicate"
+					}
 				}
+
 				if result := warningInfo.Add(); result.Code != http.StatusOK {
 					return errors.New(result.Message)
 				}
@@ -938,7 +947,7 @@ func (this *NatsSubService) DeleteTask() error {
 func (this *NatsSubService) ReceiveData(result models.NatsData) {
 	data, _ := json.Marshal(result)
 	err := this.Conn.Publish(this.ClientSubject, data)
-	logs.Info("Publish suss, subject: %s data : %s", this.ClientSubject, data)
+	logs.Debug("Publish suss, subject: %s data : %s", this.ClientSubject, data)
 	if err != nil {
 		logs.Error("Nats ############################ Received data from agent fail ############################", err)
 	}
