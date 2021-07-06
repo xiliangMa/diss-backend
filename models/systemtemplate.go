@@ -75,7 +75,7 @@ func (this *SystemTemplate) Get() (*SystemTemplate, error) {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	cond := orm.NewCondition()
-	var template *SystemTemplate
+	var template SystemTemplate
 
 	if this.Type != "" {
 		cond = cond.And("type", this.Type)
@@ -94,10 +94,10 @@ func (this *SystemTemplate) Get() (*SystemTemplate, error) {
 	if err != nil {
 		errMsg := fmt.Sprintf("Get SystemTemplate failed, code: %d, err: %s", utils.GetSYSTemplateErr, err.Error())
 		logs.Error(errMsg)
-		return template, err
+		return &template, err
 	}
 
-	return template, err
+	return &template, err
 }
 
 func (this *SystemTemplate) Add() Result {

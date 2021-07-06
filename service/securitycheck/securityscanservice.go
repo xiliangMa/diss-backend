@@ -285,7 +285,7 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 				logs.Error(err.Error())
 				return
 			}
-			task.SystemTemplate = &templateObj
+			task.SystemTemplate = templateObj
 		}
 		task.Host = securityCheck.Host
 		task.SearchHostId = securityCheck.Host.Id
@@ -306,7 +306,7 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 				logs.Error(err.Error())
 				return
 			}
-			task.SystemTemplate = &templateObj
+			task.SystemTemplate = templateObj
 		}
 
 		task.Host = securityCheck.Host
