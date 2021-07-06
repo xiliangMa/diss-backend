@@ -161,7 +161,6 @@ func (this *ImageConfig) List(from, limit int) Result {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetImageConfigErr
 		logs.Error("Get ImageConfig List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
 	}
 
 	total, _ := o.QueryTable(utils.ImageConfig).SetCond(cond).Count()
@@ -171,9 +170,6 @@ func (this *ImageConfig) List(from, limit int) Result {
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
 }
 

@@ -89,7 +89,6 @@ func (this *RespCenter) List(from, limit int) Result {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetRespCenterErr
 		logs.Error("Get RespCenter list failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
 	}
 
 	o.Raw(countSql).QueryRow(&total)
@@ -99,9 +98,6 @@ func (this *RespCenter) List(from, limit int) Result {
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
 }
 
