@@ -9,7 +9,7 @@ import (
 )
 
 type ContainerConfig struct {
-	Id             string      `orm:"pk;" description:"(id)"`
+	Id             string      `orm:"pk;not null" description:"(id)"`
 	Name           string      `orm:"" description:"(容器名)"`
 	NameSpaceName  string      `orm:"" description:"(命名空间)"`
 	PodId          string      `orm:"default(null)" description:"(pod id)"`
@@ -85,7 +85,7 @@ func (this *ContainerConfig) Get() *ContainerConfig {
 func (this *ContainerConfig) List(from, limit int, groupSearch bool) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var ContainerList []*ContainerConfig = nil
+	var ContainerList []*ContainerConfig
 	var ResultData Result
 	var err error
 
@@ -126,15 +126,13 @@ func (this *ContainerConfig) List(from, limit int, groupSearch bool) Result {
 		}
 	}
 	_, err = o.QueryTable(utils.ContainerConfig).SetCond(cond).Limit(limit, from).All(&ContainerList)
+	total, _ := o.QueryTable(utils.ContainerConfig).SetCond(cond).Count()
 
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetContainerConfigErr
 		logs.Error("Get ContainerConfig List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
 	}
-
-	total, _ := o.QueryTable(utils.ContainerConfig).SetCond(cond).Count()
 
 	for _, containerConfig := range ContainerList {
 		o.LoadRelated(containerConfig, "TaskList", 1, 1, 0, "-update_time")

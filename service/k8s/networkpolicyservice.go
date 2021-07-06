@@ -139,7 +139,7 @@ func (this *NetworkPolicyService) Create() (*v1.NetworkPolicy, error) {
 	netpol := v1.NetworkPolicy{ObjectMeta: objectMeta, Spec: spec}
 	netpol.ObjectMeta.ResourceVersion = ""
 
-	return this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies(this.NetworkPolicy.NameSpaceName).Create(nil, &netpol, metav1.CreateOptions{})
+	return this.ClientGo.ClientSet.NetworkingV1().NetworkPolicies(this.NetworkPolicy.NameSpaceName).Create(context.Background(), &netpol, metav1.CreateOptions{})
 }
 
 func (this *NetworkPolicyService) Update() (*v1.NetworkPolicy, error) {

@@ -26,7 +26,8 @@ func (this *NodeService) List() (*v1.NodeList, error) {
 func (this *NodeService) Wtach() {
 	nodeWatch, err := this.ClientGo.ClientSet.CoreV1().Nodes().Watch(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		panic(err)
+		logs.Error("Wtach node error: %s  ", err)
+		return
 	}
 	// 开启 watch 事件
 Retry:
@@ -58,10 +59,9 @@ Retry:
 				hc.IsInK8s = true
 				hc.ClusterId = clusterId
 				hc.ClusterName = clusterName
-				hc.IsInK8s = true
 				hc.Diss = models.Diss_NotInstalled
 				hc.DissStatus = models.Diss_Status_Unsafe
-				hc.Status = models.Host_Status_Normal
+				hc.Status = models.Host_Status_Abnormal
 
 				// HostInfo
 				hi := new(models.HostInfo)

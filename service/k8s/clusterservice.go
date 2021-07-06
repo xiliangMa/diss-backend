@@ -26,7 +26,7 @@ func (this *ClusterService) UpdateCluster() *models.Result {
 	}
 
 	// 停止watch 携程、清除全局集群客户端、清除集群数据
-	list := []*models.Cluster{}
+	var list []*models.Cluster
 	list = append(list, this.Cluster)
 	k8sClearService := K8sClearService{ClusterList: list, DropCluster: false}
 	k8sClearService.ClearAll()
