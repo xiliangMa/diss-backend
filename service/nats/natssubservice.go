@@ -298,6 +298,7 @@ func (this *NatsSubService) Save() error {
 				return err
 			}
 			logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", benchMarkLog.HostId, models.Resource_DockerBenchMark)
+			benchMarkLog.BenchMarkType = models.Resource_DockerBenchMark
 			if result := benchMarkLog.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
 			}
@@ -353,6 +354,7 @@ func (this *NatsSubService) Save() error {
 				return err
 			}
 			logs.Info("Nats ############################ Sync agent data, >>>  HostId: %s, Type: %s <<<", benchMarkLog.HostId, models.Resource_KubernetesBenchMark)
+			benchMarkLog.BenchMarkType = models.Resource_KubernetesBenchMark
 			if result := benchMarkLog.Add(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
 			}

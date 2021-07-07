@@ -10,6 +10,7 @@ import (
 type BenchMarkLog struct {
 	Id            string `orm:"pk;" description:"(基线id)"`
 	BenchMarkName string `orm:"" description:"(基线模版名称)"`
+	BenchMarkType string `orm:"" description:"(基线模版类型，DockerBenchMark 和 KubernetesBenchMark)"`
 	Level         string `orm:"" description:"(级别 info warn  fail pass)"`
 	ProjectName   string `orm:"" description:"(测试项目)"`
 	HostName      string `orm:"" description:"(主机名称)"`
@@ -90,6 +91,10 @@ func (this *BenchMarkLog) List(from, limit int) Result {
 
 	if this.BenchMarkName != "" && this.BenchMarkName != BML_Template_ALL {
 		cond = cond.And("bench_mark_name", this.BenchMarkName)
+	}
+
+	if this.BenchMarkType != "" && this.BenchMarkType != BML_Template_ALL {
+		cond = cond.And("bench_mark_type", this.BenchMarkType)
 	}
 
 	if this.UpdateTime != 0 {
