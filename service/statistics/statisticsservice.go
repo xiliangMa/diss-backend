@@ -171,34 +171,42 @@ func (this *StatisticsService) GetMirrorRiskStatistics() models.Result {
 	h[models.SEVERITY_Low] = vu.Count()
 
 	vr := make(map[string]int64)
-	virusRecord := new(models.VirusRecord)
-	virusRecord.Type = "ImageVirusScan"
-	virusRecord.Severity = models.SEVERITY_Critical
-	vr[models.SEVERITY_Critical] = virusRecord.Count()
+	VirusScan := new(models.VirusScan)
+	VirusScan.Type = "ImageVirusScan"
+	VirusScan.Type = models.SEVERITY_Critical
+	_, count, _ := VirusScan.VirusList(0, 0)
 
-	virusRecord.Severity = models.SEVERITY_High
-	vr[models.SEVERITY_High] = virusRecord.Count()
+	vr[models.SEVERITY_Critical] = count
+	VirusScan.Type = models.SEVERITY_High
+	_, count, _ = VirusScan.VirusList(0, 0)
+	vr[models.SEVERITY_High] = count
 
-	virusRecord.Severity = models.SEVERITY_Medium
-	vr[models.SEVERITY_Medium] = virusRecord.Count()
+	VirusScan.Type = models.SEVERITY_Medium
+	_, count, _ = VirusScan.VirusList(0, 0)
+	vr[models.SEVERITY_Medium] = count
 
-	virusRecord.Severity = models.SEVERITY_Low
-	vr[models.SEVERITY_Low] = virusRecord.Count()
+	VirusScan.Type = models.SEVERITY_Low
+	_, count, _ = VirusScan.VirusList(0, 0)
+	vr[models.SEVERITY_Low] = count
 
 	si := make(map[string]int64)
 	sensitiveInfo := new(models.SensitiveInfo)
 
 	sensitiveInfo.Severity = models.SEVERITY_Critical
-	si[models.SEVERITY_Critical] = sensitiveInfo.Count()
+	_, count, _ = sensitiveInfo.BaseList(0, 0)
+	si[models.SEVERITY_Critical] = count
 
 	sensitiveInfo.Severity = models.SEVERITY_High
-	si[models.SEVERITY_High] = sensitiveInfo.Count()
+	_, count, _ = sensitiveInfo.BaseList(0, 0)
+	si[models.SEVERITY_High] = count
 
 	sensitiveInfo.Severity = models.SEVERITY_Medium
-	si[models.SEVERITY_Medium] = sensitiveInfo.Count()
+	_, count, _ = sensitiveInfo.BaseList(0, 0)
+	si[models.SEVERITY_Medium] = count
 
 	sensitiveInfo.Severity = models.SEVERITY_Low
-	si[models.SEVERITY_Low] = sensitiveInfo.Count()
+	_, count, _ = sensitiveInfo.BaseList(0, 0)
+	si[models.SEVERITY_Low] = count
 
 	// 漏洞库
 	data["vuln"] = h
