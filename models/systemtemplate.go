@@ -18,7 +18,8 @@ type SystemTemplate struct {
 	Version                  string                 `orm:"null" description:"(版本)"`
 	Commands                 string                 `orm:"null;" description:"(操作命令)"`
 	Status                   string                 `orm:"default(Enable);" description:"(类型 Enable Disable)"`
-	IsDefault                bool                   `orm:"default(false);" description:"(默认系统策略)"`
+	IsDefault                bool                   `orm:"default(false);" description:"(系统策略默认项)"`
+	IsSystem                 bool                   `orm:"default(false);" description:"(是否是系统策略)"`
 	SystemTemplateGroup      []*SystemTemplateGroup `orm:"rel(m2m);" description:"(策略组)"`
 	Job                      []*Job                 `orm:"reverse(many);null" description:"(job)"`
 	Task                     []*Task                `orm:"reverse(many);null" description:"(task)"`
