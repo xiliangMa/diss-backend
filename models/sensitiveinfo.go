@@ -37,6 +37,8 @@ type FileInfo struct {
 type SensitiveInfoInterface interface {
 	Add() Result
 	List(from, limit int) Result
+	BaseList(from, limit int) ([]*SensitiveInfo, int64, error)
+	Count() int64
 }
 
 func (this *SensitiveInfo) Add() Result {
@@ -71,8 +73,28 @@ func (this *SensitiveInfo) Add() Result {
 func (this *SensitiveInfo) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
-	var SensitiveInfoList []*SensitiveInfo = nil
 	var ResultData Result
+	SensitiveInfoList, total, err := this.BaseList(0, 0)
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetWarningInfoListErr
+		return ResultData
+	}
+
+	data := make(map[string]interface{})
+	data[Result_Total] = total
+	data[Result_Items] = SensitiveInfoList
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	return ResultData
+}
+
+func (this *SensitiveInfo) BaseList(from, limit int) ([]*SensitiveInfo, int64, error) {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Security_Log)
+	var SensitiveInfoList []*SensitiveInfo = nil
 	var err error
 	var total int64 = 0
 
@@ -133,20 +155,12 @@ func (this *SensitiveInfo) List(from, limit int) Result {
 	}
 	_, err = o.Raw(resultSql, fields).QueryRows(&SensitiveInfoList)
 	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetWarningInfoListErr
-		logs.Error("Get SensitiveInfo list failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
+		logs.Error("Get SensitiveInfo list failed, code: %d, err: %s", utils.GetWarningInfoListErr, err.Error())
+		return nil, 0, err
 	}
 
 	o.Raw(countSql, fields).QueryRow(&total)
-	data := make(map[string]interface{})
-	data[Result_Total] = total
-	data[Result_Items] = SensitiveInfoList
-
-	ResultData.Code = http.StatusOK
-	ResultData.Data = data
-	return ResultData
+	return SensitiveInfoList, total, nil
 }
 
 func (this *SensitiveInfo) Count() int64 {

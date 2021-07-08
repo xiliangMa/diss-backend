@@ -96,6 +96,7 @@ type ContainerVirus struct {
 type VirusScanInterface interface {
 	Add() Result
 	List(from, limit int) Result
+	VirusList(from, limit int) ([]*VirusScanRecord, int64, error)
 }
 
 func (this *VirusScan) Add() Result {
@@ -136,6 +137,29 @@ func (this *VirusScan) List(from, limit int) Result {
 	o.Using(utils.DS_Security_Log)
 	var virusLogList []*VirusScanRecord = nil
 	var ResultData Result
+
+	virusLogList, total, err := this.VirusList(from, limit)
+	if err != nil {
+		ResultData.Code = utils.GetImageVirusErr
+		ResultData.Message = err.Error()
+	}
+
+	data := make(map[string]interface{})
+	data[Result_Total] = total
+	data[Result_Items] = virusLogList
+
+	ResultData.Code = http.StatusOK
+	ResultData.Data = data
+	if total == 0 {
+		ResultData.Data = nil
+	}
+	return ResultData
+}
+
+func (this *VirusScan) VirusList(from, limit int) ([]*VirusScanRecord, int64, error) {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Security_Log)
+	var virusLogList []*VirusScanRecord = nil
 	var err error
 	var total int64 = 0
 
@@ -201,23 +225,18 @@ func (this *VirusScan) List(from, limit int) Result {
 	}
 	_, err = o.Raw(resultSql, fields).QueryRows(&virusLogList)
 	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetImageVirusErr
-		logs.Error("Get VirusLogErr List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
+		logs.Error("Get VirusLogErr List failed, code: %d, err: %s", utils.GetImageVirusErr, err.Error())
+		return nil, 0, err
 	}
 
 	o.Raw(countSql, fields).QueryRow(&total)
-	data := make(map[string]interface{})
-	data[Result_Total] = total
-	data[Result_Items] = virusLogList
+	return virusLogList, total, nil
+}
 
-	ResultData.Code = http.StatusOK
-	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
-	return ResultData
+type VirusRecordInterface interface {
+	List(from, limit int)
+	Add() Result
+	Count() int64
 }
 
 func (this *VirusRecord) List(from, limit int) Result {
@@ -274,10 +293,6 @@ func (this *VirusRecord) List(from, limit int) Result {
 		ResultData.Data = nil
 	}
 	return ResultData
-}
-
-type VirusRecordInterface interface {
-	Add() Result
 }
 
 func (this *VirusRecord) Add() Result {
