@@ -39,6 +39,8 @@ func (this *SystemTemplateService) AddSystemTemplate() models.Result {
 			this.SystemTemplate.CheckManagedServicesJson = benchTemplate.CheckManagedServicesJson
 			this.SystemTemplate.Commands = benchTemplate.Commands
 			benchTemplate.IsDefault = this.SystemTemplate.IsDefault
+			benchTemplate.Name = sysTemplateQuery.Name
+			benchTemplate.Description = this.SystemTemplate.Description
 		}
 		ResultData = benchTemplate.Add()
 	}
