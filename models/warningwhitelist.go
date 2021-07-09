@@ -15,6 +15,7 @@ type WarningWhiteList struct {
 	Desc            string `orm:"" description:"(描述)"`
 	WarningInfoType string `orm:"size(64)" description:"(告警类型)"`
 	WarningInfoName string `orm:"size(64)" description:"(告警名称)"`
+	RuleNode        string `orm:"size(256)" description:"(节点规则，如主机IP，主机名、容器名、容器ID等)"`
 	Rule            string `orm:"size(256)" description:"(规则)"`
 	Enabled         bool   `orm:"" description:"(是否启用)"`
 	IsAll           bool   `orm:"-" description:"(是否获取全部)"`
