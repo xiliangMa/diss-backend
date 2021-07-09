@@ -2,10 +2,14 @@ package securitypolicy
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/nats"
 	sl "github.com/xiliangMa/diss-backend/service/securitylog"
+	"github.com/xiliangMa/diss-backend/utils"
+	"net/http"
 )
 
 // Warning Info api list
@@ -73,9 +77,19 @@ func (this *WarningInfoController) AddClientSub_Image_Safe() {
 // @router /warninginfo/disposal [post]
 func (this *WarningInfoController) DisposalMode() {
 	dm := new(models.DisposalMode)
-	json.Unmarshal(this.Ctx.Input.RequestBody, &dm)
+	err := json.Unmarshal(this.Ctx.Input.RequestBody, &dm)
+	result := models.Result{Code: http.StatusOK}
+	if err != nil {
+		result.Message = fmt.Sprintf("Disposal Mode failed, code: %d, err: %s", utils.GetWarningWhiteListErr, err.Error())
+		result.Code = utils.ParameterParseErr
+		logs.Error(result.Message)
+		this.Data["json"] = result
+		this.ServeJSON(false)
+		return
+	}
+
 	dms := new(sl.DisposalModeService)
-	result := dms.DisposalMode(dm)
+	result = dms.DisposalMode(dm)
 
 	this.Data["json"] = result
 	this.ServeJSON(false)

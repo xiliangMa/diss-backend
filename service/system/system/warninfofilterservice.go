@@ -10,11 +10,12 @@ import (
 )
 
 type WariningFilterService struct {
-	Info string
-	Rule string
+	Rule        string
+	RuleNode    string
+	WarningInfo models.WarningInfo
 }
 
-func (this *WariningFilterService) CheckFromWhiteListItem() bool {
+func (this *WariningFilterService) WhiteListCheckInner() bool {
 	rule := strings.Replace(this.Rule, models.WarnWhiteListCnTrans_Node[0], models.WarnWhiteListCnTrans_Node[1], 1)
 	rule = strings.Replace(rule, models.WarnWhiteListCnTrans_ContainerId[0], models.WarnWhiteListCnTrans_ContainerId[1], 1)
 	rule = strings.Replace(rule, models.WarnWhiteListCnTrans_ContainerName[0], models.WarnWhiteListCnTrans_ContainerName[1], 1)
@@ -28,7 +29,36 @@ func (this *WariningFilterService) CheckFromWhiteListItem() bool {
 		if ruleitem != "" {
 			val := strings.ReplaceAll(ruleitem, ".", "\\.")
 			whitelistRegex := regexp.MustCompile(`"` + rulekey + `":".*` + val + `.*"`)
-			match := whitelistRegex.Match([]byte(this.Info))
+			match := whitelistRegex.Match([]byte(this.WarningInfo.Info))
+			if !match {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+func (this *WariningFilterService) WhiteListCheckOuter() bool {
+	rulenode := this.RuleNode
+
+	warnRule := []byte(rulenode)
+	rulelines := map[string]string{}
+	json.Unmarshal(warnRule, &rulelines)
+
+	for rulekey, ruleitem := range rulelines {
+
+		if ruleitem != "" {
+			val := strings.ReplaceAll(ruleitem, ".", "\\.")
+			match := true
+			switch rulekey {
+			case models.WarnWhiteListOuterKey_IP:
+				whitelistRegex := regexp.MustCompile(`".*` + val + `.*"`)
+				match = whitelistRegex.Match([]byte(this.WarningInfo.Ip))
+			case models.WarnWhiteListOuterKey_Container:
+				whitelistRegex := regexp.MustCompile(`".*` + val + `.*"`)
+				match = whitelistRegex.Match([]byte(this.WarningInfo.ContainerId))
+			}
 			if !match {
 				return false
 			}
@@ -50,9 +80,11 @@ func (this *WariningFilterService) FilterWarnWhiteList(warningInfo models.Warnin
 		for _, whiteItem := range avaiWhiteList {
 			if whiteItem.WarningInfoType == warningInfo.Type && whiteItem.WarningInfoName == warningInfo.Name {
 				warnFilterservice := new(WariningFilterService)
-				warnFilterservice.Info = warningInfo.Info
+				warnFilterservice.WarningInfo = warningInfo
 				warnFilterservice.Rule = whiteItem.Rule
-				checkstatus := warnFilterservice.CheckFromWhiteListItem()
+				warnFilterservice.RuleNode = whiteItem.RuleNode
+				checkstatus := warnFilterservice.WhiteListCheckInner()
+				checkstatus = warnFilterservice.WhiteListCheckOuter()
 				if checkstatus {
 					return true
 				}

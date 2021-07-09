@@ -290,7 +290,10 @@ var (
 	WarnWhiteListCnTrans_Node          = []string{"节点", "node"}
 	WarnWhiteListCnTrans_ContainerId   = []string{"容器ID", "container\\.id"}
 	WarnWhiteListCnTrans_ContainerName = []string{"容器名称", "container\\.name"}
-	WarnWhiteListCnTrans_CmdLine       = []string{"命令包含", "proc\\.cmdline"}
+	WarnWhiteListCnTrans_CmdLine       = []string{"执行命令", "proc\\.cmdline"}
+
+	WarnWhiteListOuterKey_IP        = "HostIP"
+	WarnWhiteListOuterKey_Container = "ContainerId"
 
 	PictureType = "image/png"
 	TextType    = "text/plain"
