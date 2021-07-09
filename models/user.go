@@ -101,6 +101,9 @@ func (this *User) Update() Result {
 		userData := userList[0]
 		this.CreateTime = userData.CreateTime
 		this.UpdateTime = time.Now().UnixNano()
+		password := utils.MD5(this.Password)
+		passwordBase64 := base64.StdEncoding.EncodeToString([]byte(password))
+		this.Password = passwordBase64
 
 		// 同时指定了角色的处理
 		if this.Role != nil {
@@ -278,6 +281,7 @@ func (this *User) UpdateRole() Result {
 		ResultData.Code = utils.ChangeRoleForUserErr
 		msg := fmt.Sprintf("Change Role for User failed, No User Info , code: %d", ResultData.Code)
 		ResultData.Message = msg
+		return ResultData
 	}
 
 	roleQuery := Role{Id: this.Role.Id}
