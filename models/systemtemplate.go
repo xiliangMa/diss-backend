@@ -7,6 +7,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"time"
 )
 
 type SystemTemplate struct {
@@ -42,6 +43,8 @@ type SystemTemplate struct {
 	CheckIds                 string                 `orm:"null;" description:"(选中的检查项集合)"`
 	DefaultPathList          string                 `orm:"null;" description:"(默认的路径集合)"`
 	EngineCode               string                 `orm:"null;" description:"(使用的引擎编码)"`
+	CreateTime               int64                  `orm:"default(0);" description:"(创建时间)"`
+	UpdateTime               int64                  `orm:"default(0)" description:"(更新时间)"`
 }
 
 type SystemTemplateGroup struct {
@@ -122,6 +125,9 @@ func (this *SystemTemplate) Add() Result {
 		this.Account = Account_Admin
 	}
 
+	this.UpdateTime = time.Now().UnixNano()
+	this.CreateTime = time.Now().UnixNano()
+
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 
@@ -162,7 +168,7 @@ func (this *SystemTemplate) List(from, limit int) Result {
 	if this.Status != "" && this.Status != All {
 		cond = cond.And("status", this.Status)
 	}
-	_, err = o.QueryTable(utils.SYSTemplate).SetCond(cond).RelatedSel().Limit(limit, from).All(&systemTemplateList)
+	_, err = o.QueryTable(utils.SYSTemplate).SetCond(cond).RelatedSel().Limit(limit, from).OrderBy("-create_time").All(&systemTemplateList)
 	for _, systemTemplate := range systemTemplateList {
 		o.LoadRelated(systemTemplate, "SystemTemplateGroup")
 		o.LoadRelated(systemTemplate, "Job")
@@ -214,13 +220,12 @@ func (this *SystemTemplate) Update() Result {
 	o.Using(utils.DS_Default)
 	var ResultData Result
 
-	if this.IsDefault {
-		_, err := o.Raw("update " + utils.SYSTemplate + " set is_default=false where type='" + this.Type + "'").Exec()
-		if err != nil {
-			logs.Warn("Update SystemTemplate isDefault fail , err: ", err)
-		}
-	}
+	sysTemplateQuery := SystemTemplate{}
+	sysTemplateQuery.Id = this.Id
+	sysTemplateObj, _ := sysTemplateQuery.Get()
 
+	this.CreateTime = sysTemplateObj.CreateTime
+	this.UpdateTime = time.Now().UnixNano()
 	_, err := o.Update(this)
 	if err != nil {
 		ResultData.Message = err.Error()
