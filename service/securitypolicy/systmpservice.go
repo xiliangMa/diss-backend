@@ -42,6 +42,7 @@ func (this *SystemTemplateService) AddSystemTemplate() models.Result {
 			benchTemplate.Name = sysTemplateQuery.Name
 			benchTemplate.Description = this.SystemTemplate.Description
 			benchTemplate.IsSystem = this.SystemTemplate.IsSystem
+			benchTemplate.Status = this.SystemTemplate.Status
 		}
 		ResultData = benchTemplate.Add()
 	}
