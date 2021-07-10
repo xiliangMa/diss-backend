@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	v1 "k8s.io/api/core/v1"
@@ -66,8 +67,11 @@ func (this *ContainerService) AddContainer() {
 
 		//计算运行时间
 		now := time.Now()
-		createTime, _ := time.Parse(time.RFC3339, startTime.String())
-		created := now.Sub(createTime)
+		//createTime, _ := time.Parse(time.RFC3339, .)
+		created := time.Unix(startTime.Unix(), 0)
+		mi := int(now.Sub(created).Minutes())
+		hours := mi / 60
+		age := fmt.Sprintf("%dd%dh%dm", hours/24, hours-hours/24*24, mi%60)
 
 		//动态的回去容器状态
 		status := models.Container_Status_Running
@@ -89,9 +93,9 @@ func (this *ContainerService) AddContainer() {
 		ccob.HostName = hostName
 		ccob.Status = strings.ToLower(status)
 		ccob.ClusterName = clusterName
-		ccob.Age = "Up " + created.String()
+		ccob.Age = age
 		ccob.CreateTime = startTime.UnixNano()
-		ccob.UpdateTime = startTime.UnixNano()
+		//ccob.UpdateTime = startTime.UnixNano()
 		ccob.AccountName = models.Account_Admin
 
 		//同步 containerinfo
@@ -106,8 +110,8 @@ func (this *ContainerService) AddContainer() {
 		ciob.ImageName = imageName
 		//ciob.HostId = ""
 		ciob.HostName = hostName
-		ciob.StartedAt = createTime.Unix()
-		ciob.CreatedAt = createTime.Unix()
+		ciob.StartedAt = startTime.UnixNano()
+		ciob.CreatedAt = startTime.UnixNano()
 		ciob.Status = strings.ToLower(status)
 		ciob.Ip = podIp
 		ciob.Labels = labels

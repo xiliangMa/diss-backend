@@ -7,45 +7,44 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"time"
 )
 
 type HostConfig struct {
-	Id                  string    `orm:"pk;size(128)" description:"(主机id)"`
-	HostName            string    `orm:"size(64)" description:"(主机名)"`
-	OS                  string    `orm:"size(32)" description:"(系统)"`
-	PG                  string    `orm:"size(32);default(sys-default)" description:"(安全策略组)"`
-	InternalAddr        string    `orm:"size(32);default(null);" description:"(主机ip 内)"`
-	PublicAddr          string    `orm:"size(32);default(null);" description:"(主机ip 外)"`
-	Status              string    `orm:"size(32);default(Normal)" description:"(主机状态 正常 Normal 异常 Abnormal)"`
-	Diss                string    `orm:"size(32);default(Installed)" description:"(安全容器 Installed NotInstalled)"`
-	DissStatus          string    `orm:"size(32);default(Safe)" description:"(安全状态 Safe Unsafe)"`
-	AccountName         string    `orm:"size(32);default(admin)" description:"(租户)"`
-	GroupId             string    `orm:"-" description:"(查询参数：分组Id， 仅仅是查询使用, 返回数据看 Group)"`
-	Group               *Groups   `orm:"rel(fk);null;on_delete(set_null)" description:"(分组)"`
-	Type                string    `orm:"size(32);default(Server);" description:"(类型 服务器: Server 虚拟机: Vm)"`
-	IsInK8s             bool      `orm:"default(false);" description:"(是否在k8s集群)"`
-	ClusterId           string    `orm:"size(128);default(null);" description:"(集群id)"`
-	ClusterName         string    `orm:"size(128);default(null);" description:"(集群名)"`
-	Label               string    `orm:"size(32);default(null);" description:"(标签)"`
-	TaskList            []*Task   `orm:"reverse(many);null" description:"(任务列表)"`
-	Job                 []*Job    `orm:"rel(m2m);null;" description:"(job)"`
-	IsEnableHeartBeat   bool      `orm:"default(false);" description:"(是否开启心跳上报)"`
-	IsEnableDockerEvent bool      `orm:"default(false);" description:"(是否开启容器审计上报)"`
-	HeartBeat           time.Time `orm:"null;type(datetime)" description:"(心跳)"`
-	KMetaData           string    `orm:"" description:"(源数据)"`
-	KSpec               string    `orm:"" description:"(Spec数据)"`
-	KStatus             string    `orm:"" description:"(状态数据)"`
-	KubernetesVer       string    `orm:"size(64)" description:"(kubernetes 版本)"`
-	NodeRole            string    `orm:"size(64)" description:"(集群主机角色)"`
-	DockerCISCount      string    `orm:"null;" description:"(docker基线结果个数)"`
-	DockerCISUpdateTime int64     `orm:"default(0)" description:"(docker基线更新时间)"`
-	KubeCISCount        string    `orm:"null;" description:"(k8s基线结果个数)"`
-	KubeCISUpdateTime   int64     `orm:"default(0)" description:"(k8s基线更新时间)"`
-	IsLicensed          bool      `orm:"default(false);" description:"(是否已经授权)"`
-	LicCount            bool      `orm:"-" description:"(是否获取授权个数操作)"`
-	CreateTime          int64     `orm:"default(0)" description:"(上线时间)"`
-	OfflineTime         int64     `orm:"default(0)" description:"(离线时间)"`
+	Id                  string  `orm:"pk;size(128)" description:"(主机id)"`
+	HostName            string  `orm:"size(64)" description:"(主机名)"`
+	OS                  string  `orm:"size(32)" description:"(系统)"`
+	PG                  string  `orm:"size(32);default(sys-default)" description:"(安全策略组)"`
+	InternalAddr        string  `orm:"size(32);default(null);" description:"(主机ip 内)"`
+	PublicAddr          string  `orm:"size(32);default(null);" description:"(主机ip 外)"`
+	Status              string  `orm:"size(32);default(Abnormal)" description:"(主机状态 正常 Normal 异常 Abnormal)"`
+	Diss                string  `orm:"size(32);default(NotInstalled)" description:"(安全容器 Installed NotInstalled)"`
+	DissStatus          string  `orm:"size(32);default(Unsafe)" description:"(安全状态 Safe Unsafe)"`
+	AccountName         string  `orm:"size(32);default(admin)" description:"(租户)"`
+	GroupId             string  `orm:"-" description:"(查询参数：分组Id， 仅仅是查询使用, 返回数据看 Group)"`
+	Group               *Groups `orm:"rel(fk);null;on_delete(set_null)" description:"(分组)"`
+	Type                string  `orm:"size(32);default(Server);" description:"(类型 服务器: Server 虚拟机: Vm)"`
+	IsInK8s             bool    `orm:"default(false);" description:"(是否在k8s集群)"`
+	ClusterId           string  `orm:"size(128);default(null);" description:"(集群id)"`
+	ClusterName         string  `orm:"size(128);default(null);" description:"(集群名)"`
+	Label               string  `orm:"size(32);default(null);" description:"(标签)"`
+	TaskList            []*Task `orm:"reverse(many);null" description:"(任务列表)"`
+	Job                 []*Job  `orm:"rel(m2m);null;" description:"(job)"`
+	IsEnableHeartBeat   bool    `orm:"default(false);" description:"(是否开启心跳上报)"`
+	IsEnableDockerEvent bool    `orm:"default(false);" description:"(是否开启容器审计上报)"`
+	HeartBeat           int64   `orm:"null;type(0)" description:"(心跳)"`
+	KMetaData           string  `orm:"" description:"(源数据)"`
+	KSpec               string  `orm:"" description:"(Spec数据)"`
+	KStatus             string  `orm:"" description:"(状态数据)"`
+	KubernetesVer       string  `orm:"size(64)" description:"(kubernetes 版本)"`
+	NodeRole            string  `orm:"size(64)" description:"(集群主机角色)"`
+	DockerCISCount      string  `orm:"null;" description:"(docker基线结果个数)"`
+	DockerCISUpdateTime int64   `orm:"default(0)" description:"(docker基线更新时间)"`
+	KubeCISCount        string  `orm:"null;" description:"(k8s基线结果个数)"`
+	KubeCISUpdateTime   int64   `orm:"default(0)" description:"(k8s基线更新时间)"`
+	IsLicensed          bool    `orm:"default(false);" description:"(是否已经授权)"`
+	LicCount            bool    `orm:"-" description:"(是否获取授权个数操作)"`
+	CreateTime          int64   `orm:"default(0)" description:"(上线时间)"`
+	OfflineTime         int64   `orm:"default(0)" description:"(离线时间)"`
 }
 
 type HostConfigInterface interface {
@@ -65,30 +64,37 @@ func (this *HostConfig) Add() error {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var err error
-	var hostConfigList []*HostConfig
-	cond := orm.NewCondition()
-	if this.Id != "" {
-		cond = cond.And("id", this.Id)
-	}
 
-	_, err = o.QueryTable(utils.HostConfig).SetCond(cond).All(&hostConfigList)
-	if err != nil {
-		return err
-	}
-	if len(hostConfigList) != 0 {
-		updateHostConfig := hostConfigList[0]
+	if hostConfig := this.Get(); hostConfig != nil {
+		updateHostConfig := hostConfig
 		// agent 或者 k8s 数据更新 （因为有diss-backend的关系数据，防止覆盖diss-backend的数据，需要替换更新）
-		updateHostConfig.ClusterName = this.ClusterName
-		updateHostConfig.HostName = this.HostName
-		updateHostConfig.IsInK8s = this.IsInK8s
-		updateHostConfig.OS = this.OS
-		updateHostConfig.ClusterId = this.ClusterId
-		updateHostConfig.InternalAddr = this.InternalAddr
+
+		if this.HostName != "" {
+			updateHostConfig.HostName = this.HostName
+		}
+		if this.InternalAddr != "" {
+			updateHostConfig.InternalAddr = this.InternalAddr
+		}
 		if this.PublicAddr != "" {
 			updateHostConfig.PublicAddr = this.PublicAddr
 		}
-		updateHostConfig.OS = this.OS
-		updateHostConfig.AccountName = Account_Admin
+
+		if this.OS != "" {
+			updateHostConfig.OS = this.OS
+		}
+		if this.PG != "" {
+			updateHostConfig.PG = this.PG
+		}
+
+		if this.ClusterId != "" {
+			updateHostConfig.ClusterId = this.ClusterId
+		}
+		if this.ClusterName != "" {
+			updateHostConfig.ClusterName = this.ClusterName
+		}
+		if this.NodeRole != "" {
+			updateHostConfig.NodeRole = this.NodeRole
+		}
 		result := updateHostConfig.Update()
 		if result.Code != http.StatusOK {
 			return errors.New(result.Message)
@@ -104,7 +110,6 @@ func (this *HostConfig) Add() error {
 			return err
 		}
 	}
-
 	return nil
 }
 
@@ -117,10 +122,11 @@ func (this *HostConfig) Get() *HostConfig {
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
 	}
-
+	if this.InternalAddr != "" {
+		cond = cond.And("internal_addr", this.InternalAddr)
+	}
 	err = o.QueryTable(utils.HostConfig).SetCond(cond).RelatedSel().One(hostConfig)
 	if err != nil {
-		logs.Error("GetHostConfig failed, code: %d, err: %s", utils.GetHostConfigErr, err.Error())
 		return nil
 	}
 	return hostConfig
@@ -145,7 +151,8 @@ func (this *HostConfig) List(from, limit int) Result {
 func (this *HostConfig) BaseList(from, limit int) (error, int64, []*HostConfig) {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
-	var list []*HostConfig = nil
+	var list []*HostConfig
+	var TaskList []*Task
 	var err error
 	cond := orm.NewCondition()
 	if this.Id != "" {
@@ -194,13 +201,23 @@ func (this *HostConfig) BaseList(from, limit int) (error, int64, []*HostConfig) 
 		cond = cond.And("is_licensed", true)
 	}
 	_, err = o.QueryTable(utils.HostConfig).SetCond(cond).Limit(limit, from).OrderBy("-host_name").RelatedSel().All(&list)
+	total, _ := o.QueryTable(utils.HostConfig).SetCond(cond).Count()
 	if err != nil {
 		return err, 0, nil
 	}
+
 	for _, l := range list {
-		o.LoadRelated(l, "TaskList", 1, 1, 0, "-update_time")
+		cond = orm.NewCondition()
+		cond = cond.And("host_id", l.Id)
+		if this.ClusterId != "" {
+			cond = cond.And("cluster_id", this.ClusterId)
+		} else {
+			cond = cond.And("cluster_id", true)
+		}
+		_, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().Limit(1, 0).OrderBy("-update_time").All(&TaskList)
+		l.TaskList = TaskList
 	}
-	total, _ := o.QueryTable(utils.HostConfig).SetCond(cond).Count()
+
 	return nil, total, list
 }
 
@@ -208,7 +225,6 @@ func (this *HostConfig) Update() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
-
 	_, err := o.Update(this)
 	if err != nil {
 		ResultData.Message = err.Error()
@@ -216,7 +232,6 @@ func (this *HostConfig) Update() Result {
 		logs.Error("Update HostConfig: %s failed, code: %d, err: %s", this.HostName, ResultData.Code, ResultData.Message)
 		return ResultData
 	}
-
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
@@ -333,7 +348,6 @@ func (this *HostConfig) UpdateHostCISCount(benchMarkSummary MarkSummary) {
 		kubeCISCount[CIS_WarnCount] = benchMarkSummary.PassCount
 		benchCountJson, _ := json.Marshal(kubeCISCount)
 		hostConfig.KubeCISCount = string(benchCountJson)
-
 		hostConfig.Update()
 	}
 }

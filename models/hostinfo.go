@@ -63,16 +63,18 @@ func (this *HostInfo) Add() error {
 	if len(hostInfoList) != 0 {
 		// agent 或者 k8s 数据更新 （因为有diss-backend的关系数据，防止覆盖diss-backend的数据，需要替换更新）
 		updateHostInfo := hostInfoList[0]
-		updateHostInfo.ClusterName = this.ClusterName
-		updateHostInfo.HostName = this.HostName
-		updateHostInfo.OS = this.OS
-		updateHostInfo.ClusterId = this.ClusterId
-		updateHostInfo.InternalAddr = this.InternalAddr
-		if this.PublicAddr != "" {
-			updateHostInfo.PublicAddr = this.PublicAddr
+
+		if this.HostName != "" {
+			updateHostInfo.HostName = this.HostName
 		}
 		if this.InternalAddr != "" {
 			updateHostInfo.InternalAddr = this.InternalAddr
+		}
+		if this.PublicAddr != "" {
+			updateHostInfo.PublicAddr = this.PublicAddr
+		}
+		if this.OS != "" {
+			updateHostInfo.OS = this.OS
 		}
 		if this.DockerRuntime != "" {
 			updateHostInfo.DockerRuntime = this.DockerRuntime
@@ -94,6 +96,12 @@ func (this *HostInfo) Add() error {
 		}
 		if this.ContainerStoppedCount != 0 {
 			updateHostInfo.ContainerStoppedCount = this.ContainerStoppedCount
+		}
+		if this.ClusterId != "" {
+			updateHostInfo.ClusterId = this.ClusterId
+		}
+		if this.ClusterName != "" {
+			updateHostInfo.ClusterName = this.ClusterName
 		}
 		result := updateHostInfo.Update()
 		if result.Code != http.StatusOK {
@@ -122,6 +130,13 @@ func (this *HostInfo) List() Result {
 	}
 	if this.Id != "" {
 		cond = cond.And("id", this.Id)
+	}
+
+	if this.ClusterId != "" {
+		cond = cond.And("cluster_id", this.ClusterId)
+	}
+	if this.ClusterName != "" {
+		cond = cond.And("cluster_name", this.ClusterName)
 	}
 
 	_, err := o.QueryTable(utils.HostInfo).SetCond(cond).All(&HostInfoList)

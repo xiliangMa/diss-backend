@@ -42,7 +42,7 @@ Retry:
 				object := event.Object.(*v1.Node)
 				id := strings.ToLower(object.Status.NodeInfo.SystemUUID)
 				name := object.ObjectMeta.Name
-				os := object.Status.NodeInfo.OSImage
+				//os := object.Status.NodeInfo.OSImage
 				clusterId := this.Cluster.Id
 				clusterName := this.Cluster.Name
 				cType := this.Cluster.Type
@@ -55,7 +55,7 @@ Retry:
 				hc := new(models.HostConfig)
 				hc.HostName = name
 				hc.Id = id
-				hc.OS = os
+				//hc.OS = os
 				hc.IsInK8s = true
 				hc.ClusterId = clusterId
 				hc.ClusterName = clusterName
@@ -82,7 +82,7 @@ Retry:
 				d, _ := capacity.StorageEphemeral().AsInt64()
 				hi.Disk = utils.UnitConvert(d)
 				nStatusNodeinfo := object.Status.NodeInfo
-				hi.OS = os
+				//hi.OS = os
 				hi.Kernel = nStatusNodeinfo.KernelVersion
 				hi.Architecture = nStatusNodeinfo.Architecture
 				hi.DockerRuntime = nStatusNodeinfo.ContainerRuntimeVersion

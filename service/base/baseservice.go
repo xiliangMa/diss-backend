@@ -137,8 +137,8 @@ func (this *BaseService) CheckContainerIsExist() (models.Result, []*models.Conta
 }
 
 func (this *BaseService) CheckClusterIsExist() (models.Result, []*models.Cluster, []*models.HostConfig) {
-	clusterList := []*models.Cluster{}
-	hostList := []*models.HostConfig{}
+	var clusterList []*models.Cluster
+	var hostList []*models.HostConfig
 	ResultData := models.Result{Code: http.StatusOK}
 	if this.ClusterIds == "" {
 		logs.Warn("Check failed, Err: ClusterIds is null.")

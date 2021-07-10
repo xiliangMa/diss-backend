@@ -9,7 +9,7 @@ import (
 )
 
 type ContainerConfig struct {
-	Id             string      `orm:"pk;not null" description:"(id)"`
+	Id             string      `orm:"pk;" description:"(id)"`
 	Name           string      `orm:"" description:"(容器名)"`
 	NameSpaceName  string      `orm:"" description:"(命名空间)"`
 	PodId          string      `orm:"default(null)" description:"(pod id)"`
@@ -48,16 +48,18 @@ func (this *ContainerConfig) Add() Result {
 	var ResultData Result
 	var err error
 
-	cond := orm.NewCondition()
 	if this.Id != "" {
-		cond = cond.And("id", this.Id)
-	}
-	_, err = o.Insert(this)
-	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.AddContainerConfigErr
-		logs.Error("Add ContainerConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
+		if this.Get() == nil {
+			_, err = o.Insert(this)
+			if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
+				ResultData.Message = err.Error()
+				ResultData.Code = utils.AddContainerConfigErr
+				logs.Error("Add ContainerConfig failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+				return ResultData
+			}
+		} else {
+			this.Update()
+		}
 	}
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
@@ -76,7 +78,6 @@ func (this *ContainerConfig) Get() *ContainerConfig {
 
 	err = o.QueryTable(utils.ContainerConfig).SetCond(cond).RelatedSel().One(containerConfig)
 	if err != nil {
-		logs.Error("GetContainerConfig failed, code: %d, err: %s", err.Error(), utils.GetContainerConfigErr)
 		return nil
 	}
 	return containerConfig
