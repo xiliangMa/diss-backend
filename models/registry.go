@@ -37,8 +37,15 @@ func (this *Registry) Add() Result {
 	var ResultData Result
 	var err error
 
-	if r := this.Get(); r.Data != nil {
+	if r := this.GetName(); r > 0 {
 		ResultData.Message = "Name is already"
+		ResultData.Code = utils.GetRegistryErr
+		logs.Error("Get Registry failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	if r := this.GetAccount(); r > 0 {
+		ResultData.Message = "Account is already"
 		ResultData.Code = utils.GetRegistryErr
 		logs.Error("Get Registry failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
@@ -78,7 +85,6 @@ func (this *Registry) Get() Result {
 	}
 
 	err := o.QueryTable(utils.Registry).SetCond(cond).RelatedSel().One(obj)
-
 	if err != nil {
 		ResultData.Code = utils.GetRegistryErr
 		ResultData.Message = err.Error()
@@ -90,8 +96,39 @@ func (this *Registry) Get() Result {
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
-
 	return ResultData
+}
+
+func (this *Registry) GetName() int64 {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	cond := orm.NewCondition()
+	if this.Id != 0 {
+		cond = cond.And("id", this.Id)
+	}
+	if this.Name != "" {
+		cond = cond.And("name", this.Name)
+	}
+
+	total, _ := o.QueryTable(utils.Registry).SetCond(cond).RelatedSel().Count()
+	return total
+}
+
+func (this *Registry) GetAccount() int64 {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	cond := orm.NewCondition()
+	if this.User != "" {
+		cond = cond.And("user", this.User)
+	}
+	if this.Pwd != "" {
+		cond = cond.And("pwd", this.Pwd)
+	}
+	if this.Type != "" {
+		cond = cond.And("type", this.Type)
+	}
+	total, _ := o.QueryTable(utils.Registry).SetCond(cond).RelatedSel().Count()
+	return total
 }
 
 func (this *Registry) List(from, limit int) Result {
@@ -161,7 +198,23 @@ func (this *Registry) Update() Result {
 	o.Using(utils.DS_Default)
 	var ResultData Result
 
+	if r := this.GetName(); r > 1 {
+		ResultData.Message = "Name is already"
+		ResultData.Code = utils.GetRegistryErr
+		logs.Error("Get Registry failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
+	if r := this.GetAccount(); r > 1 {
+		ResultData.Message = "Account is already"
+		ResultData.Code = utils.GetRegistryErr
+		logs.Error("Get Registry failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+
 	this.Url = strings.TrimRight(this.Url, "/")
+
+	this.CreateTime = time.Now().UnixNano()
 
 	_, err := o.Update(this)
 	if err != nil {
