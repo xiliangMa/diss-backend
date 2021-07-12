@@ -159,6 +159,7 @@ var (
 	SYSTemplateExistErr             = 164
 	PasswordLengthErr               = 165
 	RoleExistErr                    = 166
+	PasswordFormatErr               = 165
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001

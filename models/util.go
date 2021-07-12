@@ -383,5 +383,5 @@ var (
 	System_Role           = "admin"
 	Permission_AuthManage = "AuthManage"
 
-	PasswordLength = 8
+	SpecialChars = "*&^%$#-=+_\\[\\]\\{\\}\\!\\<\\>\\@\\~\\|\\?\\/\\\\"
 )
