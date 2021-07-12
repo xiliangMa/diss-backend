@@ -66,6 +66,7 @@ type VirusScanRecord struct {
 	Permission    uint32 `description:"(感染文件权限)"`
 	ModifyTime    int64  `description:"(感染文件最近修改时间)"`
 	CreateTime    int64  `description:"(感染文件创建时间)"`
+	Severity      string `description:"(等级)"`
 }
 
 type ImageVirus struct {
@@ -289,9 +290,6 @@ func (this *VirusRecord) List(from, limit int) Result {
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
 }
 

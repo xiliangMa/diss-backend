@@ -141,14 +141,11 @@ func (this *Task) List(from, limit int) Result {
 
 	total, _ := o.QueryTable(utils.Task).SetCond(cond).Count()
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = TaskList
+	data[Result_Total] = total
+	data[Result_Items] = TaskList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
 }
 

@@ -57,18 +57,20 @@ func (this *WSMetricsService) Save() error {
 			client.Hub.Register <- client
 
 			//更新主机心跳（更新时间
-			host := models.HostConfig{Id: heartBeat.SystemId}
-			listData := host.List(0, 0).Data
-			if listData == nil {
-				return nil
-			}
-			data := listData.(map[string]interface{})
-			items := data["items"].([]*models.HostConfig)
-			if len(items) != 0 {
-				currentHost := items[0]
-				currentHost.HeartBeat = time.Now()
-				currentHost.IsEnableHeartBeat = true
+			hostConfig := models.HostConfig{Id: heartBeat.SystemId}
+			currentHost := hostConfig.Get()
+			if currentHost != nil {
+				currentHost.HeartBeat = time.Now().UnixNano()
+				if currentHost.CreateTime == 0 || heartBeat.State == "reconnect" {
+					currentHost.CreateTime = time.Now().UnixNano()
+					hostConfig.IsEnableHeartBeat = true
+					currentHost.Diss = models.Diss_Installed
+					currentHost.Status = models.Host_Status_Normal
+					currentHost.DissStatus = models.Diss_status_Safe
+				}
 				currentHost.Update()
+			} else {
+				return nil
 			}
 			logs.Info("############################ Agent Heater Beat data, >>> HostId: %s, Type: %s <<<", heartBeat.SystemId, models.Resource_HeartBeat)
 			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil}
@@ -100,7 +102,7 @@ func (this *WSMetricsService) Save() error {
 			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil}
 			this.ReceiveData(metricsResult)
 		case models.Resource_ContainerConfig:
-			containerConfigList := []models.ContainerConfig{}
+			var containerConfigList []models.ContainerConfig
 			CheckObject := new(models.ContainerConfig)
 			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &containerConfigList); err != nil {
@@ -128,7 +130,7 @@ func (this *WSMetricsService) Save() error {
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_ContainerInfo:
-			containerInfoList := []models.ContainerInfo{}
+			var containerInfoList []models.ContainerInfo
 			CheckObject := new(models.ContainerInfo)
 			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &containerInfoList); err != nil {
@@ -157,7 +159,7 @@ func (this *WSMetricsService) Save() error {
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_ImageConfig:
-			imageConfigList := []models.ImageConfig{}
+			var imageConfigList []models.ImageConfig
 			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &imageConfigList); err != nil {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
@@ -180,7 +182,7 @@ func (this *WSMetricsService) Save() error {
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_ImageInfo:
-			imageInfoList := []models.ImageInfo{}
+			var imageInfoList []models.ImageInfo
 			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &imageInfoList); err != nil {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
@@ -201,7 +203,7 @@ func (this *WSMetricsService) Save() error {
 			metricsResult := models.NatsData{Type: models.Type_ReceiveState, Tag: models.Resource_Received, Data: nil}
 			this.ReceiveData(metricsResult)
 		case models.Resource_HostPs:
-			hostPsList := []models.HostPs{}
+			var hostPsList []models.HostPs
 			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &hostPsList); err != nil {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
@@ -224,7 +226,7 @@ func (this *WSMetricsService) Save() error {
 			this.ReceiveData(metricsResult)
 			return nil
 		case models.Resource_ContainerPs:
-			containerPsList := []models.ContainerPs{}
+			var containerPsList []models.ContainerPs
 			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &containerPsList); err != nil {
 				logs.Error("Paraces %s error %s", ms.Tag, err)

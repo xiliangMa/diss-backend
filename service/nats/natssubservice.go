@@ -98,7 +98,6 @@ func (this *NatsSubService) Save() error {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
-
 			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s <<<", hostConfig.Id, models.Resource_HostConfigDynamic)
 			if result := hostConfig.UpdateDynamic(); result.Code != http.StatusOK {
 				return errors.New(result.Message)
@@ -110,11 +109,6 @@ func (this *NatsSubService) Save() error {
 				logs.Error("Paraces %s error %s", ms.Tag, err)
 				return err
 			}
-			hostConfig.Status = models.Host_Status_Normal
-			hostConfig.Diss = models.Diss_Installed
-			hostConfig.DissStatus = models.Diss_status_Safe
-			hostConfig.CreateTime = time.Now().UnixNano()
-			hostConfig.IsEnableHeartBeat = true
 			logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s <<<", hostConfig.Id, models.Resource_HostConfig)
 			if err := hostConfig.Add(); err != nil {
 				return err
@@ -314,7 +308,6 @@ func (this *NatsSubService) Save() error {
 				dockerCISCount["PassCount"] = benchMarkLog.PassCount
 				benchCountJson, _ := json.Marshal(dockerCISCount)
 				hostConfig.DockerCISCount = string(benchCountJson)
-
 				hostConfig.Update()
 			}
 
@@ -894,15 +887,12 @@ func (this *NatsSubService) Save() error {
 			natsPubService.RuleDefinePub()
 
 		case models.Resource_Authorization:
-
 			config := models.HostConfig{}
 			s, _ := json.Marshal(ms.Data)
-
 			if err := json.Unmarshal(s, &config); err != nil {
 				logs.Error("Parses %s error %s", ms.Tag, err)
 				return err
 			}
-
 			hs := system.HostService{Host: config}
 			hs.SendAuthorizationDetail()
 		}
@@ -966,43 +956,17 @@ func RunClientSub(clientSubject string) {
 	}
 }
 
-func RunClientSub_Image_Safe() {
-	//natsManager := models.Nats
-	//if natsManager != nil && natsManager.Conn != nil {
-	//	registries := models.Registries{}
-	//	registryList := registries.List()
-	//	if registryList == nil || len(registryList) == 0 {
-	//		return
-	//	}
-	//	for _, registry := range registryList {
-	//		libname := registry.Registry
-	//		imageSafeSubject := libname + `_` + models.Subject_Image_Safe
-	//
-	//		logs.Info("init nats subscribe:", imageSafeSubject)
-	//
-	//		natsManager.Conn.Subscribe(imageSafeSubject, func(m *stan.Msg) {
-	//			natsSubService := NatsSubService{Conn: natsManager.Conn, Message: m.Data, ClientSubject: libname}
-	//			natsSubService.Save()
-	//		}, stan.DurableName(imageSafeSubject))
-	//	}
-	//}
-}
-
 func RunClientSub_IDL(hostId string) {
 	natsManager := models.Nats
 	if natsManager != nil && natsManager.Conn != nil {
-		host := models.HostConfig{}
-		hostList := host.List(0, 0)
-		if hostList.Code != http.StatusOK {
-			return
-		}
-
 		if hostId == "" {
+			host := models.HostConfig{}
+			hostList := host.List(0, 0)
 			if hostList.Data != nil {
 				hostListData := hostList.Data.(map[string]interface{})["items"]
 				if hostListData != nil {
-					for _, host := range hostListData.([]*models.HostConfig) {
-						hostid := host.Id
+					for _, hc := range hostListData.([]*models.HostConfig) {
+						hostid := hc.Id
 						IDLSubject := hostid + `_` + models.Subject_IntrudeDetect
 						logs.Info("Subscribe Intrude Detect :", IDLSubject)
 						natsManager.Conn.Subscribe(IDLSubject, func(m *stan.Msg) {

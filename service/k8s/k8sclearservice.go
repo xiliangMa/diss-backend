@@ -76,11 +76,9 @@ func (this *K8sClearService) Check(cluster *models.Cluster) *models.Cluster {
 	if result.Data == nil {
 		return nil
 	}
-	data := result.Data.(map[string]interface{})
-	clusetrList := data["items"].([]*models.Cluster)
-	total := data["total"]
-	if total != 0 {
-		return clusetrList[0]
+	clusterList := result.Data.(map[string]interface{})["items"].([]*models.Cluster)
+	if len(clusterList) > 0 {
+		return clusterList[0]
 	}
 	return nil
 }

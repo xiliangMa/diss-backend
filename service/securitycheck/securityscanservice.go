@@ -311,6 +311,7 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 
 		task.Host = securityCheck.Host
 		task.SearchHostId = securityCheck.Host.Id
+		task.ClusterId = securityCheck.Host.ClusterId
 		task.ScanStatus = models.Task_Status_Created
 		task.SecurityStatus = "unknown"
 	} else if securityCheck.HostImageVulnScan {
