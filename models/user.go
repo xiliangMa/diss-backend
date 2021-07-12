@@ -88,22 +88,26 @@ func (this *User) Update() Result {
 	userObj := User{}
 	userObj.Id = this.Id
 
-	passwordLen := strings.Count(this.Password, "")
-	if passwordLen < PasswordLength+1 {
-		ResultData.Message = fmt.Sprintf("Password need >= %d digits, code: %d", PasswordLength, utils.PasswordLengthErr)
-		ResultData.Code = utils.PasswordLengthErr
-		logs.Error(ResultData.Message)
-		return ResultData
-	}
-
 	userList, total, _ := userObj.UserList(0, 1)
 	if total > 0 {
 		userData := userList[0]
 		this.CreateTime = userData.CreateTime
 		this.UpdateTime = time.Now().UnixNano()
-		password := utils.MD5(this.Password)
-		passwordBase64 := base64.StdEncoding.EncodeToString([]byte(password))
-		this.Password = passwordBase64
+		if this.Password != "" {
+			passwordLen := strings.Count(this.Password, "")
+			if passwordLen < PasswordLength+1 {
+				ResultData.Message = fmt.Sprintf("Password need >= %d digits, code: %d", PasswordLength, utils.PasswordLengthErr)
+				ResultData.Code = utils.PasswordLengthErr
+				logs.Error(ResultData.Message)
+				return ResultData
+			}
+
+			password := utils.MD5(this.Password)
+			passwordBase64 := base64.StdEncoding.EncodeToString([]byte(password))
+			this.Password = passwordBase64
+		} else {
+			this.Password = userData.Password
+		}
 
 		// 同时指定了角色的处理
 		if this.Role != nil {
