@@ -10,6 +10,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/shirou/gopsutil/host"
 	"math/rand"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -361,4 +362,11 @@ func GenRandomString(n int) string {
 	randBytes := make([]byte, n/2)
 	rand.Read(randBytes)
 	return fmt.Sprintf("%x", randBytes)
+}
+
+func CheckLengthAndChars(srcString string, minLen, maxLen int, avaChars string) bool {
+	rule := fmt.Sprintf("[a-z|A-z|0-9|%s]{%d,%d}", avaChars, minLen, maxLen)
+	regexCharVeri := regexp.MustCompile(rule)
+	status := regexCharVeri.MatchString(srcString)
+	return status
 }

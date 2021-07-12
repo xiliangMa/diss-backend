@@ -7,7 +7,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -40,10 +39,10 @@ func (this *User) Add() Result {
 
 	userQuery := User{}
 	userQuery.Name = this.Name
-	passwordLen := strings.Count(this.Password, "")
-	if passwordLen < PasswordLength+1 {
-		ResultData.Message = fmt.Sprintf("Password need >= %d digits, code: %d", PasswordLength, utils.PasswordLengthErr)
-		ResultData.Code = utils.PasswordLengthErr
+	passwordVeri := utils.CheckLengthAndChars(this.Password, 8, 20, SpecialChars)
+	if !passwordVeri {
+		ResultData.Message = fmt.Sprintf("Password format check failed, code: %d", utils.PasswordFormatErr)
+		ResultData.Code = utils.PasswordFormatErr
 		logs.Error(ResultData.Message)
 		return ResultData
 	}
@@ -94,10 +93,10 @@ func (this *User) Update() Result {
 		this.CreateTime = userData.CreateTime
 		this.UpdateTime = time.Now().UnixNano()
 		if this.Password != "" {
-			passwordLen := strings.Count(this.Password, "")
-			if passwordLen < PasswordLength+1 {
-				ResultData.Message = fmt.Sprintf("Password need >= %d digits, code: %d", PasswordLength, utils.PasswordLengthErr)
-				ResultData.Code = utils.PasswordLengthErr
+			passwordVeri := utils.CheckLengthAndChars(this.Password, 8, 20, SpecialChars)
+			if !passwordVeri {
+				ResultData.Message = fmt.Sprintf("Password format check failed, code: %d", utils.PasswordFormatErr)
+				ResultData.Code = utils.PasswordFormatErr
 				logs.Error(ResultData.Message)
 				return ResultData
 			}

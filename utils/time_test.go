@@ -25,3 +25,9 @@ func Test_GetRandStr(t *testing.T) {
 
 	t.Log("Rand Str: ", randStr)
 }
+
+func Test_Chars(t *testing.T) {
+	status := CheckLengthAndChars("Tes<~@??//}", 8, 20, "*&^%$#-=+_\\[\\]\\{\\}\\!\\<\\>\\@\\~\\|\\?\\/\\\\")
+
+	t.Log("password verify ", status)
+}
