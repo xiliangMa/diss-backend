@@ -46,6 +46,7 @@ cp entrypoint.sh "$BUILD_DIR"
 if [ $ARCH == 'arm' ]
 then
   cp docker-compose-arm.yml "$BUILD_DIR/docker-compose.yml"
+  cp Dockerfile-arm "$BUILD_DIR/"
 else
   cp docker-compose.yml "$BUILD_DIR/docker-compose.yml"
 fi
@@ -79,17 +80,25 @@ fi
 # build 镜像
 echo "=========== 6. build diss-backend images ==========="
 cd $PROJECT_DIR
-if [ $ARCH == 'arm' ]
-then
-  docker-compose -f docker-compose-arm.yml build --no-cache
+if [ $ARCH == 'arm' ];then
+  echo "-----------------------------"
+  echo "Prebuild ok, build to $BUILD_DIR"
+  echo "-----------------------------"
+  # docker-compose -f docker-compose-arm.yml build --no-cache
+  echo " run following commnd to build image:
+    docker-compose build --no-cache "
 else
   docker-compose build --no-cache
 fi
 
 cd $BUILD_DIR
-#tar -zcvf diss.tar.gz ./docker-compose.yml ./conf
-rm -rf bin swagger entrypoint.sh upload public
-docker save -o diss-backend.tar.gz `docker images | grep diss-backend | awk '{print $1":"$2}'`
+
+if [ $ARCH != 'arm' ];then
+  rm -rf bin swagger entrypoint.sh upload public
+  docker save -o diss-backend.tar.gz `docker images | grep diss-backend | awk '{print $1":"$2}'`
+fi
+tar -zcvf diss-backend.tar.gz ./docker-compose.yml ./conf
+
 
 echo "=========== 7. remove none images ==========="
 NONE_IMAGES_ID=`docker images -f "dangling=true" -q`
