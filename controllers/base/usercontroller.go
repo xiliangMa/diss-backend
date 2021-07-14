@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/auth"
+	"github.com/xiliangMa/diss-backend/service/base"
+	"net/http"
 )
 
 // 用户接口列表
@@ -39,6 +42,21 @@ func (this *UserController) AddUser() {
 	user := new(models.User)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &user)
 
+	token := this.Ctx.Request.Header.Get("token")
+	jwtService := auth.JwtService{}
+	jwtService.TokenStr = token
+	_, isAdmin := jwtService.GetUserFromToken()
+
+	if !isAdmin {
+		userService := base.UserService{}
+		result := userService.ConstrictUserCreate()
+		if result.Code != http.StatusOK {
+			this.Data["json"] = result
+			this.ServeJSON(false)
+			return
+		}
+	}
+
 	this.Data["json"] = user.Add()
 	this.ServeJSON(false)
 }
@@ -57,6 +75,15 @@ func (this *UserController) UserList() {
 
 	user := new(models.User)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &user)
+
+	token := this.Ctx.Request.Header.Get("token")
+	jwtService := auth.JwtService{}
+	jwtService.TokenStr = token
+	loginUser, isAdmin := jwtService.GetUserFromToken()
+
+	if !isAdmin {
+		user.Name = loginUser
+	}
 	this.Data["json"] = user.List(from, limit)
 	this.ServeJSON(false)
 }
@@ -72,6 +99,24 @@ func (this *UserController) UpdateUser() {
 	userId, _ := this.GetInt(":userId")
 	user := new(models.User)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &user)
+
+	token := this.Ctx.Request.Header.Get("token")
+	jwtService := auth.JwtService{}
+	jwtService.TokenStr = token
+	loginUser, isAdmin := jwtService.GetUserFromToken()
+
+	if !isAdmin {
+		userService := base.UserService{}
+		userService.UserId = userId
+		userService.LoginName = loginUser
+		result := userService.ConstrictUserModify()
+		if result.Code != http.StatusOK {
+			this.Data["json"] = result
+			this.ServeJSON(false)
+			return
+		}
+	}
+
 	user.Id = userId
 	this.Data["json"] = user.Update()
 	this.ServeJSON(false)
@@ -86,9 +131,25 @@ func (this *UserController) UpdateUser() {
 func (this *UserController) DeleteUser() {
 	userId, _ := this.GetInt(":userId")
 	user := new(models.User)
-	user.Id = userId
 
-	result := user.Delete()
+	token := this.Ctx.Request.Header.Get("token")
+	jwtService := auth.JwtService{}
+	jwtService.TokenStr = token
+	loginUser, isAdmin := jwtService.GetUserFromToken()
+
+	userService := base.UserService{}
+	userService.IsAdmin = isAdmin
+	userService.UserId = userId
+	userService.LoginName = loginUser
+	result := userService.ConstrictUserRemove()
+	if result.Code != http.StatusOK {
+		this.Data["json"] = result
+		this.ServeJSON(false)
+		return
+	}
+
+	user.Id = userId
+	result = user.Delete()
 
 	this.Data["json"] = result
 	this.ServeJSON(false)
