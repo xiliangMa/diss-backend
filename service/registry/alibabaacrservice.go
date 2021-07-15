@@ -5,14 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"regexp"
+	"strings"
+
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/requests"
 	"github.com/aliyun/alibaba-cloud-sdk-go/services/cr"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
-	"net/http"
-	"regexp"
-	"strings"
 )
 
 type timeUnix int64
@@ -175,18 +176,18 @@ func (this *AlibabaACRService) Imports() (err error) {
 	}
 	var aliRepoData []aliRepo
 	if this.ImageConfig.Namespaces != "" {
-		repos, e := this.listReposByNamespace(domain, this.ImageConfig.Namespaces, client)
-		if e != nil {
-			return
+		repos, err := this.listReposByNamespace(domain, this.ImageConfig.Namespaces, client)
+		if err != nil {
+			return err
 		}
 
 		for _, repo := range repos {
 			aliRepoData = append(aliRepoData, repo)
 		}
 	} else {
-		namespaces, e := this.GetNamespaces(domain, client)
-		if e != nil {
-			return
+		namespaces, err := this.GetNamespaces(domain, client)
+		if err != nil {
+			return fmt.Errorf("get namespaces err")
 		}
 		logs.Info("got namespaces: %v", namespaces)
 
@@ -194,54 +195,47 @@ func (this *AlibabaACRService) Imports() (err error) {
 			var repos []aliRepo
 			repos, err = this.listReposByNamespace(domain, ns, client)
 			if err != nil {
-				return
+				return fmt.Errorf("get repos err")
 			}
-
 			for _, repo := range repos {
 				aliRepoData = append(aliRepoData, repo)
 			}
 		}
 	}
-
-	for _, r := range aliRepoData {
-		repo := r
-
-		tags, e := this.getTags(domain, repo, client)
-		if e != nil {
-			return fmt.Errorf("List tags for repo '%s' error: %v", repo.RepoName, err)
-		}
-
-		for _, tag := range tags {
-			public := repo.RepoDomainList.Public
-			this.ImageConfig.ImageId = "sha256:" + tag.ImageID
-			this.ImageConfig.Name = public + "/" + repo.RepoNamespace + "/" + repo.RepoName + ":" + tag.Tag
-			if ic := this.ImageConfig.Get(); ic == nil {
+	go func() {
+		for _, r := range aliRepoData {
+			repo := r
+			tags, _ := this.getTags(domain, repo, client)
+			for _, tag := range tags {
+				public := repo.RepoDomainList.Public
+				this.ImageConfig.ImageId = "sha256:" + tag.ImageID
+				this.ImageConfig.Name = public + "/" + repo.RepoNamespace + "/" + repo.RepoName + ":" + tag.Tag
+				cs := CommonService{ImageConfig: this.ImageConfig}
+				task := cs.AddTask()
+				msg := ""
 				this.ImageConfig.Id = ""
-				this.ImageConfig.Size = utils.FormatFileSize(tag.ImageSize)
-				this.ImageConfig.CreateTime = tag.ImageCreate * 1e6
+				if ic := this.ImageConfig.Get(); ic == nil {
+					this.ImageConfig.Size = utils.FormatFileSize(tag.ImageSize)
+					this.ImageConfig.CreateTime = tag.ImageCreate * 1e6
+					this.ImageConfig.Add()
 
-				this.ImageConfig.Add()
-
-				imageDetail := models.ImageDetail{}
-				imageDetail.ImageId = this.ImageConfig.ImageId
-				imageDetail.Name = this.ImageConfig.Name
-				imageDetail.ImageConfigId = this.ImageConfig.Id
-
-				if imd := imageDetail.Get(); imd == nil {
-
-					layer, l := this.getImageLayer(domain, repo, tag.Tag, client)
-					if l != nil {
-						return fmt.Errorf("getImageLayer error: %v", err)
+					imageDetail := models.ImageDetail{}
+					imageDetail.ImageId = this.ImageConfig.ImageId
+					imageDetail.Name = this.ImageConfig.Name
+					imageDetail.ImageConfigId = this.ImageConfig.Id
+					layer, err := this.getImageLayer(domain, repo, tag.Tag, client)
+					if err != nil {
+						task.Status = models.Task_Status_Failed
+						msg = err.Error()
 					}
-
-					manifest, m := this.getImageManifest(domain, repo, tag.Tag, client)
-					if m != nil {
-						return fmt.Errorf("getImageManifest error: %v", err)
+					manifest, err := this.getImageManifest(domain, repo, tag.Tag, client)
+					if err != nil {
+						task.Status = models.Task_Status_Failed
+						msg = err.Error()
 					}
-
-					lenx := len(layer.Data.Image.Layers)
+					lay := len(layer.Data.Image.Layers)
 					var buffer bytes.Buffer
-					for i, j := 0, lenx-1; i < j; i, j = i+1, j-1 {
+					for i, j := 0, lay-1; i < j; i, j = i+1, j-1 {
 						layer.Data.Image.Layers[i], layer.Data.Image.Layers[j] = layer.Data.Image.Layers[j], layer.Data.Image.Layers[i]
 					}
 					re := regexp.MustCompile(`[\s\p{Zs}]{2,}`)
@@ -254,15 +248,26 @@ func (this *AlibabaACRService) Imports() (err error) {
 					imageDetail.RepoDigests = tag.Digest
 					imageDetail.CreateTime = tag.ImageCreate * 1e6
 					imageDetail.Size = this.ImageConfig.Size
+					imageDetail.Add()
 
-					if result := imageDetail.Add(); result.Code != http.StatusOK {
-						logs.Error("ImageDetail err: %s", errors.New(result.Message))
-						return errors.New(result.Message)
-					}
+					task.Status = models.Task_Status_Finished
+					task.RunCount = 1
+				} else {
+					task.Status = models.Task_Status_Failed
+					msg = "镜像已存在"
 				}
+				task.Update()
+				taskRawInfo, _ := json.Marshal(task)
+				if msg == "" {
+					msg = fmt.Sprintf("更新任务成功, 状态: %s >>> 镜像名: %s, 任务ID: %s <<<", "完成", this.ImageConfig.Name, task.Id)
+				} else {
+					msg = fmt.Sprintf("更新任务失败, 状态: %s >>> 镜像名: %s, 任务ID: %s 失败原因: %s <<<", "失败", this.ImageConfig.Name, task.Id, msg)
+				}
+				taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Info}
+				taskLog.Add()
 			}
 		}
-	}
+	}()
 
 	return nil
 }

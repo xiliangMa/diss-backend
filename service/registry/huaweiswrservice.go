@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/astaxie/beego/logs"
-	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/plugins/proxy"
-	"github.com/xiliangMa/diss-backend/utils"
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/plugins/proxy"
+	"github.com/xiliangMa/diss-backend/utils"
 )
 
 type HuaweiSWRService struct {
@@ -171,7 +171,7 @@ func (this *HuaweiSWRService) ListNamespaces() models.Result {
 	return ResultData
 }
 
-func (this *HuaweiSWRService) Imports() (error error) {
+func (this *HuaweiSWRService) Imports() (err error) {
 	token, err := this.Auth(this.ImageConfig.Registry.Url, this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 	if err != nil {
 		return err
@@ -180,51 +180,59 @@ func (this *HuaweiSWRService) Imports() (error error) {
 	if reposErr != nil {
 		return reposErr
 	}
-	for _, repo := range repos {
-		tags, _ := this.getTags(token, repo.Name)
-		for _, tag := range tags {
-			this.ImageConfig.Name = tag.Path
-			this.ImageConfig.ImageId = "sha256:" + tag.ImageId
-			var mf = &hwManifest{}
-			json.Unmarshal([]byte(tag.Manifest), mf)
-			if ic := this.ImageConfig.Get(); ic == nil {
+	go func() {
+		for _, repo := range repos {
+			tags, _ := this.getTags(token, repo.Name)
+			for _, tag := range tags {
+				this.ImageConfig.Name = tag.Path
+				this.ImageConfig.ImageId = "sha256:" + tag.ImageId
 				this.ImageConfig.Id = ""
-				timeTemplate1 := "2006-01-02T15:04:05Z"
-				stamp, _ := time.ParseInLocation(timeTemplate1, tag.Created, time.Local)
-				this.ImageConfig.CreateTime = stamp.UnixNano()
-				this.ImageConfig.Size = utils.FormatFileSize(tag.Size)
-				this.ImageConfig.Add()
+				cs := CommonService{ImageConfig: this.ImageConfig}
+				task := cs.AddTask()
+				msg := ""
+				if ic := this.ImageConfig.Get(); ic == nil {
+					var mf = &hwManifest{}
+					json.Unmarshal([]byte(tag.Manifest), mf)
+					timeTemplate1 := "2006-01-02T15:04:05Z"
+					stamp, _ := time.ParseInLocation(timeTemplate1, tag.Created, time.Local)
+					this.ImageConfig.CreateTime = stamp.UnixNano()
+					this.ImageConfig.Size = utils.FormatFileSize(tag.Size)
+					this.ImageConfig.Add()
 
-				imageDetail := models.ImageDetail{}
-
-				imageDetail.ImageId = this.ImageConfig.ImageId
-				imageDetail.Name = this.ImageConfig.Name
-				imageDetail.ImageConfigId = this.ImageConfig.Id
-
-				if imd := imageDetail.Get(); imd == nil {
+					imageDetail := models.ImageDetail{}
+					imageDetail.ImageId = this.ImageConfig.ImageId
+					imageDetail.Name = this.ImageConfig.Name
+					imageDetail.ImageConfigId = this.ImageConfig.Id
 					imageDetail.Layers = len(mf.Layers)
 					imageDetail.CreateTime = this.ImageConfig.CreateTime
 					imageDetail.RepoDigests = tag.Digest
 					imageDetail.Dockerfile = ""
 					imageDetail.Size = this.ImageConfig.Size
-					if result := imageDetail.Add(); result.Code != http.StatusOK {
-						logs.Error("ImageDetail err: %s", errors.New(result.Message))
-						return errors.New(result.Message)
-					}
+					imageDetail.Add()
+
+					task.Status = models.Task_Status_Finished
+					task.RunCount = 1
+				} else {
+					task.Status = models.Task_Status_Failed
+					msg = "镜像已存在"
 				}
+				task.Update()
+				taskRawInfo, _ := json.Marshal(task)
+				if msg == "" {
+					msg = fmt.Sprintf("更新任务成功, 状态: %s >>> 镜像名: %s, 任务ID: %s <<<", "完成", this.ImageConfig.Name, task.Id)
+				} else {
+					msg = fmt.Sprintf("更新任务失败, 状态: %s >>> 镜像名: %s, 任务ID: %s 失败原因: %s <<<", "失败", this.ImageConfig.Name, task.Id, msg)
+				}
+				taskLog := models.TaskLog{RawLog: msg, Task: string(taskRawInfo), Account: task.Account, Level: models.Log_level_Info}
+				taskLog.Add()
 			}
 		}
-	}
+	}()
 	return
 }
 
 func (this *HuaweiSWRService) getRepos(token string) (hw []*hwRepo, err error) {
-
-	path := "/v2/manage/repos"
-	if this.ImageConfig.Namespaces != "" {
-		path += "?namespace=" + this.ImageConfig.Namespaces
-	}
-	urls := fmt.Sprintf("https://swr-api.%s"+path, this.ImageConfig.Registry.Url)
+	urls := fmt.Sprintf("https://swr-api.%s/v2/manage/repos?namespace=%s", this.ImageConfig.Registry.Url, this.ImageConfig.Namespaces)
 	proxy := proxy.ProxyServer{TargetUrl: urls, Token: token}
 	resp, err := proxy.Request(this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 	if err != nil {
@@ -239,13 +247,7 @@ func (this *HuaweiSWRService) getRepos(token string) (hw []*hwRepo, err error) {
 }
 
 func (this *HuaweiSWRService) getTags(token string, repo string) (hw []hwTags, err error) {
-
-	path := "/v2/manage/namespaces"
-	if this.ImageConfig.Namespaces != "" {
-		path = path + "/" + this.ImageConfig.Namespaces + "/repos/" + repo + "/tags"
-	}
-
-	urls := fmt.Sprintf("https://swr-api.%s"+path, this.ImageConfig.Registry.Url)
+	urls := fmt.Sprintf("https://swr-api.%s/v2/manage/namespaces/%s/repos/%s/tags", this.ImageConfig.Registry.Url, this.ImageConfig.Namespaces, repo)
 	proxy := proxy.ProxyServer{TargetUrl: urls, Token: token}
 	resp, err := proxy.Request(this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 	if err != nil {
