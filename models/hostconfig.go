@@ -3,10 +3,11 @@ package models
 import (
 	"encoding/json"
 	"errors"
+	"net/http"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
-	"net/http"
 )
 
 type HostConfig struct {
@@ -211,8 +212,6 @@ func (this *HostConfig) BaseList(from, limit int) (error, int64, []*HostConfig) 
 		cond = cond.And("host_id", l.Id)
 		if this.ClusterId != "" {
 			cond = cond.And("cluster_id", this.ClusterId)
-		} else {
-			cond = cond.And("cluster_id", true)
 		}
 		_, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().Limit(1, 0).OrderBy("-update_time").All(&TaskList)
 		l.TaskList = TaskList

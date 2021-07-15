@@ -3,14 +3,15 @@ package securitycheck
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/astaxie/beego/logs"
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/base"
 	"github.com/xiliangMa/diss-backend/service/ws"
 	"github.com/xiliangMa/diss-backend/utils"
-	"net/http"
-	"strings"
 )
 
 type SecurityScanService struct {
@@ -377,7 +378,7 @@ func (this *SecurityScanService) saveTaskLog(task *models.Task, securityCheck *m
 	taskLog.Account = securityCheck.Job.Account
 	taskLog.Level = models.Log_level_Info
 	//msg := fmt.Sprintf("Add task success, Status: %s, Type: %s, Batch: %v, TaskId: %s.", task.Status, task.Type, task.Batch, task.Id)
-	msg := fmt.Sprintf("创建任务成功, 状态: 已创建,  批次: %v, 任务ID: %s.", task.Batch, task.Id)
+	msg := fmt.Sprintf("创建任务成功, 状态: 已创建,  批次: %v, 任务ID: %s", task.Batch, task.Id)
 	taskLog.RawLog = msg
 	taskLog.Add()
 }
