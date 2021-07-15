@@ -1,12 +1,13 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
-	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/astaxie/beego/logs"
+	"github.com/astaxie/beego/orm"
+	"github.com/xiliangMa/diss-backend/utils"
 )
 
 type VirusScan struct {
@@ -136,7 +137,7 @@ func (this *VirusScan) Add() Result {
 func (this *VirusScan) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
-	var virusLogList []*VirusScanRecord = nil
+	var virusLogList []*VirusScanRecord
 	var ResultData Result
 
 	virusLogList, total, err := this.VirusList(from, limit)
@@ -160,7 +161,7 @@ func (this *VirusScan) List(from, limit int) Result {
 func (this *VirusScan) VirusList(from, limit int) ([]*VirusScanRecord, int64, error) {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
-	var virusLogList []*VirusScanRecord = nil
+	var virusLogList []*VirusScanRecord
 	var err error
 	var total int64 = 0
 
@@ -177,27 +178,27 @@ func (this *VirusScan) VirusList(from, limit int) ([]*VirusScanRecord, int64, er
 		fields = append(fields, string(rune(this.Id)))
 	}
 	if this.HostId != "" {
-		filter = filter + `host_id = ? and `
+		filter = filter + `virus_log.host_id = ? and `
 		fields = append(fields, this.HostId)
 	}
 	if this.HostName != "" {
-		filter = filter + `host_name like ? and `
+		filter = filter + `virus_log.host_name like ? and `
 		fields = append(fields, "%"+this.HostName+"%")
 	}
 	if this.ImageId != "" {
-		filter = filter + `image_id = ? and `
+		filter = filter + `virus_log.image_id = ? and `
 		fields = append(fields, this.ImageId)
 	}
 	if this.ImageName != "" {
-		filter = filter + `image_name like ? and `
+		filter = filter + `virus_log.image_name like ? and `
 		fields = append(fields, "%"+this.ImageName+"%")
 	}
 	if this.ContainerId != "" {
-		filter = filter + `contaienr_id = ? and `
+		filter = filter + `virus_log.container_id = ? and `
 		fields = append(fields, this.ContainerId)
 	}
 	if this.ContainerName != "" {
-		filter = filter + `container_name like ? and `
+		filter = filter + `virus_log.container_name like ? and `
 		fields = append(fields, "%"+this.ContainerName+"%")
 	}
 	if this.Type != "" {
@@ -226,7 +227,6 @@ func (this *VirusScan) VirusList(from, limit int) ([]*VirusScanRecord, int64, er
 	}
 	_, err = o.Raw(resultSql, fields).QueryRows(&virusLogList)
 	if err != nil {
-		logs.Error("Get VirusLogErr List failed, code: %d, err: %s", utils.GetImageVirusErr, err.Error())
 		return nil, 0, err
 	}
 
@@ -238,59 +238,6 @@ type VirusRecordInterface interface {
 	List(from, limit int)
 	Add() Result
 	Count() int64
-}
-
-func (this *VirusRecord) List(from, limit int) Result {
-	o := orm.NewOrm()
-	o.Using(utils.DS_Security_Log)
-	var virusLogList []*VirusScanRecord
-	var ResultData Result
-	var err error
-	var total int64 = 0
-	var fields []string
-
-	sql := `select vr.*,vs.image_id from virus_scan vs  join virus_record vr on vs.id = vr.virus_scan_id where vs.type = 'ImageVirusScan'  `
-	countSql := `select count(vr.id) from virus_scan vs  join virus_record vr on vs.id = vr.virus_scan_id where vs.type = 'ImageVirusScan' `
-	filter := ""
-
-	if this.Filename != "" {
-		filter = filter + `vr.filename like ? and `
-		fields = append(fields, "%"+this.Filename+"%")
-	}
-
-	if this.Severity != "" {
-		filter = filter + `vr.severity = ? and `
-		fields = append(fields, this.Severity)
-	}
-
-	if filter != "" {
-		sql = sql + "where " + filter
-		countSql = countSql + " where " + filter
-	}
-	sql = strings.TrimSuffix(strings.TrimSpace(sql), "and")
-	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
-	resultSql := sql
-
-	if from >= 0 && limit > 0 {
-		limitSql := " limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
-		resultSql = resultSql + limitSql
-	}
-	_, err = o.Raw(resultSql, fields).QueryRows(&virusLogList)
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetImageVirusErr
-		logs.Error("Get VirusLogErr List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
-	}
-
-	o.Raw(countSql, fields).QueryRow(&total)
-	data := make(map[string]interface{})
-	data[Result_Total] = total
-	data[Result_Items] = virusLogList
-
-	ResultData.Code = http.StatusOK
-	ResultData.Data = data
-	return ResultData
 }
 
 func (this *VirusRecord) Add() Result {
@@ -323,22 +270,24 @@ func (this *VirusRecord) Add() Result {
 	return ResultData
 }
 
-func (this *VirusRecord) Count() int64 {
+func (this *VirusScanRecord) Count() int64 {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var total int64
 	var fields []string
 	filter := ""
 
-	countSql := `select count(vr.id) from virus_scan vs  join virus_record vr on vs.id = vr.virus_scan_id `
+	countSql := `select count(virus_record.id) from virus_record join
+ (select distinct on(created_at) *  from virus_scan order by created_at desc)  as virus_log
+    on virus_record.virus_scan_id = virus_log.id `
 
 	if this.Type != "" {
-		filter = filter + `vs.type = ? and `
+		filter = filter + `virus_log.type = ? and `
 		fields = append(fields, this.Type)
 	}
 
 	if this.Severity != "" {
-		filter = filter + `vr.severity = ? and `
+		filter = filter + `virus_record.severity = ? and `
 		fields = append(fields, this.Severity)
 	}
 

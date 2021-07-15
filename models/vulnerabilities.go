@@ -1,12 +1,13 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
-	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"regexp"
 	"time"
+
+	"github.com/astaxie/beego/logs"
+	"github.com/astaxie/beego/orm"
+	"github.com/xiliangMa/diss-backend/utils"
 )
 
 type ImageVulnerabilities struct {
@@ -26,8 +27,8 @@ type Vulnerabilities struct {
 	VulnerabilityID      string                `orm:"column(vulnerability_id)" description:"(漏洞Id)"`
 	PkgName              string                `orm:"size(128)" description:"(包名)"`
 	InstalledVersion     string                `orm:"size(64)" description:"(安装版本)"`
-	FixedVersion         string                `orm:"size(32)" description:"(已解决版本)"`
-	SeveritySource       string                `orm:"size(32)" description:"(来源)"`
+	FixedVersion         string                `orm:"size(128)" description:"(已解决版本)"`
+	SeveritySource       string                `orm:"size(128)" description:"(来源)"`
 	PrimaryURL           string                `orm:"size(512)" description:"(漏洞地址)"`
 	Title                string                `description:"(漏洞标题)"`
 	Description          string                `description:"(漏洞描述)"`
@@ -127,7 +128,6 @@ func (this *ImageVulnerabilities) ScanList(from, limit int) Result {
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetImageVulnerabilitiesErr
-		logs.Error("Get ImageVulnerabilitiesErr List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 		return ResultData
 	}
 
@@ -154,7 +154,6 @@ func (this *ImageVulnerabilities) List(from, limit int) Result {
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetImageVulnerabilitiesErr
-		logs.Error("Get ImageVulnerabilitiesErr List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
 	}
 	vuln := orm.NewCondition()
 	vuln = vuln.And("image_vulnerabilities_id", imageVulnerabilities.Id)

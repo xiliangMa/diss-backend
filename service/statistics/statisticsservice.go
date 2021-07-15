@@ -1,8 +1,9 @@
 package statistics
 
 import (
-	"github.com/xiliangMa/diss-backend/models"
 	"net/http"
+
+	"github.com/xiliangMa/diss-backend/models"
 )
 
 type StatisticsService struct {
@@ -170,43 +171,38 @@ func (this *StatisticsService) GetMirrorRiskStatistics() models.Result {
 	vu.Severity = models.SEVERITY_Low
 	h[models.SEVERITY_Low] = vu.Count()
 
+	vu.Severity = models.SEVERITY_Unknown
+	h[models.SEVERITY_Unknown] = vu.Count()
+
 	vr := make(map[string]int64)
-	VirusScan := new(models.VirusScan)
-	VirusScan.Type = "ImageVirusScan"
-	VirusScan.Type = models.SEVERITY_Critical
-	_, count, _ := VirusScan.VirusList(0, 0)
+	virusRecord := new(models.VirusScanRecord)
 
-	vr[models.SEVERITY_Critical] = count
-	VirusScan.Type = models.SEVERITY_High
-	_, count, _ = VirusScan.VirusList(0, 0)
-	vr[models.SEVERITY_High] = count
+	virusRecord.Severity = models.SEVERITY_Critical
+	vr[models.SEVERITY_Critical] = virusRecord.Count()
 
-	VirusScan.Type = models.SEVERITY_Medium
-	_, count, _ = VirusScan.VirusList(0, 0)
-	vr[models.SEVERITY_Medium] = count
+	virusRecord.Severity = models.SEVERITY_High
+	vr[models.SEVERITY_High] = virusRecord.Count()
 
-	VirusScan.Type = models.SEVERITY_Low
-	_, count, _ = VirusScan.VirusList(0, 0)
-	vr[models.SEVERITY_Low] = count
+	virusRecord.Severity = models.SEVERITY_Medium
+	vr[models.SEVERITY_Medium] = virusRecord.Count()
+
+	virusRecord.Severity = models.SEVERITY_Low
+	vr[models.SEVERITY_Low] = virusRecord.Count()
 
 	si := make(map[string]int64)
 	sensitiveInfo := new(models.SensitiveInfo)
 
 	sensitiveInfo.Severity = models.SEVERITY_Critical
-	_, count, _ = sensitiveInfo.BaseList(0, 0)
-	si[models.SEVERITY_Critical] = count
+	si[models.SEVERITY_Critical] = sensitiveInfo.Count()
 
 	sensitiveInfo.Severity = models.SEVERITY_High
-	_, count, _ = sensitiveInfo.BaseList(0, 0)
-	si[models.SEVERITY_High] = count
+	si[models.SEVERITY_High] = sensitiveInfo.Count()
 
 	sensitiveInfo.Severity = models.SEVERITY_Medium
-	_, count, _ = sensitiveInfo.BaseList(0, 0)
-	si[models.SEVERITY_Medium] = count
+	si[models.SEVERITY_Medium] = sensitiveInfo.Count()
 
 	sensitiveInfo.Severity = models.SEVERITY_Low
-	_, count, _ = sensitiveInfo.BaseList(0, 0)
-	si[models.SEVERITY_Low] = count
+	si[models.SEVERITY_Low] = sensitiveInfo.Count()
 
 	// 漏洞库
 	data["vuln"] = h
