@@ -3,13 +3,14 @@ package base
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/plugins/proxy"
 	"github.com/xiliangMa/diss-backend/service/registry"
 	"github.com/xiliangMa/diss-backend/utils"
-	"io/ioutil"
-	"net/http"
 )
 
 type ImageConfigService struct {
@@ -46,14 +47,12 @@ func (this *ImageConfigService) BatchImportImage() models.Result {
 		ae := registry.AwsECRService{ImageConfig: this.ImageConfig}
 		err = ae.Imports()
 	}
-
 	if err != nil {
 		result.Message = err.Error()
 		result.Code = utils.ImportImageErr
 		logs.Error("Import Image failed, code: %d, err: %s", result.Code, result.Message)
 		return result
 	}
-
 	result.Code = http.StatusOK
 	return result
 }
@@ -81,16 +80,14 @@ func (this *ImageConfigService) GetNamespaces() models.Result {
 	return result
 }
 
-func (this *ImageConfigService) generalType(url string) (error error) {
+func (this *ImageConfigService) generalType(url string) (err error) {
 	imageConfig := this.ImageConfig
 	proxy := proxy.ProxyServer{}
 	proxy.TargetUrl = fmt.Sprintf("%s/v2/_catalog", url)
 	resp, err := proxy.Request(imageConfig.Registry.User, imageConfig.Registry.Pwd)
-
 	if err != nil {
 		return err
 	}
-
 	if resp.StatusCode == 200 {
 		defer resp.Body.Close()
 		body, respErr := ioutil.ReadAll(resp.Body)
@@ -101,26 +98,30 @@ func (this *ImageConfigService) generalType(url string) (error error) {
 		json.Unmarshal(body, &cc)
 
 		if cc["repositories"] != nil {
-			for _, imageName := range cc["repositories"].([]interface{}) {
-
-				name := imageName.(string)
-				proxy.TargetUrl = fmt.Sprintf("%s/v2/%s/tags/list", url, name)
-				tags, _ := proxy.Request(imageConfig.Registry.User, imageConfig.Registry.Pwd)
-				if tags.StatusCode == 200 {
-					defer tags.Body.Close()
-					t, _ := ioutil.ReadAll(tags.Body)
-					var tagObj map[string]interface{}
-					json.Unmarshal(t, &tagObj)
-
-					if tagObj["tags"] != nil {
-						for _, tag := range tagObj["tags"].([]interface{}) {
-							imageConfig.Name = name + ":" + tag.(string)
-							cs := registry.CommonService{ImageConfig: imageConfig}
-							cs.AddDetail()
+			repo := cc["repositories"].([]interface{})
+			go func() {
+				for _, imageName := range repo {
+					name := imageName.(string)
+					proxy.TargetUrl = fmt.Sprintf("%s/v2/%s/tags/list", url, name)
+					tags, err := proxy.Request(imageConfig.Registry.User, imageConfig.Registry.Pwd)
+					if err != nil {
+						fmt.Errorf("list tags for repo '%s' error: %v", repo, err)
+					}
+					if tags.StatusCode == 200 {
+						defer tags.Body.Close()
+						t, _ := ioutil.ReadAll(tags.Body)
+						var tagObj map[string]interface{}
+						json.Unmarshal(t, &tagObj)
+						if tagObj["tags"] != nil {
+							for _, tag := range tagObj["tags"].([]interface{}) {
+								imageConfig.Name = name + ":" + tag.(string)
+								cs := registry.CommonService{ImageConfig: imageConfig}
+								cs.AddDetail()
+							}
 						}
 					}
 				}
-			}
+			}()
 		}
 	}
 	return

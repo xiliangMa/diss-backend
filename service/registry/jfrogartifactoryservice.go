@@ -3,11 +3,12 @@ package registry
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/plugins/proxy"
 	"github.com/xiliangMa/diss-backend/utils"
-	"io/ioutil"
-	"net/http"
 )
 
 type JFrogArtifactoryService struct {
@@ -30,11 +31,9 @@ func (this *JFrogArtifactoryService) ListRepositories() models.Result {
 	defer resp.Body.Close()
 	if resp.StatusCode == 200 {
 		body, e := ioutil.ReadAll(resp.Body)
-
 		var repositoriesData []string
 		var repo repositories
 		json.Unmarshal(body, &repo.Repository)
-
 		if e != nil {
 			ResultData.Message = e.Error()
 			ResultData.Code = utils.GetNamespacesErr
@@ -43,7 +42,6 @@ func (this *JFrogArtifactoryService) ListRepositories() models.Result {
 		for _, r := range repo.Repository {
 			repositoriesData = append(repositoriesData, r.Key)
 		}
-
 		ResultData.Data = repositoriesData
 		ResultData.Code = http.StatusOK
 	}

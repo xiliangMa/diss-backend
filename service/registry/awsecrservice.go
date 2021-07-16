@@ -4,6 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"regexp"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -12,9 +16,6 @@ import (
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/plugins/proxy"
 	"github.com/xiliangMa/diss-backend/utils"
-	"io/ioutil"
-	"net/http"
-	"regexp"
 )
 
 type AwsECRService struct {
@@ -76,7 +77,7 @@ func (this *AwsECRService) ListRepositories() models.Result {
 	return ResultData
 }
 
-func (this *AwsECRService) Imports() (error error) {
+func (this *AwsECRService) Imports() (err error) {
 	authorizationData, err := this.Auth(this.ImageConfig.Registry.Url, this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 	if err != nil {
 		return err
@@ -92,11 +93,13 @@ func (this *AwsECRService) Imports() (error error) {
 		json.Unmarshal(t, &tagObj)
 
 		if tagObj["tags"] != nil {
-			for _, tag := range tagObj["tags"].([]interface{}) {
-				this.ImageConfig.Name = this.ImageConfig.Namespaces + ":" + tag.(string)
-				cs := CommonService{ImageConfig: this.ImageConfig, Token: *authorizationData.AuthorizationToken}
-				cs.AddDetail()
-			}
+			go func() {
+				for _, tag := range tagObj["tags"].([]interface{}) {
+					this.ImageConfig.Name = this.ImageConfig.Namespaces + ":" + tag.(string)
+					cs := CommonService{ImageConfig: this.ImageConfig, Token: *authorizationData.AuthorizationToken}
+					cs.AddDetail()
+				}
+			}()
 		}
 	}
 	return

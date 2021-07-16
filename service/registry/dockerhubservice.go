@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/plugins/proxy"
 	"github.com/xiliangMa/diss-backend/utils"
-	"io/ioutil"
-	"net/http"
 )
 
 type DockerHubService struct {
@@ -20,14 +21,18 @@ type dhNamespaceList struct {
 }
 
 type dhRepos struct {
-	Results []struct {
-		Name      string `json:"name"`
-		Namespace string `json:"namespace"`
-	} `json:"results"`
+	Next  string `json:"next"`
+	Repos []Repo `json:"results"`
+}
+
+type Repo struct {
+	Name      string `json:"name"`
+	Namespace string `json:"namespace"`
 }
 
 type dhTags struct {
-	Results []struct {
+	Next string `json:"next"`
+	Tags []struct {
 		Name string `json:"name"`
 	} `json:"results"`
 }
@@ -66,23 +71,52 @@ func (this *DockerHubService) Auth(url string, user string, pwd string) (token s
 	return "JWT " + value, nil
 }
 
-func (this *DockerHubService) Imports() (error error) {
+func (this *DockerHubService) Imports() (err error) {
 	token, err := this.Auth(this.ImageConfig.Registry.Url, this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 	if err != nil {
 		return err
 	}
-	repos, reposErr := this.getRepos(token)
-	if reposErr != nil {
-		return reposErr
-	}
-	for _, repo := range repos.Results {
-		tags, _ := this.getTags(token, repo.Name)
-		for _, t := range tags.Results {
-			this.ImageConfig.Name = repo.Namespace + "/" + repo.Name + ":" + t.Name
-			cs := CommonService{ImageConfig: this.ImageConfig}
-			cs.AddDetail()
+	go func() {
+		var repos []Repo
+		page := 1
+		pageSize := 100
+		n := 0
+		for {
+			repo, reposErr := this.getRepos(token, page, pageSize)
+			if reposErr != nil {
+				reposErr.Error()
+			}
+			repos = append(repos, repo.Repos...)
+			n += len(repo.Repos)
+			if len(repo.Next) == 0 {
+				break
+			}
+			page++
 		}
-	}
+
+		for _, repo := range repos {
+			page = 1
+			pageSize = 100
+			var tags []string
+			for {
+				tag, _ := this.getTags(token, repo.Name, page, pageSize)
+				for _, t := range tag.Tags {
+					tags = append(tags, t.Name)
+				}
+				if len(tag.Next) == 0 {
+					break
+				}
+				page++
+			}
+			if len(tags) > 0 {
+				for _, t := range tags {
+					this.ImageConfig.Name = repo.Namespace + "/" + repo.Name + ":" + t
+					cs := CommonService{ImageConfig: this.ImageConfig}
+					cs.AddDetail()
+				}
+			}
+		}
+	}()
 	return
 }
 
@@ -117,14 +151,8 @@ func (this *DockerHubService) ListNamespaces() models.Result {
 	return ResultData
 }
 
-func (this *DockerHubService) getRepos(token string) (dh *dhRepos, err error) {
-
-	path := "/v2/repositories"
-	if this.ImageConfig.Namespaces != "" {
-		path = path + "/" + this.ImageConfig.Namespaces + "/?page_size=10000"
-	}
-
-	url := fmt.Sprintf("%s"+path, this.ImageConfig.Registry.Url)
+func (this *DockerHubService) getRepos(token string, page, pageSize int) (dh *dhRepos, err error) {
+	url := fmt.Sprintf("%s/v2/repositories/%s/?page=%d&page_size=%d", this.ImageConfig.Registry.Url, this.ImageConfig.Namespaces, page, pageSize)
 	proxy := proxy.ProxyServer{TargetUrl: url, Token: token}
 	resp, err := proxy.Request(this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 	if err != nil {
@@ -138,14 +166,8 @@ func (this *DockerHubService) getRepos(token string) (dh *dhRepos, err error) {
 	return
 }
 
-func (this *DockerHubService) getTags(token string, repo string) (dh *dhTags, err error) {
-
-	path := "/v2/repositories/"
-	if this.ImageConfig.Namespaces != "" {
-		path = path + "/" + this.ImageConfig.Namespaces + "/" + repo + "/tags"
-	}
-
-	urls := fmt.Sprintf("%s"+path, this.ImageConfig.Registry.Url)
+func (this *DockerHubService) getTags(token string, repo string, page, pageSize int) (dh *dhTags, err error) {
+	urls := fmt.Sprintf("%s/v2/repositories/%s/%s/tags/?page=%d&page_size=%d", this.ImageConfig.Registry.Url, this.ImageConfig.Namespaces, repo, page, pageSize)
 	proxy := proxy.ProxyServer{TargetUrl: urls, Token: token}
 	resp, err := proxy.Request(this.ImageConfig.Registry.User, this.ImageConfig.Registry.Pwd)
 	if err != nil {
