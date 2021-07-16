@@ -11,19 +11,21 @@ import (
 )
 
 type SensitiveInfo struct {
-	Id         string `orm:"pk;" description:"(id)"`
-	ImageId    string `description:"(镜像ID)"`
-	HostId     string `description:"(主机ID)"`
-	HostName   string `description:"(主机名称)"`
-	Type       string `description:"(资源类型：host image)"`
-	FileName   string `description:"(文件名称)"`
-	MD5        string `description:"(文件MD5码)"`
-	Permission uint32 `description:"(文件权限)"`
-	FileType   string `description:"(文件类型)"`
-	Size       int64  `description:"(文件大小)"`
-	CreateTime int64  `description:"(添加时间)"`
-	Files      []FileInfo
-	Severity   string `orm:"size(32)" description:"(等级)"`
+	Id            string `orm:"pk;" description:"(id)"`
+	ImageId       string `description:"(镜像ID)"`
+	ImageConfigId string `description:"(镜像唯一标识)"`
+	ImageName     string `description:"(镜像名称)"`
+	HostId        string `description:"(主机ID)"`
+	HostName      string `description:"(主机名称)"`
+	Type          string `description:"(资源类型：host image)"`
+	FileName      string `description:"(文件名称)"`
+	MD5           string `orm:"column(md5)" description:"(文件MD5码)"`
+	Permission    uint32 `description:"(文件权限)"`
+	FileType      string `description:"(文件类型)"`
+	Size          int64  `description:"(文件大小)"`
+	CreateTime    int64  `description:"(添加时间)"`
+	Files         []FileInfo
+	Severity      string `orm:"size(32)" description:"(等级)"`
 }
 
 //虚拟表，用于接收agent的文件列表
@@ -43,21 +45,33 @@ type SensitiveInfoInterface interface {
 }
 
 func (this *SensitiveInfo) Add() Result {
-	insertSql := `INSERT INTO ` + utils.SensitiveInfo + `(file_name, host_id, host_name, image_id, file_type, m_d5, permission, size, create_time, severity) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?,?)`
+	insertSql := `INSERT INTO ` + utils.SensitiveInfo + `(file_name, host_id, host_name, type, image_id,image_name, file_type, md5, permission, size, create_time, severity,image_config_id) VALUES(?, ?, ?,?, ?,?, ?, ?, ?, ?, ?,?,?)`
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
+
+	if this.ImageConfigId == "" {
+		this.ImageConfigId = this.HostId + "---" + this.ImageId + "---" + this.ImageName
+	}
+	if this.Type == "" {
+		this.Type = "image"
+	}
+	if this.Severity == "" {
+		this.Severity = "MEDIUM"
+	}
 
 	_, err := o.Raw(insertSql,
 		this.FileName,
 		this.HostId,
 		this.HostName,
+		this.Type,
 		this.ImageId,
+		this.ImageName,
 		this.FileType,
 		this.MD5,
 		this.Permission,
 		this.Size,
-		this.CreateTime, this.Severity).Exec()
+		this.CreateTime, this.Severity, this.ImageConfigId).Exec()
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -95,11 +109,11 @@ func (this *SensitiveInfo) List(from, limit int) Result {
 func (this *SensitiveInfo) BaseList(from, limit int) ([]*SensitiveInfo, int64, error) {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
-	var SensitiveInfoList []*SensitiveInfo = nil
+	var SensitiveInfoList []*SensitiveInfo
 	var err error
-	var total int64 = 0
+	var total int64
 
-	resType := "host_id"
+	resType := "image_id"
 	if this.Type == Sc_Type_Image {
 		resType = "image_id"
 	}
@@ -134,7 +148,7 @@ func (this *SensitiveInfo) BaseList(from, limit int) ([]*SensitiveInfo, int64, e
 	}
 
 	if this.MD5 != "" {
-		filter = filter + `m_d5 like ? and `
+		filter = filter + `md5 like ? and `
 		fields = append(fields, "%"+this.MD5+"%")
 	}
 
@@ -156,7 +170,6 @@ func (this *SensitiveInfo) BaseList(from, limit int) ([]*SensitiveInfo, int64, e
 	}
 	_, err = o.Raw(resultSql, fields).QueryRows(&SensitiveInfoList)
 	if err != nil {
-		logs.Error("Get SensitiveInfo list failed, code: %d, err: %s", utils.GetWarningInfoListErr, err.Error())
 		return nil, 0, err
 	}
 
@@ -171,7 +184,7 @@ func (this *SensitiveInfo) Count() int64 {
 	var fields []string
 	filter := ""
 
-	resType := "host_id"
+	resType := "image_id"
 	if this.Type == Sc_Type_Image {
 		resType = "image_id"
 	}
@@ -183,13 +196,11 @@ func (this *SensitiveInfo) Count() int64 {
 		filter = filter + `severity = ? and `
 		fields = append(fields, this.Severity)
 	}
-
 	if filter != "" {
 		countSql = countSql + " where " + filter
 	}
 
 	countSql = strings.TrimSuffix(strings.TrimSpace(countSql), "and")
-
 	_ = o.Raw(countSql, fields).QueryRow(&total)
 	return total
 

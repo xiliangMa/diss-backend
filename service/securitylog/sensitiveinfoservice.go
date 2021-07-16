@@ -1,8 +1,9 @@
 package securitylog
 
 import (
-	"github.com/xiliangMa/diss-backend/models"
 	"time"
+
+	"github.com/xiliangMa/diss-backend/models"
 )
 
 type SensitiveInfoService struct {
@@ -19,7 +20,6 @@ func (this *SensitiveInfoService) AddFileList() {
 		sensiInfo.Permission = fileinfo.Permission
 		sensiInfo.FileType = fileinfo.Type
 		sensiInfo.Size = fileinfo.Size
-		sensiInfo.Severity = "MEDIUM"
 		sensiInfo.Add()
 	}
 }
