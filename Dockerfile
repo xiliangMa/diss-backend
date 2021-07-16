@@ -9,10 +9,15 @@ COPY build/bin/diss-backend .
 COPY conf ./conf
 COPY swagger ./swagger
 COPY upload ./upload
+COPY public ./public
 
 FROM alpine:3.11
 WORKDIR /opt/diss-backend
 COPY --from=builder /build/ .
 RUN chmod +x ./entrypoint.sh
+RUN apk update \
+    && apk add tzdata \
+    && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo "Asia/Shanghai" > /etc/timezone
 VOLUME /opt/diss-backend
 ENTRYPOINT ["sh", "./entrypoint.sh"]
