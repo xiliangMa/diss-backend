@@ -5,6 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/mitchellh/mapstructure"
 	"github.com/nats-io/stan.go"
@@ -13,9 +17,6 @@ import (
 	"github.com/xiliangMa/diss-backend/service/synccheck"
 	"github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
-	"net/http"
-	"strings"
-	"time"
 )
 
 type NatsSubService struct {
@@ -657,7 +658,7 @@ func (this *NatsSubService) Save() error {
 				var taskList []models.Task
 				taskObj := models.Task{}
 				s, _ := json.Marshal(ms.Data)
-				logs.Debug("Receive task data: %s.", string(s))
+				//logs.Debug("Receive task data: %s.", string(s))
 				dec := json.NewDecoder(bytes.NewBuffer(s))
 				dec.UseNumber()
 				err := dec.Decode(&taskList)
