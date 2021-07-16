@@ -185,6 +185,37 @@ func (this *User) UserList(from, limit int) (userLists []*User, count int64, err
 	return userList, total, err
 }
 
+func (this *User) Get() (*User, error) {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var user User
+	cond := orm.NewCondition()
+
+	if this.Id != 0 {
+		cond = cond.And("id", this.Id)
+	}
+	if this.Name != "" {
+		cond = cond.And("name", this.Name)
+	}
+	if this.Password != "" {
+		cond = cond.And("password", this.Password)
+	}
+
+	err := o.QueryTable(utils.User).SetCond(cond).One(&user)
+	if &user != nil {
+		userRole, _ := GlobalCasbin.Enforcer.GetRolesForUser(user.Name)
+		if len(userRole) > 0 {
+			roleQuery := Role{Code: utils.GetRoleString(userRole[0])}
+			roleObj, count, _ := roleQuery.RoleList(0, 1)
+			if count > 0 {
+				user.Role = roleObj[0]
+			}
+		}
+	}
+
+	return &user, err
+}
+
 func (this *User) Delete() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)

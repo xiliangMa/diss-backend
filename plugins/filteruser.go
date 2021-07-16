@@ -18,7 +18,7 @@ func (a *BasicAuthorizer) GetUserRole(input *context.Context) string {
 
 	jwtService := auth.JwtService{}
 	jwtService.TokenStr = input.Request.Header.Get("token")
-	username := jwtService.GetUserFromToken()
+	username, _ := jwtService.GetUserFromToken()
 
 	return username
 }

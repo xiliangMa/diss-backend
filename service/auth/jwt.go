@@ -37,10 +37,18 @@ func (this *JwtService) CreateToken(name, pwd, userType string) models.Result {
 
 		claims := this.Token.Claims.(jwt.MapClaims)
 		claims["name"] = beego.AppConfig.String("AppName")
-		claims["admin"] = true
+		claims["admin"] = false
 		claims["exp"] = time.Now().Add(time.Hour * 1).Unix()
 		claims["UserName"] = name
 		claims["Pwd"] = pwd
+
+		userRoleList, _ := models.GlobalCasbin.Enforcer.GetRolesForUser(name)
+		for _, userRole := range userRoleList {
+			if userRole == utils.GetRoleString("admin") {
+				claims["admin"] = true
+				break
+			}
+		}
 
 		t, err := this.Token.SignedString([]byte("secret"))
 		if err != nil {
@@ -83,11 +91,13 @@ func (this *JwtService) CheckToken(TokenStr string) (string, int) {
 	}
 }
 
-func (this *JwtService) GetUserFromToken() string {
+func (this *JwtService) GetUserFromToken() (string, bool) {
 	this.CheckToken(this.TokenStr)
-	user := ""
+	loginUser := ""
+	isadmin := false
 	if this.Token != nil {
-		user = this.Token.Claims.(jwt.MapClaims)["UserName"].(string)
+		isadmin = this.Token.Claims.(jwt.MapClaims)["admin"].(bool)
+		loginUser = this.Token.Claims.(jwt.MapClaims)["UserName"].(string)
 	}
-	return user
+	return loginUser, isadmin
 }
