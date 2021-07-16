@@ -129,17 +129,20 @@ var (
 			constraint sensitive_info_pkey
 				primary key,
 		image_id text default ''::text not null,
+		image_name text default ''::text not null,
 		host_id text default ''::text not null,
 		host_name text default ''::text not null,
+        type text default ''::text not null,
 		file_name text default ''::text not null,
-		m_d5 text default ''::text not null,
+		md5 text default ''::text not null,
 		permission bigint default 0 not null
 			constraint sensitive_info_permission_check
 				check (permission >= 0),
 		file_type text default ''::text not null,
 		size bigint default 0 not null,
 		create_time bigint default 0 not null,
-		severity text default ''::text not null
+		severity text default ''::text not null,
+		image_config_id text default ''::text not null
 	);
 	
 	alter table public.sensitive_info owner to diss;`
