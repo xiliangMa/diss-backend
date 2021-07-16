@@ -2,6 +2,7 @@ package securitypolicy
 
 import (
 	"encoding/json"
+
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
 )
@@ -42,9 +43,9 @@ func (this *VirusLogController) GetVirusRecordList() {
 	limit, _ := this.GetInt("limit")
 	from, _ := this.GetInt("from")
 
-	vr := new(models.VirusRecord)
-	json.Unmarshal(this.Ctx.Input.RequestBody, &vr)
+	virusLog := new(models.VirusScan)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &virusLog)
 
-	this.Data["json"] = vr.List(from, limit)
+	this.Data["json"] = virusLog.List(from, limit)
 	this.ServeJSON(false)
 }

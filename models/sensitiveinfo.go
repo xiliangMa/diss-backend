@@ -1,12 +1,13 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
-	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/astaxie/beego/logs"
+	"github.com/astaxie/beego/orm"
+	"github.com/xiliangMa/diss-backend/utils"
 )
 
 type SensitiveInfo struct {
@@ -170,7 +171,13 @@ func (this *SensitiveInfo) Count() int64 {
 	var fields []string
 	filter := ""
 
-	countSql := `select count(id) from ` + utils.SensitiveInfo + ``
+	resType := "host_id"
+	if this.Type == Sc_Type_Image {
+		resType = "image_id"
+	}
+
+	countSql := `select count(id) from ` + utils.SensitiveInfo + ` join (select distinct on (res_time_filter.` + resType + `) * from
+		(select ` + resType + `, create_time from ` + utils.SensitiveInfo + ` group by create_time,` + resType + ` order by create_time desc) as res_time_filter) as dist_res on sensitive_info.` + resType + ` = dist_res.` + resType + ` and sensitive_info.create_time = dist_res.create_time`
 
 	if this.Severity != "" {
 		filter = filter + `severity = ? and `

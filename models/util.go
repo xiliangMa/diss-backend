@@ -362,6 +362,7 @@ var (
 	SEVERITY_High     = "HIGH"
 	SEVERITY_Medium   = "MEDIUM"
 	SEVERITY_Low      = "LOW"
+	SEVERITY_Unknown  = "UNKNOWN"
 
 	// 入侵
 	ReverseShell         = "ALERT_TYPE_REVERSE_SHELL"
