@@ -1,7 +1,7 @@
-version: '3'
+version: '3.6'
 networks:
-  diss-net-all:
-    external: true
+  backend:
+    name: diss-net-all
 services:
   diss-backend:
     restart: always
@@ -13,22 +13,22 @@ services:
     ports:
       - "10443:10443"
       - "10444:10444"
-    links:
-      - diss-db
     depends_on:
       - diss-db
+      - timescale-db
+      - diss-nats-streaming
     volumes:
       - /var/lib/diss/diss-backend/upload/kubernetes:/opt/diss-backend/upload/kubernetes
       - /var/lib/diss/diss-backend/upload/vuln:/opt/diss-backend/upload/vuln
       - /var/lib/diss/diss-backend/upload/probe:/opt/diss-backend/upload/probe
       - /var/lib/diss/diss-backend/upload/virus:/opt/diss-backend/upload/virus
-      - /var/lib/diss/diss-backend/public:/opt/diss-backend/public
+#      - /var/lib/diss/diss-backend/public:/opt/diss-backend/public
       - /var/log/diss/diss-backend:/opt/diss-backend/logs
       - ./conf:/opt/diss-backend/conf
     entrypoint:
       - ./entrypoint.sh
     networks:
-      - "diss-net-all"
+      - backend
     deploy:
       resources:
         limits:
@@ -46,7 +46,7 @@ services:
     volumes:
       - /var/lib/diss/db/diss-db:/var/lib/postgresql/data
     networks:
-      - "diss-net-all"
+      - backend
     deploy:
       resources:
         limits:
@@ -64,7 +64,7 @@ services:
     expose:
       - 5432
     networks:
-      - diss-net-all
+      - backend
     deploy:
       resources:
         limits:
@@ -79,5 +79,5 @@ services:
       - 4222:4222
     command: -cid=diss-cluster -p 4222 -m 8222 --user "diss" --pass "dissP@ssw0rd"
     networks:
-      - "diss-net-all"
+      - backend
 

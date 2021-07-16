@@ -51,9 +51,12 @@ fi
 mkdir -p "$BUILD_DIR/upload/plugin/scope"
 mkdir -p "$BUILD_DIR/upload/license"
 mkdir -p "$BUILD_DIR/upload/logo"
+mkdir -p "$BUILD_DIR/public"
 cp ./upload/plugin/scope/diss-scope.yml "$BUILD_DIR/upload/plugin/scope"
 cp ./upload/license/TrialLicense.lic "$BUILD_DIR/upload/license/TrialLicense.lic"
 cp ./upload/logo/newcon.png "$BUILD_DIR/upload/logo/newcon.png"
+cp ./public/apm "$BUILD_DIR/public/apm"
+
 
 #### 停止容器
 echo "=========== 4. stop diss-backend and db ==========="
@@ -87,7 +90,7 @@ fi
 
 cd $BUILD_DIR
 tar -zcvf diss-backend.tar.gz ./docker-compose.yml ./conf
-rm -rf bin swagger entrypoint.sh upload
+rm -rf bin swagger entrypoint.sh upload public
 
 echo "=========== 7. remove none images ==========="
 NONE_IMAGES_ID=`docker images -f "dangling=true" -q`
