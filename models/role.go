@@ -10,7 +10,7 @@ import (
 )
 
 type Role struct {
-	Id          int       `orm:"auto;pk" description:"角色ID"`
+	Id          int64     `orm:"auto;pk" description:"角色ID"`
 	Name        string    `orm:"size(64)" description:"角色名"`
 	DispName    string    `orm:"size(64)" description:"显示名"`
 	Code        string    `orm:"size(64);unique"  description:"角色代码"`
@@ -19,6 +19,7 @@ type Role struct {
 	Modules     []*Module `orm:"reverse(many)" description:"模块列表"` // 使用casbin中的关联，ORM中不做关联操作
 	CreateTime  int64     `orm:"default(0);" description:"(创建时间)"`
 	UpdateTime  int64     `orm:"default(0)" description:"(更新时间)"`
+	IsInBuild   bool      `orm:"default(false);" description:"(是否内置角色)"`
 }
 
 type RoleInterface interface {
@@ -165,9 +166,16 @@ func (this *Role) Delete() Result {
 	cond := orm.NewCondition()
 
 	if this.Id != 0 {
+		roleQuery := Role{Id: this.Id}
+		ruleObject, _ := roleQuery.Get()
+		if ruleObject != nil && ruleObject.IsInBuild {
+			ResultData.Message = "InBuild Role cant Deleted."
+			ResultData.Code = utils.DeleteInbuildRoleErr
+			return ResultData
+		}
 		cond = cond.And("id", this.Id)
 	} else {
-		ResultData.Message = "No RoleList Id."
+		ResultData.Message = "No Role Id."
 		ResultData.Code = utils.DeleteRoleErr
 		return ResultData
 	}
