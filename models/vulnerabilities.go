@@ -224,10 +224,13 @@ func (this *Vulnerabilities) List(from, limit int) Result {
 		cond = cond.And("vulnerability_id", this.VulnerabilityID)
 	}
 	if this.PkgName != "" {
-		cond = cond.And("pkg_name", this.PkgName)
+		cond = cond.And("pkg_name__icontains", this.PkgName)
 	}
 	if this.Severity != "" {
 		cond = cond.And("severity", this.Severity)
+	}
+	if this.Title != "" {
+		cond = cond.And("title__icontains", this.Title)
 	}
 	if this.VulnerabilityID != "" {
 		cond = cond.And("vulnerability_id", this.VulnerabilityID)
