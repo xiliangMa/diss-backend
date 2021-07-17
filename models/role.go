@@ -124,7 +124,13 @@ func (this *Role) Get() (*Role, error) {
 		cond = cond.And("name", this.Name)
 	}
 	err := o.QueryTable(utils.Role).SetCond(cond).RelatedSel().One(&role)
-	return &role, err
+	count, _ := o.QueryTable(utils.Role).SetCond(cond).Count()
+	if count > 0 {
+		return &role, err
+	} else {
+		return nil, err
+	}
+
 }
 
 func (this *Role) Update() Result {

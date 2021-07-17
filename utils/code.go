@@ -281,6 +281,7 @@ var (
 	DeleteVulnerabilityLibErr       = 1261
 	RestoreDefaultLogoErr           = 1262
 	ParameterParseErr               = 1263
+	RuleDefineDuplicate             = 1264
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300

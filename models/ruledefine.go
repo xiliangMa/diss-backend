@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -30,12 +31,21 @@ type RuleDefineInterface interface {
 	Update() Result
 	Delete() Result
 	RuleDefineList() ([]*RuleDefine, int64, error)
+	Get() (*RuleDefine, error)
 }
 
 func (this *RuleDefine) Add() Result {
 	var ResultData Result
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
+
+	ruleDefineObj, _ := this.Get()
+	if ruleDefineObj != nil {
+		ResultData.Code = utils.RuleDefineDuplicate
+		ResultData.Message = fmt.Sprintf("RuleDefine Duplicate and add failed, code: %d", ResultData.Code)
+		logs.Error(ResultData.Message)
+		return ResultData
+	}
 
 	if this.Enabled == 0 {
 		this.Enabled = 1
@@ -135,6 +145,36 @@ func (this *RuleDefine) RuleDefineList(from, limit int) (ruleLists []*RuleDefine
 
 	total, _ := o.QueryTable(utils.RuleDefine).SetCond(cond).Count()
 	return ruleList, total, err
+}
+
+func (this *RuleDefine) Get() (*RuleDefine, error) {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	cond := orm.NewCondition()
+	var ruleObj RuleDefine
+
+	if this.Id != 0 {
+		cond = cond.And("id", this.Id)
+	}
+	if this.Type != "" {
+		ruleType := strings.Split(this.Type, ",")
+		cond = cond.And("type", ruleType)
+	}
+	if this.Name != "" {
+		cond = cond.And("name", this.Name)
+	}
+	if this.Info != "" {
+		cond = cond.And("info", this.Info)
+	}
+
+	err := o.QueryTable(utils.RuleDefine).SetCond(cond).One(&ruleObj)
+	count, _ := o.QueryTable(utils.RuleDefine).SetCond(cond).Count()
+	if count > 0 {
+		return &ruleObj, err
+	} else {
+		return nil, err
+	}
+
 }
 
 func (this *RuleDefine) Delete() Result {
