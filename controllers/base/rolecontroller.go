@@ -135,7 +135,7 @@ func (this *RoleController) UpdatePolicy() {
 // @Success 200 {object} models.Result
 // @router /:roleId [put]
 func (this *RoleController) UpdateRole() {
-	roleId, _ := this.GetInt(":roleId")
+	roleId, _ := this.GetInt64(":roleId")
 	role := new(models.Role)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &role)
 	role.Id = roleId
@@ -150,7 +150,7 @@ func (this *RoleController) UpdateRole() {
 // @Success 200 {object} models.Result
 // @router /:roleId [delete]
 func (this *RoleController) DeleteRole() {
-	roleId, _ := this.GetInt(":roleId")
+	roleId, _ := this.GetInt64(":roleId")
 	role := new(models.Role)
 	role.Id = roleId
 

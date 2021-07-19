@@ -23,7 +23,6 @@ func (this *UserService) ConstrictUserModify() models.Result {
 		result.Code = utils.ForbidenModifyUserErr
 		result.Message = fmt.Sprintf("Forbinden Opeartion: Modify User failed,  code: %d ", result.Code)
 		logs.Error(result.Message)
-
 		return result
 	}
 	return result

@@ -160,6 +160,7 @@ var (
 	PasswordLengthErr               = 165
 	RoleExistErr                    = 166
 	PasswordFormatErr               = 165
+	DeleteInbuildRoleErr            = 166
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001
