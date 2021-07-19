@@ -3,11 +3,10 @@ package models
 import (
 	"encoding/json"
 	"errors"
-	"net/http"
-
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
+	"net/http"
 )
 
 type HostConfig struct {
@@ -215,6 +214,20 @@ func (this *HostConfig) BaseList(from, limit int) (error, int64, []*HostConfig) 
 		}
 		_, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().Limit(1, 0).OrderBy("-update_time").All(&TaskList)
 		l.TaskList = TaskList
+
+		bml := BenchMarkLog{}
+		bml.HostId = l.Id
+		bml.Type = BMLT_K8s
+		bmlData, _ := bml.Get()
+		if bmlData != nil && l.ClusterId != "" {
+			k8sMarkSummary := MarkSummary{}
+			k8sMarkSummary.FailCount = bmlData.FailCount
+			k8sMarkSummary.PassCount = bmlData.PassCount
+			k8sMarkSummary.InfoCount = bmlData.InfoCount
+			k8sMarkSummary.WarnCount = bmlData.WarnCount
+			k8sMarkSummaryJson, _ := json.Marshal(k8sMarkSummary)
+			l.KubeCISCount = string(k8sMarkSummaryJson)
+		}
 	}
 
 	return nil, total, list
