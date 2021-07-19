@@ -10,17 +10,19 @@ import (
 )
 
 type WarningWhiteList struct {
-	Id              string `orm:"pk;size(128)" description:"(Id)"`
-	Name            string `orm:"size(256)" description:"(白名单项名称)"`
-	Desc            string `orm:"" description:"(描述)"`
-	WarningInfoType string `orm:"size(64)" description:"(告警类型)"`
-	WarningInfoName string `orm:"size(64)" description:"(告警名称)"`
-	RuleNode        string `orm:"" description:"(节点规则，如主机IP，主机名、容器名、容器ID等)"`
-	Rule            string `orm:"" description:"(规则)"`
-	Enabled         bool   `orm:"" description:"(是否启用)"`
-	IsAll           bool   `orm:"-" description:"(是否获取全部)"`
-	WarningInfoId   string `orm:"size(128)" description:"(外键id)" `
-	CreateTime      int64  `orm:"" description:"(创建时间)"`
+	Id                   string `orm:"pk;size(128)" description:"(Id)"`
+	Name                 string `orm:"size(256)" description:"(白名单项名称)"`
+	Desc                 string `orm:"" description:"(描述)"`
+	WarningInfoType      string `orm:"size(64)" description:"(告警类型)"`
+	WarningInfoName      string `orm:"size(64)" description:"(告警名称)"`
+	RuleNode             string `orm:"" description:"(节点规则，如主机IP，主机名、容器名、容器ID等)"`
+	Rule                 string `orm:"" description:"(规则)"`
+	Enabled              bool   `orm:"" description:"(是否启用)"`
+	IsAll                bool   `orm:"-" description:"(是否获取全部)"`
+	WarningInfoId        string `orm:"size(128)" description:"(外键id)" `
+	CreateTime           int64  `orm:"" description:"(创建时间)"`
+	RuleNode_IP          string `orm:"-" description:"(节点信息-IP，虚拟字段)"`
+	RuleNode_ContainerId string `orm:"-" description:"(节点信息-容器ID，虚拟字段)"`
 }
 
 type WarningWhiteListInterface interface {
@@ -112,6 +114,15 @@ func (this *WarningWhiteList) WhiteList(from, limit int) (whiteLists []*WarningW
 	if this.Rule != "" {
 		cond = cond.And("Rule__contains", this.Rule)
 	}
+
+	if this.RuleNode_IP != "" {
+		cond = cond.And("RuleNode__contains", this.RuleNode_IP)
+	}
+
+	if this.RuleNode_ContainerId != "" {
+		cond = cond.And("RuleNode__contains", this.RuleNode_ContainerId)
+	}
+
 	if !this.IsAll {
 		cond = cond.And("enabled", this.Enabled)
 	}
