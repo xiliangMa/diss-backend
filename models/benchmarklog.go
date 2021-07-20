@@ -138,6 +138,54 @@ func (this *BenchMarkLog) List(from, limit int) Result {
 	return ResultData
 }
 
+func (this *BenchMarkLog) Get() (*BenchMarkLog, error) {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var benchMarkLog BenchMarkLog
+	var ResultData Result
+	var err error
+	cond := orm.NewCondition()
+
+	if this.HostId != "" {
+		cond = cond.And("host_id", this.HostId)
+	}
+	if this.HostName != "" {
+		cond = cond.And("host_name", this.HostName)
+	}
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	if this.Type != "" {
+		cond = cond.And("type", this.Type)
+	}
+
+	isInfo := this.IsInfo
+	if isInfo {
+		err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).One(&benchMarkLog)
+	} else {
+		fields := []string{"id", "bench_mark_name", "level", "project_name", "host_name", "host_id", "internal_addr", "public_addr", "o_s", "update_time", "fail_count", "warn_count", "pass_count", "info_count", "type", "result", "task_id"}
+		err = o.QueryTable(utils.BenchMarkLog).SetCond(cond).One(&benchMarkLog, fields...)
+	}
+
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.GetBenchMarkLogErr
+		logs.Error("Get BenchMarkLog List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+	}
+	var count int64
+	if this.UpdateTime == 0 {
+		count, _ = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Count()
+	} else {
+		count, _ = o.QueryTable(utils.BenchMarkLog).SetCond(cond).Filter("update_time__gte", this.UpdateTime).Count()
+	}
+	if count != 0 {
+		return &benchMarkLog, err
+	} else {
+		return nil, err
+	}
+
+}
+
 type MarkSummary struct {
 	FailCount int
 	WarnCount int
