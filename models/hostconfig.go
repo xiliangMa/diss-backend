@@ -45,6 +45,7 @@ type HostConfig struct {
 	LicCount            bool    `orm:"-" description:"(是否获取授权个数操作)"`
 	CreateTime          int64   `orm:"default(0)" description:"(上线时间)"`
 	OfflineTime         int64   `orm:"default(0)" description:"(离线时间)"`
+	WithK8sBench        bool    `orm:"-" description:"(是否获取k8s基线统计)"`
 }
 
 type HostConfigInterface interface {
@@ -215,19 +216,22 @@ func (this *HostConfig) BaseList(from, limit int) (error, int64, []*HostConfig) 
 		_, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().Limit(1, 0).OrderBy("-update_time").All(&TaskList)
 		l.TaskList = TaskList
 
-		bml := BenchMarkLog{}
-		bml.HostId = l.Id
-		bml.Type = BMLT_K8s
-		bmlData, _ := bml.Get()
-		if bmlData != nil && l.ClusterId != "" {
-			k8sMarkSummary := MarkSummary{}
-			k8sMarkSummary.FailCount = bmlData.FailCount
-			k8sMarkSummary.PassCount = bmlData.PassCount
-			k8sMarkSummary.InfoCount = bmlData.InfoCount
-			k8sMarkSummary.WarnCount = bmlData.WarnCount
-			k8sMarkSummaryJson, _ := json.Marshal(k8sMarkSummary)
-			l.KubeCISCount = string(k8sMarkSummaryJson)
+		if this.WithK8sBench && l.ClusterId != "" {
+			bml := BenchMarkLog{}
+			bml.HostId = l.Id
+			bml.Type = BMLT_K8s
+			bmlData, _ := bml.Get()
+			if bmlData != nil {
+				k8sMarkSummary := MarkSummary{}
+				k8sMarkSummary.FailCount = bmlData.FailCount
+				k8sMarkSummary.PassCount = bmlData.PassCount
+				k8sMarkSummary.InfoCount = bmlData.InfoCount
+				k8sMarkSummary.WarnCount = bmlData.WarnCount
+				k8sMarkSummaryJson, _ := json.Marshal(k8sMarkSummary)
+				l.KubeCISCount = string(k8sMarkSummaryJson)
+			}
 		}
+
 	}
 
 	return nil, total, list
