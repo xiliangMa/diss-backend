@@ -6,3 +6,9 @@ type ClientModuleControl struct {
 	Enable     bool
 	Status     string
 }
+
+// 通过客户端更新资产数据(虚拟模型）
+type UpdateAssets struct {
+	GlobalRefresh bool
+	Tags          *map[string]string
+}
