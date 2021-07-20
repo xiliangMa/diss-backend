@@ -21,6 +21,7 @@ type WarningWhiteList struct {
 	IsAll                bool   `orm:"-" description:"(是否获取全部)"`
 	WarningInfoId        string `orm:"size(128)" description:"(外键id)" `
 	CreateTime           int64  `orm:"" description:"(创建时间)"`
+	UpdateTime           int64  `orm:"" description:"(修改时间)"`
 	RuleNode_IP          string `orm:"-" description:"(节点信息-IP，虚拟字段)"`
 	RuleNode_ContainerId string `orm:"-" description:"(节点信息-容器ID，虚拟字段)"`
 }
@@ -31,6 +32,7 @@ type WarningWhiteListInterface interface {
 	Update() Result
 	Delete() Result
 	WhiteList() ([]*WarningWhiteList, int64, error)
+	Get() (*WarningWhiteList, error)
 }
 
 func (this *WarningWhiteList) Add() Result {
@@ -41,6 +43,7 @@ func (this *WarningWhiteList) Add() Result {
 	uid, _ := uuid.NewV4()
 	this.Id = uid.String()
 	this.CreateTime = time.Now().UnixNano()
+	this.UpdateTime = time.Now().UnixNano()
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -58,13 +61,21 @@ func (this *WarningWhiteList) Update() Result {
 	o.Using(utils.DS_Default)
 	var ResultData Result
 
-	_, err := o.Update(this)
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.EditWarningWhiteListErr
-		logs.Error("Edit WarningWhiteList: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
-		return ResultData
+	whitelistQuery := WarningWhiteList{Id: this.Id}
+	whitelistObject, _ := whitelistQuery.Get()
+	if whitelistObject != nil {
+		this.WarningInfoType = whitelistObject.WarningInfoType
+		this.CreateTime = whitelistObject.CreateTime
+		this.UpdateTime = time.Now().UnixNano()
+		_, err := o.Update(this)
+		if err != nil {
+			ResultData.Message = err.Error()
+			ResultData.Code = utils.EditWarningWhiteListErr
+			logs.Error("Edit WarningWhiteList: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+			return ResultData
+		}
 	}
+
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
 	return ResultData
@@ -131,6 +142,33 @@ func (this *WarningWhiteList) WhiteList(from, limit int) (whiteLists []*WarningW
 
 	total, _ := o.QueryTable(utils.WarningWhiteList).SetCond(cond).Count()
 	return warnList, total, err
+}
+
+func (this *WarningWhiteList) Get() (*WarningWhiteList, error) {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var warnlist WarningWhiteList
+	cond := orm.NewCondition()
+
+	if this.Id != "" {
+		cond = cond.And("id", this.Id)
+	}
+	if this.WarningInfoType != "" {
+		cond = cond.And("warning_info_type", this.WarningInfoType)
+	}
+	if this.WarningInfoName != "" {
+		cond = cond.And("WarningInfoName__contains", this.WarningInfoName)
+	}
+
+	err := o.QueryTable(utils.WarningWhiteList).SetCond(cond).OrderBy("-create_time").One(&warnlist)
+	count, _ := o.QueryTable(utils.WarningWhiteList).SetCond(cond).Count()
+
+	if count > 0 {
+		return &warnlist, err
+	} else {
+		return nil, err
+	}
+
 }
 
 func (this *WarningWhiteList) Delete() Result {
