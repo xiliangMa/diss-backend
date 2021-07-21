@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/service/base"
+	"net/http"
 )
 
 // 角色接口列表
@@ -154,7 +156,16 @@ func (this *RoleController) DeleteRole() {
 	role := new(models.Role)
 	role.Id = roleId
 
-	result := role.Delete()
+	roleServce := base.RoleService{}
+	roleServce.Role = role
+	result := roleServce.CheckUserInRole()
+	if result.Code != http.StatusOK {
+		this.Data["json"] = result
+		this.ServeJSON(false)
+		return
+	}
+
+	result = role.Delete()
 
 	this.Data["json"] = result
 	this.ServeJSON(false)
