@@ -14,6 +14,7 @@ type VulnerabilitiesLogController struct {
 // @Title GetVulnerabilitiesScan
 // @Description Get VulnerabilitiesScan
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param body body models.ImageVulnerabilities false "漏洞"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -33,6 +34,7 @@ func (this *VulnerabilitiesLogController) GetVulnerabilitiesScan() {
 // @Title GetVulnerabilities
 // @Description Get Vulnerabilities
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param body body models.Vulnerabilities false "漏洞"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -52,6 +54,7 @@ func (this *VulnerabilitiesLogController) GetVulnerabilities() {
 // @Title GetImageVulnerabilities
 // @Description Get ImageVulnerabilities
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param body body models.ImageVulnerabilities false "漏洞"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"

@@ -14,6 +14,7 @@ type DockerScanController struct {
 // @Title GetDockerScan
 // @Description Get DockerScan Log
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param body body models.DockerVulnerabilities false "docker漏洞扫描结果"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"

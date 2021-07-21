@@ -16,6 +16,7 @@ type TaskController struct {
 // @Title GetTaskList
 // @Description Get Task List
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param body body models.Task false "任务"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -34,6 +35,7 @@ func (this *TaskController) GetTaskList() {
 // @Title DeleteTask
 // @Description Delete Task
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param id path string "" true "id"
 // @Success 200 {object} models.Result
 // @router /:id [delete]
@@ -60,6 +62,7 @@ func (this *TaskController) DeleteTask() {
 // @Title GetTaskLogList
 // @Description Get TaskLog List
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param body body models.TaskLog false "任务调度"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"

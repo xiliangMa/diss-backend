@@ -14,6 +14,8 @@ type SystemTemplateGroupController struct {
 // @Title GetSystemTemplateGroupList
 // @Description Get System Template List
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
+// @Param module header string true "moduleCode"
 // @Param body body models.SystemTemplateGroup false "安全策略组"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -31,6 +33,7 @@ func (this *SystemTemplateGroupController) GetSystemTemplateGroupLIst() {
 // @Title AddSystemTemplateGroup
 // @Description Add SystemTemplateGroup
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param body body models.SystemTemplateGroup false "安全策略组"
 // @Success 200 {object} models.Result
 // @router /add [post]
@@ -44,6 +47,7 @@ func (this *SystemTemplateGroupController) AddSystemTemplateGroup() {
 // @Title DeleteSystemTemplateGroup
 // @Description Delete SystemTemplateGroup
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param id path string "" true "id"
 // @Success 200 {object} models.Result
 // @router /:id [delete]
@@ -59,6 +63,7 @@ func (this *SystemTemplateGroupController) DeleteSystemTemplateGroup() {
 // @Title UpdateSystemTemplateGroup
 // @Description Update SystemTemplateGroup
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param id path string "" true "id"
 // @Param body body models.SystemTemplateGroup false "安全策略组"
 // @Success 200 {object} models.Result

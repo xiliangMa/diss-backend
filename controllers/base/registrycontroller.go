@@ -15,6 +15,7 @@ type RegistryController struct {
 // @Title GetRegistryList
 // @Description Get Registry List
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param body body models.Registry false "镜像仓库信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -34,6 +35,7 @@ func (this *RegistryController) GetRegistryList() {
 // @Title Add
 // @Description Add Registry
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param body body models.Registry true "Registry"
 // @Success 200 {object} models.Result
 // @router /add [post]
@@ -56,6 +58,7 @@ func (this *RegistryController) Add() {
 // @Title Update
 // @Description Update Registry
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param body body models.Registry true "Registry"
 // @Success 200 {object} models.Result
 // @router /update [put]
@@ -78,6 +81,7 @@ func (this *RegistryController) Update() {
 // @Title GetRegistry
 // @Description Registry
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param id path int 0 true "id"
 // @Success 200 {object} models.Result
 // @router /:id [post]
@@ -94,6 +98,7 @@ func (this *RegistryController) GetRegistry() {
 // @Title DelRegistry
 // @Description Del Registry
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param id path int 0 true "id"
 // @Success 200 {object} models.Result
 // @router /:id [delete]
@@ -110,6 +115,7 @@ func (this *RegistryController) DelRegistry() {
 // @Title ping
 // @Description Test ping
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param body body models.Registry true "Registry"
 // @Success 200 {object} models.Result
 // @router /ping [post]
@@ -127,6 +133,7 @@ func (this *RegistryController) Ping() {
 // @Title TypeInfos
 // @Description type Infos
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Success 200 {object} models.Result
 // @router /typeInfos [post]
 func (this *RegistryController) TypeInfos() {

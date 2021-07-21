@@ -13,6 +13,7 @@ type StatisticsController struct {
 // @Title GetAssetStatistics
 // @Description Get Asset Statistics (资产概况：主机数、容器数、镜像仓库、镜像、集群数、Pod)
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Success 200 {object} models.Result
 // @router /asset [get]
 func (this *StatisticsController) GetAssetStatistics() {
@@ -24,6 +25,7 @@ func (this *StatisticsController) GetAssetStatistics() {
 // @Title GetMirrorRiskStatistics
 // @Description Get Mirror Risk Statistics
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Success 200 {object} models.Result
 // @router /mirrorrisk [get]
 func (this *StatisticsController) GetMirrorRiskStatistics() {
@@ -35,6 +37,7 @@ func (this *StatisticsController) GetMirrorRiskStatistics() {
 // @Title GetBenchMarkProportionStatistics
 // @Description Get BnechMark Proportion Statistics (安全基线占比：docker基线、kubernetes基线)
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Success 200 {object} models.Result
 // @router /bmp [get]
 func (this *StatisticsController) GetBenchMarkProportionStatistics() {
@@ -46,6 +49,7 @@ func (this *StatisticsController) GetBenchMarkProportionStatistics() {
 // @Title GetBnechMarkSummaryStatistics
 // @Description Get BnechMark Summary Statistics (安全基线摘要统计)
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Success 200 {object} models.Result
 // @router /bms [get]
 func (this *StatisticsController) GetBnechMarkSummaryStatistics() {
@@ -58,6 +62,7 @@ func (this *StatisticsController) GetBnechMarkSummaryStatistics() {
 // @Description Get IntrudeDetect Log Statistics (入侵基线告警)
 // @Param timeCycle query int 24 false "timecycle 时间周期"
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Success 200 {object} models.Result
 // @router /idl [get]
 func (this *StatisticsController) GetIntrudeDetectLogStatistics() {
@@ -70,6 +75,7 @@ func (this *StatisticsController) GetIntrudeDetectLogStatistics() {
 // @Title GetHostBnechMarkSummaryStatistics
 // @Description Get Host BnechMark Summary Statistics (主机安全基线摘要统计)
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param hostId path string "" true "hostId"
 // @Success 200 {object} models.Result
 // @router /:hostId/bms/host [get]
@@ -82,6 +88,7 @@ func (this *StatisticsController) GetHostBnechMarkSummaryStatistics() {
 // @Title GetOnlineProportionStatistics
 // @Description Get BnechMark Proportion Statistics (主机在线占比：Online / Offline)
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Success 200 {object} models.Result
 // @router /onlineproportion [get]
 func (this *StatisticsController) GetOnlineProportionStatistics() {
@@ -93,6 +100,7 @@ func (this *StatisticsController) GetOnlineProportionStatistics() {
 // @Title GetDissProportionStatistics
 // @Description Get Diss Proportion Statistics (安全容器占比：Safe / Unsafe)
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Success 200 {object} models.Result
 // @router /dissproportion [get]
 func (this *StatisticsController) GetDissProportionStatistics() {
@@ -104,6 +112,7 @@ func (this *StatisticsController) GetDissProportionStatistics() {
 // @Title GetWarningStatistics
 // @Description Get Diss Proportion Statistics (安全容器占比：Safe / Unsafe)
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Success 200 {object} models.Result
 // @router /warning [get]
 func (this *StatisticsController) GetWarningStatistics() {

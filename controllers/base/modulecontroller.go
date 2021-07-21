@@ -14,6 +14,7 @@ type ModuleController struct {
 // @Title AddModule
 // @Description Add Module
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param body body models.Module false "模块信息"
 // @Success 200 {object} models.Result
 // @router / [post]
@@ -28,6 +29,7 @@ func (this *ModuleController) AddModule() {
 // @Title GetModules
 // @Description Get Modules
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param body body models.Module false "模块信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -46,6 +48,7 @@ func (this *ModuleController) ModuleList() {
 // @Title UpdateModule
 // @Description Update Module
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param moduleId path string "" true "moduleId"
 // @Param body body models.Module true "用户信息"
 // @Success 200 {object} models.Result
@@ -62,6 +65,7 @@ func (this *ModuleController) UpdateModule() {
 // @Title DeleteModule
 // @Description Delete Module
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param userId path string "" true "moduleId"
 // @Success 200 {object} models.Result
 // @router /:moduleId [delete]

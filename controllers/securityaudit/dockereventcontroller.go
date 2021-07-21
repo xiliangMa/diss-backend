@@ -14,6 +14,7 @@ type DockerEventController struct {
 // @Title GetDockerEvents
 // @Description Get DockerEven List
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param body body models.DockerEvent false "docker event 审计"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"

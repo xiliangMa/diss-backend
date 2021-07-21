@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -63,8 +64,13 @@ func (this *JwtService) CreateToken(name, pwd, userType string) models.Result {
 		result.Data = data
 		return result
 	}
-	result.Code = http.StatusUnauthorized
-	result.Message = http.StatusText(http.StatusUnauthorized)
+
+	//result.Code = http.StatusUnauthorized
+	//result.Message = http.StatusText(http.StatusUnauthorized)
+	result.Code = utils.UsernameOrPasswordErr
+	msg := fmt.Sprintf("Username or Password error, Login failed, code: %d , name: %s.", result.Code, name)
+	result.Message = msg
+	logs.Info(result.Message)
 	return result
 }
 
