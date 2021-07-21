@@ -52,12 +52,9 @@ fi
 mkdir -p "$BUILD_DIR/upload/plugin/scope"
 mkdir -p "$BUILD_DIR/upload/license"
 mkdir -p "$BUILD_DIR/upload/logo"
-mkdir -p "$BUILD_DIR/public"
 cp ./upload/plugin/scope/diss-scope.yml "$BUILD_DIR/upload/plugin/scope"
 cp ./upload/license/TrialLicense.lic "$BUILD_DIR/upload/license/TrialLicense.lic"
 cp ./upload/logo/newcon.png "$BUILD_DIR/upload/logo/newcon.png"
-cp ./public/apm "$BUILD_DIR/public/apm"
-
 
 #### 停止容器
 echo "=========== 4. stop diss-backend and db ==========="
@@ -66,7 +63,7 @@ docker-compose down
 
 
 #### 删除镜像
-echo "=========== 5. remove diss-backen images ==========="
+echo "=========== 5. remove diss-backend images ==========="
 DISS_BACKEND_ID=`docker images | grep diss-backend | awk '{print $3}'`
 echo $DISS_BACKEND_ID
 if [[ -n "$DISS_BACKEND_ID"  ]]
@@ -90,8 +87,9 @@ else
 fi
 
 cd $BUILD_DIR
-tar -zcvf diss-backend.tar.gz ./docker-compose.yml ./conf
+#tar -zcvf diss.tar.gz ./docker-compose.yml ./conf
 rm -rf bin swagger entrypoint.sh upload public
+docker save -o diss-backend.tar.gz `docker images | grep diss-backend | awk '{print $1":"$2}'`
 
 echo "=========== 7. remove none images ==========="
 NONE_IMAGES_ID=`docker images -f "dangling=true" -q`

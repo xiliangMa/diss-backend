@@ -18,6 +18,8 @@ func main() {
 	beego.SetStaticPath(utils.GetProbeDriverUrl(), utils.GetProbeDriverPath())
 	// virus
 	beego.SetStaticPath(utils.GetVirusrUrl(), utils.GetVirusPath())
+	// agent
+	beego.SetStaticPath(utils.GetAgentUrl(), utils.GetAgentPath())
 	// public
 	beego.SetStaticPath(utils.GetPublicUrl(), utils.GetPublicPath())
 	beego.BConfig.WebConfig.DirectoryIndex = true

@@ -9,7 +9,6 @@ COPY build/bin/diss-backend .
 COPY conf ./conf
 COPY swagger ./swagger
 COPY upload ./upload
-COPY public ./public
 
 FROM alpine:3.11
 WORKDIR /opt/diss-backend
