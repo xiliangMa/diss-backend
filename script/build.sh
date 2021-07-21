@@ -27,6 +27,7 @@ echo "=========== 2. build  diss-backend bin ==========="
 mkdir -p "$BUILD_DIR/bin"
 echo "build path: $(cd $BUILD_DIR; pwd)"
 cd "$PROJECT_DIR" || exit
+sed -is 's/RunMode = dev/RunMode = prod/' "$PROJECT_DIR/conf/app.conf" && rm "$PROJECT_DIR/conf/app.confs"
 if [ $ARCH == 'arm' ]
 then
   CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o "$BUILD_DIR/bin/diss-backend"
@@ -100,3 +101,4 @@ then
 fi
 
 echo "=========== 8. build success ==========="
+sed -is 's/RunMode = prod/RunMode = dev/' "$PROJECT_DIR/conf/app.conf" && rm "$PROJECT_DIR/conf/app.confs"
