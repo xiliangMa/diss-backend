@@ -2,6 +2,7 @@ package system
 
 import (
 	"encoding/json"
+
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
 	css "github.com/xiliangMa/diss-backend/service/system/system"
@@ -59,5 +60,20 @@ func (this *RespCenterController) ContainerOperation() {
 	result := respCenterService.ContainerOperation(resp)
 
 	this.Data["json"] = result
+	this.ServeJSON(false)
+}
+
+// @Title DeleteRespCenter
+// @Description Delete Resp Center
+// @Param token header string true "authToken"
+// @Param id query string "" true "id"
+// @Success 200 {object} models.Result
+// @router /respcenter [delete]
+func (this *RespCenterController) DeleteRespCenter() {
+	id := this.GetString("id")
+	rc := new(models.RespCenter)
+	rc.Id = id
+
+	this.Data["json"] = rc.Delete()
 	this.ServeJSON(false)
 }

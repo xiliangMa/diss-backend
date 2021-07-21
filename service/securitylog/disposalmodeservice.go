@@ -2,11 +2,12 @@ package securitylog
 
 import (
 	"encoding/json"
+	"net/http"
+	"strings"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
-	"net/http"
-	"strings"
 )
 
 type DisposalModeService struct {
@@ -25,7 +26,7 @@ func (this *DisposalModeService) DisposalMode(dm *models.DisposalMode) models.Re
 				warningInfo := new(models.WarningInfo)
 				warningInfo.Mode = dm.Action
 				warningInfo.Id = whiteListConfig.WarningInfoId
-				warningInfo.Proposal = whiteListConfig.Desc
+				warningInfo.Analysis = whiteListConfig.Desc
 				warningInfo.Status = models.WarnInfoStatus
 				warningInfo.Update()
 			}
@@ -35,6 +36,7 @@ func (this *DisposalModeService) DisposalMode(dm *models.DisposalMode) models.Re
 				if dm.Action != "" {
 					warningInfo.Action = strings.Title(dm.Action + models.Container)
 					warningInfo.Mode = dm.Action
+
 					result.Code = http.StatusOK
 					subject := warningInfo.HostId
 					r := models.NatsData{Code: result.Code, Type: models.Type_Control, Msg: result.Message, Tag: models.Resource_ContainerControl, RCType: models.Resource_Control_Type_Put, Data: warningInfo}
@@ -48,8 +50,9 @@ func (this *DisposalModeService) DisposalMode(dm *models.DisposalMode) models.Re
 					_ = utils.ConvertType(warningInfo, containerRespCenter)
 					containerRespCenter.Id = ""
 					containerRespCenter.WarningInfoId = warningInfo.Id
-					containerRespCenter.Status = ""
+					containerRespCenter.Status = "执行中"
 					containerRespCenter.Add()
+
 				}
 				warningInfo.Status = models.WarnInfoStatus
 				warningInfo.Update()

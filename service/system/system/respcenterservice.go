@@ -2,10 +2,11 @@ package system
 
 import (
 	"encoding/json"
-	"github.com/astaxie/beego/logs"
-	"github.com/xiliangMa/diss-backend/models"
 	"net/http"
 	"strings"
+
+	"github.com/astaxie/beego/logs"
+	"github.com/xiliangMa/diss-backend/models"
 )
 
 type RespCenterService struct {
@@ -32,6 +33,8 @@ func (this *RespCenterService) ContainerOperation(crc *models.RespCenter) models
 				logs.Error("Nats ############################ received data from agent fail ############################", err)
 			}
 		}
+		crc.Status = "执行中"
+		crc.Msg = ""
 		return crc.Update()
 
 	}

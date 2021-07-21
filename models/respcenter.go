@@ -1,14 +1,15 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
-	uuid "github.com/satori/go.uuid"
-	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/astaxie/beego/logs"
+	"github.com/astaxie/beego/orm"
+	uuid "github.com/satori/go.uuid"
+	"github.com/xiliangMa/diss-backend/utils"
 )
 
 type RespCenter struct {
@@ -25,11 +26,13 @@ type RespCenter struct {
 	CreateTime    int64  `orm:"" description:"(发生时间)" json:"ct"`
 	UpdateTime    int64  `orm:"" description:"(更新时间)" json:"ut"`
 	Status        string `orm:"size(256)" description:"(状态)"`
-	Proposal      string `orm:"size(256)" description:"(隔离原因)"`
+	Analysis      string `orm:"size(256)" description:"(建议)"`
 	ProcessNote   string `orm:"size(256)" description:"(处理说明)"`
+	Msg           string `orm:"size(1024)" description:"(消息)"`
 	WarningInfoId string `orm:"size(128)" description:"(外键id)" `
-	Action        string `orm:"-" description:"(处理方式：resume、start)"`
 	Mode          string `orm:"size(128)" description:"(方式)" `
+	Code          int64  `orm:"" description:"(错误码)"`
+	Action        string `orm:"-" description:"(处理方式：resume、start)"`
 }
 
 type RespCenterInterface interface {
@@ -38,6 +41,7 @@ type RespCenterInterface interface {
 	Update() Result
 	GetRespCenter() Result
 	Get() *RespCenter
+	Delete() Result
 }
 
 func (this *RespCenter) List(from, limit int) Result {
@@ -45,8 +49,7 @@ func (this *RespCenter) List(from, limit int) Result {
 	o.Using(utils.DS_Default)
 	var respCenterList []*RespCenter
 	var ResultData Result
-	var err error
-	var total int64 = 0
+	var total int64
 
 	sql := ` select * from ` + utils.RespCenter + ` `
 	countSql := `select "count"(id) from ` + utils.RespCenter + ` `
@@ -84,12 +87,7 @@ func (this *RespCenter) List(from, limit int) Result {
 		limitSql := " order by create_time desc limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
 		resultSql = resultSql + limitSql
 	}
-	_, err = o.Raw(resultSql).QueryRows(&respCenterList)
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetRespCenterErr
-		logs.Error("Get RespCenter list failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-	}
+	_, _ = o.Raw(resultSql).QueryRows(&respCenterList)
 
 	o.Raw(countSql).QueryRow(&total)
 	data := make(map[string]interface{})
@@ -102,7 +100,7 @@ func (this *RespCenter) List(from, limit int) Result {
 }
 
 func (this *RespCenter) Add() Result {
-	insertSql := `INSERT INTO ` + utils.RespCenter + ` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`
+	insertSql := `INSERT INTO ` + utils.RespCenter + ` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)`
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
@@ -131,9 +129,10 @@ func (this *RespCenter) Add() Result {
 		this.CreateTime,
 		this.UpdateTime,
 		this.Status,
-		this.Proposal,
+		this.Analysis,
 		this.ProcessNote,
-		this.WarningInfoId, this.Mode).Exec()
+		this.Msg,
+		this.WarningInfoId, this.Mode, this.Code).Exec()
 
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
 		ResultData.Message = err.Error()
@@ -148,21 +147,12 @@ func (this *RespCenter) Add() Result {
 }
 
 func (this *RespCenter) Update() Result {
-	var err error
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
 
 	this.UpdateTime = time.Now().UnixNano()
-
-	if this.Status != "" {
-		_, err = o.Raw(`UPDATE `+utils.RespCenter+` SET status=? WHERE id=?`, this.Status, this.Id).Exec()
-	}
-
-	if this.ProcessNote != "" {
-		_, err = o.Raw(`UPDATE `+utils.RespCenter+` SET process_note=? WHERE id=?`, this.ProcessNote, this.Id).Exec()
-	}
-
+	_, err := o.Update(this)
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.UpdateRespCenterErr
@@ -191,7 +181,7 @@ func (this *RespCenter) GetRespCenter() Result {
 	}
 
 	data := make(map[string]interface{})
-	data["items"] = respCenterList
+	data[Result_Items] = respCenterList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
@@ -211,8 +201,32 @@ func (this *RespCenter) Get() *RespCenter {
 
 	err = o.QueryTable(utils.RespCenter).SetCond(cond).RelatedSel().One(rc)
 	if err != nil {
-		logs.Error("Get failed, code: %d, err: %s", utils.GetRespCenterErr, err.Error())
 		return nil
 	}
 	return rc
+}
+
+func (this *RespCenter) Delete() Result {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var ResultData Result
+	cond := orm.NewCondition()
+
+	if this.Id != "" {
+		cond = cond.And("id__in", strings.Split(this.Id, ","))
+	} else {
+		ResultData.Message = "No RespCenter Id"
+		ResultData.Code = utils.DeleteRespCenterErr
+		return ResultData
+	}
+
+	_, err := o.QueryTable(utils.RespCenter).SetCond(cond).Delete()
+	if err != nil {
+		ResultData.Message = err.Error()
+		ResultData.Code = utils.DeleteRespCenterErr
+		logs.Error("Delete RespCenter failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return ResultData
+	}
+	ResultData.Code = http.StatusOK
+	return ResultData
 }

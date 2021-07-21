@@ -2,14 +2,15 @@ package models
 
 import (
 	"fmt"
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
-	uuid "github.com/satori/go.uuid"
-	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/astaxie/beego/logs"
+	"github.com/astaxie/beego/orm"
+	uuid "github.com/satori/go.uuid"
+	"github.com/xiliangMa/diss-backend/utils"
 )
 
 type WarningInfo struct {
@@ -50,9 +51,8 @@ type WarningInfoInterface interface {
 func (this *WarningInfo) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
-	var WarningInfoList []*WarningInfo = nil
+	var WarningInfoList []*WarningInfo
 	var ResultData Result
-	var err error
 	var total int64
 
 	sql := ` select * from ` + utils.WarningInfo + ` `
@@ -141,13 +141,7 @@ func (this *WarningInfo) List(from, limit int) Result {
 		limitSql := " order by create_time desc limit " + strconv.Itoa(limit) + " OFFSET " + strconv.Itoa(from)
 		resultSql = resultSql + limitSql
 	}
-	_, err = o.Raw(resultSql, fields).QueryRows(&WarningInfoList)
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetWarningInfoListErr
-		logs.Error("Get WarningInfo list failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-		return ResultData
-	}
+	_, _ = o.Raw(resultSql, fields).QueryRows(&WarningInfoList)
 
 	o.Raw(countSql, fields).QueryRow(&total)
 	data := make(map[string]interface{})
@@ -156,9 +150,6 @@ func (this *WarningInfo) List(from, limit int) Result {
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
 }
 
@@ -226,9 +217,9 @@ func (this *WarningInfo) Update() Result {
 		filter = filter + `status = ? , `
 		fields = append(fields, this.Status)
 	}
-	if this.Proposal != "" {
-		filter = filter + `proposal = ? , `
-		fields = append(fields, this.Proposal)
+	if this.Analysis != "" {
+		filter = filter + `analysis = ? , `
+		fields = append(fields, this.Analysis)
 	}
 	if this.Mode != "" {
 		filter = filter + `mode = ? , `
