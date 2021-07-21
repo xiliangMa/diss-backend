@@ -14,6 +14,7 @@ type ServiceController struct {
 // @Title GetService
 // @Description Get Service List
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param body body models.Service false "Service"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"

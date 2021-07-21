@@ -15,6 +15,7 @@ type ImageController struct {
 // @Title GetContainers
 // @Description Get Containers List
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param body body models.ContainerConfig false "容器配置信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -32,6 +33,7 @@ func (this *ImageController) GetContainersList() {
 // @Title ImageDetail
 // @Description Get ImageDetail Info
 // @Param token header string true "authToken"
+// @Param module header string true "moduleCode"
 // @Param body body models.ImageDetail false "镜像信息"
 // @Success 200 {object} models.Result
 // @router /imagedetail [post]
