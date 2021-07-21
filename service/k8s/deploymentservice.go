@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
@@ -37,6 +38,9 @@ Retry:
 			return
 		case event, ok := <-deployWatch.ResultChan():
 			if event.Object != nil || ok {
+				if event.Type == watch.Error {
+					break
+				}
 				object := event.Object.(*v1.Deployment)
 				id := string(object.UID)
 				name := object.Name

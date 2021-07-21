@@ -3,10 +3,12 @@ package k8s
 import (
 	"context"
 	"encoding/json"
+	"reflect"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
-	"k8s.io/api/networking/v1"
+	v1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 )
@@ -42,6 +44,13 @@ Retry:
 			return
 		case event, ok := <-netpolWatch.ResultChan():
 			if event.Object != nil || ok {
+				if event.Type == watch.Error {
+					break
+				}
+				networkPolicy := v1.NetworkPolicy{}
+				if !reflect.DeepEqual(event.Object.GetObjectKind(), networkPolicy.GetObjectKind()) {
+					break
+				}
 				object := event.Object.(*v1.NetworkPolicy)
 				id := string(object.UID)
 				name := object.Name

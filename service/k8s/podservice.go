@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/scope"
@@ -41,6 +42,9 @@ Retry:
 			return
 		case event, ok := <-podWatch.ResultChan():
 			if event.Object != nil || ok {
+				if event.Type == watch.Error {
+					break
+				}
 				isDelete := false
 				object := event.Object.(*v1.Pod)
 				id := string(object.UID)

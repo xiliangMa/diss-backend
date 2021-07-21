@@ -2,6 +2,10 @@ package k8s
 
 import (
 	"encoding/json"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/satori/go.uuid"
@@ -12,9 +16,6 @@ import (
 	"github.com/xiliangMa/diss-backend/service/securitycheck"
 	css "github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
-	"net/http"
-	"os"
-	"time"
 )
 
 // 集群接口
@@ -187,7 +188,7 @@ func (this *ClusterController) UpdateCluster() {
 // @router /:id [delete]
 func (this *ClusterController) DeleteCluster() {
 	id := this.GetString(":id")
-	clusterList := []*models.Cluster{}
+	var clusterList []*models.Cluster
 	cluster := new(models.Cluster)
 	cluster.Id = id
 	clusterList = append(clusterList, cluster)
