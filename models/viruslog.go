@@ -26,6 +26,7 @@ type VirusScan struct {
 	CreatedAt     int64  `description:"(创建时间)"`
 	Records       []VirusRecord
 	FileName      string
+	Severity      string `orm:"-" description:"(等级)"`
 }
 
 type VirusRecord struct {
@@ -211,6 +212,11 @@ func (this *VirusScan) VirusList(from, limit int) ([]*VirusScanRecord, int64, er
 	if this.FileName != "" {
 		filter = filter + `virus_record.filename  like ? and `
 		fields = append(fields, "%"+this.FileName+"%")
+	}
+
+	if this.Severity != "" {
+		filter = filter + `virus_record.severity = ? and `
+		fields = append(fields, this.Severity)
 	}
 
 	if filter != "" {

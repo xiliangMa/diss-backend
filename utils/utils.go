@@ -6,13 +6,14 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
-	"github.com/shirou/gopsutil/host"
 	"math/rand"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
+	"github.com/shirou/gopsutil/host"
 )
 
 var (
@@ -285,6 +286,14 @@ func GetPublicPath() string {
 
 func GetPublicUrl() string {
 	return beego.AppConfig.String("system::PublicUrl")
+}
+
+func GetAgentPath() string {
+	return beego.AppConfig.String("system::AgentPath")
+}
+
+func GetAgentUrl() string {
+	return beego.AppConfig.String("system::AgentUrl")
 }
 
 func GetSystemIP() string {
