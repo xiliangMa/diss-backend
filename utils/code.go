@@ -206,6 +206,7 @@ var (
 	ForbidenRemoveUserErr            = 1031
 	ForbidenCreateUserErr            = 1032
 	ForbidenAdminDelSelfErr          = 1033
+	ForbiddenRoleRemoveErr           = 1034
 
 	//task job 1100-1200
 	AddTaskErr        = 1100
