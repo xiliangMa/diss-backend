@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
-	"strings"
 )
 
 type NodeService struct {
@@ -39,6 +40,9 @@ Retry:
 			return
 		case event, ok := <-nodeWatch.ResultChan():
 			if event.Object != nil || ok {
+				if event.Type == watch.Error {
+					break
+				}
 				object := event.Object.(*v1.Node)
 				id := strings.ToLower(object.Status.NodeInfo.SystemUUID)
 				name := object.ObjectMeta.Name

@@ -1,33 +1,33 @@
 package models
 
 import (
+	"net/http"
+	"strings"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
-	"net/http"
-	"strings"
 )
 
 type ContainerConfig struct {
-	Id             string      `orm:"pk;" description:"(id)"`
-	Name           string      `orm:"" description:"(容器名)"`
-	NameSpaceName  string      `orm:"" description:"(命名空间)"`
-	PodId          string      `orm:"default(null)" description:"(pod id)"`
-	PodName        string      `orm:"default(null)" description:"(pod 名)"`
-	HostName       string      `orm:"" description:"(主机名)"`
-	HostId         string      `orm:"" description:"(主机id)"`
-	AccountName    string      `orm:"" description:"(租户)"`
-	ClusterName    string      `orm:"" description:"(集群名)"`
-	SyncCheckPoint int64       `orm:"default(0);" description:"(同步检查点)"`
-	Status         string      `orm:"default(null);" description:"(状态)"`
-	Command        string      `orm:"default(null);" description:"(命令)"`
-	ImageName      string      `orm:"default(null);" description:"(镜像名)"`
-	Age            string      `orm:"null;" description:"(运行时长)"`
-	CreateTime     int64       `orm:"default(0);" description:"(创建时间);"`
-	UpdateTime     int64       `orm:"default(0);" description:"(更新时间);"`
-	TaskList       []*Task     `orm:"reverse(many);null" description:"(任务列表)"`
-	Job            []*Job      `orm:"rel(m2m);null;" description:"(job)"`
-	HostConfig     *HostConfig `orm:"rel(fk);null;" description:"(主机列表)"`
+	Id             string  `orm:"pk;" description:"(id)"`
+	Name           string  `orm:"" description:"(容器名)"`
+	NameSpaceName  string  `orm:"" description:"(命名空间)"`
+	PodId          string  `orm:"default(null)" description:"(pod id)"`
+	PodName        string  `orm:"default(null)" description:"(pod 名)"`
+	HostName       string  `orm:"" description:"(主机名)"`
+	HostId         string  `orm:"" description:"(主机id)"`
+	AccountName    string  `orm:"" description:"(租户)"`
+	ClusterName    string  `orm:"" description:"(集群名)"`
+	SyncCheckPoint int64   `orm:"default(0);" description:"(同步检查点)"`
+	Status         string  `orm:"default(null);" description:"(状态)"`
+	Command        string  `orm:"default(null);" description:"(命令)"`
+	ImageName      string  `orm:"default(null);" description:"(镜像名)"`
+	Age            string  `orm:"null;" description:"(运行时长)"`
+	CreateTime     int64   `orm:"default(0);" description:"(创建时间);"`
+	UpdateTime     int64   `orm:"default(0);" description:"(更新时间);"`
+	TaskList       []*Task `orm:"reverse(many);null" description:"(任务列表)"`
+	Job            []*Job  `orm:"rel(m2m);null;" description:"(job)"`
 }
 
 type ContainerConfigInterface interface {
@@ -88,7 +88,6 @@ func (this *ContainerConfig) List(from, limit int, groupSearch bool) Result {
 	o.Using(utils.DS_Default)
 	var ContainerList []*ContainerConfig
 	var ResultData Result
-	var err error
 
 	cond := orm.NewCondition()
 	if this.Name != "" {
@@ -126,20 +125,11 @@ func (this *ContainerConfig) List(from, limit int, groupSearch bool) Result {
 			cond = cond.And("pod_id", this.PodId)
 		}
 	}
-	_, err = o.QueryTable(utils.ContainerConfig).SetCond(cond).Limit(limit, from).All(&ContainerList)
+	_, _ = o.QueryTable(utils.ContainerConfig).SetCond(cond).Limit(limit, from).All(&ContainerList)
 	total, _ := o.QueryTable(utils.ContainerConfig).SetCond(cond).Count()
-
-	if err != nil {
-		ResultData.Message = err.Error()
-		ResultData.Code = utils.GetContainerConfigErr
-		logs.Error("Get ContainerConfig List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
-	}
 
 	for _, containerConfig := range ContainerList {
 		o.LoadRelated(containerConfig, "TaskList", 1, 1, 0, "-update_time")
-		if containerConfig.AccountName == "" {
-			containerConfig.AccountName = this.AccountName
-		}
 	}
 	data := make(map[string]interface{})
 	data[Result_Total] = total

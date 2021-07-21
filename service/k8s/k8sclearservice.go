@@ -2,13 +2,14 @@ package k8s
 
 import (
 	"fmt"
+	"net/http"
+	"os"
+
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	sssystem "github.com/xiliangMa/diss-backend/service/system/system"
 	"github.com/xiliangMa/diss-backend/utils"
-	"net/http"
-	"os"
 )
 
 type K8sClearService struct {
@@ -53,15 +54,15 @@ func (this *K8sClearService) ClearAll() {
 			// 清除ns
 			this.ClearNs()
 
+			// 清除集群
+			if this.DropCluster {
+				this.ClearCluster()
+			}
+
 			// 清除node // 清除networkpolicy
 			if this.DropCluster {
 				this.ClearNode()
 				this.ClearNetworkPolicy()
-			}
-
-			// 清除集群
-			if this.DropCluster {
-				this.ClearCluster()
 			}
 
 			msg = fmt.Sprintf("Clear ClusterOBJ: %s sucess......", this.CurrentCluster.Name)

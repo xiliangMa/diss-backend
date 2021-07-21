@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/scope"
@@ -38,6 +39,9 @@ Retry:
 			return
 		case event, ok := <-nswatch.ResultChan():
 			if event.Object != nil || ok {
+				if event.Type == watch.Error {
+					break
+				}
 				object := event.Object.(*v1.Namespace)
 				id := string(object.UID)
 				name := object.Name

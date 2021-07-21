@@ -1,11 +1,12 @@
 package models
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
-	"net/http"
-	"time"
 )
 
 type Cluster struct {
@@ -23,7 +24,7 @@ type Cluster struct {
 	SocpeStatus string `orm:"size(64);default()" description:"(scope 操作状态)"`
 	AccountName string `orm:"-" description:"(租户)"`
 	SyncStatus  string `orm:"default(NotSynced)" description:"(同步状态 NotSynced 未同步 Synced 成功 InProcess 同步中 Fail 失败 Clearing 清理中)"`
-	CreateTime  int64  `orm:"default(0)" description:"(创建时间)"`
+	CreateTime  int64  `orm:"" description:"(创建时间)"`
 	UpdateTime  int64  `orm:"default(0)" description:"(更新时间)"`
 }
 
@@ -59,7 +60,6 @@ func (this *Cluster) Get() *Cluster {
 
 	err := o.QueryTable(utils.Cluster).SetCond(cond).One(C)
 	if err != nil {
-		logs.Error("Get cluster failed, code: %d, err: %s", utils.GetClusterErr, err.Error())
 		return nil
 	}
 	return C
@@ -143,14 +143,11 @@ func (this *Cluster) GetRequiredSyncList() Result {
 	}
 
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = ClusterList
+	data[Result_Total] = total
+	data[Result_Items] = ClusterList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
 }
 
@@ -190,14 +187,11 @@ func (this *Cluster) List(from, limit int) Result {
 	}
 
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = ClusterList
+	data[Result_Total] = total
+	data[Result_Items] = ClusterList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
 }
 
@@ -205,6 +199,8 @@ func (this *Cluster) Update() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
+
+	this.UpdateTime = time.Now().UnixNano()
 
 	_, err := o.Update(this)
 	if err != nil {
@@ -258,14 +254,11 @@ func (this *Cluster) ListByAccount(from, limit int) Result {
 	}
 
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = ClusterList
+	data[Result_Total] = total
+	data[Result_Items] = ClusterList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
 }
 
