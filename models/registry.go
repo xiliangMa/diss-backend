@@ -1,12 +1,13 @@
 package models
 
 import (
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
-	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/astaxie/beego/logs"
+	"github.com/astaxie/beego/orm"
+	"github.com/xiliangMa/diss-backend/utils"
 )
 
 type Registry struct {
@@ -126,6 +127,9 @@ func (this *Registry) GetAccount() int64 {
 	}
 	if this.Type != "" {
 		cond = cond.And("type", this.Type)
+	}
+	if this.Url != "" {
+		cond = cond.And("url", this.Url)
 	}
 	total, _ := o.QueryTable(utils.Registry).SetCond(cond).RelatedSel().Count()
 	return total

@@ -147,14 +147,15 @@ func (this *NatsSubService) Save() error {
 
 				ib := models.ImageBlocking{}
 				ib.ImageName = containerConfig.ImageName
+				ib.ImageId = containerConfig.Id
 
 				if ibg := ib.GetIb(); ibg != nil {
 					ibg.Action = models.ClearImage
-
 					result.Code = http.StatusOK
 					result.Message = "Image Blocking Operation Success"
-
 					this.ClientSubject = containerConfig.HostId
+					nd := models.NatsData{Code: result.Code, Type: models.Type_Control, Msg: result.Message, Tag: models.Image_Control, RCType: models.Resource_Control_Type_Delete, Data: ibg}
+					this.ReceiveData(nd)
 					continue
 				}
 				containerConfig.Add()
@@ -803,31 +804,31 @@ func (this *NatsSubService) Save() error {
 			}
 
 			containerControl := obj["ContainerControl"]
-
 			if err := json.Unmarshal([]byte(containerControl.(string)), &cc); err != nil {
 				logs.Error("Parse %s error %s", ms.Tag, err)
 				return err
 			}
-
 			if cc[models.WarningInfoId] == nil {
 				if err := mapstructure.Decode(cc, &wi); err != nil {
 					logs.Error("Parse %s error %s", ms.Tag, err)
 				}
 
-				if obj[models.StatusKey] == "" {
-					wi.Status = models.WarnInfoStatus
-				} else {
-					wi.Status = models.FailStatus
-
-					resp.WarningInfoId = wi.Id
-					if r := resp.Get(); r != nil {
-						r.Status = obj[models.StatusKey].(string)
-						if result := r.Update(); result.Code != http.StatusOK {
-							return errors.New(result.Message)
-						}
+				resp.WarningInfoId = wi.Id
+				if r := resp.Get(); r != nil {
+					if obj[models.StatusKey] == "" {
+						wi.Status = models.WarnInfoStatus
+						r.Status = "完成"
+						r.Msg = models.Status
+					} else {
+						wi.Status = models.FailStatus
+						r.Status = "失败"
+						r.Code = 1400
+						r.Msg = obj[models.StatusKey].(string)
+					}
+					if result := r.Update(); result.Code != http.StatusOK {
+						return errors.New(result.Message)
 					}
 				}
-
 				if result := wi.Update(); result.Code != http.StatusOK {
 					return errors.New(result.Message)
 				}
@@ -836,36 +837,33 @@ func (this *NatsSubService) Save() error {
 					logs.Error("Parse %s error %s", ms.Tag, err)
 				}
 				if obj[models.StatusKey] == "" {
-					resp.Status = models.Status
+					resp.Status = "成功"
+					resp.Msg = models.Status
 				} else {
-					resp.Status = obj[models.StatusKey].(string)
+					resp.Status = "失败"
+					resp.Code = 1400
+					resp.Msg = obj[models.StatusKey].(string)
 				}
 				if result := resp.Update(); result.Code != http.StatusOK {
 					return errors.New(result.Message)
 				}
 			}
 		case models.Image_ControlStatus:
-
 			var obj map[string]interface{}
-
 			cc := new(models.ContainerConfig)
-
 			s, _ := json.Marshal(ms.Data)
-
 			if err := json.Unmarshal(s, &obj); err != nil {
 				logs.Error("Parse %s error %s", ms.Tag, err)
 				return err
 			}
 
 			imageControl := obj["ImageControl"]
-
 			if err := json.Unmarshal([]byte(imageControl.(string)), &cc); err != nil {
 				logs.Error("Parse %s error %s", ms.Tag, err)
 				return err
 			}
 
 			list := cc.GetContainerConfigList()
-
 			for _, containerConfig := range list {
 				containerConfig.Delete()
 			}

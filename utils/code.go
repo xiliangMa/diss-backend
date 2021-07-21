@@ -283,6 +283,7 @@ var (
 	RestoreDefaultLogoErr           = 1262
 	ParameterParseErr               = 1263
 	RuleDefineDuplicate             = 1264
+	DeleteRespCenterErr             = 1265
 
 	// timescaledb 安全日志1300-1400
 	GetIntrudeDetectLogErr = 1300
