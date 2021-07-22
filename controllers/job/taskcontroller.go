@@ -2,10 +2,11 @@ package job
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/astaxie/beego"
 	"github.com/xiliangMa/diss-backend/models"
 	taskservice "github.com/xiliangMa/diss-backend/service/task"
-	"net/http"
 )
 
 // Task 接口
@@ -36,26 +37,20 @@ func (this *TaskController) GetTaskList() {
 // @Description Delete Task
 // @Param token header string true "authToken"
 // @Param module header string true "moduleCode"
-// @Param id path string "" true "id"
+// @Param id query string "" true "id"
 // @Success 200 {object} models.Result
-// @router /:id [delete]
+// @router / [delete]
 func (this *TaskController) DeleteTask() {
-	id := this.GetString(":id")
+	id := this.GetString("id")
 	Task := new(models.Task)
 	Task.Id = id
-	result := Task.List(0, 0)
-	if result.Data != nil {
-		data := result.Data.(map[string]interface{})
-		if result.Code == http.StatusOK && data["total"] != 0 {
-			//向agent下发删除任务指令
-			deleteTaskList := data["items"]
-			deleteTask := deleteTaskList.([]*models.Task)[0]
-			taskService := new(taskservice.TaskService)
-			taskService.Task = deleteTask
-			result = taskService.RemoveTask()
-		}
+	for _, task := range Task.GetTaskList() {
+		taskService := new(taskservice.TaskService)
+		taskService.Task = task
+		taskService.RemoveTask()
 	}
-	this.Data["json"] = result
+
+	this.Data["json"] = models.Result{Code: http.StatusOK}
 	this.ServeJSON(false)
 }
 

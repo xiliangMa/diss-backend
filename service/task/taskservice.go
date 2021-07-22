@@ -3,10 +3,11 @@ package task
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/nats"
-	"net/http"
 )
 
 type TaskService struct {

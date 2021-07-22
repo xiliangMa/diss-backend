@@ -3,13 +3,14 @@ package ws
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/gorilla/websocket"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/base"
 	"github.com/xiliangMa/diss-backend/service/kubevuln"
-	"net/http"
-	"strings"
 )
 
 type WSDeliverService struct {
@@ -81,7 +82,6 @@ func (this *WSDeliverService) DeliverTaskToNats() {
 				result := models.NatsData{Type: models.Type_Control, Tag: models.Resource_Task, Data: task, RCType: models.Resource_Control_Type_Post}
 				data, _ := json.MarshalIndent(result, "", "  ")
 				err := models.Nats.Conn.Publish(subject, data)
-				logs.Debug("Send task data: %s.", string(data))
 				if err == nil {
 					logs.Info("Deliver Task to Nats Success, Subject: %s Id: %s, data: %v", subject, task.Id, result)
 				} else {

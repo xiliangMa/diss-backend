@@ -1,11 +1,13 @@
 package models
 
 import (
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
-	"net/http"
-	"time"
 )
 
 type Task struct {
@@ -35,6 +37,7 @@ type Task struct {
 	ScanStatus      string           `orm:"" description:"(扫描状态)"`
 	VirusStatus     string           `orm:"" description:"(杀毒状态)"`
 	SecurityStatus  string           `orm:"" description:"(是否受信 unknown Trustee NotTrustee)"`
+	TemplateType    string           `orm:"" description:"(模版类型)"`
 }
 
 type TaskLogInterface interface {
@@ -130,6 +133,9 @@ func (this *Task) List(from, limit int) Result {
 			limit = 1
 		}
 	}
+	if this.TemplateType != "" {
+		cond = cond.And("template_type", this.TemplateType)
+	}
 	_, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().Limit(limit, from).OrderBy("-update_time").All(&TaskList)
 
 	if err != nil {
@@ -216,7 +222,6 @@ func (this *Task) GetCurrentBatchTaskList() (error, []*Task) {
 	cond = cond.And("batch", this.Batch)
 	_, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().All(&TaskList)
 	if err != nil {
-		logs.Error("Get Task List failed, code: %d, err: %s", utils.GetTaskErr, err.Error())
 		return err, nil
 	}
 	return nil, TaskList
@@ -251,13 +256,20 @@ func (this *Task) GetUnFinishedTaskList() Result {
 	}
 
 	data := make(map[string]interface{})
-	data["total"] = total
-	data["items"] = TaskList
+	data[Result_Total] = total
+	data[Result_Items] = TaskList
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = data
-	if total == 0 {
-		ResultData.Data = nil
-	}
 	return ResultData
+}
+
+func (this *Task) GetTaskList() []*Task {
+	o := orm.NewOrm()
+	o.Using(utils.DS_Default)
+	var TaskList []*Task
+	cond := orm.NewCondition()
+	cond = cond.And("id__in", strings.Split(this.Id, ","))
+	_, _ = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().All(&TaskList)
+	return TaskList
 }
