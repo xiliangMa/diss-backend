@@ -67,9 +67,16 @@ func (this *CmdHistory) Delete() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
-	deleteSql := `DELETE FROM cmd_history WHERE TYPE = ? AND host_id = ?`
+	var err error
+	var deleteSql = "DELETE FROM cmd_history WHERE "
+	if this.ContainerId != "" {
+		deleteSql = deleteSql + "type = ? AND host_id = ?  AND container_id = ? "
+		_, err = o.Raw(deleteSql, this.Type, this.HostId, this.ContainerId).Exec()
+	} else {
+		deleteSql = `type = ? AND host_id = ? `
+		_, err = o.Raw(deleteSql, this.Type, this.HostId).Exec()
+	}
 
-	_, err := o.Raw(deleteSql, this.Type, this.HostId).Exec()
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.DeleteCmdHistoryErr

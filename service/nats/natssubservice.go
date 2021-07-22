@@ -440,15 +440,21 @@ func (this *NatsSubService) Save() error {
 			cmdHistoryList := models.CmdHistoryList{}
 			s, _ := json.Marshal(ms.Data)
 			if err := json.Unmarshal(s, &cmdHistoryList.List); err != nil {
-				logs.Error("Paraces %s error %s", ms.Tag, err)
+				logs.Error("Parses %s error %s", ms.Tag, err)
 				return err
 			}
 			size := len(cmdHistoryList.List)
 			if size != 0 {
 				logs.Info("Nats ############################ Sync agent data, >>> HostId: %s, Type: %s, Size: %d <<<", cmdHistoryList.List[0].HostId, models.Resource_ContainerCmdHistory, size)
 			}
-			for _, cmdHistory := range cmdHistoryList.List {
-				cmdHistory.Add()
+			cmdList := cmdHistoryList.List
+			if len(cmdList) > 0 {
+				cmdHistory := cmdList[0]
+				cmdHistroyExec := models.CmdHistory{Type: models.Cmd_History_Type_Container, ContainerId: cmdHistory.ContainerId, HostId: cmdHistory.HostId}
+				cmdHistroyExec.Delete()
+				for _, cmdHistory := range cmdList {
+					cmdHistory.Add()
+				}
 			}
 
 			// ContainerCmdHistory 通过通道推送给邮件发送协程
