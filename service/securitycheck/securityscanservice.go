@@ -243,6 +243,7 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 			// 容器杀毒
 			logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_ContainerVS, uid)
 			task.SystemTemplate = this.DefaultTMP[models.TMP_Type_ContainerVS]
+			task.TemplateType = models.TMP_Type_ContainerVS
 			task.Description = taskpre + "容器病毒查杀"
 			task.Container = securityCheck.Container
 			task.SearchHostId = securityCheck.Container.HostId
@@ -252,6 +253,7 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 			task.Host = securityCheck.Host
 			logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_HostVS, uid)
 			task.SystemTemplate = this.DefaultTMP[models.TMP_Type_HostVS]
+			task.TemplateType = models.TMP_Type_HostVS
 			task.Description = taskpre + "主机病毒查杀"
 			task.SearchHostId = securityCheck.Host.Id
 			task.VirusStatus = models.Task_Status_Created
@@ -260,6 +262,7 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 			task.Image = securityCheck.Image
 			logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_ImageVS, uid)
 			task.SystemTemplate = this.DefaultTMP[models.TMP_Type_ImageVS]
+			task.TemplateType = models.TMP_Type_ImageVS
 			task.Description = taskpre + "镜像病毒查杀"
 			task.SearchHostId = securityCheck.Image.HostId
 			task.VirusStatus = models.Task_Status_Created
@@ -288,6 +291,7 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 			}
 			task.SystemTemplate = templateObj
 		}
+		task.TemplateType = models.TMP_Type_BM_Docker
 		task.Host = securityCheck.Host
 		task.SearchHostId = securityCheck.Host.Id
 		task.ScanStatus = models.Task_Status_Created
@@ -311,6 +315,7 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		}
 
 		task.Host = securityCheck.Host
+		task.TemplateType = models.TMP_Type_BM_K8S
 		task.SearchHostId = securityCheck.Host.Id
 		task.ClusterId = securityCheck.Host.ClusterId
 		task.ScanStatus = models.Task_Status_Created
@@ -319,6 +324,7 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		// 主机镜像扫描
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_HostImageVulnScan, uid)
 		task.Description = taskpre + "主机镜像漏洞扫描"
+		task.TemplateType = models.TMP_Type_HostImageVulnScan
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_HostImageVulnScan]
 		task.Image = securityCheck.Image
 		task.SearchHostId = securityCheck.Image.HostId
@@ -328,6 +334,7 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		// 仓库镜像扫描
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_ImageVulnScan, uid)
 		task.Description = taskpre + "仓库镜像漏洞扫描"
+		task.TemplateType = models.TMP_Type_ImageVulnScan
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_ImageVulnScan]
 		task.Image = securityCheck.Image
 		task.SearchHostId = strings.ToLower(utils.GetHostInfo().HostID)
@@ -337,12 +344,14 @@ func (this *SecurityScanService) genTask(securityCheck *models.SecurityCheck) {
 		//kubernetes 漏扫
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_KubernetesVulnScan, uid)
 		task.Description = taskpre + "kubernetes漏洞扫描"
+		task.TemplateType = models.TMP_Type_KubernetesVulnScan
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_KubernetesVulnScan]
 		task.ClusterOBJ = securityCheck.Cluster
 	} else if securityCheck.DockerScan {
 		//docker 漏扫
 		logs.Info("PrePare task, Type:  %s , Task Id: %s ......", models.TMP_Type_DockerVulnScan, uid)
 		task.Description = taskpre + "Docker漏洞扫描"
+		task.TemplateType = models.TMP_Type_DockerVulnScan
 		task.SystemTemplate = this.DefaultTMP[models.TMP_Type_DockerVulnScan]
 		task.Host = securityCheck.Host
 		task.ScanStatus = models.Task_Status_Created

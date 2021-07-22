@@ -3,10 +3,11 @@ package models
 import (
 	"encoding/json"
 	"errors"
+	"net/http"
+
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/xiliangMa/diss-backend/utils"
-	"net/http"
 )
 
 type HostConfig struct {
@@ -46,6 +47,7 @@ type HostConfig struct {
 	CreateTime          int64   `orm:"default(0)" description:"(上线时间)"`
 	OfflineTime         int64   `orm:"default(0)" description:"(离线时间)"`
 	WithK8sBench        bool    `orm:"-" description:"(是否获取k8s基线统计)"`
+	TemplateType        string  `orm:"-" description:"(类型)"`
 }
 
 type HostConfigInterface interface {
@@ -153,7 +155,6 @@ func (this *HostConfig) BaseList(from, limit int) (error, int64, []*HostConfig) 
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var list []*HostConfig
-	var TaskList []*Task
 	var err error
 	cond := orm.NewCondition()
 	if this.Id != "" {
@@ -208,13 +209,18 @@ func (this *HostConfig) BaseList(from, limit int) (error, int64, []*HostConfig) 
 	}
 
 	for _, l := range list {
-		cond = orm.NewCondition()
-		cond = cond.And("host_id", l.Id)
+		task := Task{}
+		task.Host = l
 		if this.ClusterId != "" {
-			cond = cond.And("cluster_id", this.ClusterId)
+			task.ClusterId = this.ClusterId
 		}
-		_, err = o.QueryTable(utils.Task).SetCond(cond).RelatedSel().Limit(1, 0).OrderBy("-update_time").All(&TaskList)
-		l.TaskList = TaskList
+		if this.TemplateType != "" {
+			task.TemplateType = this.TemplateType
+		}
+		items := task.List(0, 1).Data.(map[string]interface{})["items"].([]*Task)
+		if len(items) > 0 {
+			l.TaskList = items
+		}
 
 		if this.WithK8sBench && l.ClusterId != "" {
 			bml := BenchMarkLog{}
