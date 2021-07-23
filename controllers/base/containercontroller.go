@@ -14,7 +14,6 @@ type ContainerController struct {
 // @Title GetContainers
 // @Description Get Containers List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.ContainerConfig false "容器配置信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -34,7 +33,6 @@ func (this *ContainerController) GetContainersList() {
 // @Title DeleteContainer
 // @Description Delete Container
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param containerId path string "" true "containerId"
 // @Success 200 {object} models.Result
 // @router /:containerId [delete]
@@ -51,7 +49,6 @@ func (this *ContainerController) DeleteContainer() {
 // @Title GetContainerInfo
 // @Description Get Container Info
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param containerId path string "" true "containerId"
 // @Param body body models.ContainerInfo false "容器详细信息"
 // @Success 200 {object} models.Result
@@ -70,7 +67,6 @@ func (this *ContainerController) GetContainerInfo() {
 // @Title GetContainerPsList
 // @Description Get Container Ps  List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.ContainerPs false "容器进程"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"

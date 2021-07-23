@@ -14,7 +14,6 @@ type NSController struct {
 // @Title GetNameSpaces
 // @Description Get NameSpace List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.NameSpace false "命名空间"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -32,7 +31,6 @@ func (this *NSController) GetNameSpaceList() {
 // @Title UpdateNameSpace
 // @Description Update NameSpace
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "Id"
 // @Param body body models.NameSpace true "命名空间"
 // @Success 200 {object} models.Result
@@ -49,7 +47,6 @@ func (this *NSController) UpdateNameSpace() {
 // @Title BindAccount
 // @Description BindAccount（绑定租户）
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param nsId path string "" true "nsId"
 // @Param body body models.NameSpace true "命名空间"
 // @Success 200 {object} models.Result
@@ -66,7 +63,6 @@ func (this *NSController) BindAccount() {
 // @Title UnBindAccount
 // @Description UnBindAccount（解除绑定）
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param nsId path string "" true "nsId"
 // @Param body body models.NameSpace true "命名空间"
 // @Success 200 {object} models.Result

@@ -21,7 +21,6 @@ type LicenseController struct {
 // @Title Import License File
 // @Description ImportLicense
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param licenseFile formData file true "licenseFile"
 // @Param isForce formData bool false true "force"
 // @Success 200 {object} models.Result
@@ -118,7 +117,6 @@ func (this *LicenseController) AddLicenseFile() {
 // @Title Get License
 // @Description GetLicense
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id query string false "id"
 // @Success 200 {object} models.Result
 // @router /system/license [get]
@@ -156,7 +154,6 @@ func (this *LicenseController) GetLicense() {
 // @Title Get Licensed Host Count
 // @Description Get Licensed Host Count
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Success 200 {object} models.Result
 // @router /system/license/hostcount [get]
 func (this *LicenseController) GetLicensedHostCount() {
@@ -173,7 +170,6 @@ func (this *LicenseController) GetLicensedHostCount() {
 // @Title Set Host License
 // @Description Set One Host License
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostId path string "" true "hostId"
 // @Param isLicense query string "" true "add or remove host license, bool"
 // @Success 200 {object} models.Result
@@ -270,7 +266,6 @@ func (this *LicenseController) SetHostLicense() {
 // @Title Get License History
 // @Description Get LicenseHistory
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param from query int 0 false "from"
 // @Param limit query int 50 false "limit"
 // @Success 200 {object} models.Result
@@ -287,7 +282,6 @@ func (this *LicenseController) GetLicenseHistory() {
 // @Title Get FeatureCode
 // @Description GetFeatureCode
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Success 200 {object} models.Result
 // @router /system/featurecode [get]
 func (this *LicenseController) GetFeatureCode() {
@@ -304,7 +298,6 @@ func (this *LicenseController) GetFeatureCode() {
 // @Title Verify Feature Code
 // @Description Verify FeatureCode
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param featurecode query string true "featurecode"
 // @Success 200 {object} models.Result
 // @router /system/featurecode/verify [get]
@@ -324,7 +317,6 @@ func (this *LicenseController) VerifyFeatureCode() {
 // @Title Get module License Count(获取授权模块授权数)
 // @Description GetModuleLicenseCount
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.LicenseModule false "license 模块信息"
 // @Success 200 {object} models.Result
 // @router /system/license/modulecount [post]

@@ -15,7 +15,6 @@ type SystemTemplateController struct {
 // @Title GetSystemTemplateList
 // @Description Get System Template List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.SystemTemplate false "安全策略"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -33,7 +32,6 @@ func (this *SystemTemplateController) GetSystemTemplateLIst() {
 // @Title DeleteSystemTemplate
 // @Description Delete SystemTemplate
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "id"
 // @Success 200 {object} models.Result
 // @router /:id [delete]
@@ -49,7 +47,6 @@ func (this *SystemTemplateController) DeleteSystemTemplate() {
 // @Title AddSystemTemplate
 // @Description Add SystemTemplate
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.SystemTemplate false "SystemTemplate"
 // @Success 200 {object} models.Result
 // @router /add [post]
@@ -66,7 +63,6 @@ func (this *SystemTemplateController) AddSystemTemplate() {
 // @Title UpdateSystemTemplate
 // @Description Update SystemTemplate
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "id"
 // @Param body body models.SystemTemplate false "SystemTemplate"
 // @Success 200 {object} models.Result

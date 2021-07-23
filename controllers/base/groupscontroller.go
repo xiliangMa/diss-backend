@@ -14,7 +14,6 @@ type GroupsController struct {
 // @Title GetGroups
 // @Description Get Groups List（获取租户下的分组 主机/容器分组, 暂不支持主机、容器对象参数传入查询）
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param accountName query string "admin" true "diss api 系统登入用户的所属租户"
 // @Param body body models.Groups false "分组信息"
 // @Param from query int 0 false "from"
@@ -35,7 +34,6 @@ func (this *GroupsController) GetGroupsList() {
 // @Title UpdateGroup
 // @Description Update Group
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "id"
 // @Param body body models.Groups false "分组信息"
 // @Success 200 {object} models.Result
@@ -52,7 +50,6 @@ func (this *GroupsController) UpdateGroup() {
 // @Title AddGroup
 // @Description Add Group
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.Groups false "分组信息"
 // @Success 200 {object} models.Result
 // @router /add [post]
@@ -66,7 +63,6 @@ func (this *GroupsController) AddGroup() {
 // @Title DeleteGroup
 // @Description Delete Group
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param grouprId path string "" true "grouprId"
 // @Success 200 {object} models.Result
 // @router /:grouprId [delete]
@@ -81,7 +77,6 @@ func (this *GroupsController) DeleteGroup() {
 // @Title GetContainers
 // @Description Get Groups List（获取分组下的容器）
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param user query string "admin" true "diss api 系统的登入用户"
 // @Param body body models.ContainerConfig false "分组信息"
 // @Param from query int 0 false "from"

@@ -16,7 +16,6 @@ type HostController struct {
 // @Title GetHosts
 // @Description Get Hosts
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.HostConfig false "主机配置信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -35,7 +34,6 @@ func (this *HostController) HostList() {
 // @Title HostPs
 // @Description Get HostPs List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.HostPs false "主机进程"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -54,7 +52,6 @@ func (this *HostController) GetHostPsList() {
 // @Title UpdateHost
 // @Description Update Host
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostId path string "" true "hostId"
 // @Param body body models.HostConfig true "主机配置信息"
 // @Success 200 {object} models.Result
@@ -71,7 +68,6 @@ func (this *HostController) UpdateHost() {
 // @Title DeleteHost
 // @Description Delete Host
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostId path string "" true "hostId"
 // @Success 200 {object} models.Result
 // @router /:hostId [delete]
@@ -94,7 +90,6 @@ func (this *HostController) DeleteHost() {
 // @Title HostPackage
 // @Description Get HostPackage List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostId path string "" true "hostId"
 // @Param body body models.HostPackage false "主机包"
 // @Param from query int 0 false "from"

@@ -14,7 +14,6 @@ type IntrudeDetectLogController struct {
 // @Title GetIntrudeDetectLogInfo
 // @Description Get IntrudeDetectLogInfo (查询主机/容器的入侵日志， 主机：targeType = host 容器：targeType = container)
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostId path string "" true "hostId"
 // @Param body body models.IntrudeDetectLog false "入侵检测日志信息"
 // @Param from query int 0 false "from"
@@ -38,7 +37,6 @@ func (this *IntrudeDetectLogController) GetIntrudeDetectLogInfo() {
 // @Title GetIntrudeDetectLog
 // @Description Get IntrudeDetectLog List (1. 根据 TargeType = host 查询主机基线日志 2. 根据 TargeType = container 如果快速查询所有容器日志可以设置 ContianerId =All)
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.IntrudeDetectLog false "入侵检测日志信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"

@@ -17,7 +17,6 @@ type UserController struct {
 // @Title GetUserEvents
 // @Description Get User event List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.UserEvent false "用户事件"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -36,7 +35,6 @@ func (this *UserController) UserEventList() {
 // @Title AddUser
 // @Description Add User
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.User false "用户信息"
 // @Success 200 {object} models.Result
 // @router / [post]
@@ -66,7 +64,6 @@ func (this *UserController) AddUser() {
 // @Title GetUsers
 // @Description Get Users
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.User false "用户信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -94,7 +91,6 @@ func (this *UserController) UserList() {
 // @Title UpdateUser
 // @Description Update User
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param userId path string "" true "userId"
 // @Param body body models.User true "用户信息"
 // @Success 200 {object} models.Result
@@ -129,7 +125,6 @@ func (this *UserController) UpdateUser() {
 // @Title DeleteUser
 // @Description Delete User
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param userId path string "" true "userId"
 // @Success 200 {object} models.Result
 // @router /:userId [delete]
@@ -163,7 +158,6 @@ func (this *UserController) DeleteUser() {
 // @Title AddUser
 // @Description Add User
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.User false "用户信息"
 // @Success 200 {object} models.Result
 // @router /role [post]
@@ -178,7 +172,6 @@ func (this *UserController) AddRoleForUser() {
 // @Title UpdateUser
 // @Description Update User
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param userId path string "" true "userId"
 // @Param body body models.User true "用户信息"
 // @Success 200 {object} models.Result
@@ -195,7 +188,6 @@ func (this *UserController) UpdateRoleForUser() {
 // @Title DeleteUser
 // @Description Delete User
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param userId path string "" true "userId"
 // @Success 200 {object} models.Result
 // @router /user [delete]

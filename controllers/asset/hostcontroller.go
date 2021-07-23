@@ -18,7 +18,6 @@ type HostController struct {
 // @Title GetHostConfig
 // @Description Get HostConfig List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param user query string "admin" true "diss api 系统的登入用户 如果用户all, 直接根据租户查询"
 // @Param body body models.HostConfig false "主机配置信息"
 // @Param from query int 0 false "from"
@@ -43,7 +42,6 @@ func (this *HostController) GetHostConfigList() {
 // @Title GetHostInfo
 // @Description Get HostInfo
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostId path string "" true "hostId"
 // @Success 200 {object} models.Result
 // @router /:hostId [post]
@@ -59,7 +57,6 @@ func (this *HostController) GetHostInfoList() {
 // @Title SetClientModule
 // @Description Set ClientModule
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostId path string "" true "hostId"
 // @Param body body models.ClientModuleControl false "ClientModuleControl , 目前支持模块： DockerEvent"
 // @Success 200 {object} models.Result
@@ -101,7 +98,6 @@ func (this *HostController) SetClientModule() {
 // @Title GetHostPod
 // @Description Get HostPod List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostName path string "" true "主机名"
 // @Param body body models.Pod false "Pod 信息"
 // @Param from query int 0 false "from"
@@ -124,7 +120,6 @@ func (this *HostController) GetHostPodList() {
 // @Title HostImage
 // @Description Get HostImage List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostId path string "" true "hostId"
 // @Param body body models.ImageConfig false "镜像配置信息"
 // @Param from query int 0 false "from"
@@ -147,7 +142,6 @@ func (this *HostController) GetHostImagesList() {
 // @Title HostCmdHistory
 // @Description Get HostCmdHistory List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostId path string "" true "hostId"
 // @Param body body models.CmdHistory false "主机命令历史信息"
 // @Param from query int 0 false "from"
@@ -171,7 +165,6 @@ func (this *HostController) GetHostCmdHistoryList() {
 // @Title HostImageInfo
 // @Description Get HostImage Info
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostId path string "" true "hostId"
 // @Param imageId path string "" true "imageId"
 // @Success 200 {object} models.Result
@@ -192,7 +185,6 @@ func (this *HostController) GetHostImageInfo() {
 // @Title HostContainerConfig
 // @Description Get HostContainerConfig List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostName path string "" true "hostName"
 // @Param body body models.ContainerConfig false "容器配置信息"
 // @Param from query int 0 false "from"
@@ -215,7 +207,6 @@ func (this *HostController) GetHostContainerConfigList() {
 // @Title HostPs
 // @Description Get HostPs List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostId path string "" true "hostId"
 // @Param body body models.HostPs false "主机进程"
 // @Param from query int 0 false "from"
@@ -238,7 +229,6 @@ func (this *HostController) GetHostPsList() {
 // @Title HostContainerInfo
 // @Description Get HostContainer info
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostName path string "" true "hostName"
 // @Param containerId path string "" true "containerId"
 // @Success 200 {object} models.Result
@@ -258,7 +248,6 @@ func (this *HostController) GetHostContainerInfoList() {
 // @Title HostBenchMarkLog
 // @Description Get HostBenchMarkLog List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostId path string "" true "hostId"
 // @Param body body models.BenchMarkLog false "基线日志信息"
 // @Param from query int 0 false "from"
@@ -282,7 +271,6 @@ func (this *HostController) GetHostBenchMarkLogList() {
 // @Title HostBenchMarkLogInfo
 // @Description Get HostBenchMarkLog Info
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostId path string "" true "hostId"
 // @Param bmlId path string "" true "benchMarkLogId"
 // @Success 200 {object} models.Result

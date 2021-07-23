@@ -16,7 +16,6 @@ type JobController struct {
 // @Title GetJobList
 // @Description Get Job List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.Job false "Job"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -35,7 +34,6 @@ func (this *JobController) GetJobList() {
 // @Title DeleteJob
 // @Description Delete Job
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "id"
 // @Success 200 {object} models.Result
 // @router /:id [delete]
@@ -62,7 +60,6 @@ func (this *JobController) DeleteJob() {
 // @Title DeactiveJob
 // @Description Deactive Job
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "id"
 // @Success 200 {object} models.Result
 // @router /:id/deactive [put]
@@ -103,7 +100,6 @@ func (this *JobController) DeactiveJob() {
 // @Title AddJob
 // @Description Add Job
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.Job false "Job"
 // @Success 200 {object} models.Result
 // @router /add [post]
@@ -118,7 +114,6 @@ func (this *JobController) AddJob() {
 // @Title UpdateJob
 // @Description Update Job
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "id"
 // @Param body body models.Job false "Job"
 // @Success 200 {object} models.Result
@@ -137,7 +132,6 @@ func (this *JobController) UpdateJob() {
 // @Title ActiveJob
 // @Description Gen Tasks From Job , and Delivery Tasks
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "id"
 // @Param account query string "admin" false "租户"
 // @Success 200 {object} models.Result

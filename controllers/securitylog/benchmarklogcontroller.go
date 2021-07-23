@@ -14,7 +14,6 @@ type BenchMarkLogController struct {
 // @Title GetBenchMarkLog
 // @Description Get BenchMarkLog List (暂不支持租户查询)
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.BenchMarkLog false "基线日志信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"

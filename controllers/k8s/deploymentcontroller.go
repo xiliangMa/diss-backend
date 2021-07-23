@@ -14,7 +14,6 @@ type DeploymentController struct {
 // @Title GetDeployment
 // @Description Get Deployment List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.Deployment false "Deployment"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"

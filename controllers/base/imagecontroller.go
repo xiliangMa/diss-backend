@@ -15,7 +15,6 @@ type ImageController struct {
 // @Title GetImages
 // @Description Get Images List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.ImageConfig false "镜像配置信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -35,7 +34,6 @@ func (this *ImageController) GetImagesList() {
 // @Title DeleteImage
 // @Description Delete Image
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param imageId query string "" true "imageId"
 // @Success 200 {object} models.Result
 // @router / [delete]
@@ -56,7 +54,6 @@ func (this *ImageController) DeleteImage() {
 // @Title GetImage
 // @Description Get Image
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.ImageConfig false "镜像信息"
 // @Success 200 {object} models.Result
 // @router /get [post]
@@ -71,7 +68,6 @@ func (this *ImageController) GetImage() {
 // @Title GetImageByDBType
 // @Description Get Image Info
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.ImageConfig false "镜像配置信息"
 // @Success 200 {object} models.Result
 // @router /dbimage [post]
@@ -86,7 +82,6 @@ func (this *ImageController) GetImageByDBType() {
 // @Title BatchImportImage
 // @Description Batch Import Image
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.ImageConfig false "镜像配置信息"
 // @Success 200 {object} models.Result
 // @router /import [post]
@@ -103,7 +98,6 @@ func (this *ImageController) BatchImportImage() {
 // @Title GetNamespaces
 // @Description GetNamespaces
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.ImageConfig false "镜像配置信息"
 // @Success 200 {object} models.Result
 // @router /namespaces [post]

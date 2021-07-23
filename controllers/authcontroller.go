@@ -49,7 +49,6 @@ func (this *AuthController) Login() {
 // @Title authorization
 // @Description authorization
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Success 200 {object} models.Result
 // @router /Authorization [post]
 func (this *AuthController) Authorize() {

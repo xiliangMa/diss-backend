@@ -14,7 +14,6 @@ type SensitiveInfoController struct {
 // @Title GetSensitiveInfo
 // @Description Get SensitiveInfo List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.SensitiveInfo false "敏感信息列表"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
