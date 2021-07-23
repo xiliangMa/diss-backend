@@ -327,31 +327,31 @@ func (this *Role) UpdatePolicy() Result {
 		if err != nil {
 			ResultData.Message = err.Error()
 			ResultData.Code = utils.EditRoleErr
-			logs.Error("Edit Role %s failed, code: %d, err: %s", this.Code, ResultData.Code, ResultData.Message)
+			logs.Error("Edit Role %s failed, code: %d, err: %s.", this.Code, ResultData.Code, ResultData.Message)
 			return ResultData
 		}
-	}
 
-	// 移除之前的全部权限
-	modules := GlobalCasbin.Enforcer.GetPermissionsForUser(utils.GetRoleString(this.Code))
-	for _, mo := range modules {
-		if this.Code != utils.GetRoleString(System_Role) && mo[1] != Permission_AuthManage {
-			_, err := GlobalCasbin.Enforcer.RemovePolicy(utils.GetRoleString(this.Code), mo[1], "")
-			if err != nil {
-				logs.Warn("Remove Policy failed, code: %d, error : %s", ResultData.Code, err)
+		// 移除之前的全部权限
+		modules := GlobalCasbin.Enforcer.GetPermissionsForUser(utils.GetRoleString(this.Code))
+		for _, mo := range modules {
+			if this.Code != utils.GetRoleString(System_Role) && mo[1] != Permission_AuthManage {
+				_, err := GlobalCasbin.Enforcer.RemovePolicy(utils.GetRoleString(this.Code), mo[1], "")
+				if err != nil {
+					logs.Warn("Remove Policy failed, code: %d, error : %s.", ResultData.Code, err)
+				}
+
 			}
 		}
-	}
-
-	// 添加新指定的权限
-	for _, module := range this.Modules {
-		_, err := GlobalCasbin.Enforcer.AddPolicy(utils.GetRoleString(this.Code), module.Code, "-")
 		GlobalCasbin.Enforcer.LoadPolicy()
-		if err != nil {
-			logs.Warn("Add AddPolicy failed, code: %d, error : %s", ResultData.Code, err)
+		// 添加新指定的权限
+		for _, module := range this.Modules {
+			_, err := GlobalCasbin.Enforcer.AddPolicy(utils.GetRoleString(this.Code), module.Code, "-")
+			if err != nil {
+				logs.Warn("Add AddPolicy failed, code: %d, error : %s.", ResultData.Code, err)
+			}
 		}
+		GlobalCasbin.Enforcer.LoadPolicy()
 	}
-	GlobalCasbin.Enforcer.LoadPolicy()
 
 	ResultData.Code = http.StatusOK
 	ResultData.Data = this
