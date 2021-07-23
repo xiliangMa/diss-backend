@@ -16,7 +16,6 @@ type RoleController struct {
 // @Title GetRoles
 // @Description Get Roles
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.Role false "角色信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -35,7 +34,6 @@ func (this *RoleController) RoleList() {
 // @Title AddRole
 // @Description Add Role
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.Role false "角色及用户信息"
 // @Success 200 {object} models.Result
 // @router /role [post]
@@ -50,7 +48,6 @@ func (this *RoleController) AddRole() {
 // @Title AddUser
 // @Description Add Role
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.Role false "角色及用户信息"
 // @Success 200 {object} models.Result
 // @router /binduser [post]
@@ -65,7 +62,6 @@ func (this *RoleController) AddUsersToRole() {
 // @Title RemoveUser
 // @Description Remove Role Of User
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.Role false "角色及用户信息"
 // @Success 200 {object} models.Result
 // @router /user [delete]
@@ -80,7 +76,6 @@ func (this *RoleController) RemoveUsersFromRole() {
 // @Title PolicyList
 // @Description list Policy for Role
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.Role false "Role信息"
 // @Success 200 {object} models.Result
 // @router /policylist [post]
@@ -95,7 +90,6 @@ func (this *RoleController) PolicyList() {
 // @Title AddPolicy
 // @Description Add Policy for Role
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.Role false "Policy信息"
 // @Success 200 {object} models.Result
 // @router /policy [post]
@@ -110,7 +104,6 @@ func (this *RoleController) AddPolicy() {
 // @Title RemovePolicy
 // @Description Remove Policy for Role
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.Role false "Policy信息"
 // @Success 200 {object} models.Result
 // @router /policy [delete]
@@ -125,7 +118,6 @@ func (this *RoleController) RemovePolicy() {
 // @Title UpdatePolicy
 // @Description Update Policy for Role
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.Role false "Policy信息"
 // @Success 200 {object} models.Result
 // @router /policy [put]
@@ -140,7 +132,6 @@ func (this *RoleController) UpdatePolicy() {
 // @Title UpdateRole
 // @Description Update Role
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param roleId path string "" true "roleId"
 // @Param body body models.Role true "主机配置信息"
 // @Success 200 {object} models.Result
@@ -157,7 +148,6 @@ func (this *RoleController) UpdateRole() {
 // @Title DeleteRole
 // @Description Delete Role
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param roleId path string "" true "roleId"
 // @Success 200 {object} models.Result
 // @router /:roleId [delete]

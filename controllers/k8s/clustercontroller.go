@@ -26,7 +26,6 @@ type ClusterController struct {
 // @Title AddCluster
 // @Description Add ClusterOBJ "authType=KubeConfig, 需要 上传KubeConfig文件; authType=BearerToken， 需要设置 masterUrl、bearerToken 参数"
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param authType formData string true "default: BearerToken、KubeConfig"
 // @Param masterUrl formData string false "ApiServer 访问地址"
 // @Param bearerToken formData string false "ApiServer 访问token"
@@ -150,7 +149,6 @@ func (this *ClusterController) AddCluster() {
 // @Title GetClusters
 // @Description Get ClusterOBJ List(不支持租户查询)
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.ClusterOBJ false "集群"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -168,7 +166,6 @@ func (this *ClusterController) GetClusters() {
 // @Title UpdateCluster
 // @Description Update ClusterOBJ
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "Id"
 // @Param body body models.ClusterOBJ true "集群"
 // @Success 200 {object} models.Result
@@ -186,7 +183,6 @@ func (this *ClusterController) UpdateCluster() {
 // @Title DeleteCluster
 // @Description delete ClusterOBJ
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "Id"
 // @Success 200 {object} models.Result
 // @router /:id [delete]
@@ -205,7 +201,6 @@ func (this *ClusterController) DeleteCluster() {
 // @Title ClusterSecurityCheck
 // @Description ClusterSecurityCheck
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.ClusterCheck true "集群检查"
 // @Success 200 {object} models.Result
 // @router /securitycheck [post]
@@ -222,7 +217,6 @@ func (this *ClusterController) ClusterSecurityCheck() {
 // @Title Scope
 // @Description Scope
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "Id"
 // @Param isActive query bool false true "是否激活"
 // @Success 200 {object} models.Result
@@ -269,7 +263,6 @@ func (this *ClusterController) Scope() {
 // @Title ProxyOperator
 // @Description ClusterSecurityCheck
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param close query bool false false "是否关闭"
 // @Param targetUrl query string "" true "目标地址"
 // @Success 200 {object} models.Result

@@ -21,7 +21,6 @@ import (
 	"github.com/xiliangMa/diss-backend/controllers/system/report"
 	csystem "github.com/xiliangMa/diss-backend/controllers/system/system"
 	ws "github.com/xiliangMa/diss-backend/controllers/ws"
-	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/service/auth"
 	"net/http"
 )
@@ -204,6 +203,8 @@ func init() {
 	}
 	beego.InsertFilter("/api/v1/*", beego.BeforeRouter, isLogin)
 
+	//beego.InsertFilter("/api/v1/*", beego.BeforeRouter, models.GlobalCasbin.CheckPermisson())
+
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins:  true,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -211,8 +212,5 @@ func init() {
 		ExposeHeaders:    []string{"Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
 		AllowCredentials: true,
 	}))
-
-	beego.InsertFilter("/api/v1/*", beego.BeforeRouter, models.GlobalCasbin.CheckPermisson())
-
 	beego.AddNamespace(ns)
 }

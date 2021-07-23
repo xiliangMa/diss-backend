@@ -13,7 +13,6 @@ type PackageStatisticsController struct {
 // @Title GetPackacgeStatistics
 // @Description Get Package Statistics
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostId query string "" false "hostId"
 // @Success 200 {object} models.Result
 // @router /hostpackage [get]
@@ -27,7 +26,6 @@ func (this *PackageStatisticsController) GetPackageStatistics() {
 // @Title GetDBImageStatistics
 // @Description Get DB Image Statistics
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param hostId query string "" false "hostId"
 // @Success 200 {object} models.Result
 // @router /dbpackage [get]

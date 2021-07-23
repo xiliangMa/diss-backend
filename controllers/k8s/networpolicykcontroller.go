@@ -19,7 +19,6 @@ type NetworkPolicyController struct {
 // @Title GetNetworkPolicy
 // @Description Get NetworkPolicy List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.NetworkPolicy false "网络策略"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -38,7 +37,6 @@ func (this *NetworkPolicyController) GetNetworkPolicysList() {
 // @Title AddNetworkPolicy
 // @Description Add NetworkPolicy
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.NetworkPolicy true "网络策略"
 // @Success 200 {object} models.Result
 // @router /add [post]
@@ -72,7 +70,6 @@ func (this *NetworkPolicyController) AddNetworkPolicy() {
 // @Title UpdateNetworkPolicy
 // @Description Update NetworkPolicy
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "Id"
 // @Param body body models.NetworkPolicy true "网络策略"
 // @Success 200 {object} models.Result
@@ -101,7 +98,6 @@ func (this *NetworkPolicyController) UpdateNetworkPolicy() {
 // @Title DeleteNetworkPolicy
 // @Description Delete NetworkPolicy
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "Id"
 // @Success 200 {object} models.Result
 // @router /:id [delete]

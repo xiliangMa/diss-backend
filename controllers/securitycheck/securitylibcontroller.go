@@ -15,7 +15,6 @@ type SecurityLibController struct {
 // @Title AddKubeVulnLib
 // @Description Add VulnerabilityLib Item
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.VulnerabilityLib false "漏洞库资料"
 // @Success 200 {object} models.Result
 // @router /vulnlib [post]
@@ -32,7 +31,6 @@ func (this *SecurityLibController) AddVulnLib() {
 // @Title UpdateVulnerabilityLib
 // @Description Update VulnerabilityLib
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "Id"
 // @Param body body models.VulnerabilityLib false "漏洞库资料"
 // @Success 200 {object} models.Result
@@ -56,7 +54,6 @@ func (this *SecurityLibController) UpdateVulnLib() {
 // @Title GetVulnerabilityLib
 // @Description Get VulnerabilityLib
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.VulnerabilityLib false "漏洞库资料"
 // @Success 200 {object} models.Result
 // @Param from query int 0 false "from"
@@ -75,7 +72,6 @@ func (this *SecurityLibController) GetVulnLib() {
 // @Title DeleteVulnerabilityLib
 // @Description Delete VulnerabilityLib
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "id"
 // @Success 200 {object} models.VulnerabilityLib
 // @router /vulnlib/:id [delete]

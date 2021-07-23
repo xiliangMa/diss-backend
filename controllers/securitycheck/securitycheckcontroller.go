@@ -16,7 +16,6 @@ type SecurityCheckController struct {
 // @Title SecurityCheck
 // @Description Security check
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param account query string "admin" false "租户"
 // @Param body body models.SecurityCheckList true "检查列表"
 // @Success 200 {object} models.Result
@@ -37,7 +36,6 @@ func (this *SecurityCheckController) SecurityCheck() {
 // @Title SecurityCheck2
 // @Description Security Check2
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param isSystem query bool false false "系统检查"
 // @Param body body models.SecurityCheckParams true "安全检查参数"
 // @Success 200 {object} models.Result

@@ -16,7 +16,6 @@ type RespCenterController struct {
 // @Title GetRespCenterList
 // @Description Get Resp Center List (暂不支持租户查询)
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.RespCenter false "响应中心"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -36,7 +35,6 @@ func (this *RespCenterController) GetRespCenterList() {
 // @Title GetRespCenter
 // @Description Get Resp Center (暂不支持租户查询)
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "id"
 // @Success 200 {object} models.Result
 // @router /respcenter/:id [post]
@@ -52,7 +50,6 @@ func (this *RespCenterController) GetRespCenter() {
 // @Title ContainerOperation
 // @Description Resp Center operation
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.RespCenter true "RespCenter"
 // @Success 200 {object} models.Result
 // @router /respcenter/operation [post]
@@ -69,7 +66,6 @@ func (this *RespCenterController) ContainerOperation() {
 // @Title DeleteRespCenter
 // @Description Delete Resp Center
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id query string "" true "id"
 // @Success 200 {object} models.Result
 // @router /respcenter [delete]

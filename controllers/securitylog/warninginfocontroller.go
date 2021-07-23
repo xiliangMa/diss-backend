@@ -20,7 +20,6 @@ type WarningInfoController struct {
 // @Title GetWarningInfo
 // @Description Get Warning Info List (暂不支持租户查询)
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.WarningInfo false "告警信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -40,7 +39,6 @@ func (this *WarningInfoController) GetWarningInfoList() {
 // @Title UpdateWarningInfo
 // @Description Update WarningInfo
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "id"
 // @Param body body models.WarningInfo false "WarningInfo"
 // @Success 200 {object} models.Result
@@ -60,7 +58,6 @@ func (this *WarningInfoController) UpdateWarningInfo() {
 // @Title AddClientSub_Image_Safe
 // @Description Add Nats Subscribe topic for Image_Safe
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param libname path string "" true "Registry Name"
 // @Success 200 {object} models.Result
 // @router /warninginfo/add_sub_imagelib/:libname [post]
@@ -75,7 +72,6 @@ func (this *WarningInfoController) AddClientSub_Image_Safe() {
 // @Title WarninginfoDisposal
 // @Description Add Alarm Processing
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.DisposalMode true "DisposalMode"
 // @Success 200 {object} models.Result
 // @router /warninginfo/disposal [post]

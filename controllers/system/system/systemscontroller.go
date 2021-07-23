@@ -19,7 +19,6 @@ type SystemController struct {
 // @Title UpLoadLogo
 // @Description UpLoad Logo
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param logo formData file true "logo"
 // @Success 200 {object} models.Result
 // @router /system/logo [post]
@@ -49,7 +48,6 @@ func (this *SystemController) UploadLogo() {
 // @Title Restore Default Logo
 // @Description Restore Default Logo
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Success 200 {object} models.Result
 // @router /system/logo/restore [get]
 func (this *SystemController) RestoreDefaultLogo() {
@@ -62,7 +60,6 @@ func (this *SystemController) RestoreDefaultLogo() {
 // @Title Check Logo isexist
 // @Description Check kLogo IsExist
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Success 200 {object} models.Result
 // @router /system/logo/isexist [get]
 func (this *SystemController) CheckLogoIsExist() {
@@ -75,7 +72,6 @@ func (this *SystemController) CheckLogoIsExist() {
 // @Title AddSysConfig
 // @Description Add System Config
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.SysConfig false "系统配置信息"
 // @Success 200 {object} models.Result
 // @router /system/sysconfig [post]
@@ -90,7 +86,6 @@ func (this *SystemController) AddSysConfig() {
 // @Title GetSysConfigs
 // @Description Get System Config
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param key query string false "配置项键名"
 // @Success 200 {object} models.Result
 // @router /system/sysconfig [get]
@@ -107,7 +102,6 @@ func (this *SystemController) GetSysConfigs() {
 // @Title UpdateSysConfig
 // @Description Update System Config
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "Id"
 // @Param body body models.SysConfig false "系统配置信息"
 // @Success 200 {object} models.Result
@@ -130,7 +124,6 @@ func (this *SystemController) UpdateSysConfig() {
 // @Title AddWarningWhiteList
 // @Description Add WarningWhiteList Item
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.WarningWhiteList false "告警白名单"
 // @Success 200 {object} models.Result
 // @router /system/warnwhitelist [post]
@@ -145,7 +138,6 @@ func (this *SystemController) AddWarningWhiteList() {
 // @Title UpdateWarningWhiteList
 // @Description Update WarningWhiteList
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "Id"
 // @Param body body models.WarningWhiteList false "告警白名单"
 // @Success 200 {object} models.Result
@@ -164,7 +156,6 @@ func (this *SystemController) UpdateWarningWhiteList() {
 // @Title GetWarningWhiteList
 // @Description Get WarningWhiteList
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.WarningWhiteList false "告警白名单"
 // @Success 200 {object} models.Result
 // @Param from query int 0 false "from"
@@ -183,7 +174,6 @@ func (this *SystemController) GetWarningWhiteList() {
 // @Title DeleteWarningWhiteList
 // @Description Delete WarningWhiteList
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "id"
 // @Success 200 {object} models.Result
 // @router /system/warnwhitelist/:id [delete]
@@ -199,7 +189,6 @@ func (this *SystemController) DeleteWarningWhiteList() {
 // @Title ImportWarnWhiteList
 // @Description Import WarnInfo WhiteList
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param whitelistfile formData file true "whitelistfile"
 // @Success 200 {object} models.Result
 // @router /system/warnwhitelist/import [post]
@@ -238,7 +227,6 @@ func (this *SystemController) ImportWhiteList() {
 // @Title AddRuleDefine
 // @Description Add RuleDefine Item
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.RuleDefine false "规则定义"
 // @Success 200 {object} models.Result
 // @router /system/ruledefine [post]
@@ -261,7 +249,6 @@ func (this *SystemController) AddRuleDefine() {
 // @Title UpdateRuleDefine
 // @Description Update RuleDefine
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "Id"
 // @Param body body models.RuleDefine false "规则定义"
 // @Success 200 {object} models.Result
@@ -287,7 +274,6 @@ func (this *SystemController) UpdateRuleDefine() {
 // @Title GetRuleDefine
 // @Description Get RuleDefine
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.RuleDefine false "规则定义"
 // @Success 200 {object} models.Result
 // @Param from query int 0 false "from"
@@ -306,7 +292,6 @@ func (this *SystemController) GetRuleDefine() {
 // @Title DeleteRuleDefine
 // @Description Delete RuleDefine
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param id path string "" true "id"
 // @Success 200 {object} models.RuleDefine
 // @router /system/ruledefine/:id [delete]
@@ -322,7 +307,6 @@ func (this *SystemController) DeleteRuleDefine() {
 // @Title Version
 // @Description version
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
 // @Success 200 {object} models.Result

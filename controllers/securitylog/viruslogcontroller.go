@@ -15,7 +15,6 @@ type VirusLogController struct {
 // @Title GetVirusLog
 // @Description Get Virus Log List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.VirusScan false "病毒信息列表"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -35,7 +34,6 @@ func (this *VirusLogController) GetVirusLogList() {
 // @Title GetVirusRecordList
 // @Description Get Virus Record List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.VirusScan false "病毒信息列表"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"

@@ -14,7 +14,6 @@ type ImageBlockingController struct {
 // @Title GetImageBlockingList
 // @Description Get Image Blocking List
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.ImageBlocking false "镜像配置信息"
 // @Param from query int 0 false "from"
 // @Param limit query int 20 false "limit"
@@ -34,7 +33,6 @@ func (this *ImageBlockingController) GetImageBlockingList() {
 // @Title ImageBlocking operation
 // @Description Image Blocking operation
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param body body models.ImageBlocking true "ImageBlocking"
 // @Success 200 {object} models.Result
 // @router /operation [post]
@@ -50,7 +48,6 @@ func (this *ImageBlockingController) Operation() {
 // @Title Get ImageBlocking
 // @Description Get Image Blocking
 // @Param token header string true "authToken"
-// @Param module header string true "moduleCode"
 // @Param imageId path string "" true "imageId"
 // @Success 200 {object} models.Result
 // @router /:imageId [post]
