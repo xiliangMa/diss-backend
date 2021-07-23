@@ -39,7 +39,7 @@ services:
   diss-db:
     restart: unless-stopped
     container_name: diss-db
-    image: postgres:9.6
+    image: registry.cn-qingdao.aliyuncs.com/diss/postgres:9-alpine3.14
     env_file:
       - conf/diss-db.env
     expose:
@@ -57,7 +57,7 @@ services:
   timescale-db:
     restart: always
     container_name: timescale-db
-    image: "timescale/timescaledb:latest-pg11"
+    image: registry.cn-qingdao.aliyuncs.com/diss/timescaledb:2.3.1-pg13
     volumes:
       - /var/lib/diss/db/timescale/:/var/lib/postgresql/data
     env_file:
