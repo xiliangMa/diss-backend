@@ -10,7 +10,7 @@ COPY conf ./conf
 COPY swagger ./swagger
 COPY upload ./upload
 
-FROM alpine:3.11
+FROM alpine:3.14
 WORKDIR /opt/diss-backend
 COPY --from=builder /build/ .
 RUN chmod +x ./entrypoint.sh
