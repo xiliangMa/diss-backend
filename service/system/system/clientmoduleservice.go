@@ -7,14 +7,15 @@ import (
 )
 
 type ClientModuleService struct {
+	ConfigForUpdate     *models.UpdateAssets
 	ClientModuleControl *models.ClientModuleControl
-	HostId              string
+	HostIds             string
 }
 
 func (this *ClientModuleService) SetModule() *models.NatsData {
 	cmsdata := this.ClientModuleControl
-	if cmsdata != nil && cmsdata.ModuleName != "" && this.HostId != "" {
-		subject := this.HostId
+	if cmsdata != nil && cmsdata.ModuleName != "" && this.HostIds != "" {
+		subject := this.HostIds
 		result := models.NatsData{Type: models.Type_Control, Tag: models.Resource_ClientModuleControl, Data: cmsdata, RCType: models.Resource_Control_Type_Post}
 		data, _ := json.MarshalIndent(result, "", "  ")
 		err := models.Nats.Conn.Publish(subject, data)
@@ -22,6 +23,19 @@ func (this *ClientModuleService) SetModule() *models.NatsData {
 			logs.Info("Deliver ClientModuleControl to Nats Success, Subject: %s Id: %s, data: %v", subject, cmsdata.ModuleName, result)
 		}
 		return &result
+	}
+
+	return nil
+}
+
+func (this *ClientModuleService) GetUpdateAssetsConfig() []byte {
+	cmsdata := this.ConfigForUpdate
+
+	if cmsdata != nil {
+		result := models.NatsData{Type: models.Type_Control, Tag: models.Resource_AssetData, Data: cmsdata, RCType: models.Resource_Control_Type_Post}
+		data, _ := json.MarshalIndent(result, "", "  ")
+
+		return data
 	}
 
 	return nil

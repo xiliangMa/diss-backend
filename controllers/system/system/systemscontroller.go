@@ -337,3 +337,29 @@ func (this *SystemController) Version() {
 	this.ServeJSON(false)
 
 }
+
+// @Title UpdateMetricData
+// @Description Update Metric Data
+// @Param token header string true "authToken"
+// @Param hostIds path string "" false "hostId"
+// @Param body body models.UpdateAssets true "更新配置设置"
+// @Success 200 {object} models.Result
+// @router /updatemetricdata [post]
+func (this *SystemController) UpdateMetricData() {
+	updateAssets := new(models.UpdateAssets)
+	json.Unmarshal(this.Ctx.Input.RequestBody, &updateAssets)
+	hostids := this.GetString(":hostIds")
+	cmservice := css.ClientModuleService{}
+	cmservice.ConfigForUpdate = updateAssets
+	cmsdata := cmservice.GetUpdateAssetsConfig()
+
+	natsManager := models.Nats
+	natsPubService := nats.NatsPubService{Conn: natsManager.Conn}
+	natsPubService.Message = cmsdata
+	natsPubService.ClientSubject = hostids
+	targetHosts := natsPubService.SendToManyHost()
+
+	this.Data["json"] = targetHosts
+	this.ServeJSON(false)
+
+}

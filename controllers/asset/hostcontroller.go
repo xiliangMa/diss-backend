@@ -80,7 +80,7 @@ func (this *HostController) SetClientModule() {
 	cmcontrol := models.ClientModuleControl{}
 	json.Unmarshal(this.Ctx.Input.RequestBody, &cmcontrol)
 	cmservice := system.ClientModuleService{}
-	cmservice.HostId = id
+	cmservice.HostIds = id
 	cmservice.ClientModuleControl = &cmcontrol
 	cmservice.SetModule()
 
