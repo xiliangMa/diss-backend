@@ -162,6 +162,8 @@ var (
 	PasswordFormatErr               = 167
 	DeleteInbuildRoleErr            = 168
 	UsernameOrPasswordErr           = 169
+	LoginVerifyCodeErr              = 170
+	NoLoginVerifyCodeErr            = 171
 
 	//k8s 1001-1100
 	AddNameSpaceErr                  = 1001

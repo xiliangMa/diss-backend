@@ -7,6 +7,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/xiliangMa/diss-backend/models"
+	"github.com/xiliangMa/diss-backend/plugins"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
 	"time"
@@ -20,6 +21,7 @@ type JwtService struct {
 	Token     *jwt.Token
 	TokenStr  string
 	LoginType string
+	User      models.User
 }
 
 func (this *JwtService) CreateToken(name, pwd, userType string) models.Result {
@@ -106,4 +108,28 @@ func (this *JwtService) GetUserFromToken() (string, bool) {
 		loginUser = this.Token.Claims.(jwt.MapClaims)["UserName"].(string)
 	}
 	return loginUser, isadmin
+}
+
+func (this *JwtService) CheckCaptcha() models.Result{
+	var ResultData models.Result
+	ResultData.Code = http.StatusOK
+
+	// 验证码检查
+	captchaVeri := new(models.Captcha)
+	captchaTool := plugins.CaptchaTool{}
+	captchaVeri.Id = this.User.CaptchaId
+	captchaVeri.Value = this.User.CaptchaValue
+	if captchaVeri.Id == "" || captchaVeri.Value == "" {
+		ResultData.Message = "No Verify Code Input"
+		ResultData.Code = utils.NoLoginVerifyCodeErr
+		return ResultData
+	}
+	captchaTool.Captcha = *captchaVeri
+	verifyStatus := captchaTool.VerifyCaptcha()
+	if !verifyStatus {
+		ResultData.Message =  "Verify Code Error."
+		ResultData.Code = utils.LoginVerifyCodeErr
+		return ResultData
+	}
+	return ResultData
 }
