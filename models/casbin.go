@@ -36,35 +36,31 @@ func NewCasbinManager() *CasbinManager {
 
 func (this *CasbinManager) CheckPermisson() beego.FilterFunc {
 	return func(ctx *context.Context) {
-		if ctx.Request.Method != "OPTIONS" {
-			var secret []byte = []byte("secret")
-			tokenStr := ctx.Request.Header.Get("token")
-			token, _ := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-				// Don't forget to validate the alg is what you expect:
-				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-					return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-				}
-				return secret, nil
-			})
-
-			name := token.Claims.(jwt.MapClaims)["UserName"].(string)
-			userRoleList, _ := GlobalCasbin.Enforcer.GetRolesForUser(name)
-			isAllow := false
-			for _, userRole := range userRoleList {
-				// todo check path
-				//path := strings.ToLower(ctx.Request.URL.Path)
-				module := ctx.Request.Header.Get("module")
-
-				status, _ := GlobalCasbin.Enforcer.Enforce(userRole, module, "-")
-				if status {
-					isAllow = true
-					return
-				}
+		var secret []byte = []byte("secret")
+		tokenStr := ctx.Request.Header.Get("token")
+		token, _ := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+			// Don't forget to validate the alg is what you expect:
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 			}
-			if !isAllow {
-				result := Result{Code: http.StatusUnauthorized, Message: "权限不足"}
-				ctx.Output.JSON(result, false, false)
+			return secret, nil
+		})
+		name := token.Claims.(jwt.MapClaims)["UserName"].(string)
+		userRoleList, _ := GlobalCasbin.Enforcer.GetRolesForUser(name)
+		isAllow := false
+		for _, userRole := range userRoleList {
+			// todo check path
+			//path := strings.ToLower(ctx.Request.URL.Path)
+			module := ctx.Request.Header.Get("module")
+			status, _ := GlobalCasbin.Enforcer.Enforce(userRole, module, "-")
+			if status {
+				isAllow = true
+				return
 			}
+		}
+		if !isAllow {
+			result := Result{Code: http.StatusUnauthorized, Message: "权限不足"}
+			ctx.Output.JSON(result, false, false)
 		}
 	}
 }
