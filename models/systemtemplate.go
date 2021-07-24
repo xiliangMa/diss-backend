@@ -7,13 +7,14 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
+	"strings"
 	"time"
 )
 
 type SystemTemplate struct {
 	Id                       string                 `orm:"pk;" description:"(id)"`
 	Account                  string                 `orm:"default(admin)" description:"(租户)"`
-	Name                     string                 `orm:"" description:"(名称)"`
+	Name                     string                 `orm:"unique" description:"(名称)"`
 	Description              string                 `orm:"" description:"(描述)"`
 	Type                     string                 `orm:"" description:"(类型)"`
 	Version                  string                 `orm:"null" description:"(版本)"`
@@ -108,30 +109,27 @@ func (this *SystemTemplate) Add() Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Default)
 	var ResultData Result
-
 	if this.Name == "" || this.Type == "" || this.Version == "" {
 		ResultData.Code = utils.AddSYSTemplateErr
-		errMsg := fmt.Sprint("Name, Type or Version Not Input for SystemTemplate, code: %s", utils.AddSYSTemplateErr)
+		errMsg := fmt.Sprint("Name type or version is none, code: %v", utils.AddSYSTemplateErr)
 		ResultData.Message = errMsg
-
 		logs.Error(errMsg)
 		return ResultData
 	}
-
 	uuidCode, _ := uuid.NewV4()
 	this.Id = uuidCode.String()
-
 	if this.Account == "" {
 		this.Account = Account_Admin
 	}
-
 	this.UpdateTime = time.Now().UnixNano()
 	this.CreateTime = time.Now().UnixNano()
-
 	_, err := o.Insert(this)
 	if err != nil && utils.IgnoreLastInsertIdErrForPostgres(err) != nil {
-
-		logs.Error("Add SystemTemplate failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		logs.Error("Add SystemTemplate failed, code: %v, err: %s.", ResultData.Code, err.Error())
+		if strings.Contains(err.Error(), "unique constraint \"system_template_name_key\"") {
+			ResultData.Code = utils.SYSTemplateExistErr
+			ResultData.Message = "SYSTemplateExistErr"
+		}
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK
@@ -230,7 +228,11 @@ func (this *SystemTemplate) Update() Result {
 	if err != nil {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.EditSYSTemplateErr
-		logs.Error("Update SYSTemplateErr: %s failed, code: %d, err: %s", this.Name, ResultData.Code, ResultData.Message)
+		logs.Error("Update SYSTemplateErr: %s failed, code: %d, err: %s", this.Name, ResultData.Code, err.Error())
+		if strings.Contains(err.Error(), "unique constraint \"system_template_name_key\"") {
+			ResultData.Code = utils.SYSTemplateExistErr
+			ResultData.Message = "SYSTemplateExistErr"
+		}
 		return ResultData
 	}
 	ResultData.Code = http.StatusOK
