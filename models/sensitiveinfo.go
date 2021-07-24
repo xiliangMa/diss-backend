@@ -89,7 +89,7 @@ func (this *SensitiveInfo) List(from, limit int) Result {
 	o := orm.NewOrm()
 	o.Using(utils.DS_Security_Log)
 	var ResultData Result
-	SensitiveInfoList, total, err := this.BaseList(0, 0)
+	SensitiveInfoList, total, err := this.BaseList(from, limit)
 
 	if err != nil {
 		ResultData.Message = err.Error()
