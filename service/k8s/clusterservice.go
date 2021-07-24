@@ -1,6 +1,7 @@
 package k8s
 
 import (
+	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
 	"github.com/xiliangMa/diss-backend/utils"
 	"net/http"
@@ -34,5 +35,23 @@ func (this *ClusterService) UpdateCluster() *models.Result {
 	// 更新全局集群客户端、重新watch集群
 	k8sWatchService := K8sWatchService{Cluster: this.Cluster}
 	k8sWatchService.WatchCluster()
+	return &result
+}
+
+func (this *ClusterService) ListCluster(from, limit int) *models.Result {
+	result := models.Result{Code: http.StatusOK}
+	err, _, list := this.Cluster.BaseList(from, limit)
+	if err != nil {
+		result.Code = utils.GetClusterErr
+		result.Message = err.Error()
+		return &result
+	}
+	var kubeScan models.KubeScan
+	for _, cluster := range list {
+		kubeScan.ClusterId = cluster.Id
+		cluster.KubeVulnCount = len(kubeScan.Vulnerabilities)
+		cluster.Update()
+	}
+	result = this.Cluster.List(from, limit)
 	return &result
 }

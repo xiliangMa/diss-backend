@@ -10,22 +10,23 @@ import (
 )
 
 type Cluster struct {
-	Id          string `orm:"pk" description:"(集群id)"`
-	Name        string `orm:"unique;size(32)" description:"(集群名)"`
-	FileName    string `orm:"size(255)" description:"(KubeConfig 文件)"`
-	AuthType    string `orm:"size(32);default(BearerToken)" description:"(认证类型 KubeConfig BearerToken)"`
-	BearerToken string `orm:"" description:"(Token)"`
-	MasterUrls  string `orm:"size(255)" description:"(ApiServer 访问地址)"`
-	Status      string `orm:"size(32);default(Active)" description:"(集群状态 Active Unavailable)"`
-	Type        string `orm:"size(32);default(Kubernetes)" description:"(类型 Kubernetes Openshift Rancher)"`
-	IsSync      bool   `orm:"default(false)" description:"(是否同步)"`
-	Label       string `orm:"size(64);default(null)" description:"(标签)"`
-	ScopeUrl    string `orm:"size(512);default()" description:"(scope访问地址)"`
-	SocpeStatus string `orm:"size(64);default()" description:"(scope 操作状态)"`
-	AccountName string `orm:"-" description:"(租户)"`
-	SyncStatus  string `orm:"default(NotSynced)" description:"(同步状态 NotSynced 未同步 Synced 成功 InProcess 同步中 Fail 失败 Clearing 清理中)"`
-	CreateTime  int64  `orm:"" description:"(创建时间)"`
-	UpdateTime  int64  `orm:"default(0)" description:"(更新时间)"`
+	Id            string `orm:"pk" description:"(集群id)"`
+	Name          string `orm:"unique;size(32)" description:"(集群名)"`
+	FileName      string `orm:"size(255)" description:"(KubeConfig 文件)"`
+	AuthType      string `orm:"size(32);default(BearerToken)" description:"(认证类型 KubeConfig BearerToken)"`
+	BearerToken   string `orm:"" description:"(Token)"`
+	MasterUrls    string `orm:"size(255)" description:"(ApiServer 访问地址)"`
+	Status        string `orm:"size(32);default(Active)" description:"(集群状态 Active Unavailable)"`
+	Type          string `orm:"size(32);default(Kubernetes)" description:"(类型 Kubernetes Openshift Rancher)"`
+	IsSync        bool   `orm:"default(false)" description:"(是否同步)"`
+	Label         string `orm:"size(64);default(null)" description:"(标签)"`
+	ScopeUrl      string `orm:"size(512);default()" description:"(scope访问地址)"`
+	SocpeStatus   string `orm:"size(64);default()" description:"(scope 操作状态)"`
+	AccountName   string `orm:"-" description:"(租户)"`
+	SyncStatus    string `orm:"default(NotSynced)" description:"(同步状态 NotSynced 未同步 Synced 成功 InProcess 同步中 Fail 失败 Clearing 清理中)"`
+	KubeVulnCount int    `orm:"default(0)" description:"(kubescan vuln count)"`
+	CreateTime    int64  `orm:"" description:"(创建时间)"`
+	UpdateTime    int64  `orm:"default(0)" description:"(更新时间)"`
 }
 
 type ClusterCheck struct {
@@ -151,7 +152,7 @@ func (this *Cluster) GetRequiredSyncList() Result {
 	return ResultData
 }
 
-func (this *Cluster) List(from, limit int) Result {
+func (this *Cluster) BaseList(from, limit int) (error, int64, []*Cluster) {
 	o := orm.NewOrm()
 	orm.DefaultTimeLoc = time.Local
 	o.Using(utils.DS_Default)
@@ -183,14 +184,27 @@ func (this *Cluster) List(from, limit int) Result {
 		ResultData.Message = err.Error()
 		ResultData.Code = utils.GetClusterErr
 		logs.Error("Get ClusterOBJ List failed, code: %d, err: %s", ResultData.Code, ResultData.Message)
+		return err, 0, nil
+	}
+	return nil, total, ClusterList
+}
+
+func (this *Cluster) List(from, limit int) Result {
+	o := orm.NewOrm()
+	orm.DefaultTimeLoc = time.Local
+	o.Using(utils.DS_Default)
+	ResultData := Result{
+		Code: http.StatusOK,
+	}
+	err, total, ClusterList := this.BaseList(from, limit)
+	if err != nil {
+		ResultData.Code = utils.GetClusterErr
+		ResultData.Message = err.Error()
 		return ResultData
 	}
-
 	data := make(map[string]interface{})
 	data[Result_Total] = total
 	data[Result_Items] = ClusterList
-
-	ResultData.Code = http.StatusOK
 	ResultData.Data = data
 	return ResultData
 }

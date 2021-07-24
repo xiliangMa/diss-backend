@@ -159,7 +159,8 @@ func (this *ClusterController) GetClusters() {
 	from, _ := this.GetInt("from")
 	cluster := new(models.Cluster)
 	json.Unmarshal(this.Ctx.Input.RequestBody, &cluster)
-	this.Data["json"] = cluster.List(from, limit)
+	clusterService := k8s.ClusterService{Cluster: cluster}
+	this.Data["json"] = clusterService.ListCluster(from, limit)
 	this.ServeJSON(false)
 }
 

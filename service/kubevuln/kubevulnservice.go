@@ -67,7 +67,12 @@ func (this *KubeVlunService) ReceiveKubeScanLog() models.Result {
 		taskService.UpdateTaskStatus()
 		return result
 	}
-
+	searchCluster := models.Cluster{Id: kubeScan.ClusterId}
+	cluster := searchCluster.Get()
+	if cluster != nil {
+		cluster.KubeVulnCount = len(kubeScan.Vulnerabilities)
+		cluster.Update()
+	}
 	// 删除job
 	this.IsActive = false
 	result = this.ActiveOrDisableKubeScan()
