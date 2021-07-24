@@ -19,8 +19,6 @@ type User struct {
 	Role        *Role  `orm:"rel(fk);null" description:"角色"`
 	CreateTime  int64  `orm:"default(0);" description:"(创建时间)"`
 	UpdateTime  int64  `orm:"default(0)" description:"(更新时间)"`
-	CaptchaId    string `orm:"-"`
-	CaptchaValue string `orm:"-"`
 }
 
 type UserInterface interface {

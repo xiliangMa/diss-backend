@@ -1,11 +1,9 @@
 package controllers
 
 import (
-	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/xiliangMa/diss-backend/models"
-	"github.com/xiliangMa/diss-backend/plugins"
 	"github.com/xiliangMa/diss-backend/service/auth"
 	"github.com/xiliangMa/diss-backend/service/system/system"
 	"net/http"
@@ -20,7 +18,6 @@ type AuthController struct {
 // @Param name query string true "userName"
 // @Param pwd query string true "userPwd"
 // @Param loginType query string true "loginType类型 LOCAL(本地) LDAP(ldap登录)，空值视为LOCAL"
-// @Param body body models.Captcha false "命令历史"
 // @Success 200 {object} models.Result
 // @router /login [post]
 func (this *AuthController) Login() {
@@ -28,19 +25,6 @@ func (this *AuthController) Login() {
 	pwd := this.GetString("pwd")
 	loginType := this.GetString("loginType")
 	jwtService := auth.JwtService{}
-
-	//验证码处理
-	captchaData := models.Captcha{}
-	json.Unmarshal(this.Ctx.Input.RequestBody, &captchaData)
-	userData := models.User{Name: name,Password: pwd,CaptchaId: captchaData.Id, CaptchaValue: captchaData.Value}
-	jwtService.User = userData
-	ResultData := jwtService.CheckCaptcha()
-	if ResultData.Code != http.StatusOK {
-		this.Data["json"] = ResultData
-		this.ServeJSON(false)
-		return
-	}
-
 	result := jwtService.CreateToken(name, pwd, loginType)
 	this.Data["json"] = result
 	this.ServeJSON(false)
@@ -75,22 +59,5 @@ func (this *AuthController) Authorize() {
 func (this *AuthController) CheckLDAPStatus() {
 	ldapService := system.LDAPService{}
 	this.Data["json"] = ldapService.CheckLDAPStatus()
-	this.ServeJSON(false)
-}
-
-// @Title GenerateCaptcha
-// @Description Generate Captcha Code
-// @Success 200 {object} models.Result
-// @router /captcha [get]
-func (this *AuthController) GenerateCaptcha() {
-	captchaTool := plugins.CaptchaTool{}
-	err := captchaTool.GenerateCaptcha()
-	if err != nil {
-		logs.Error("generate captcha err: ", err)
-	}
-
-	logs.Warn("captcha id %s", captchaTool.Captcha.Id)
-
-	this.Data["json"] = captchaTool.Captcha
 	this.ServeJSON(false)
 }
